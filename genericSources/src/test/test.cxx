@@ -44,7 +44,6 @@ public:
          std::cerr << eObj.what() << std::endl;
       } catch (...) {
          std::cerr << "~TestApp:: Unknown exception." << std::endl;
-         throw;
       }
    }
 

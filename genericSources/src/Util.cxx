@@ -6,6 +6,8 @@
  * $Header$
  */
 
+#include <cmath>
+
 #include <algorithm>
 #include <fstream>
 #include <iostream>
