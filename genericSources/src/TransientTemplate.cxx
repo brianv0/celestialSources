@@ -19,7 +19,7 @@
 
 #include "facilities/Util.h"
 
-#include "st_facilities/Util.h"
+#include "Util.h"
 
 #include "flux/SpectrumFactory.h"
 #include "flux/EventSource.h"
@@ -52,7 +52,7 @@ TransientTemplate::TransientTemplate(const std::string & paramString)
 void TransientTemplate::createEventTimes(std::string templateFile) {
    facilities::Util::expandEnvVar(&templateFile);
 
-   st_facilities::Util::file_ok(templateFile);
+   genericSources::Util::file_ok(templateFile);
 
    std::vector<double> light_curve;
    Pulsar::readLightCurve(templateFile, light_curve);

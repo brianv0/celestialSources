@@ -5,6 +5,8 @@
   @verbatim
   $Id$
 
+  13-Dec-04 v1      JC    remove dependence on st_facilities so that GR may
+                          use this package.
   25-Oct-04 v0r1p2  JC    check for template file existence
   11-Oct-04 v0r1p1  JC    removed use of iterators in TransientTemplate
                           since it was causing mysterious seg faults

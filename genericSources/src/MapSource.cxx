@@ -23,8 +23,8 @@
 #include "flux/SpectrumFactory.h"
 #include "flux/EventSource.h"
 
-#include "st_facilities/FitsImage.h"
-#include "st_facilities/Util.h"
+#include "FitsImage.h"
+#include "Util.h"
 
 #include "genericSources/MapSource.h"
 
@@ -126,8 +126,8 @@ double MapSource::mapValue(unsigned int i, unsigned int j) {
 void MapSource::readFitsFile(std::string fitsFile) {
    facilities::Util::expandEnvVar(&fitsFile);
 
-   st_facilities::Util::file_ok(fitsFile);
-   st_facilities::FitsImage fitsImage(fitsFile);
+   genericSources::Util::file_ok(fitsFile);
+   genericSources::FitsImage fitsImage(fitsFile);
 
    fitsImage.getAxisNames(m_axisTypes);
 
@@ -142,11 +142,15 @@ void MapSource::readFitsFile(std::string fitsFile) {
    int npix = m_solidAngles.size();
    m_integralDist.resize(npix);
    m_integralDist[0] = 0;
+   double totalSolidAngle(0);
    for (int i = 1; i < npix; i++) {
       m_integralDist[i] = m_integralDist[i-1] + m_solidAngles[i]*m_image[i];
+      totalSolidAngle += m_solidAngles[i];
    }
    m_mapIntegral = m_integralDist[npix-1];
    for (int i = 1; i < npix; i++) {
       m_integralDist[i] /= m_integralDist[npix-1];
    }
+//    std::cerr << "total solid angle in map: " 
+//              << totalSolidAngle/M_PI << "*pi" << std::endl;
 }
