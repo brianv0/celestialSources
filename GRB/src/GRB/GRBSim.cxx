@@ -24,6 +24,8 @@ GRBSim::GRBSim(Parameters *params)
 {
   m_GRBengine = new GRBengine(params);
   m_fluence   = m_params->GetFluence(); 
+  if(DEBUG) 
+    std::cout<<" Fluence = "<<m_fluence<<std::endl;
 }
 
 void GRBSim::GetUniqueName(const void *ptr, std::string & name)
@@ -49,7 +51,7 @@ TH2D* GRBSim::Fireball()
 
   double meanDuration = 0;
   int nshocks = (int) Shocks.size();
-
+  
   std::vector<GRBShock*>::iterator pos;
   for (pos=Shocks.begin();pos!=Shocks.end();++pos)
     {
@@ -58,11 +60,12 @@ TH2D* GRBSim::Fireball()
       meanDuration+=(*pos)->GetDuration();
     }
   meanDuration/=nshocks;
-
+  
   //  int i=1;
   double shift =0.0;// Shocks.front()->GetTime() + 2.0*meanDuration;//3.*Shocks.front()->GetDuration();
   m_tfinal = Shocks.back()->GetTime() + meanDuration + shift;
-  if(DEBUG) std::cout<<shift<<" "<<m_tfinal<<" "<<meanDuration<<std::endl;
+  if(DEBUG) 
+    std::cout<<shift<<" "<<m_tfinal<<" "<<meanDuration<<std::endl;
   double dt = m_tfinal/(Tbin-1);
   
   m_Nv = new TH2D("Nv","Nv",Tbin,0.,m_tfinal,Ebin, e);
@@ -232,7 +235,6 @@ void GRBSim::GetGBMFlux()
       Const=pow(10.,band.GetParameter(3));
       band.SetParameters(a,b,band.GetParameter(2),band.GetParameter(3));
       //Ep=(a+2)*E0;
-      std::cout<<t<<" "<<a<<" "<<b<<" "<<E0<<" "<<Const<<std::endl;
       gPad->SetLogx();
       gPad->SetLogy();
       gPad->Update();

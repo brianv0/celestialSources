@@ -40,11 +40,11 @@ class GRBShock
   inline   void SetICComponent(double ic){m_IC = ic;}
   
   double GetTime(){return tsh;}
-  inline double EsynCom(double g){ return 1.1447e-11 * B * pow(g,2.0);} //kev
+  inline double EsynCom(double g){ return 1.16e-11 * B * pow(g,2.0);} //kev
   inline double EsynObs(double g){ return EsynCom(g)* gf;} //kev
   inline double GammaElectron(double Eobs){return TMath::Max(1.0,sqrt(8.736e10*Eobs/(B * gf)));}
-  inline double Psyn(double g)   { return 6.6e-7 * pow(B,2.) *pow(g,2.0);}     //KeV/s
-  inline double gt(double g0, double tcom)    { return TMath::Max(1.0,g0/(1.0+TMath::Max(0.0,tcom)/ts0));}
+  inline double Psyn(double g)   { return 1.0e-6 * pow(B,2.) *pow(g,2.0);}     //KeV/s
+  inline double gt(double g0, double tcom)    { return TMath::Max(1.0,g0/(1.0+g0*TMath::Max(0.0,tcom)/ts0));}
   inline   double GetDuration(){return  sqrt(ta*ta + tc*tc + pow(ts0/GammaElectron(20.0),2.));}
   inline double GetEfficiency(){return eff;}
   

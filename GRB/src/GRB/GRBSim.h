@@ -59,7 +59,7 @@ class GRBSim
   TH2D *GRBSim::Nph(const TH2D *Nv);
   inline std::pair<double,double> GRBdir(){return m_GRBengine->GetDirection();}
   inline double Tmax(){return m_tfinal;}
-  inline double GetFluence(){return m_fluence * 1.0e-4 ;} //erg/cm^2
+  inline double GetFluence(){return m_fluence;} //erg/cm^2
   inline double GetGRBNumber(){return m_params->GetGRBNumber();} //erg/cm^2
   void SaveNv();
   void GetGBMFlux();
