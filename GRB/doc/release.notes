@@ -7,6 +7,8 @@
 *   $Header$
 *@verbatim
 *
+*   v4r1p0 14-Jan-2005 HMK Use any version of ROOT
+*   v4r1
 *   v4r0p3 11-May-2004 THB  clean up req file.
 *   v4r0   27-Feb-2004 JCT  GRB is now dissociated from Gaudi.
 *   v3r1p4 09-Jan-2004 SB  Modified Interval, energy and Dir methods.
