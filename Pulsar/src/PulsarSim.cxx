@@ -211,13 +211,10 @@ TH2D* PulsarSim::PSRPhenom(double par1, double par2, double par3, double par4)
   // This will be moved onto PulsarSpectrum
 
   ofstream OutTimeProf("PSRTimeProfile.txt");
-  OutTimeProf <<  m_flux << "\t" << m_period << "\n-----------------------\n";  
-  TH1D NvTimeProf("NvTimeProf","NvTimeProf",Tbin,0.0,m_period);
-
+  
   for (int t=0; t < Tbin; t++)
     {
-      NvTimeProf.SetBinContent(t+1,m_Nv->Integral(t+1,t+1,ei2,ei3));
-      OutTimeProf << t << "\t" <<  NvTimeProf.GetBinContent(t+1)*1e4 << "\n";
+      OutTimeProf << t+1 << "\t" <<  m_Nv->Integral(t+2,t+2,ei2,ei3)*1e4 << "\n";
     }
 
 

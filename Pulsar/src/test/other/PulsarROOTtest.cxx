@@ -21,7 +21,7 @@ using namespace cst;
 double EMIN, EMAX, TMIN, TMAX, DT;
 int    TBIN, EBIN;
 const double AreaDetector = 6.0; //m2
-const double nLoops = 4e5;
+const double nLoops = 4e4;
 
 //////////////////////////////////////////////////
 
@@ -149,9 +149,7 @@ void PlotPulsar(double enph = 0,char name[100]="pulsar.root")
   Lct_LAT->Scale((1e-4)/(DT*AreaDetector)); //ph/cm2/s
   //Extracted photons band
   TH1D *Lct_EXT = sp->Integral_E(enph,EMAX);  // ph
-  
-
-
+ 
 
 
   Lct_Pulsar->SetStats(0);
@@ -220,7 +218,7 @@ void PlotPulsar(double enph = 0,char name[100]="pulsar.root")
 	  flux     = sp->flux(time,enph);     // ph/s
 	  
 	  Counts->Fill(energy); // ph
-	  Lc->Fill( time - (TMAX*int(time/TMAX)));       // ph
+	  Lc->Fill((time - (TMAX*int(time/TMAX))));       // ph
 	
 	  time+=Interval;
 	  std::cout<<" Time (s)  = "<<time
@@ -280,7 +278,7 @@ void PlotPulsar(double enph = 0,char name[100]="pulsar.root")
       Lc->SetLineColor(2);
       Lct_EXT->Scale(nLoops);
       Lct_EXT->Draw("same");
-      Lc->Draw("elpsame");  
+      Lc->Draw("epsame");  
       std::cout << " Photon expecteed : " << Lct_EXT->Integral(0,TBIN) << " ph " << std::endl;  
 
     } 
