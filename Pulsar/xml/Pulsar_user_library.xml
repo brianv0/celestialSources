@@ -17,12 +17,14 @@
        <galactic_dir l="184.56" b="-5.78"/>
        </spectrum> 
     </source>
+
     <source name=" PSRVelaPolarPhen " >
-       <spectrum escale="MeV"> <SpectrumClass name="PulsarSpectrum" params=" 1,9e-6,0.089,124e-15,2,1e6,6e6,-1.7,2.0"/>
-       <direction theta="0" phi="0"/>
-       <!--galactic_dir l="263.55" b="-2.79"/-->
+       <spectrum escale="MeV"> <SpectrumClass name="PulsarSpectrum" params=" 1,9e-6,0.089,0.0,2,1e6,8e6,-1.62,1.7"/>
+       <!--<galactic_dir l="263.55" b="-2.79"/> -->
+           <celestial_dir ra="128.83" dec="-45.18"/>
        </spectrum> 
     </source>
+
     <source name=" PSRGemingaPolarPhen " >
        <spectrum escale="MeV"> <SpectrumClass name="PulsarSpectrum" params="1,3.66e-6,0.237,11.4e-15,2,1e6,4.8e6,-1.56,2.2"/>
        <galactic_dir l="195.13" b="4.27"/>

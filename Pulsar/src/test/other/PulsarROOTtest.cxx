@@ -304,18 +304,19 @@ int main(int argc, char** argv)
     }
   TApplication theApp("App",0,0);
 
-  /*
+  
   double Period  = 0.089; // s
   double Fluence = 9e-6; // ph/cm2/s
-  int npeaks = 2;
+  int npeaks = 3;
   double ppar1 = 1e6;
   double ppar2 = 8e6;
   double ppar3 = -1.62;
   double ppar4 = 1.7;
-  */
+  
 
   
   //Crab Polar Cap vs Outer Gap
+  /*
   double Period  = 0.033; // s
   double Fluence = 2.3e-6; // ph/cm2/s
   int npeaks = 2;
@@ -323,7 +324,7 @@ int main(int argc, char** argv)
   double ppar2 = 30e6;
   double ppar3 = -1.9;
   double ppar4 = 0.29; // 1.0 for outer
-  
+  */
 
   /*
   //Vela Polar Cap vs Outer 

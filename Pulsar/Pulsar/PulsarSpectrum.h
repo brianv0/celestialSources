@@ -60,10 +60,10 @@ class PulsarSpectrum : public ISpectrum
     \retval output is the value of the parameter as float number.
   */  
   double parseParamList(std::string input, int index);  
-  
+    
  private:
   
-  PulsarSim   *m_Pulsar;
+  PulsarSim *m_Pulsar;
   SpectObj *m_spectrum;
   
   astro::JulianDate *JDStartMission; //de-corr
@@ -72,7 +72,7 @@ class PulsarSpectrum : public ISpectrum
 
   const std::string& m_params; 
 
-  double m_period, m_pdot, m_fluence;
+  double m_period, m_pdot, m_flux;
   int m_numpeaks;
 };
 #endif

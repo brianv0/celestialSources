@@ -1,10 +1,8 @@
 /////////
 // Da fare :
 // - Controllare che il flusso sia uguale a 0 a t=0 e a t=periodo
-// - numero di picchi
-//Inserire parametri al modello
 
-
+//edds:eeciao
 #include <fstream>
 #include <iostream>
 #include <ctime>
@@ -18,9 +16,9 @@
 using namespace cst;
 
 //////////////////////////////////////////////////
-PulsarSim::PulsarSim(double fluence,double period, int numpeaks)
+PulsarSim::PulsarSim(double flux,double period, int numpeaks)
 {
-  m_fluence = fluence; //ph/cm2/s
+  m_flux = flux; //ph/cm2/s
   m_period  = period;
   m_numpeaks = numpeaks;
 }
@@ -51,8 +49,10 @@ TH2D* PulsarSim::PSRPhenom(double par1, double par2, double par3, double par4)
   engine->SetSeed(0);
   
   // Part 1 - Generate a single or double peak-shaped timecurve with Lorenz function.
-  // The timecurve is generated with 2 Lorenz-shaped curves.
-  // The parameters aplitude,fwhm and gamma are random, we require only a minimum distance of 0.4 period
+  // The timecurve is generated with 1 or 2 Lorenz-shaped curves.
+  // The parameters amplitude,fwhm and gamma are random, we require only a minimum distance of 0.4 period
+  // If the user select 3 or 4 is possible to have a time profile with 1 or 2 delta instead of the
+  // usual Lorenzian profile.
 
 
   peak1 = engine->Uniform()*m_period; 
@@ -66,7 +66,6 @@ TH2D* PulsarSim::PSRPhenom(double par1, double par2, double par3, double par4)
       n++;
       peak1 = engine->Uniform()*m_period; 
       fwhm1 = engine->Uniform()*m_period;
-      //std::cout << "Extracting peak 1 " << peak1 << " fw1 " << fwhm1 << std::endl;
     }    
 
 
@@ -80,8 +79,6 @@ TH2D* PulsarSim::PSRPhenom(double par1, double par2, double par3, double par4)
     {
       peak2 = engine->Uniform()*m_period; 
       fwhm2 = engine->Uniform()*m_period;
-      //  std::cout << "Extracting peak 2 " << peak2 << " fw2 " << fwhm2 << std::endl;
-      //  std::cout << "Diff " << peak2-peak1 << std::endl; 
     }
   
   ampl1 = engine->Uniform();
@@ -90,27 +87,25 @@ TH2D* PulsarSim::PSRPhenom(double par1, double par2, double par3, double par4)
   ampl2 = engine->Uniform();
   while (ampl2 < 0.3)  ampl2 = engine->Uniform();
   
-  if (m_numpeaks == 1)
+  if ((m_numpeaks == 1) || (m_numpeaks == 3))
     {
       if (engine->Uniform() < 0.5) 
 	{
 	  ampl1 = 0;
-	  //std::cout << "Erasing peak 1 " << std::endl;
 	}
       else 
 	{
 	  ampl2 = 0;
-	  // std::cout << "Erasing peak 2 " << std::endl;
 	}
     }
 
-  std::cout << "Extracting Random Peaks for Pulsar lightcurve with mindist = " 
+  std::cout << "\n*****\nExtracting Random LightCurve with mindist = " 
 	    << mindist  << " msec. " << std::endl;
   std::cout << "----> LightCurve " << std::endl;
   std::cout << "      Peak 1 t = " << peak1 << "(Phase= " << peak1/m_period << " ) " 
 	    << " FWHM " << fwhm1 << " ampl1 " << ampl1 << std::endl;  
   std::cout << "      Peak 2 t = " << peak2 << "(Phase= " << peak2/m_period << " ) " 
-	    <<" FWHM " << fwhm2 << " ampl2 " << ampl2 << std::endl; 
+	    <<" FWHM " << fwhm2 << " ampl2 " << ampl2 << "\n*****" << std::endl; 
 
   TF1 *PulsarTimeCurve = new TF1("PulsarTimeCurve",
                                  "([2]*(1/(((x-[0])^2)+(([1]/2)^2))) + [5]*(1/(((x-[3])^2)+(([4]/2)^2))))",
@@ -129,11 +124,10 @@ TH2D* PulsarSim::PSRPhenom(double par1, double par2, double par3, double par4)
   m_Nv = new TH2D("Nv","Nv",Tbin,0.,m_period,Ebin, e);
 
 
-  //  Part 2 - Generation of the Spectrum.
-  //
+  //  Part 2 - Generation of the Spectrum.according to the Phenomenological model
   
   
-  double K1 = 138e-8; //This is the constant, irrelevant because there is the m_fluence normalizatio
+  double K1 = 138e-8; //This is the constant, irrelevant because there is the m_fluxnormalizatio
  
   TF1 *PulsarSpectralShape = new TF1("PulsarSpectralShape", 
 				     "([0]*((x/[1])^[2])*exp(-1.0*((x/[3])^[4])))",cst::emin,cst::emax);
@@ -141,14 +135,33 @@ TH2D* PulsarSim::PSRPhenom(double par1, double par2, double par3, double par4)
   PulsarSpectralShape->SetParameters(K1,En,G1,E0,b);
 
 
+  // This deltaFunction is used instead of the usual curve if the user select 3 or 4 
+  // as parameters for number of peaks.
 
-  //Fill the TH2D object
+  TH1D *deltaFunction = new TH1D("deltaFunction","DeltaFuction",Tbin,0,m_period);
 
+  if ((m_numpeaks == 3 ) || (m_numpeaks == 4 ))
+    {
+      
+      deltaFunction->SetBinContent(int(peak1/dt),ampl1);
+      deltaFunction->SetBinContent(int(peak2/dt),ampl2);
+      for (int i=0; i < Tbin; i++)
+	deltaFunction->SetBinContent(i,deltaFunction->GetBinContent(i)+((ampl1+ampl2)/100));
+    } 
+
+
+  //Filling the TH2D Histogram...
   double t = 0.0;
   for(int ti = 0; ti<Tbin; ti++)
     {
       t = ti*dt;
       double nt = PulsarTimeCurve->Eval(t);
+
+      if ((m_numpeaks == 3 ) || (m_numpeaks == 4 ))
+	{
+	  nt = deltaFunction->GetBinContent(ti);
+	}
+
       for(int ei = 0; ei < Ebin; ei++)
 	{
 	  double nv = PulsarSpectralShape->Eval(e[ei]);
@@ -157,40 +170,45 @@ TH2D* PulsarSim::PSRPhenom(double par1, double par2, double par3, double par4)
     }
 
 
-  // Conervsion 1/cm² -> 1/m² IMPORTANT m_Nv has to be in [ph/m2s KeV)
-  // In the XML file is espressed in Kev/cm2, but here we have to use erg/m2
+  // Conversion 1/cm² -> 1/m² IMPORTANT m_Nv has to be in [ph/m2s KeV)
+  // In the XML file the flux is espressed in ph/cm2/s according to EGRET Catalogs
 
-  
-  m_Nv->Scale(1.0e+4);        // [ph/(m² s keV)]
-  m_fluence *= 1.0e+4;        //  ph/m²/s
+  m_Nv->Scale(1.0e+4);  // [ph/(m² s keV)]
+  m_flux*= 1.0e+4;      //  ph/m²/s
   
   // nph = nv * dE * dt
 
-
   TH2D *nph = Nph(m_Nv); //ph/m²
   
-  //  int ei1 = nph->GetYaxis()->FindBin(BATSE1);
-  //  int ei2 = nph->GetYaxis()->FindBin(BATSE2);
-  //double norm = nph->Integral(0,Tbin,ei1,ei2,"width")*(1.0e-3)/(dt*erg2meV); //erg/m²
-
-  //Normalisation with m_fluence
-  // m_fluence is now converted in erg/m2, so we must convert the integral into erg/m2
-  // IMPORTANT m_Nv has to  be in [ph/(m² s keV)]
-
-  /* now we want to normalize in ph/cm2/s and do the underliying lines are not required
-    double norm = nph->Integral(0,Tbin,0,Ebin,"width")*(1.0e-3)/(dt*erg2meV); //erg/m²
-  */
-
   int ei2 = nph->GetYaxis()->FindBin(EGRET2);
   int ei3 = nph->GetYaxis()->FindBin(EGRET3);
  
-  double norm = nph->Integral(0,Tbin,ei2,ei3)/m_period;//*(1.0e-3)/(dt*erg2meV); //ph/(m² s)
+  //Normalisation Integration above 100MeV up to limit of EGRET band 
+  double norm = nph->Integral(0,Tbin,ei2,ei3)/m_period; //ph/cm2/s
 
-  m_Nv->Scale(m_fluence/norm);
+  m_Nv->Scale(m_flux/norm);
 
   delete e;
   delete nph;
+  delete deltaFunction;
   SaveNv(m_Nv);
+
+  //Saving TimeProfile on a TXT Output file.
+
+  ofstream OutTimeProf("PSRTimeProfile.txt");
+  OutTimeProf <<  m_flux << "\t" << m_period << "\n-----------------------\n";  
+  TH1D *NvTimeProf = new TH1D("NvTimeProf","NvTimeProf",Tbin,0.0,m_period);
+
+  for (int t=0; t < Tbin; t++)
+    {
+      NvTimeProf->SetBinContent(t+1,m_Nv->Integral(t+1,t+1,ei2,ei3));
+      OutTimeProf << t << "\t" <<  NvTimeProf->GetBinContent(t+1)*1e4 << "\n";
+    }
+
+
+  OutTimeProf.close();
+
+
   return m_Nv;
 }
 //////////////////////////////////////////////////
@@ -235,4 +253,5 @@ void PulsarSim::SaveNv(TH2D *Nv)
   mod.Close();
   
 };
+
 

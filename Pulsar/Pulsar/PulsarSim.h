@@ -10,7 +10,7 @@ class PulsarSim
  public:
   
   //! The simulation can be initialized by setting the seed of the Random engine generator. If seed is 0, a Random Pulsar is computed.
-  PulsarSim(double fluence,double period, int numpeaks);
+  PulsarSim(double flux,double period, int numpeaks);
   //! destructor
   ~PulsarSim()
     {
@@ -30,11 +30,12 @@ class PulsarSim
   TH2D *PulsarSim::Nph(const TH2D *Nv);
   inline double Period(){return m_period;}
   void SaveNv(TH2D *Nv);
+  
  private:
   
   //! Gathers all relevant constants for the simulation 
   double m_period;
-  double m_fluence;
+  double m_flux;
   int m_numpeaks;
   TH2D *m_Nv;
 };
