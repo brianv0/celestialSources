@@ -28,7 +28,7 @@ class GRBShell
    * the same fraction of the total energy released by the inner engine. 
    */
   GRBShell(double gamma, double mass,
-	   double thickness, double radius,double distance = 0.0,string type = "jet");
+	   double thickness, double radius,double distance = 0.0,std::string type = "jet");
   
   //! Destructor
   ~GRBShell() { }

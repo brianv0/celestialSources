@@ -9,15 +9,15 @@ GRBmanager::GRBmanager(const std::string& params)
   m_initialTime = m_FirstTime;
   m_GRB = new GRBSpectrum("temp.txt");
   m_endTime = m_FirstTime+m_GRB->m_grbsim->Tmax();
-  cout<<m_FirstTime<<endl;
-  cout<<m_timeToWait<<endl;
-  cout<<m_initialTime<<endl;
-  cout<<m_endTime<<endl;
+  std::cout<<m_FirstTime<<std::endl;
+  std::cout<<m_timeToWait<<std::endl;
+  std::cout<<m_initialTime<<std::endl;
+  std::cout<<m_endTime<<std::endl;
 }
 
 GRBmanager::~GRBmanager() 
 {  
-  cout<<"**************************************************"<<endl;
+  std::cout<<"**************************************************"<<std::endl;
   delete m_GRB;
 }
 
@@ -33,11 +33,11 @@ double GRBmanager::flux(double time) const
   if(time < m_initialTime || (time > m_endTime)) flux = 1.;
  
   else flux = m_GRB->flux(time - m_initialTime);  
-  cout<<"-----------------------------------"<<endl; 
-  cout<<" flux @ internal time "<<time - m_initialTime<<" = "<<flux<<endl;
-  cout<<"	time = "<<time<<endl;
-  cout<<"	Initial time = "<<m_initialTime<<endl;
-  cout<<"-----------------------------------"<<endl;
+  std::cout<<"-----------------------------------"<<std::endl; 
+  std::cout<<" flux @ internal time "<<time - m_initialTime<<" = "<<flux<<std::endl;
+  std::cout<<"	time = "<<time<<std::endl;
+  std::cout<<"	Initial time = "<<m_initialTime<<std::endl;
+  std::cout<<"-----------------------------------"<<std::endl;
   return flux;
 }
 
@@ -54,7 +54,7 @@ double GRBmanager::interval(double time)// const
   else if (time < m_endTime + m_timeToWait)
 	{
 	  delete m_GRB;
-	  cout<<" NEW GRB "<<endl;
+	  std::cout<<" NEW GRB "<<std::endl;
 	  inte = m_timeToWait -(time - m_endTime);
 	  m_GRB = new GRBSpectrum("temp.txt");
 	  m_initialTime=time+inte;
@@ -64,19 +64,19 @@ double GRBmanager::interval(double time)// const
   else
   	{
 	 delete m_GRB;
-	 cout<<" WARNING UNEXPECTED NEW GRB "<<endl;
+	 std::cout<<" WARNING UNEXPECTED NEW GRB "<<std::endl;
 	 inte = 0.0;
 	 m_GRB = new GRBSpectrum("temp.txt");
 	 m_initialTime=time+inte;
 	 m_endTime=m_initialTime+m_GRB->m_grbsim->Tmax();
 	} 	
-  cout<<"-----------------------------------"<<endl;
-  cout<<" Interval @ int time "<<time - m_initialTime<<endl;
-  cout<<" 		time = "<<time<<endl;
-  cout<<"		Initial Time = "<<m_initialTime<<endl;
-  cout<<"		End Time = "<<m_endTime<<endl;
-  cout<<" INTERVAL = "<<inte<<endl;
-  cout<<"-----------------------------------"<<endl;
+  std::cout<<"-----------------------------------"<<std::endl;
+  std::cout<<" Interval @ int time "<<time - m_initialTime<<std::endl;
+  std::cout<<" 		time = "<<time<<std::endl;
+  std::cout<<"		Initial Time = "<<m_initialTime<<std::endl;
+  std::cout<<"		End Time = "<<m_endTime<<std::endl;
+  std::cout<<" INTERVAL = "<<inte<<std::endl;
+  std::cout<<"-----------------------------------"<<std::endl;
   return inte;
 }
 

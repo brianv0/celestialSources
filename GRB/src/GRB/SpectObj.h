@@ -1,3 +1,4 @@
+#include <iterator>
 #include <map>
 #include <vector>
 #include <math.h>
@@ -23,7 +24,7 @@ class SpectObj
   inline double getBinContent(double index) 
     {
       std::map<double,double>::const_iterator it = m_spectrum.begin();
-      advance(it,index);
+      std::advance(it,index);
       return it->second;
     }
   
