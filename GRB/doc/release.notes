@@ -1,5 +1,12 @@
-/*
-  Needs a coordinator
-
-
+/*! \file release.notes
+*   Package GRB
+*
+*   Managers:  <a href="mailto:johann.cohen@pi.infn.it">Johann Cohen-Tanugi</a>, 
+*              <a href="mailto:nicola.omodei@pi.infn.it">Nicola Omodei</a>, 
+*              <a href="mailto:sandhiab@lheapop.gsfc.nasa.gov">Sandhia Bansal</a>
+*
+*   $Heading:$
+*
+*   v2r0 28-Jan-2003 JCT big cleaning for the code review.
+*
 */

@@ -6,30 +6,29 @@ use RootIo
 use GlastSvc
 
 apply_pattern packageShr
-#apply_pattern ld_library_path
 
-#apply_pattern package_linkopts
 # This needs to be fixed (?)
 #=============================================================
 path_append LD_LIBRARY_PATH ${GRBROOT}/${BINDIR}
 path_append LD_LIBRARY_PATH ${FLUXSVCROOT}/${BINDIR}
 #=============================================================
+
 private
 
-#apply_pattern package_include
 apply_pattern package_Cshlibflags
 apply_pattern package_headers
 
 apply_pattern package_stamps
 macro_append GRB_stamps " $(GRBDir)/GRB_lib.stamp"
 
+
 # component library, with GRB, GRBmaker, GRBUtil, and LatGRBAlert
+macro_append GRB_headers 	""  \
+			  WIN32 "../xml/*.xml test/*.xml GRBmaker/*.h LatGRBAlert/*.h GRB/*.h"
 
-macro_append GRB_headers "" WIN32 "../xml/*.xml test/*.xml GRBmaker/*.h LatGRBAlert/*.h GRB/*.h"
-
-#library GRB *.cxx GRB/*.cxx Dll/*.cxx GRBmaker/*.cxx  LatGRBAlert/*.cxx ${GRB_headers}
-
-library GRB_lib -no_share *.cxx GRB/*.cxx GRBmaker/*.cxx  LatGRBAlert/*.cxx ${GRB_headers}
+library GRB_lib -no_share 	*.cxx GRB/*.cxx \
+			  	GRBmaker/*.cxx  LatGRBAlert/*.cxx \
+				${GRB_headers}
 
 macro libs ""   WIN32   "$(GRBDir)/GRB_lib.lib"
 
@@ -37,17 +36,28 @@ macro GRB_linkopts "-L $(GRBDir) -lGRB_lib" \
                        WIN32 ""
 
 macro_append ROOT_linkopts " -lHist  -lMatrix -lGraf -lGraf3d -lGpad " \
-       WIN32 " $(ROOT_PATH)/lib/libHist.lib $(ROOT_PATH)/lib/libMatrix.lib $(ROOT_PATH)/lib/libGraf.lib $(ROOT_PATH)/lib/libGraf3d.lib $(ROOT_PATH)/lib/libGpad.lib "
+       WIN32 " 	$(ROOT_PATH)/lib/libHist.lib $(ROOT_PATH)/lib/libMatrix.lib \
+	       	$(ROOT_PATH)/lib/libGraf.lib $(ROOT_PATH)/lib/libGraf3d.lib \
+		$(ROOT_PATH)/lib/libGpad.lib "
+
 
 library GRB  Dll/*.cxx $(libs)
+
 macro GRB_extrastamps "$(GRBDir)/GRB_lib.stamp"
 
+#
+#	Executables:
+#
+
+# this executable provides visualization with ROOT at runtime
+#
 application test_GRBROOT  test/other/GRBROOTtest.cxx $(libs)
-
-# test program, using local joboptions
-
 public set JOBOPTIONS ${GRBROOT}/src/test/jobOptions.txt
 
+
+# builds batch job (no ROOT visualization) for nightly builds, 
+# and sets its jobOptions file
+#
 apply_pattern package_test
 set TESTJOBOPTIONS ${GRBROOT}/src/test/test_jobOptions.txt
 

@@ -81,10 +81,55 @@ implementation of GRB algorithm. It doesn't contain any information
 regarding the physics of the GRB (that are all included in the GRBParam 
 file), but it manages some options available for the GRB Algorithm.
 
-\include jobOptions.txt
+\section jobOptions jobOptions files
+There are two different jobOptions.txt file:
 
-\section requirements requirements
-\include requirements
+- <a href="../../src/test/test_jobOptions.txt>test_jobOptions.txt</a> is meant to be used in nightly 
+builds together with test_GRB.exe
+
+- <a href="../../src/test/jobOptions.txt>jobOptions.txt</a>:
+This file is used to choose (by picking up/commenting out '\c #include' statements) between the 3 files: 
+ GRBtestAlgOptions.txt, TDSreadFluxOptions.txt, and LatGRBAlertOptions.txt
+
+- <a href="../../src/test/GRBtestAlgOptions.txt>GRBtestAlgOptions.txt</a>:
+\param GRBTestAlg.source_name
+passes the name of the GRB source, to be chosen among the ones defined in 
+<a href="../../xml/GRB_user_library.xml>GRB_user_library.xml</a>
+\param GRBTestAlg.background_name
+passes the name of the background source, to be added on top of the GRB signal. 
+It can be any spectrum defined in FluxSvc xml files.
+\param GRBTestAlg.EvtMax
+Maximum number of photon generated. Default is 100000
+\param GRBTestAlg.savefile
+"root" saves data in ROOT format, "ascii" in ASCII text file. 
+Saving in both is also possible
+
+- <a href="../../src/test/TDSreadFluxOptions.txt>TDSreadFluxOptions.txt</a>:
+\param same as above, replacing \c GRBTestAlg with \c FluxAlg.
+- <a href="../../src/test/LatGRBAlertOptions.txt>LatGRBAlertOptions.txt</a>:
+\param same as above, with \c LatGRBAlertAlg as the driving algorithm, plus
+\param LatGRBAlertAlg.OutputLevel
+Sandhia. Default is 2.
+\param LatGRBAlertAlg.nbckoff
+Sandhia. Default is 5.
+\param LatGRBAlertAlg.mix
+Sandhia. Default is 0.
+\param LatGRBAlertAlg.grbFile
+Sandhia
+\param LatGRBAlertAlg.backgroundFile
+Sandhia
+\param LatGRBAlertAlg.grbOffsetTime
+Sandhia. Default is 0.
+\param LatGRBAlertAlg.mixedFile
+Sadhia
+
+<hr>
+\section requirements CMT requirements
+\include cmt/requirements
+<hr>
+\section notes Release notes
+doc/release.notes
+<hr>
 
 
  */
