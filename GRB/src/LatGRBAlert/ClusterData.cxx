@@ -6,7 +6,7 @@
 #include <cmath>       // for log10
 
 #include "ClusterData.h"
-#include "LatTriggerConstants.h"
+#include "LatGRBAlertConstants.h"
 
 using namespace lattrigtypes;
 
