@@ -148,7 +148,7 @@ GRBmaker::GRBmaker(double duration, int npuls, double flux, double fraction, dou
 //		specnorm					:   calculates spectral normalization
 //		nphoton						:	uses specnorm and duration to calculate number of photons in the current burst
 
-
+void
 GRBmaker::createGRB(const std::string &dir)
 {
 	// Get an engine and set its seed
@@ -223,6 +223,7 @@ GRBmaker::createGRB(const std::string &dir)
 //		nphoton						:	uses specnorm and duration to calculate number of photons in the current burst
 //		operator<<					:	records the photon list in specified output file
 
+void 
 GRBmaker::createGRB(double duration, int npuls, double flux, double fraction, double powerLawIndex, bool flag)
 {
 	HepRandomEngine *engine = HepRandom::getTheEngine();
@@ -266,7 +267,7 @@ GRBmaker::createGRB(double duration, int npuls, double flux, double fraction, do
 //
 // Calls:
 //		operator>>					:	reads photon list from file specified by filename
-
+void
 GRBmaker::readGRB(const std::vector<std::string> &paramVector)
 {
 	try
@@ -294,7 +295,7 @@ GRBmaker::readGRB(const std::vector<std::string> &paramVector)
 
 
 
-
+void
 GRBmaker::readGRB(const std::string &fname)
 {
 	try
