@@ -30,9 +30,8 @@ class GRBmanager : public ISpectrum
   double interval(double time);//{return m_GRB->interval(time);}//const;
   double solidAngle() const;//{return m_GRB->solidAngle();}
   
-  std::pair<float,float> dir(float energy) const;// {return m_GRB->dir(energy);}
-  std::pair<double,double> dir(double energy, HepRandomEngine* engine){
-    return dir(energy);} 
+  inline std::pair<double,double> 
+    dir(double energy, HepRandomEngine* engine){return m_GRB->dir(energy, engine);} 
 
 
   float operator() (float u) const;

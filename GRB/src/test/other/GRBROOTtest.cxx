@@ -178,7 +178,7 @@ void Burst(int argc, char** argv)
       ////////////////  Compute the Total Flux /////////////////
       //------------------------------------------------------//
       // Logaritmic Binning
-      double e_delta=pow(cst::enmax/cst::enmin,1.0/cst::enstep);
+      //      double e_delta=pow(cst::enmax/cst::enmin,1.0/cst::enstep);
       double *e_bins;
       e_bins=(double*)malloc(sizeof(double)*(cst::enstep+1));
   

@@ -13,7 +13,7 @@
 0.0		// Angle of the jet  [degree]
 ## Common
 1.0e+10		// Thickness of the shells[cm]
-1.0e+58		// Etot
+1.0e+52		// Etot
 100.		// Minumum Lorenz Factor
 1000.		// Maximum Lorenz Factor
 1.		// Redshift

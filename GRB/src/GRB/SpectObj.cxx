@@ -144,10 +144,10 @@ SpectObj SpectObj::SetSpectrum(std::vector<double> energy, std::vector<double> s
 SpectObj SpectObj::operator+(SpectObj inputObj)
 {
   std::map<double,double>::const_iterator it = m_spectrum.begin();
-  int index = 0;
+  unsigned int index = 0;
   while(it != m_spectrum.end()) 
     {
-      if (index<m_spectrum.size()-1)
+      if (index < m_spectrum.size()-1)
 	{
 	  m_spectrum[(*it).first] += inputObj.getBinContent(index);
 	}

@@ -30,9 +30,6 @@ GRBSpectrum::GRBSpectrum(const std::string& params)
 ///return flux, given a time
 double GRBSpectrum::flux(double time) const
 {
-  //  cout<<"FLUX"<<endl;
-  //m_grbsim->ComputeFlux(time);
-  /// test to implement the right rate...
   return m_grbsim->IRate(m_spectrum,m_grbsim->EnergyPh()); // in ph/(m^2 s) 
 }
 
@@ -96,10 +93,6 @@ float GRBSpectrum::operator() (float u) const
   return (float) energy;
 }
 
-std::pair<float,float> GRBSpectrum::dir(float energy) const
-{  
-  return m_grbsim->GRBdir();
-}
 
 
 

@@ -28,7 +28,7 @@ GRBengine::GRBengine(GRBConstants *myParam)
 	    if(NumberOfShocks==1) ShockDuration = BurstDuration;
 	    double ComputedShockDuration = 0.0;
 	    double gamma_min = myParam->GammaMin();
-	    double gamma_max = myParam->GammaMax();
+	    //	    double gamma_max = myParam->GammaMax();
 	    double gamma = gamma_min;
 	    double mass = (1.-1.0e-3)*ei/(gamma*cst::c2); // Shell mass
 	    
@@ -126,8 +126,6 @@ GRBengine::GRBengine(GRBConstants *myParam)
 	
 	while (ns < NumberOfShocks)
 	  {
-	    double  ShockDuration = rise_time + decay_time;
-	    //	    if(NumberOfShocks==1) ShockDuration = BurstDuration;
 	    double ComputedShockDuration = 0.0;
 	    double mass = (1.-1.0e-3)*ei/(gamma*cst::c2); // Shell mass
 	    //	    double internalEnergy  = ei/

@@ -13,14 +13,16 @@
 #include "SpectObj.h"
 #include "GRBShock.h"
 
+#include "RadiationProcess.h"
+
 #ifndef GRBSYNCHROTRON_H
 #define GRBSYNCHROTRON_H 1
 
-class GRBSynchrotron
+class GRBSynchrotron : virtual public RadiationProcess
 {
  public:
-  GRBSynchrotron::GRBSynchrotron(){;}
-  GRBSynchrotron::GRBSynchrotron(SpectObj spectrumObj);
+  GRBSynchrotron();
+  GRBSynchrotron(SpectObj spectrumObj);
   
   ~GRBSynchrotron(){;}
   /*! Given a Shock compute the spectrum at a certain /param time.
@@ -40,20 +42,8 @@ class GRBSynchrotron
 	    const double gamma_max = 1.0e+10,
 	    const double Vol       = 1.0e+40,
 	    const double dr        = 1.0e+10); 
-  //! return the Spectrum object after computing the synchrotron emission.
-  inline SpectObj getSpectrumObj() {return m_spectrumObj;}
-  //! Helper function. /param B is in Gauss, Umag is in erg.
-  inline double Umag(const double B)
-    {
-      return pow(B/1.0e+4,2.)/(200.0*M_PI*cst::mu0);
-    }
-  
+
  private:
-  SpectObj m_spectrumObj;
-  std::vector<double>    x;
-  std::vector<double>    g;
-  std::vector<double>   dx;
-  std::vector<double> fsyn;
 };
 #endif
 

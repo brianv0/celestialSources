@@ -93,8 +93,8 @@ class GRBShell
     
  private:
   //Data Members:
-  double m_mass;
   double m_gamma;
+  double m_mass;
   double m_thickness;
   double m_radius;
   double m_distance;

@@ -91,15 +91,11 @@ float GRBmanager::operator() (float u) const
   return (*m_GRB)(u);
 }
 
-std::pair<float,float> GRBmanager::dir(float energy) const
-{  
-  return m_GRB->dir(energy);
-}
 
 float GRBmanager::parseParamList(std::string input, int index)
 {
   std::vector<float> output;
-  int i=0;
+  unsigned int i=0;
   for(;!input.empty() && i!=std::string::npos;){
     float f = ::atof( input.c_str() );
     output.push_back(f);

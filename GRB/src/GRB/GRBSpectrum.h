@@ -40,8 +40,9 @@ class GRBSpectrum : public ISpectrum
       delete m_grbsim;
     }  
   /*! Computes the flux, in \b photons/m^2/s, for a given time
+   *  time is actually not used bwcause the spectrum is already updated.
    */
-  double flux(double time)const;
+  double flux(double /*time*/)const;
   
   /*! \brief Returns the time interval
    *
@@ -51,11 +52,8 @@ class GRBSpectrum : public ISpectrum
   double interval(double time);//const;
 
   //! Galactic direction 
-  std::pair<float,float> dir(float energy) const;
-  //! Galactic direction 
-  std::pair<double,double> dir(double energy, HepRandomEngine* engine){
-    return dir(energy);
-  } 
+  inline std::pair<double,double> 
+    dir(double /*energy*/, HepRandomEngine* /*engine*/){return m_grbsim->GRBdir();} 
 
   /*! \brief Draws from the current spectrum the energy of a sampled photon. 
    *  \param u uniform random number drawn in the method \c energySrc .  

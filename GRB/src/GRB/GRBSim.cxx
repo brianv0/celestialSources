@@ -276,7 +276,7 @@ double GRBSim::DrawPhotonFromSpectrum(std::vector<double> spctrmVec,
 long GRBSim::parseParamList(std::string input, int index)
 {
   std::vector<long> output;
-  int i=0;
+  unsigned int i=0;
   for(;!input.empty() && i!=std::string::npos;){
     float f = ::atoi( input.c_str() );
     output.push_back(f);
