@@ -9,6 +9,7 @@ Parameters::Parameters()
 {
   rnd = new TRandom();
   SetGRBNumber((long) rnd->GetSeed());
+  m_Type=0;
 }
 
 void Parameters::SetGRBNumber(UInt_t GRBnumber)
@@ -21,11 +22,10 @@ void Parameters::SetGRBNumber(UInt_t GRBnumber)
 //////////////////////////////////////////////////
 double Parameters::GetBATSEFluence()
 {
-    using std::pow;
-  if (m_InitialSeparation<pow(10.,9.))
+  using std::pow;
+  if (m_Type==1)
     return pow(10.0,(double)rnd->Gaus(-6.3,0.57)); //erg/cm^2 (Short Bursts)
   return pow(10.0,(double)rnd->Gaus(-5.4,0.62)); //erg/cm^2 (Long Burst)
-
 }
 
 //////////////////////////////////////////////////
@@ -43,12 +43,15 @@ void Parameters::SetNshell(int nshell)
 {
   
   if (nshell<1)
-    m_Nshell = int(2+rnd->Integer(100));
+    if (m_Type==1)    
+      m_Nshell = int(2+rnd->Integer(2));
+    else
+      m_Nshell = int(10+rnd->Integer(100));
   else
     m_Nshell = nshell;
 }
 
- void Parameters::SetFluence(double fluence)
+void Parameters::SetFluence(double fluence)
 {
   if(fluence == 0)  
     m_Fluence = GetBATSEFluence();
@@ -71,10 +74,7 @@ void Parameters::SetInitialSeparation(double initialSeparation)
 
 void Parameters::SetInitialThickness(double initialThickness)
 {
-  //  double logR=log10(m_InitialSeparation);
   m_InitialThickness = (initialThickness>0.0) ? initialThickness : pow(10.,rnd->Uniform(7.0,10.0));
-  //pow(10.0,rnd->Uniform(15.0-logR,27.0-2.0*logR));//Gaus(0.0,6.0-0.5*logR));
-  //    pow(10.0,15.0-logR+rnd->Uniform(15.0-logR,21.0-1.5*logR));//Gaus(0.0,6.0-0.5*logR));
 }
   
 void Parameters::SetGammaMin(double gmin)
@@ -89,7 +89,7 @@ void Parameters::SetGammaMax(double gmax)
 
 void Parameters::SetInverseCompton(double ic)
 {
-  m_InverseCompton = (ic>=0.0 && ic<=1.0) ? ic : rnd->Uniform(0.,1.);
+  m_InverseCompton = (ic>=0.0) ? ic : rnd->Uniform(0.,10.);
 }
 
 //..................................................
@@ -156,7 +156,7 @@ void Parameters::ReadParametersFromFile(std::string paramFile, int NGRB)
 
 void Parameters::ComputeParametersFromFile(std::string paramFile, int NGRB)
 {
-    using std::pow;
+  using std::pow;
   std::ifstream f1(paramFile.c_str());
   if (!f1.is_open()) 
     {
@@ -171,11 +171,11 @@ void Parameters::ComputeParametersFromFile(std::string paramFile, int NGRB)
   char buf[200];
   f1.getline(buf,100);
   
-  int i=1;
+   int i=1;
   while(i<=NGRB && f1.getline(buf,100))
     {
-      if(sscanf(buf,"%d %lf %lf %lf %d %lf %lf %lf %lf %lf ",
-		&seed,&l0,&b0,&fluence,&nshell,&tv,&gmax_gmin,&ep,&ic)<=0) break;
+      if(sscanf(buf,"%d %lf %lf %lf %d %lf %lf %lf %lf ",
+		&seed,&l0,&b0,&fluence,&nshell,&tv,&Eco,&ep,&ic)<=0) break;
       i++;
     } 
   i--;
@@ -189,59 +189,79 @@ void Parameters::ComputeParametersFromFile(std::string paramFile, int NGRB)
       for(int j = 1; j<=(NGRB %i);j++)
 	{
 	  f2.getline(buf,100);
-	  sscanf(buf,"%d %lf %lf %lf %d %lf %lf %lf %lf %lf ",
-		 &seed,&l0,&b0,&fluence,&nshell,&tv,&gmax_gmin,&ep,&ic);
+	  sscanf(buf,"%d %lf %lf %lf %d %lf %lf %lf %lf ",
+		 &seed,&l0,&b0,&fluence,&nshell,&tv,&Eco,&ep,&ic);
 	  
 	}
       seed=NGRB;
       f2.close();
     }
-  if(gmax_gmin<1.5) gmax_gmin=1.5;
-  //  if(gmax_gmin>1.5) gmax_gmin=1.5;
+  //////////////////////////////////////////////////
+  ep/=2.0;
+  
   SetGRBNumber(65540+ (long) seed);  
   
-  SetGalDir(l0,b0);
-  SetEtot(1e52);
-  SetFluence(fluence);
-  //  double g100 = tau/100.;
-  double E52   = 1.0;
-  //  ep = pow(10,rnd->Gaus(2.,.5));//00.0)log10(ep),log10(ep/2.0)));
-  double Ep100 = ep/100.0/(gmax_gmin*gmax_gmin);
-  r0    = cst::c * tv;
-  double G100 = 3.0;
-  dr0   =  1.647e9*E52 * cst::ab * pow((double)cst::ae,4.0)/(pow(Ep100,2.0)*pow(tv,2.0)*pow(G100,4.0));//*pow(gmax_gmin,2.0);
-  //  double gmax_gmin = tau;
-  double G = G100*100.0;
+  if(tv==0)   // both
+    {
+      tv=((rnd->Uniform()<0.3) ? -2 : -1);
+      m_Type = 0;
+    }
+  
+  if(tv==-2)
+    {
+      tv     = pow(10.0,rnd->Gaus(-2.0,0.5)); // short bursts
+      m_Type=1;
+    }
+  else if(tv==-1)
+    {
+      tv   = pow(10.0,rnd->Gaus(0.0,0.5)); //long burts
+      m_Type=2;
+    }
 
+  SetEpeak(ep);
+    
+  double gmax_gmin=2;
+  
+  double E52   = 1.0;
+  double Ep100 = m_Ep/100.0;///pow(gmax_gmin,2.);
+  double ae3   = cst::ae * 3.;
+  double ab3   = cst::ab * 3.;
+  
+  r0    =  2.0 * cst::c * tv;
+  double G=0.0;
+
+  if(Ep100==0)
+    {
+      double g100 = 1.0;
+      double d7   = 1.0;
+      G=100.0*g100;
+      dr0=1e7*d7;
+      Ep100=0.405*sqrt(E52*ab3/d7)*pow(ae3,3.)/(tv*pow(g100,2));
+      m_Ep = 100.0*Ep100;
+    }
+  if(Eco==0) 
+    {
+      double d7 = 1.0;
+      dr0=1e7*d7;
+      G = 63.6*pow(E52*ab3/d7,1./4.)*ae3/sqrt(Ep100*tv);
+      Eco = 1.6*G/100.0;
+    }
+  // 1)
+  dr0   =  1.2e7*E52*ab3*pow(ae3,4.0)/(pow(Eco,4.0)*pow(Ep100*tv,2.0));
+  G     = 60.0*Eco;
   ////////////////////////////////////////////////// 
-  /*
-  double tc = tv;
-  
-  r0    = 2. * cst::c * tv;
-  dr0   = cst::c * tc;
-  
-  double G = 484.159 * pow(etot/1.e52,1./4.) * pow(cst::ab,1./4.) * cst::ae * pow(ep,-1./2.) 
-    * pow(tv,-1./2.) * pow(tc,-1./4.); 
-  double gmax_gmin = 10;
-  */
-////////////////////////////////////////////////// 
+  SetGalDir(l0,b0);  
+  SetEtot(1e52);
+  SetEpeak(Ep100*100.0);
+  SetFluence(fluence);
   gmin = 2.*G/(gmax_gmin + 1.);
-  //  m_Tau=tau;
   SetGammaMin(gmin);
-  SetGammaMax(gmax_gmin*gmin);
-  
+  SetGammaMax(gmax_gmin*gmin);  
   SetInitialSeparation(r0);
   SetInitialThickness(dr0);
   SetNshell(nshell);
   SetInverseCompton(ic);
 }
-
-/*
-  double Parameters::GetNextPeak()
-  {
-  return rnd->Exp(m_Tau);
-  }
-*/
 
 void Parameters::PrintParameters()
 {

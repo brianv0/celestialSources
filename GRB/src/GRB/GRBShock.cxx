@@ -6,8 +6,8 @@
 
 #include "GRBShock.h"
 #include "GRBShell.h"
-#include <cmath> // for fabs
-#define DEBUG 0 
+
+#define DEBUG 1 
 
 #define PulseShape 0 
 
@@ -39,20 +39,20 @@ GRBShock::GRBShock(GRBShell *S1, GRBShell *S2, double tshock, double p)
   double e1 = S1->GetEnergy();
   double e2 = S2->GetEnergy();
   
-
+  
   double M,b12,b1,b2,nc,Psyn;
   
   // Initial energy of the final shell: (obs)
   ei  = (m1*g1+m2*g2) * c2; //erg
-
+  
   // mass of the final shell:
   mf  = m1+m2; //g
   
   //  std::cout<<"--------------------My Model--------------------"<<std::endl;
   M   = sqrt(m1*m1+m2*m2+2.0*m1*m2*(g1*g2-sqrt(g1*g1-1.0)*sqrt(g2*g2-1.0)))-(mf);
   // Final: (obs) 
-  //  gf  = (m1*g1 + m2*g2)/(mf+M);
-  gf  = sqrt((m1*g1 + m2*g2)/(m1/g1 + m2/g2));
+  gf  = (m1*g1 + m2*g2)/(mf+M);
+  //gf  = sqrt((m1*g1 + m2*g2)/(m1/g1 + m2/g2));
   //  gf  = (m1*g1 + m2*g2)/(mf+M);
   ef  = mf * gf * c2;       //erg
   // Internal : (obs) 
@@ -71,20 +71,26 @@ GRBShock::GRBShock(GRBShell *S1, GRBShell *S2, double tshock, double p)
   b2  = S2->GetBeta();
   // relative velocity:
   b12 = (b1-b2)/(1.0-b1*b2);
- 
+    
+    
   double g12 = 1.0/sqrt(1.0 - b12*b12);
+  int i=0;
   
   double n1  = S1->GetComPartDens(); //1/cm^3
   double n2  = S2->GetComPartDens(); //1/cm^3
-  
   double x = n1/n2;
+
   // Lorentz factor of the shock in the comoving frame of the unshocked fluid
   gsh =  TMath::Max(1.0,pow(x,1./4.)*sqrt(g12));
-  double bsh=sqrt(1.0-1.0/(gsh*gsh));
+
+  double bsh=TMath::Max(1e-6,sqrt(1.0-1.0/(gsh*gsh)));
+
   // density of the shocked fluid
-  nsh  = 4.0 * n1 * gsh;//1/cm^3
+  nsh  = 4.0 * n1 * pow(gsh,2);//1/cm^3
+  
   // Magnetic field in gauss
   B    = 0.39 * sqrt(ab * nsh);
+  
   // synchrotron cooling time for an electron with gamma=1
   ts0  = (5.1e8)/pow(B,2.0)/(2.0*gf); //oss
   //   tcom = 2 gf toss 	   
@@ -101,7 +107,7 @@ GRBShock::GRBShock(GRBShell *S1, GRBShell *S2, double tshock, double p)
   //  gec  = TMath::Max(1.0,ts0/ta);//mec2/(Psyn0 * tc);*tc
   gec  = TMath::Max(1.0,ts0/tc);
   // c) Maximum:
-  geM  = TMath::Max(1.,1.17e8/sqrt(B)); 
+  geM  = TMath::Max(1.,3.77e7/sqrt(B)); 
   
   if(DEBUG)
     {
@@ -109,7 +115,9 @@ GRBShock::GRBShock(GRBShell *S1, GRBShell *S2, double tshock, double p)
 	std::cout<<" SLOW COOLING (gem = "<<gem<<" gec = "<<gec<<")"<<std::endl;
       else 
 	std::cout<<" FAST COOLING (gem = "<<gem<<" gec = "<<gec<<")"<<std::endl;
+      Print();
     }
+  
 }
 
 void GRBShock::SetTime(double time)
@@ -118,8 +126,8 @@ void GRBShock::SetTime(double time)
 }
 
 Double_t GRBShock::Peak(Double_t time,Double_t energy)
-{    using std::fabs;    using std::pow;
-  
+{
+  using std::fabs; using std::pow;
   Double_t to  = time-tsh;   // oss
   if(PulseShape==0)
     {
@@ -144,7 +152,7 @@ Double_t GRBShock::Peak(Double_t time,Double_t energy)
   if(PulseShape==1)
     {
       if(to <= tc)
-          return  eff*exp(-pow(fabs(to-tc)/rise,1.0));
+	return  eff*exp(-pow(fabs(to-tc)/rise,1.0));
       return  eff*exp(-pow(fabs(to-tc)/decay,1.0));
     }
   
@@ -172,8 +180,21 @@ Double_t GRBShock::SynSpectrum(Double_t time, Double_t energy)
   double doppler = gf*(1.0-beta*mu);
   energy*=doppler; //como energy
   em = EsynCom(gem);
-  ec = EsynCom(gec);//TMath::Max(1.0,ts0/time));//mec2/(Psyn0 * tc);*tcgec);
+  ec = EsynCom(gec);
+  //  ec = em/8.0;//EsynCom(gec);//TMath::Max(1.0,ts0/time));//mec2/(Psyn0 * tc);*tcgec);
   eM = EsynCom(geM);
+  /*
+    double rat = TMath::Min(1.0,gem/gec);
+    double elow = em*(1.0-rat*0.9);
+    double high = rat/2.;
+    
+    double FastCoolElectronSpectrum = pow(energy/elow,1./3.)*exp(-(energy-elow)/elow);
+    double SlowCoolElectronSpectrum = (energy<em) ? pow(energy/em,1./3.)*exp(-(energy-em)/em) : pow(energy/em,-m_p/2.);
+    double HighEnergyCutOff         =exp(-energy/eM);
+    
+    return Peak(time,energy)* (high * FastCoolElectronSpectrum + SlowCoolElectronSpectrum) * HighEnergyCutOff;
+    // Fv in [keV/(cm² s keV)]
+    */
   
   if(ec <= em) //FAST COOLOING REGIME
     {
@@ -193,55 +214,56 @@ Double_t GRBShock::SynSpectrum(Double_t time, Double_t energy)
       else
 	Fv = pow(ec/em,-(m_p-1.)/2.)*pow(energy/ec,-m_p/2.);
     }
+  
   return Fv*exp(-energy/eM)*Peak(time,energy);  // Fv in [keV/(cm² s keV)]
   //////////////////////////////////////////////////
   /*
     double tcom = 2.0*to*gf;
-  
-
-  
-  if(Spectrum==1)
-    {
-      gm = gt(gem,0);//tcom);//tcom-2.0*gf*tc);//tcom);//-2.0*gf*tc);
-      gM = gt(geM,0);//tcom);//tcom);//tcom-2.0*gf*tc);//0);//tcom);//-2.0*gf*tc);
-      em = EsynObs(gm);
-      eM = EsynObs(gM);
-            
-      if(energy<=em)
-	{
-	  Fv = pow(energy/em, 1./3.);
-	}
-      else
-	{
-	  Fv = pow(energy/em,-m_p/2.);
-	}
-      
-      return Fv*exp(-energy/eM)*Peak(time,energy);; //kev/kev/s
-    }
-  // Integrated spectrum
-  em = EsynObs(gem);
-  ec = EsynObs(gec);//TMath::Max(1.0,ts0/time));//mec2/(Psyn0 * tc);*tcgec);
-  eM = EsynObs(geM);
     
-  if(ec <= em) //FAST COOLOING REGIME
+    
+    
+    if(Spectrum==1)
     {
-      if(energy<=ec)
-	Fv = pow(energy/ec,1./3.);
-      else if(energy<em)
-	Fv = pow(energy/ec,-1./2.);
-      else
-	Fv = pow(em/ec,-1./2.)*pow(energy/em,-m_p/2.);
-    }
-  else  // SLOW COOLING REGIME:
+    gm = gt(gem,0);//tcom);//tcom-2.0*gf*tc);//tcom);//-2.0*gf*tc);
+    gM = gt(geM,0);//tcom);//tcom);//tcom-2.0*gf*tc);//0);//tcom);//-2.0*gf*tc);
+    em = EsynObs(gm);
+    eM = EsynObs(gM);
+    
+    if(energy<=em)
     {
-      if(energy<=em)
-	Fv = pow(energy/em,1./3.);
-      else if(energy<ec)
-	Fv = pow(energy/em,-(m_p-1.)/2.);
-      else
-	Fv = pow(ec/em,-(m_p-1.)/2.)*pow(energy/ec,-m_p/2.);
+    Fv = pow(energy/em, 1./3.);
     }
-  return Fv*exp(-energy/eM)*Peak(time,energy);
+    else
+    {
+    Fv = pow(energy/em,-m_p/2.);
+    }
+    
+    return Fv*exp(-energy/eM)*Peak(time,energy);; //kev/kev/s
+    }
+    // Integrated spectrum
+    em = EsynObs(gem);
+    ec = EsynObs(gec);//TMath::Max(1.0,ts0/time));//mec2/(Psyn0 * tc);*tcgec);
+    eM = EsynObs(geM);
+    
+    if(ec <= em) //FAST COOLOING REGIME
+    {
+    if(energy<=ec)
+    Fv = pow(energy/ec,1./3.);
+    else if(energy<em)
+    Fv = pow(energy/ec,-1./2.);
+    else
+    Fv = pow(em/ec,-1./2.)*pow(energy/em,-m_p/2.);
+    }
+    else  // SLOW COOLING REGIME:
+    {
+    if(energy<=em)
+    Fv = pow(energy/em,1./3.);
+    else if(energy<ec)
+    Fv = pow(energy/em,-(m_p-1.)/2.);
+    else
+    Fv = pow(ec/em,-(m_p-1.)/2.)*pow(energy/ec,-m_p/2.);
+    }
+    return Fv*exp(-energy/eM)*Peak(time,energy);
   */
 }
 

@@ -11,24 +11,8 @@
  * \author Nicola Omodei       nicola.omodei@pi.infn.it 
  * \author Johann Cohen-Tanugi johann.cohen@pi.infn.it
  */
-//#include <iterator>
-//#include <iostream.h>
-//#include <fstream.h>
-
-/* #include <math.h> */
 #include <vector> 
 #include <string>
-/* #include <algorithm> */
-/* #include <cmath> */
-/* #include "stdio.h" */
-
-/* #include "TFile.h" */
-/* #include "TCanvas.h" */
-/* #include "TPad.h" */
-/* #include "TF1.h" */
-/* #include "TF2.h" */
-/* #include "TH1D.h" */
-/* #include "TH2D.h" */
 #include "TRandom.h"
 
 
@@ -41,10 +25,9 @@ namespace cst
   static const Double_t mec2  = 0.510999;       //MeV
   static const double st      = 6.65225e-25;
   
-  const float ab = 0.3;
-  const float ae = 0.3; 
-  // const float ap = 1.-(ab-ae);
-  
+  const double ab = 0.3;
+  const double ae = 0.3; 
+
   const double emin =  10.0; //keV
   const double emax = 1e9;  //keV
   const double enph = 1.0e+5;  //keV (30 MeV) 
@@ -52,7 +35,6 @@ namespace cst
   const    int Ebin =  50; 
   const    int Tbin =  500; 
   static const double de   = pow(emax/emin,1.0/Ebin);
-  //  static const double dt   = tmax/(Tbin-1);
   const double erg2meV   = 624151.0;
   
   const double BATSE1=20.0;                   //20 keV
@@ -114,11 +96,12 @@ class Parameters
  private:
 
   UInt_t m_GRBnumber;
-
+  int m_Type;
   int    m_Nshell;
   double m_Gmin;
   double m_Gmax ;
   double m_Fluence;
+  double m_Ep;
   double m_Etot   ;
   double m_InitialSeparation;
   double m_InitialThickness ;
