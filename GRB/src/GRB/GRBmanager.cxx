@@ -176,13 +176,11 @@ void GRBmanager::GenerateGRB()
       m_GRB->SaveGBMDefinition(GRBname,m_ra,m_dec,m_theta,m_phi,m_startTime);
       m_GRB->GetGBMFlux(GRBname);
     }
-  m_startTime = m_nextBurst;
 }
 
 double GRBmanager::interval(double time)
-{  
+{ 
   double inte;  
-  
   if(time <= m_startTime) 
     inte = m_startTime - time + m_spectrum->interval(0.0,m_enph);
   else if (time<m_endTime)
@@ -191,11 +189,12 @@ double GRBmanager::interval(double time)
     {
       delete m_GRB;
       delete m_spectrum;
+      m_startTime = m_nextBurst;
       GenerateGRB(); 
       inte = m_startTime-time + m_spectrum->interval(0.0,m_enph);
     }
   inte = TMath::Min(inte,m_nextBurst-time);
-  //  std::cout<<"GRBmanager interval : "<<inte<<std::endl;
+  //  std::cout<<"GRBmanager interval : "<<time<<" "<<m_startTime<<" "<<m_endTime<<" "<<inte<<std::endl;
   return inte;
 }
 
