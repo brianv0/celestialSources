@@ -54,8 +54,14 @@
      </spectrum> </source>
 
      <source name=" GRB_GLAST_0_0 ">
-	<spectrum escale="MeV"> <SpectrumClass name="GRBmanager" params="3600,7200"/>
+	<spectrum escale="MeV"> <SpectrumClass name="GRBmanager" params="3000,4000"/>
 	<direction theta="0" phi="0" />
+     </spectrum> </source>
+
+
+     <source name=" GRB_GLAST_30_45 ">
+	<spectrum escale="MeV"> <SpectrumClass name="GRBmanager" params="3000,4000"/>
+	<direction theta="30" phi="45" />
      </spectrum> </source>
 
 	

@@ -31,8 +31,8 @@ void Parameters::SetGalDir(double l, double b)
 {
   double ll,bb;
   
-  ll = (l<=180.0 && l>=-180.0) ? l : rnd->Uniform(180.0,-180.0);
-  bb = (b<=180.0 && b>=-180.0) ? b : rnd->Uniform(90.0,-90.0);
+  ll = (l<=180.0 && l>=-180.0) ? l : rnd->Uniform(-180.0,180.0);
+  bb = (b<=90.0 && b>=-90.0) ? b : rnd->Uniform(-90.0,90.0);
   
   m_GalDir=std::make_pair(ll,bb);
 }
@@ -117,9 +117,11 @@ int Parameters::ReadParametersFromFile(std::string paramFile, int NGRB)
 	  f1.getline(buf,100);
 	  sscanf(buf,"%d %lf %lf %lf %d %lf %lf %lf %lf %lf %lf",
 		 &seed,&l0,&b0,&fluence,&nshell,&etot,&r0,&dr0,&gmin,&gmax,&ic);
+
 	}
+      seed=NGRB;
     }
-    
+
   SetGalDir(l0,b0);
   SetNshell(nshell);
   SetEtot(etot);
@@ -129,9 +131,8 @@ int Parameters::ReadParametersFromFile(std::string paramFile, int NGRB)
   SetGammaMin(gmin);
   SetGammaMax(gmax);
   SetInverseCompton(ic);
+  SetGRBNumber(65540+ (long) seed);
 
-  if(seed>0) SetGRBNumber(65540+ (long) seed);
-  else SetGRBNumber(65540+ (long) NGRB);
   
 }
 
