@@ -1,162 +1,88 @@
 <source_library>
 
-
-
 <!-- Type of GRB spectrums : -->
-
 <!-- 1) GRBSpectrum: the physical model for simulating GRBs based on the fireball model.-->
-
 <!-- The reference frame is galactic. -->
 
-
-
-    <source name=" GRBspectrum_Gal" "GeV">
-
-    <spectrum> <SpectrumClass name="GRBSpectrum"/>
-
+    <source name=" GRBspectrum_Gal">
+    <spectrum  escale="GeV"> <SpectrumClass name="GRBSpectrum"/>
     <!--This will live the direction free-->
-
     <use_spectrum frame="galaxy"/>
-
     </spectrum> </source>
-
-
 
 <!-- 2) GRBobsSpectrum: the phenomenological model of GRB. The high energy part is extrapolated from the BATSE data. The reference frame is galactic. -->
 
-
-
-    <source name=" GRBobsSpectrum_Gal" escale="GeV">
-
-<!--        <spectrum> <SpectrumClass name="GRBobsSpectrum" params="$(GRBROOT)/GRBmakerOutput/GRB_001.lis"/>     -->
-        <spectrum> <SpectrumClass name="GRBobsSpectrum" params="$(GRBROOT)/GRBmakerOutput/"/>    
-<!--        <spectrum> <SpectrumClass name="GRBobsSpectrum"/>  -->
+    <source name=" GRBobsSpectrum_Gal" >
+<!--        <spectrum escale="GeV"> <SpectrumClass name="GRBobsSpectrum" params="$(GRBROOT)/GRBmakerOutput/GRB_001.lis"/>     -->
+        <spectrum  escale="GeV"> <SpectrumClass name="GRBobsSpectrum" params="$(GRBROOT)/GRBmakerOutput/"  />    
+<!--        <spectrum escale="GeV"> <SpectrumClass name="GRBobsSpectrum"/>  -->
     <!--This will live the direction free-->
-
     <use_spectrum frame="galaxy"/>
-
     </spectrum> </source>
-
-
 
 
 <!-- 2a) GRBobsSpectrum: the phenomenological model of GRB. The high energy part is extrapolated from the BATSE data. The reference frame is galactic. -->
 
-
-
-    <source name=" GRBobsSpectrum" "GeV">
-
-        <spectrum> <SpectrumClass name="GRBobsSpectrum" params="$(GRBROOT)/GRBmakerOutput/GRB_018.lis"/>     
-<!--        <spectrum> <SpectrumClass name="GRBobsSpectrum" params="$(GRBROOT)/GRBmakerOutput/"/>  -->  
-<!--        <spectrum> <SpectrumClass name="GRBobsSpectrum"/>  -->
+    <source name=" GRBobsSpectrum" >
+        <spectrum escale="GeV"> <SpectrumClass name="GRBobsSpectrum" params="$(GRBROOT)/GRBmakerOutput/GRB_018.lis"  />     
+<!--        <spectrum escale="GeV"> <SpectrumClass name="GRBobsSpectrum" params="$(GRBROOT)/GRBmakerOutput/"/>  -->  
+<!--        <spectrum escale="GeV"> <SpectrumClass name="GRBobsSpectrum"/>  -->
     <!--Have spectrum code return the direction (costheta, phi) -->
     <use_spectrum/>
     </spectrum> </source>
 
 
 
-
-
-
 <!--3) GRBmanager: several GRB are concatenated. When a GRB ends the next is created in a different position. --> 
 
-
-
-    <source name=" GRBmanager_Gal" "GeV">
-
-    <spectrum> <SpectrumClass name="GRBmanager"/>
-
+    <source name=" GRBmanager_Gal">
+    <spectrum escale="GeV"> <SpectrumClass name="GRBmanager"  />
     <use_spectrum frame="galaxy"/> 
-
     </spectrum> </source>
 
-
-
 <!--                  TEST SPECTRUMS                      -->
-
 <!-- The reference frame is galactic and a fixed direction is given to avoid the occlusion by the Earth. -->
 
-
-
         <source name=" GRBspectrum_Test" >
-
-	<spectrum> <SpectrumClass name="GRBSpectrum"/> 
-
+	<spectrum escale="GeV"> <SpectrumClass name="GRBSpectrum"  /> 
 	<!--This will fix the direction -->
-
 	<galactic_dir l="120" b="-50"/>
-
 	</spectrum> </source>
-
-
 
 	<source name=" GRBobsSpectrum_Test" >
-
-	<spectrum> <SpectrumClass name="GRBobsSpectrum"/>
-
+	<spectrum escale="GeV"> <SpectrumClass name="GRBobsSpectrum"  />
 	<!--This will fix the direction -->
-
 	<galactic_dir l="120" b="-50"/>
-
         </spectrum>
-
 	</source>
-
 	
-
 	<source name=" GRBmanager_Test" >
-
-	<spectrum> <SpectrumClass name="GRBmanager"/>
-
+	<spectrum escale="GeV"> <SpectrumClass name="GRBmanager"  />
 	<galactic_dir l="120" b="-50"/>
-
 	</spectrum> </source>
 
-
-
 <!--     GRBs and BACKGROUND MIXTURES    -->	
-
-	<!-- Only background mixture -->
-
-	<source name="backgndmix">
-
+	<!-- Only background mixture, defined in FluxSvc
+	<source name="backgndmix" >
         <nestedSource sourceRef="chimeavg"/>
-
         <nestedSource sourceRef="albedo_proton_avg"/>
-
         <nestedSource sourceRef="albedo_gamma"/>
-
         <nestedSource sourceRef="electronavg"/>
-
 	</source>
 
+        -->
 	<!--GRB spectrum + diffuse -->
-
-	<source name="GRBbckmix">
-
+	<source name="GRBbckmix" >
         <nestedSource sourceRef="GRBspectrum_Gal"/>
-
         <nestedSource sourceRef="diffuse"/>
-
 	</source>
-
 	
 
-
-
 	<!-- GRB obs spectrum + diffuse -->
-
-	<source name="GRBobsbckmix">
-
+	<source name="GRBobsbckmix" >
         <nestedSource sourceRef="GRBobsSpectrum_Gal"/> 
-
         <nestedSource sourceRef="diffuse"/>
-
 	</source>
 
-
-
 </source_library>
-
-
 
