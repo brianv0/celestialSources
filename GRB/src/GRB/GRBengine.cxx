@@ -221,7 +221,7 @@ GRBengine::GRBengine(GRBConstants *myParam)
 
 double GRBengine::GetTime(double duration,int nshock,double rnd)
 {
-  double tau = duration/(nshock*log(2));
+  double tau = duration/(nshock*log(2.0));
   return -log(1.-rnd)*tau;
 }
 

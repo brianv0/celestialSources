@@ -27,7 +27,7 @@ namespace grbcst
     const double  dynrange    = 3;
     const double  ethresLAT   = 0.03;
     const double  ethresGBM   = 30.0;
-    const double  zenNorm     = cos(0) - cos(75. / degInPi);
+    const double  zenNorm     = cos(0.0) - cos(75. / degInPi);
     const double  minwid      = 0.01;
     const double  maxwid      = 10.0;
     const double  logfac0     = pow((maxwid/minwid), (1./nbins));
