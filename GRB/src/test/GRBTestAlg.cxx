@@ -156,23 +156,23 @@ StatusCode GRBTestAlg::execute() {
 	{
 	  arguments.push_back("-root");
 	  arguments.push_back(arg3);
-	  cout<<" Saving "<<(arg3)<<" in a root file..."<<endl;
+	  std::cout<<" Saving "<<(arg3)<<" in a root file..."<<std::endl;
 	}
       if((*itr)=="ascii") 
 	{
 	  arguments.push_back("-ascii");
 	  arguments.push_back(arg3);
-	  cout<<" Saving the events in an ascii file..."<<endl;
+	  std::cout<<" Saving the events in an ascii file..."<<std::endl;
 	}
     }
   
   arguments.push_back(const_cast<char *>(m_source_name.c_str()));
-  cout<<"Primary Source Name = "<<m_source_name.c_str()<<endl;
+  std::cout<<"Primary Source Name = "<<m_source_name.c_str()<<std::endl;
   if( !m_background_name.empty() ){
     for(itr=m_background_name.begin();itr !=m_background_name.end();++itr)
       {
 	arguments.push_back(const_cast<char *>((*itr).c_str()));
-	cout<<" Background Source Name = "<<const_cast<char *>((*itr).c_str())<<endl;
+	std::cout<<" Background Source Name = "<<const_cast<char *>((*itr).c_str())<<std::endl;
       }
   }
   

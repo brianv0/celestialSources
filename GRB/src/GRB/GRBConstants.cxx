@@ -28,13 +28,13 @@ void GRBConstants::InitializeRandom(long seed)
       time_t ctime;
       if (time(&ctime)==time_t(-1))
 	{
-	  cout<<" Time() not defined for this processor "<<endl;
+	  std::cout<<" Time() not defined for this processor "<<std::endl;
 	  seed=1;
 	}
       seed=(ctime);
     }
   HepRandom::setTheSeed(seed);
-  cout<<"HepRandom initialized... SEED = "<<seed<<endl;
+  std::cout<<"HepRandom initialized... SEED = "<<seed<<std::endl;
   HepRandom::showEngineStatus();
 }
 
@@ -51,7 +51,7 @@ int GRBConstants::ReadParam(){
   ifstream f1(paramFile.c_str());
   if (! f1.is_open()) 
     {
-      cout<<"Error Opening $(GRBROOT)/src/test/GRBParam.txt\n";
+      std::cout<<"Error Opening $(GRBROOT)/src/test/GRBParam.txt\n";
       exit(1);
     }
   f1.getline(buf,100);
@@ -138,17 +138,17 @@ double GRBConstants::Distance()
 
 void GRBConstants::Print()
 {
-  // cout<<"Read the file: "<<paramFile.c_str()<<endl;
-  cout<<"********** Selected Parameters: **********"<<endl;
-  cout<<" Number of shells               = "<<Nshell()<<endl;
-  cout<<" Redshift of the Source         = "<<Redshift()<<endl;
-  cout<<" Total Energy at the Source     = "<<Etot()<<endl;
-  cout<<" Initial shell radius (cm)      = "<<ShellRadius()<<endl;
-  cout<<" Initial thickness  (cm)        = "<<Thickness()<<endl;
-  cout<<" Radius of the shell(cm)        = "<<JetRadius()<<endl;
-  cout<<" Minimum Lorentz factor         = "<<GammaMin()<<endl;
-  cout<<" Maximum Lorentz factor         = "<<GammaMax()<<endl;
-  cout<<"*******************************************"<<endl;
+  // std::cout<<"Read the file: "<<paramFile.c_str()<<std::endl;
+  std::cout<<"********** Selected Parameters: **********"<<std::endl;
+  std::cout<<" Number of shells               = "<<Nshell()<<std::endl;
+  std::cout<<" Redshift of the Source         = "<<Redshift()<<std::endl;
+  std::cout<<" Total Energy at the Source     = "<<Etot()<<std::endl;
+  std::cout<<" Initial shell radius (cm)      = "<<ShellRadius()<<std::endl;
+  std::cout<<" Initial thickness  (cm)        = "<<Thickness()<<std::endl;
+  std::cout<<" Radius of the shell(cm)        = "<<JetRadius()<<std::endl;
+  std::cout<<" Minimum Lorentz factor         = "<<GammaMin()<<std::endl;
+  std::cout<<" Maximum Lorentz factor         = "<<GammaMax()<<std::endl;
+  std::cout<<"*******************************************"<<std::endl;
 }
 
 void GRBConstants::Save(bool flag)
@@ -157,21 +157,21 @@ void GRBConstants::Save(bool flag)
     {
       m_paramFile=cst::paramFile;
       facilities::Util::expandEnvVar(&m_paramFile);
-      cout<<"Save Parameters into the file: "<<m_paramFile.c_str()<<endl;
+      std::cout<<"Save Parameters into the file: "<<m_paramFile.c_str()<<std::endl;
       ofstream f2(m_paramFile.c_str(),ios::app);
       if (! f2.is_open()) 
 	{
-	  cout<<"Error Opening "<<m_paramFile<<endl;
+	  std::cout<<"Error Opening "<<m_paramFile<<std::endl;
 	  exit(1);
 	}
       
-      f2<<Nshock()<<endl;
-      f2<<Redshift()<<endl;
-      f2<<Etot()<<endl;
-      f2<<JetRadius()<<endl;
-      f2<<Thickness()<<endl;
-      f2<<GammaMin()<<endl;
-      f2<<GammaMax()<<endl;
+      f2<<Nshock()<<std::endl;
+      f2<<Redshift()<<std::endl;
+      f2<<Etot()<<std::endl;
+      f2<<JetRadius()<<std::endl;
+      f2<<Thickness()<<std::endl;
+      f2<<GammaMin()<<std::endl;
+      f2<<GammaMax()<<std::endl;
       f2.close();
     }
 }

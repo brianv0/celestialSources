@@ -13,7 +13,7 @@ GRBengine::GRBengine(GRBConstants *myParam)
     {
     case 1: // jet, no shell evolution
       {
-	cout<<" CASE 1: no shell evolution, no collision, physical parameters "<<endl;  
+	std::cout<<" CASE 1: no shell evolution, no collision, physical parameters "<<std::endl;  
 	m_duration=0.0;
 	double BurstDuration     = myParam->Duration();
 	if (BurstDuration<=0) BurstDuration=getDurationFromBATSE();
@@ -53,7 +53,7 @@ GRBengine::GRBengine(GRBConstants *myParam)
       break;
     case 2: // 2 shells that shock, jet, no shell evolution
       {
-	cout<<"CASE 2: no shell evolution, collision , physical parameters "<<endl;
+	std::cout<<"CASE 2: no shell evolution, collision , physical parameters "<<std::endl;
 	m_duration=0.0;
 	double BurstDuration     = myParam->Duration();
 	if (BurstDuration<=0) BurstDuration=getDurationFromBATSE();
@@ -107,7 +107,7 @@ GRBengine::GRBengine(GRBConstants *myParam)
       break;
     case 3: // jet, no shell evolution, obseravbles fixed
       {
-	cout<<" CASE 3: no shell evolution, no collision, observable fixed "<<endl;  
+	std::cout<<" CASE 3: no shell evolution, no collision, observable fixed "<<std::endl;  
 	double rise_time   = myParam->RiseTime(); //sec
 	double decay_time  = myParam->DecayTime(); //sec
 	double peak_energy = myParam->PeakEnergy(); //MeV
@@ -155,10 +155,10 @@ GRBengine::GRBengine(GRBConstants *myParam)
 	    ns++;
 	    ShockTime += timeBetweenShocks; 
 	    timeBetweenShocks = 2.*BurstDuration/NumberOfShocks*RandFlat::shoot(1.0);
-	    cout<<" **************************************************"<<endl;
-	    cout<<" Estimated Rise Time      = "<<C1*thickness/gamma<<endl;
-	    cout<<" Estimated Decay Time     = "<<C2*pow(jet_radius,2.)*thickness/(gamma*ei)<<endl;
-	    cout<<" Estimated Break Energy   = "<<C3*pow(gamma,3.)*sqrt(ei/thickness)/(jet_radius)<<endl;
+	    std::cout<<" **************************************************"<<std::endl;
+	    std::cout<<" Estimated Rise Time      = "<<C1*thickness/gamma<<std::endl;
+	    std::cout<<" Estimated Decay Time     = "<<C2*pow(jet_radius,2.)*thickness/(gamma*ei)<<std::endl;
+	    std::cout<<" Estimated Break Energy   = "<<C3*pow(gamma,3.)*sqrt(ei/thickness)/(jet_radius)<<std::endl;
 	  }
       }
       break;

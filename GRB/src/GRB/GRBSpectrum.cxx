@@ -35,7 +35,7 @@ double GRBSpectrum::flux(double time) const
 
 double GRBSpectrum::interval(double time)// const
 {
-  //  cout<<" Interval @ time "<<time<<endl;;
+  //  std::cout<<" Interval @ time "<<time<<std::endl;;
   double inter;
   if(time<0) time=abs(time);
   
@@ -74,7 +74,7 @@ double GRBSpectrum::interval(double time)// const
 
 double GRBSpectrum::energySrc(HepRandomEngine* engine, double time)
 {
-  //  cout<<"energySrc @ time "<<time<<endl;
+  //  std::cout<<"energySrc @ time "<<time<<std::endl;
   //return the flux in photons/(m^2 sec)
   /// Use time to update the spectrum
   m_spectrum.clear();

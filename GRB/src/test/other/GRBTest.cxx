@@ -153,7 +153,7 @@ DataOut::DataOut(){}
 
 GRBTest::GRBTest()
 {
-  cout<<" Starting a new Test"<<endl;
+  std::cout<<" Starting a new Test"<<std::endl;
 }
 //------------------------------------------------------------------------------
 double GRBTest::CalculateFluence(double ee/* MeV */,
@@ -210,7 +210,7 @@ void GRBTest::listSpectra() {
 int GRBTest::Start(std::vector<char*> argv)
 {
   int argc = argv.size();
-  //  cout<<argc<<endl;
+  //  std::cout<<argc<<std::endl;
   int nume,i;
   int num_sources=0;
   double time_max=TIME;  //time to use for flux and rate functions
@@ -229,17 +229,17 @@ int GRBTest::Start(std::vector<char*> argv)
   vector<std::string> sources;
 
   /*
-    cout << "------------------------------------------------------" <<endl;
-    cout << " Flux test program: type 'GRBTest.exe -help' for help" <<endl;
-    cout << ( ( argc == 1)?  " No command line args, using defaults"
-    :  "") <<endl;
+    std::cout << "------------------------------------------------------" <<std::endl;
+    std::cout << " Flux test program: type 'GRBTest.exe -help' for help" <<std::endl;
+    std::cout << ( ( argc == 1)?  " No command line args, using defaults"
+    :  "") <<std::endl;
   */
   savef_root=false;
   savef_ascii=false;
   while(current_arg < argc)
     {
       arg_name = argv[current_arg];
-      cout<<arg_name<<endl;
+      std::cout<<arg_name<<std::endl;
       if("-help" == arg_name || "help" == arg_name) 
 	{ 
 	  help();
@@ -255,20 +255,20 @@ int GRBTest::Start(std::vector<char*> argv)
 
       else if("-time" == arg_name) {
 	time_max =atof(argv[++current_arg]);
-	//cout<<" MAX TIME = "<<time_max<<endl;
+	//cout<<" MAX TIME = "<<time_max<<std::endl;
       }
       else if("-events" == arg_name) {
 	events_max = atoi(argv[++current_arg]);
-	//cout<<" MAX NUM OF EVENTS = "<<events_max<<endl;
+	//cout<<" MAX NUM OF EVENTS = "<<events_max<<std::endl;
 	if (events_max<1) return 0;
       }
       else if("-root" == arg_name) {
-	cout<<" SAVE ROOT" <<endl;
+	cout<<" SAVE ROOT" <<std::endl;
 	savef_root=true;
 	m_loop = atoi(argv[++current_arg]);//argv[++current_arg];
       }
       else if("-ascii" == arg_name) {
-	cout<<" SAVE ASCII" <<endl;
+	cout<<" SAVE ASCII" <<std::endl;
 	savef_ascii=true;
 	m_loop = atoi(argv[++current_arg]);//argv[++current_arg];
       }
@@ -287,7 +287,7 @@ int GRBTest::Start(std::vector<char*> argv)
       sources.push_back(default_arg);
       num_sources++;
     }
-  //  cout<<"Num Sources = "<<num_sources<<endl;
+  //  std::cout<<"Num Sources = "<<num_sources<<std::endl;
   // Create the file, the tree and the branches...
   TTree* events;        
   TObjArray Forest(0);
@@ -313,10 +313,10 @@ int GRBTest::Start(std::vector<char*> argv)
       StatusCode sc =  m_fsvc->source(sources[i], m_flux);
       if( sc.isFailure()) 
 	{
-	  std::cout << "Could not find flux " <<sources[i]<<endl;
+	  std::cout << "Could not find flux " <<sources[i]<<std::endl;
 	  return sc;
 	}
-      cout<<" Source Name = "<<sources[i]<<endl;
+      std::cout<<" Source Name = "<<sources[i]<<std::endl;
       number = new char(20);
       
       if (m_loop<10) 
@@ -349,7 +349,7 @@ int GRBTest::Start(std::vector<char*> argv)
 	}
       //sb pair<double,double> loc=m_fsvc->location();
 
-      //      cout << loc.first << "   " << loc.second <<endl;
+      //      std::cout << loc.first << "   " << loc.second <<std::endl;
       time=0.0;
       double t1;
       t1=time;
@@ -357,12 +357,12 @@ int GRBTest::Start(std::vector<char*> argv)
 
       while(time<time_max && nume<=events_max)
 	{
-	  //	  cout<<"GPS = "<<m_flux->gpsTime()<<endl;
-	  // cout<<"m_flux->generate()"<<endl;
+	  //	  std::cout<<"GPS = "<<m_flux->gpsTime()<<std::endl;
+	  // std::cout<<"m_flux->generate()"<<std::endl;
 	  m_flux->generate(); 
-	  // cout<<"m_flux->time()"<<endl;
+	  // std::cout<<"m_flux->time()"<<std::endl;
 	  time=m_flux->time();
-	  // cout<<"time = "<<time<<endl;
+	  // std::cout<<"time = "<<time<<std::endl;
 
 	  if (time>=1.0e+6) break;
 	  dir = m_flux->launchDir();
@@ -383,11 +383,11 @@ int GRBTest::Start(std::vector<char*> argv)
 	  if(abs(b)<1.0e-10) b=0.;
 	  if(abs(l)<1.0e-10) l=0.;
 	  
-	  // cout<<"m_flux->energy()"<<endl;
+	  // std::cout<<"m_flux->energy()"<<std::endl;
 	  energy = m_flux->energy(); // kinetic energy in MeV
-	  // cout<<"energy = "<<energy<<endl;
+	  // std::cout<<"energy = "<<energy<<std::endl;
 	  Area=m_flux->targetArea(); 
-	  // cout<<"m_flux->rate()"<<endl;
+	  // std::cout<<"m_flux->rate()"<<std::endl;
 	  Rate= m_flux->rate();
 	  dt=time-t1;
 
@@ -423,7 +423,7 @@ int GRBTest::Start(std::vector<char*> argv)
 	      theData.push_back(myData);
 	    }
 	  if (nume%1==0){
-	    cout<<
+	    std::cout<<
 	      "-------- Event Number: "<<nume<<"\n"<<
 	      " Time [s] = "<<t1<<"\n"<<
 	      " Rate [ph/(s)]= "<<Rate<<"\n"<<
@@ -439,29 +439,29 @@ int GRBTest::Start(std::vector<char*> argv)
 	  t1=time;
 	  nume++;
 	}
-      cout<<"Time final="<<t1<<endl;
-      cout<<"Number of events processed for this source= "<<nume-1<<endl;
+      std::cout<<"Time final="<<t1<<std::endl;
+      std::cout<<"Number of events processed for this source= "<<nume-1<<std::endl;
       if (savef_root==true) events->Print();
-      cout<<"Total Fluence [erg/cm^2]="<<fluenceTot/(Area*1.0e+4)*(1.0/cst::erg2MeV)<<endl;
+      std::cout<<"Total Fluence [erg/cm^2]="<<fluenceTot/(Area*1.0e+4)*(1.0/cst::erg2MeV)<<std::endl;
       
-      cout<<"Fluence ("<<ch1L<<"  MeV - "<<ch1H<<" MeV) [erg/cm^2]="<<fluence1/(Area*1.0e+4)*(1.0/cst::erg2MeV)<<endl;
-      cout<<"Fluence ("<<ch2L<<"  MeV - "<<ch2H<<" MeV) [erg/cm^2]="<<fluence2/(Area*1.0e+4)*(1.0/cst::erg2MeV)<<endl;
-      cout<<"Fluence ("<<ch3L<<"  MeV - "<<ch3H<<" MeV) [erg/cm^2]="<<fluence3/(Area*1.0e+4)*(1.0/cst::erg2MeV)<<endl;
-      cout<<"Fluence ("<<ch4L<<"  MeV - "<<ch4H<<" MeV) [erg/cm^2]="<<fluence4/(Area*1.0e+4)*(1.0/cst::erg2MeV)<<endl;
-      cout<<"Fluence ("<<ch5L<<"  MeV - "<<ch5H<<" MeV) [erg/cm^2]="<<fluence5/(Area*1.0e+4)*(1.0/cst::erg2MeV)<<endl;
+      std::cout<<"Fluence ("<<ch1L<<"  MeV - "<<ch1H<<" MeV) [erg/cm^2]="<<fluence1/(Area*1.0e+4)*(1.0/cst::erg2MeV)<<std::endl;
+      std::cout<<"Fluence ("<<ch2L<<"  MeV - "<<ch2H<<" MeV) [erg/cm^2]="<<fluence2/(Area*1.0e+4)*(1.0/cst::erg2MeV)<<std::endl;
+      std::cout<<"Fluence ("<<ch3L<<"  MeV - "<<ch3H<<" MeV) [erg/cm^2]="<<fluence3/(Area*1.0e+4)*(1.0/cst::erg2MeV)<<std::endl;
+      std::cout<<"Fluence ("<<ch4L<<"  MeV - "<<ch4H<<" MeV) [erg/cm^2]="<<fluence4/(Area*1.0e+4)*(1.0/cst::erg2MeV)<<std::endl;
+      std::cout<<"Fluence ("<<ch5L<<"  MeV - "<<ch5H<<" MeV) [erg/cm^2]="<<fluence5/(Area*1.0e+4)*(1.0/cst::erg2MeV)<<std::endl;
       
       if (savef_root==true){
 	std::string paramFile = "GRBdata.txt";
 	facilities::Util::expandEnvVar(&paramFile);
 	std::ofstream fout(paramFile.c_str(),ios::app);
-	fout<<t1<<endl;
+	fout<<t1<<std::endl;
 	
-	fout<<(fluenceTot)*(1.0/cst::erg2MeV)<<endl;
-	fout<<fluence1/(Area*1.0e+4)*(1.0/cst::erg2MeV)<<endl;
-	fout<<fluence2/(Area*1.0e+4)*(1.0/cst::erg2MeV)<<endl;
-	fout<<fluence3/(Area*1.0e+4)*(1.0/cst::erg2MeV)<<endl;
-	fout<<fluence4/(Area*1.0e+4)*(1.0/cst::erg2MeV)<<endl;
-	fout<<fluence5/(Area*1.0e+4)*(1.0/cst::erg2MeV)<<endl;
+	fout<<(fluenceTot)*(1.0/cst::erg2MeV)<<std::endl;
+	fout<<fluence1/(Area*1.0e+4)*(1.0/cst::erg2MeV)<<std::endl;
+	fout<<fluence2/(Area*1.0e+4)*(1.0/cst::erg2MeV)<<std::endl;
+	fout<<fluence3/(Area*1.0e+4)*(1.0/cst::erg2MeV)<<std::endl;
+	fout<<fluence4/(Area*1.0e+4)*(1.0/cst::erg2MeV)<<std::endl;
+	fout<<fluence5/(Area*1.0e+4)*(1.0/cst::erg2MeV)<<std::endl;
 	
 	fout.close();
       }
@@ -483,9 +483,9 @@ int GRBTest::Start(std::vector<char*> argv)
       
       //      phout=fopen(photonList.c_str(),"w");
       phout=fopen(ascii_name,"w");
-      cout<<" Total Number Of Events = "<<theData.size()<<endl;
+      std::cout<<" Total Number Of Events = "<<theData.size()<<std::endl;
       std::vector<DataOut>::iterator itr;
-      cout<<"Sorting The Photon List..."<<endl;
+      std::cout<<"Sorting The Photon List..."<<std::endl;
       std::sort(theData.begin(), theData.end(), TimeCmp());
       for(itr=theData.begin();itr != theData.end();++itr)
 	{
@@ -495,7 +495,7 @@ int GRBTest::Start(std::vector<char*> argv)
 		  (*itr).Phi(),
 		  (*itr).Theta(),
 		  (*itr).Signal());
-	  cout<<(*itr).Energy()<<endl;
+	  std::cout<<(*itr).Energy()<<std::endl;
 	  /*
 	    phout<<(*itr).Time()<<"\t"
 	    <<(*itr).Energy()<<"\t"

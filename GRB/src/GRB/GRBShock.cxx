@@ -45,8 +45,8 @@ double GRBShock::duration()
 {
   double tau_rise    = m_thickness/(cst::c)/m_gf;
   double tau_decay   = 1.e+7*m_volume/m_Eint/m_gf;
-  //  cout<<" Rise  Time "<<tau_rise<<endl;
-  //  cout<<" Decay Time "<<tau_decay<<endl;
+  //  std::cout<<" Rise  Time "<<tau_rise<<std::endl;
+  //  std::cout<<" Decay Time "<<tau_decay<<std::endl;
   return (1./2.7*sqrt(tau_decay)+tau_rise);
 }
 /*
@@ -57,29 +57,29 @@ double GRBShock::duration()
   GRBSynchrotron m_syn(time-m_tobs,m_gf,m_Beq,
   m_partnumber,m_gemin,m_gemax,
   m_volume,m_thickness);
-  //cout<<m_syn->getSpectrum().size()<<endl;
+  //std::cout<<m_syn->getSpectrum().size()<<std::endl;
   return m_syn.getSpectrum();
   }
 */
 
 void GRBShock::Write()
 {
-  cout<< "--------------------Shock's parameters --------------" << endl;
-  cout<< " T obs                      = "<<m_tobs<<endl;
-  cout<< " Mass [g]                   = "<<m_mass<<endl;
-  cout<< " Thickness [cm]             = "<< m_thickness<<endl;
-  cout<< " Volume [cm^3]              = "<< m_volume<<endl;
-  cout<< " Gamma final                = "<<m_gf<<endl;
-  cout<< " Internal Energy [erg]      = "<<m_Eint<<endl;
-  cout<< " Electron density [1/cm^3]  = "<<m_partdensity<<endl;
-  cout<< " Number of Electron         = "<<m_partnumber<<endl;
-  cout<< " Electron minimum gamma     = "<< m_gemin<<endl;
-  cout<< " Electron Maximum gamma     = "<< m_gemax<<endl;
-  cout<< " Electron Energy [erg/cm^3] = "<< m_Ue<<endl;
-  cout<< " Magnetic Field [Gauss]     = "<< m_Beq<<endl;
-  cout<< " Magnetic Energy [erg/cm^3] = "<< m_Ub<<endl;
-  cout<< " Rise  time                 = "<<m_thickness/(cst::c)/m_gf<<endl;
-  cout<< " Decay time                 = "<<1.e+7*m_volume/m_Eint/m_gf<<endl;
-  cout<< " Duration                   = "<<duration()<<endl;
+  std::cout<< "--------------------Shock's parameters --------------" << std::endl;
+  std::cout<< " T obs                      = "<<m_tobs<<std::endl;
+  std::cout<< " Mass [g]                   = "<<m_mass<<std::endl;
+  std::cout<< " Thickness [cm]             = "<< m_thickness<<std::endl;
+  std::cout<< " Volume [cm^3]              = "<< m_volume<<std::endl;
+  std::cout<< " Gamma final                = "<<m_gf<<std::endl;
+  std::cout<< " Internal Energy [erg]      = "<<m_Eint<<std::endl;
+  std::cout<< " Electron density [1/cm^3]  = "<<m_partdensity<<std::endl;
+  std::cout<< " Number of Electron         = "<<m_partnumber<<std::endl;
+  std::cout<< " Electron minimum gamma     = "<< m_gemin<<std::endl;
+  std::cout<< " Electron Maximum gamma     = "<< m_gemax<<std::endl;
+  std::cout<< " Electron Energy [erg/cm^3] = "<< m_Ue<<std::endl;
+  std::cout<< " Magnetic Field [Gauss]     = "<< m_Beq<<std::endl;
+  std::cout<< " Magnetic Energy [erg/cm^3] = "<< m_Ub<<std::endl;
+  std::cout<< " Rise  time                 = "<<m_thickness/(cst::c)/m_gf<<std::endl;
+  std::cout<< " Decay time                 = "<<1.e+7*m_volume/m_Eint/m_gf<<std::endl;
+  std::cout<< " Duration                   = "<<duration()<<std::endl;
 }
 

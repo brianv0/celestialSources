@@ -15,9 +15,9 @@ using namespace std;
 
 GRBSim::GRBSim(long seed)
 {
-  cout<<"******Staring The GRB Simulation******"<<endl;
+  std::cout<<"******Staring The GRB Simulation******"<<std::endl;
   m_seed = seed;
-  //  cout<<"--------INT SEED = "<<m_seed<<endl;
+  //  std::cout<<"--------INT SEED = "<<m_seed<<std::endl;
   //////////////////////////////////////////////////
   m_spectobj = SpectObj(cst::enmin,cst::enmax,cst::enstep);
   //////////////////////////////////////////////////
@@ -33,7 +33,7 @@ GRBSim::GRBSim(long seed)
 
 GRBSim::GRBSim(const std::string& params)
 {
-  cout<<"******Staring The GRB Simulation******"<<endl;
+  std::cout<<"******Staring The GRB Simulation******"<<std::endl;
   std::ifstream is (params.c_str());
   is>>m_seed;
   is.close();
@@ -41,7 +41,7 @@ GRBSim::GRBSim(const std::string& params)
   std::ofstream os (params.c_str());
   os<<m_seed;
   os.close();
-  //  cout<<"------PARAMS  SEED = "<<m_seed<<endl;
+  //  std::cout<<"------PARAMS  SEED = "<<m_seed<<std::endl;
   //////////////////////////////////////////////////
   m_spectobj = SpectObj(cst::enmin,cst::enmax,cst::enstep);
   //////////////////////////////////////////////////
@@ -60,7 +60,7 @@ GRBSim::~GRBSim()
 {
   delete m_engine;
   delete myParam;
-  cout<<"*******Exiting The GRB Simulation ******"<<endl;
+  std::cout<<"*******Exiting The GRB Simulation ******"<<std::endl;
 }
 /*------------------------------------------------------*/
 
@@ -76,7 +76,7 @@ void GRBSim::MakeGRB(double time_offset)
     }
   catch (char * )
     {
-      std::cout<< "Failure initializing the GRB constants \n";
+      std::std::cout<< "Failure initializing the GRB constants \n";
       exit(1);
     }
   
@@ -102,17 +102,17 @@ void GRBSim::MakeGRB(double time_offset)
 
   
   //////////////////////////////////////////////////
-  cout<<" Dist  of the source   = "<<m_distance<<" cm "<<endl;
-  cout<<" Galactic Direction = [l= "<<m_direction.first<<" ,b = "<<m_direction.second<<"]"<<endl;
-  cout<<" Number of Shocks      = " <<theShocks.size()<< endl;
-  cout<<" Duration of the Burst = "<<m_duration-time_offset<<endl;
-  //cout<<" Total Energy Radiated = "<<0<<endl;
+  std::cout<<" Dist  of the source   = "<<m_distance<<" cm "<<std::endl;
+  std::cout<<" Galactic Direction = [l= "<<m_direction.first<<" ,b = "<<m_direction.second<<"]"<<std::endl;
+  std::cout<<" Number of Shocks      = " <<theShocks.size()<< std::endl;
+  std::cout<<" Duration of the Burst = "<<m_duration-time_offset<<std::endl;
+  //std::cout<<" Total Energy Radiated = "<<0<<std::endl;
   //////////////////////////////////////////////////
-  cout<<m_energy.size()<<" "<<m_de.size()<<endl;
+  std::cout<<m_energy.size()<<" "<<m_de.size()<<std::endl;
   if (m_duration-time_offset<2.)
-    {cout<<"The burst is Short "<<endl;}
+    {std::cout<<"The burst is Short "<<std::endl;}
   else
-    {cout<<"The burst is Long "<<endl;}
+    {std::cout<<"The burst is Long "<<std::endl;}
   //ouble dt=(m_duration-time_offset)/nstep;
   
   std::vector<GRBShock>::iterator itr;
@@ -127,7 +127,7 @@ std::vector<double> GRBSim::ComputeFlux(const double time)
 {
   // Compute the flux at time t, and return a vector containing the flux in 
   //-------------->       ph/s/MeV/m^2
-  //  cout<<"Compute the flux @ time ="<<time<<endl;
+  //  std::cout<<"Compute the flux @ time ="<<time<<std::endl;
   m_spectobj *= 0.0 ;
   std::vector<double> spectrum(enstep+1 ,0.);
   if (time<=0) return spectrum;

@@ -158,14 +158,14 @@ void Burst(int argc, char** argv)
     {
       GRBSim* _myGRB = new GRBSim(seed);
       /// This initializes the GRB simulation...
-      cout<<"******     Initializing ROOT    ******"<<endl;
+      std::cout<<"******     Initializing ROOT    ******"<<std::endl;
       static const   TROOT root("GRB", "GRB Simulator");
       //TROOT->Stat()
       _myGRB->MakeGRB();
       
       if (!set_tmax) tmax=_myGRB->Tmax();
       
-      cout<<" MAX TIME = "<<tmax<<endl;
+      std::cout<<" MAX TIME = "<<tmax<<std::endl;
       double m_dt=tmax/cst::nstep;
       
       energy=_myGRB->Energy();
@@ -271,8 +271,8 @@ void Burst(int argc, char** argv)
 	  fluence4+=_myGRB->IFlux(spectrum,ch4L,ch4H)              /(cst::erg2MeV*1.0e+6)*(1.0e-4)*m_dt;
 	  // erg/cm^2
 	  if (video_out) 
-	    cout<<"Time / tmax = "<<m_time[t]<<"/" <<tmax<<" Ftot [erg]= "
-		<<fluenceTOT*(_myGRB->Area()*1.0e+4)<<endl;
+	    std::cout<<"Time / tmax = "<<m_time[t]<<"/" <<tmax<<" Ftot [erg]= "
+		<<fluenceTOT*(_myGRB->Area()*1.0e+4)<<std::endl;
 	}
       //////////////////////////////////////////////////
       if(save_gif) 
@@ -291,23 +291,23 @@ void Burst(int argc, char** argv)
       //  gSystem->Exec("gifview -a anim.gif");
       //////////////////////////////////////////////////
 
-      cout<<"**************************************************"<<endl;
+      std::cout<<"**************************************************"<<std::endl;
       if (fluence2!=0) 
-	cout<<" HardNess Ratio =  "<<fluence3/fluence2<<endl;
-      cout<<"Fluence [erg/cm^2] = "<<fluenceTOT<<endl;
+	std::cout<<" HardNess Ratio =  "<<fluence3/fluence2<<std::endl;
+      std::cout<<"Fluence [erg/cm^2] = "<<fluenceTOT<<std::endl;
       
-      cout<<"Fluence ("<<ch1L*1.0e-6<<" MeV - "<<ch1H*1.0e-6<<" MeV) [erg/cm^2] = "
+      std::cout<<"Fluence ("<<ch1L*1.0e-6<<" MeV - "<<ch1H*1.0e-6<<" MeV) [erg/cm^2] = "
 	  <<fluence1<<", photons expected = "<<
-	fluence1*(cst::erg2MeV)*1.0e+10/(ch1H-ch1L)*6.<<endl;
-      cout<<"Fluence ("<<ch2L*1.0e-6<<" MeV - "<<ch2H*1.0e-6<<" MeV) [erg/cm^2] = "
+	fluence1*(cst::erg2MeV)*1.0e+10/(ch1H-ch1L)*6.<<std::endl;
+      std::cout<<"Fluence ("<<ch2L*1.0e-6<<" MeV - "<<ch2H*1.0e-6<<" MeV) [erg/cm^2] = "
 	  <<fluence2<<", photons expected =  "<<
-	fluence2*(cst::erg2MeV)*1.0e+10/(ch2H-ch2L)*6.<<endl;
-      cout<<"Fluence ("<<ch3L*1.0e-6<<" MeV - "<<ch3H*1.0e-6<<" MeV) [erg/cm^2] = "
+	fluence2*(cst::erg2MeV)*1.0e+10/(ch2H-ch2L)*6.<<std::endl;
+      std::cout<<"Fluence ("<<ch3L*1.0e-6<<" MeV - "<<ch3H*1.0e-6<<" MeV) [erg/cm^2] = "
 	  <<fluence3<<", photons expected =  "<<
-	fluence3*(cst::erg2MeV)*1.0e+10/(ch3H-ch3L)*6.<<endl;
-      cout<<"Fluence ("<<ch4L*1.0e-6<<" MeV - "<<ch4H*1.0e-6<<" MeV) [erg/cm^2] = "
+	fluence3*(cst::erg2MeV)*1.0e+10/(ch3H-ch3L)*6.<<std::endl;
+      std::cout<<"Fluence ("<<ch4L*1.0e-6<<" MeV - "<<ch4H*1.0e-6<<" MeV) [erg/cm^2] = "
 	  <<fluence4<<", photons expected =  "<<
-	fluence4*(cst::erg2MeV)*1.0e+10/(ch4H-ch4L)*6.<<endl;
+	fluence4*(cst::erg2MeV)*1.0e+10/(ch4H-ch4L)*6.<<std::endl;
       //////////////////////////////////////////////////
       // Save the results in the GRBlogfile...        //
       //////////////////////////////////////////////////
@@ -326,29 +326,29 @@ void Burst(int argc, char** argv)
 	  /*
 	  if (! f1.is_open()) 
 	    {
-	      cout<<"Error Opening $(GRBROOT)/src/test/GRBlog.txt\n";
+	      std::cout<<"Error Opening $(GRBROOT)/src/test/GRBlog.txt\n";
 	      //TODO LIST: still need to remove this exit, without getting a core dump!
 	      exit(1);
 	    }
-	  cout<<"Save results into the file: "<<paramFile.c_str()<<endl;
-	  cout<<"*******************************************"<<endl;
+	  std::cout<<"Save results into the file: "<<paramFile.c_str()<<std::endl;
+	  std::cout<<"*******************************************"<<std::endl;
 	  
-	  f1<<"Tmax = "<<tmax<<" Ftot [erg]= "<<fluence1<<endl;
-	  f1<<"Fluence [erg/cm^2] = "<<fluence1/_myGRB->Area()<<endl;
-	  f1<<"Fluence ("<<ch1L*1.0e-6<<" MeV - "<<ch1H*1.0e-6<<" MeV) [erg/cm^2] = "<<fluence2/_myGRB->Area()<<endl;
-	  f1<<"Fluence ("<<ch2L*1.0e-6<<" MeV - "<<ch2H*1.0e-6<<" MeV) [erg/cm^2] = "<<fluence3/_myGRB->Area()<<endl;
-	  f1<<"Fluence ("<<ch3L*1.0e-6<<" MeV - "<<ch3H*1.0e-6<<" MeV) [erg/cm^2] = "<<fluence4/_myGRB->Area()<<endl;
-	  f1<<"Fluence ("<<ch4L*1.0e-6<<" MeV - "<<ch4H*1.0e-6<<" MeV) [erg/cm^2] = "<<fluence5/_myGRB->Area()<<endl;
+	  f1<<"Tmax = "<<tmax<<" Ftot [erg]= "<<fluence1<<std::endl;
+	  f1<<"Fluence [erg/cm^2] = "<<fluence1/_myGRB->Area()<<std::endl;
+	  f1<<"Fluence ("<<ch1L*1.0e-6<<" MeV - "<<ch1H*1.0e-6<<" MeV) [erg/cm^2] = "<<fluence2/_myGRB->Area()<<std::endl;
+	  f1<<"Fluence ("<<ch2L*1.0e-6<<" MeV - "<<ch2H*1.0e-6<<" MeV) [erg/cm^2] = "<<fluence3/_myGRB->Area()<<std::endl;
+	  f1<<"Fluence ("<<ch3L*1.0e-6<<" MeV - "<<ch3H*1.0e-6<<" MeV) [erg/cm^2] = "<<fluence4/_myGRB->Area()<<std::endl;
+	  f1<<"Fluence ("<<ch4L*1.0e-6<<" MeV - "<<ch4H*1.0e-6<<" MeV) [erg/cm^2] = "<<fluence5/_myGRB->Area()<<std::endl;
 	  f1.close();
 	  */
-	  f2<<seed<<endl;
-	  f2<<tmax<<endl;
-	  f2<<fluenceTOT*(_myGRB->Area()*1.e+4)<<endl;
-	  f2<<fluenceTOT<<endl;
-	  f2<<fluence1<<endl;
-	  f2<<fluence2<<endl;
-	  f2<<fluence3<<endl;
-	  f2<<fluence4<<endl;
+	  f2<<seed<<std::endl;
+	  f2<<tmax<<std::endl;
+	  f2<<fluenceTOT*(_myGRB->Area()*1.e+4)<<std::endl;
+	  f2<<fluenceTOT<<std::endl;
+	  f2<<fluence1<<std::endl;
+	  f2<<fluence2<<std::endl;
+	  f2<<fluence3<<std::endl;
+	  f2<<fluence4<<std::endl;
 	  f2.close();
 	}
       
@@ -372,7 +372,7 @@ void Burst(int argc, char** argv)
 	  TCanvas *c2 = new TCanvas("c2","GRB Light Curve");
 	  //TCanvas *c4 = new TCanvas("c4","Countour Plot");
 	  TCanvas *c5 = new TCanvas("c5","3D Flux Rapresentation");
-	  //cout<<"xmin = "<< energyx[0] << "   xmax = "<<energyx[cst::nstep-1]<< "  ymin = "<<timex[0] <<"   ymax =" << timex[cst::nstep-1] <<endl;
+	  //std::cout<<"xmin = "<< energyx[0] << "   xmax = "<<energyx[cst::nstep-1]<< "  ymin = "<<timex[0] <<"   ymax =" << timex[cst::nstep-1] <<std::endl;
 	 	  
 	  TH1D *fl = new TH1D("fl","fl",cst::enstep,e_bins);
 	  TH1D *ph = new TH1D("ph","ph",cst::enstep,e_bins);
@@ -616,7 +616,6 @@ void Burst(int argc, char** argv)
 	}
       ////////////////////////////////////////////
       
-      cout<<"YES"<<endl;
       if (video_out) theApp.Run();
       delete _myGRB;
       //To kill the application press control C //
