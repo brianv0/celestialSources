@@ -14,7 +14,7 @@
       </spectrum>
    </source>
 
-<!-- Map with spectral -->
+<!-- Map with spectral variation -->
    <source name="map_cube_source">
       <spectrum escale="MeV">
 <!-- Total photon flux from the map (#/m^2/s) = 1.
