@@ -219,6 +219,7 @@ photon SpectObj::GetPhoton(double t0, double enph)
 	double TimeFromLastPeriod = 0.0;
 	int IntNumPer = 0;
 	double ProbRest = 0.0;
+	double nextTime = 0.0;
 	double InternalTime = t0 - Int_t(t0/tmax)*tmax; // InternalTime is t0 reduced to a period
 	TH1D *P = ComputeProbability(enph); //ph/m² 
 	double Ptot = P->GetBinContent(nt) - P->GetBinContent(1); //Total proability in a period 
@@ -263,35 +264,36 @@ photon SpectObj::GetPhoton(double t0, double enph)
 
 	/*
 	std::cout << " First Step " << t0 
-		  << " to " << t0 + TimeToFirstPeriod 
-		  << " (" << TimeToFirstPeriod << ")" << std::endl;  
-	std::cout << " Second Step " << t0 + TimeToFirstPeriod 
-		  << " to " << t0 + TimeToFirstPeriod + IntNumPer*tmax 
-		  << " (" << IntNumPer*tmax << "," << IntNumPer << " periods)" << std::endl;  
+	 	  << " to " << t0 + TimeToFirstPeriod 
+	 	  << " (" << TimeToFirstPeriod << ")" << std::endl;  
+ 	std::cout << " Second Step " << t0 + TimeToFirstPeriod 
+	 	  << " to " << t0 + TimeToFirstPeriod + IntNumPer*tmax 
+	          << " (" << IntNumPer*tmax << "," << IntNumPer << " periods)" << std::endl;  
 	std::cout << " Third Step " << t0 + TimeToFirstPeriod + IntNumPer*tmax 
 		  << " to " << t0 + TimeToFirstPeriod + IntNumPer*tmax + TimeFromLastPeriod 
 		  << " (" << TimeFromLastPeriod << ")" << std::endl;  
-	*/      
+  	*/   
+
 	// Now evaluate the Spectrum Histogram
+
  	TH1D* Sp;
 	Sp = Integral_T(1,nt,ei);
 	Sp->Scale(IntNumPer*1.0);
 	Sp->Add(Sp,Integral_T(Nv->GetXaxis()->FindBin(TimeToFirstPeriod),nt,ei));	
 	Sp->Add(Sp,Integral_T(1,Nv->GetXaxis()->FindBin(TimeFromLastPeriod),ei));
-	
- 	ph.time   = t0 + TimeToFirstPeriod + IntNumPer*tmax +TimeFromLastPeriod; 
-	ph.energy = Sp->GetRandom();
-	std::cout << " ====> NextTime " << ph.time
-		  << " | Energy " << ph.energy << " KeV " << std::endl;
-	delete Sp;
-	delete P;
-      }
-  return ph;
-}
+	ph.time   = t0 + TimeToFirstPeriod + IntNumPer*tmax +TimeFromLastPeriod;
+ 	ph.energy = Sp->GetRandom();
+ 	std::cout << " ====> NextTime " << ph.time
+	 	  << " | Energy " << ph.energy << " KeV " << std::endl; 
+ 	delete Sp;
+ 	delete P;
+       }
+   return ph;
+ }
 
 void SpectObj::ScaleAtBATSE(double fluence)
 {
-
+  
   double BATSE1 = 20.0;    // 20 keV
   double BATSE2 = 1.0e+3;  // 1 MeV
   int ei1 = Nv->GetYaxis()->FindBin(BATSE1);
