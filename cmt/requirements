@@ -12,4 +12,4 @@ use flux v*
 use genericSources v0r1 celestialSources
 use GRB v4r0p7 celestialSources
 use Pulsar v0 celestialSources
-use SpectObj  v0 celestialSources
+use SpectObj  v0r0p0 celestialSources
