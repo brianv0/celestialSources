@@ -7,6 +7,8 @@
 *   $Header$
 *@verbatim
 *
+*   v3r1p2 29-Dec-2003 SB  Reformatted the ascii file containing photon list for GRBs (GRBmaker).
+*   v3r1p1
 *   v3r1   04-dec-2003 JCT new tag for DC1
 *   v2r1p2 04-oct-2003 THB clean up Windows build 
 *   v2r1p1 01-oct-2003 THB Disambiguate a few math args for vc7.1 
