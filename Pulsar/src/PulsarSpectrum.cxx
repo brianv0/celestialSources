@@ -6,6 +6,8 @@
 #include "astro/JulianDate.h"
 #include <cmath>
 #include <fstream>
+#include <iomanip>
+
 
 using namespace cst;
 
@@ -145,62 +147,96 @@ double PulsarSpectrum::flux(double time) const
 double PulsarSpectrum::interval(double time)
 {  
   double timeTilde = time + (StartMissionDateMJD - m_t0)*SecsOneDay;
-  if ((int(time) % 10000) < 10)
-    std::cout << "Time reached is: " << time << " seconds from Start " << std::endl;
-
-
-  if (m_pdot == 0.0) // Case of periodic pulsar
+  if ((int(timeTilde) % 10000) < 3.0)
+    std::cout << "**  Time reached is: " << timeTilde << " seconds from Start " << std::endl;
+  
+  if (m_pdot != 0.0) 
+    {
+      // The exact formula is:
+      //     time = (m_period/m_pdot)*log(1.0+(m_pdot/m_period)*(timeTilde)) + m_phi0*m_period;
+      // but we use an approximation in order to avoid errors due to finite precision in log (1+e)
+      // where e is of order of 10^-12. double has around 20 decimal positions.We use instead the 
+      // expansion of log(1+x)
+      time = m_phi0*m_period;
+      for (int n=1; n<10; n++)
+	{
+	  time = time + ((m_period/m_pdot)*pow(-1,n+1)*pow(((m_pdot/m_period)*timeTilde),n))/n;
+	}
+    } 
+  else // Case of exact periodic pulsar (pdot = 0)
     {
       time = timeTilde + m_phi0*m_period;
     }
-  else
-    {
-      time = (m_period/m_pdot)*log(1+(m_pdot/m_period)*timeTilde) + m_phi0*m_period; 
-    }
-  
-  double nextTime = time + m_spectrum->interval((time - m_period*int(time/m_period)),m_enphmin);
 
+
+  //Get interval in the reference system where pdot = 0;
+  double nextTime = time + m_spectrum->interval((time - m_period*int(time/m_period)),m_enphmin);
   double nextTimeTilde = 0.0;
 
-  if (m_pdot == 0.0) //Case of periodic pulsar
+  if (m_pdot != 0.0) //Case of periodic pulsar
+    {
+      // The exact formula is:
+      //     nextTimeTilde = (m_period/m_pdot)*(exp((m_pdot/m_period)*(nextTime-m_phi0*m_period))-1.0);
+      // but we use an approximation in order to avoid errors due to finite precision in log (1+e)
+      // where e is of order of 10^-12. double has around 20 decimal positions.We use instead the 
+      // expansion of exp(x)
+ 
+      
+      for (int n=1; n<10;n++)
+	{
+	  double fact = 1.0;
+	  for (int i = 0; i <n; i++) //compute factorial
+	    {
+	      if (i == 0) 
+ 		fact = 1;
+ 	      else
+ 		fact = fact*(i);
+	    }
+ 	  nextTimeTilde = nextTimeTilde + (m_period/m_pdot)*(pow(((m_pdot/m_period)*(nextTime-m_phi0*m_period)),n)/fact);
+	}
+    }
+  else // case of exactly periodic pulsar (pdot =0)
     {
       nextTimeTilde = nextTime - m_phi0*m_period;
     }
-  else
-    {
-      nextTimeTilde = (m_period/m_pdot)*(exp((m_pdot/m_period)*(nextTime-m_phi0*m_period))-1);
-    }
-
-  double ph =  m_phi0 + m_f0*(timeTilde) +0.5*m_f1*(timeTilde)*(timeTilde);
-  double intph = 0;
-
   
-  if ((fabs(modf(ph,&intph) - ((time -m_period*int(time/m_period))/m_period)) > 2.5e-3)
-      && (timeTilde - (StartMissionDateMJD - m_t0)*SecsOneDay > 0.0))
+  //This is the formula for the phase computation in the Pulsar Analysys tool. Here for comparison.
+  double ph0 =  m_phi0 + m_f0*(timeTilde) +0.5*m_f1*(timeTilde)*(timeTilde);
+  double ph1 =  m_phi0 + m_f0*(nextTimeTilde) +0.5*m_f1*(nextTimeTilde)*(nextTimeTilde);
+  double intph0 = 0;
+  double intph1 = 0;
+
+  //The precision in time is set to usec
+    
+  if ((timeTilde - (StartMissionDateMJD - m_t0)*SecsOneDay > 0.0)  //check if Dt is > of 10us
+      && ((fabs(modf(ph0,&intph0) - ((time -m_period*int(time/m_period))/m_period))*m_period) > 5.0e-5))
+    //  || ((fabs(modf(ph1,&intph1) - ((nextTime -m_period*int(nextTime/m_period))/m_period))*m_period) > 5.0e-5)))
     {
-      
-      std::cout << "\n****t0~ = " << timeTilde  << " (RefStart="
+  
+      std::cout << "\n\n** " <<  m_PSRname << " Warning: 2 Order Approx (LAT-ST pulsePhase): " <<std::endl; 
+      std::cout << std::setprecision(20) << "\n**** t0~ = " << timeTilde  << " (RefStart="
 		<< timeTilde - (StartMissionDateMJD - m_t0)*SecsOneDay  << ")" << std::endl;
-      std::cout << " -->t0  = " << time << " (Fract = " << (time  -m_period*int(time/m_period)) << " ), phase " 
+      std::cout << std::setprecision(20) << "  -->t0 = " << time << " (Fract = " << (time  -m_period*int(time/m_period)) << " ), phase " 
 		<<  (time - m_period*int(time/m_period))/m_period << std::endl;
-      std::cout << "\n****t1~ = " << nextTimeTilde  << " (RefStart="
-		<< nextTimeTilde - (StartMissionDateMJD - m_t0)*SecsOneDay  << ")" << std::endl;
-      std::cout << " -->t1  = " << nextTime << " (Fract = " << (nextTime -m_period*int(nextTime/m_period)) << " ), phase " 
+            
+      std::cout << std::setprecision(20)<< "\n  ==>t1 = " << nextTime << " (Fract = " << (nextTime -m_period*int(nextTime/m_period)) << " ), phase " 
 		<< (nextTime -m_period*int(nextTime/m_period))/m_period << std::endl;
-
+      std::cout << std::setprecision(20) << "  -->t1~ = " << nextTimeTilde  << " (RefStart="
+		<< nextTimeTilde - (StartMissionDateMJD - m_t0)*SecsOneDay  << ")" << std::endl;
       
-      std::cout << "\n\n** " <<  m_PSRname << " Warning: 2 Order Approx (LAT-ST pulsePhase):  ph0 " 
-		<< ph <<  " " << modf(ph,&intph) << std::endl;
-      std::cout << "**          Phase difference : ph0 " 
-		<< fabs(modf(ph,&intph) - ((time -m_period*int(time/m_period))/m_period)) << std::endl;
-
-      double ph =  m_phi0 + m_f0*(nextTimeTilde) +0.5*m_f1*(nextTimeTilde)*(nextTimeTilde);
-      std::cout << "**          Phase difference : ph1 " 
-		<< fabs(modf(ph,&intph) - ((nextTime -m_period*int(nextTime/m_period))/m_period)) << std::endl;
-
-
-    }
-
+      std::cout <<  std::setprecision(16)   << "**  ph0(th) : " << modf(ph0,&intph0) << " ph0(sim) : " 
+		<< ((time -m_period*int(time/m_period))/m_period)
+		<< " deltaPh0 " << fabs(modf(ph0,&intph0) - ((time -m_period*int(time/m_period))/m_period)) << std::endl;
+      std::cout	<<  std::setprecision(16)  <<  "     deltat0 " 
+		<<  m_period*fabs(modf(ph0,&intph0) - ((time -m_period*int(time/m_period))/m_period)) << std::endl;
+  
+      std::cout <<  std::setprecision(16)   << "**  ph1(th) : " << modf(ph1,&intph1) << " ph1(sim) : " 
+		<< ((nextTime -m_period*int(nextTime/m_period))/m_period)
+		<< " deltaPh1 " << fabs(modf(ph1,&intph1) - ((nextTime -m_period*int(nextTime/m_period))/m_period)) << std::endl;
+      std::cout	<<  std::setprecision(16) <<   "     deltat1 " 
+		<<  m_period*fabs(modf(ph1,&intph1) - ((nextTime -m_period*int(nextTime/m_period))/m_period)) << " \n\n" << std::endl;
+      
+}
 
   return nextTimeTilde - timeTilde;
 }
