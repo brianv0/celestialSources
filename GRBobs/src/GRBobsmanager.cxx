@@ -80,18 +80,12 @@ TString GRBobsmanager::GetGRBname(double time)
   int An,Me,Gio;
   m_Rest=((int) m_startTime % 86400) + m_startTime - floor(m_startTime);
   m_Frac=(m_Rest/86400.);
-  int FracI=(int)(m_Frac*100.0);
+  int FracI=(int)(m_Frac*1000.0);
   double utc;
   JD.getGregorianDate(An,Me,Gio,utc);
 
   TString GRBname="";
-  /*
-    char AnFlag[10];
-    char MeFlag[10];
-    char GioFlag[10];
-    char RestFlag[20];
-    char FracFlag[20];
-  */
+
   An-=2000;
   
   if(An<10) 
@@ -122,20 +116,21 @@ TString GRBobsmanager::GetGRBname(double time)
       GRBname+=Gio;
     }
   
-  if(FracI==100) 
-    GRBname+=FracI;
-  else if (FracI>10) 
+  
+  if (FracI<10)
+    {
+      GRBname+="00";
+      GRBname+=FracI;
+    }
+  else if(FracI<100) 
     {
       GRBname+="0";
       GRBname+=FracI;
     }
   else 
-    {
-      GRBname+="00";
-      GRBname+=FracI;
-    }
+    GRBname+=FracI;
   
-  std::cout<<"GENERATE GRB ("<<GRBname<<")"<<std::endl;
+  if(DEBUG) std::cout<<"GENERATE GRB ("<<GRBname<<")"<<std::endl;
   
   //..................................................  //
   return GRBname;
@@ -169,7 +164,8 @@ void GRBobsmanager::GenerateGRB()
   std::ofstream os(name,std::ios::out);
   os<<m_startTime<<" "<<m_endTime<<" "<<m_l<<" "<<m_b<<" "<<m_theta<<" "<<m_phi<<" "<<m_fluence<<" "<<m_Npulses<<" "<<m_alpha<<" "<<m_beta<<std::endl;
   os.close();
-  std::cout<<" Generate GRB obs ("<<m_GRBnumber<<"), l = "<<m_l<<" b = "<<m_b<<" ts = "<<m_startTime<<" te ="<<m_endTime<<" F= "<<m_fluence<<" N = "<<m_Npulses<<" a= "<<m_alpha<<" b= "<<m_beta<<" GRB location (SC) Theta,Phi: "<<m_theta<<" , "<<m_phi<<std::endl;  
+  std::cout<<"Phenomen. Model GRB"<<GRBname<<" t start "<<m_startTime<<", tend "<<m_endTime
+	   <<" l,b = "<<m_l<<", "<<m_b<<" elevation,phi(deg) = "<<m_theta<<", "<<m_phi<<" Fluence = "<<m_fluence<<std::endl;
   m_grbGenerated=true;
 }
 
