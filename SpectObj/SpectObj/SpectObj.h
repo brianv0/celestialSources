@@ -51,6 +51,8 @@ class SpectObj
       Nv->Scale(AreaDetector/m_AreaDetector); // ph
       m_AreaDetector = AreaDetector;
     }
+
+  inline double GetAreaDetector() { return m_AreaDetector; };
   double flux(double time, double enph);
   double interval(double time, double enph);
   double energy(double time, double enph);

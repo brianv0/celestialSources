@@ -75,6 +75,14 @@ SpectObj::SpectObj(const TH2D* In_Nv, int type)
   gDirectory->Delete(name.c_str());
   Probability->SetName(name.c_str());
   ProbabilityIsComputed=false;
+
+  if (sourceType ==1)
+    {
+      PeriodicSpectrum = new TH1D("PeriodicSpectrum","PeriodicSpectrum",nt,m_Tmin,m_Tmax);
+      GetUniqueName(PeriodicSpectrum,name);
+      gDirectory->Delete(name.c_str());
+      PeriodicSpectrum->SetName(name.c_str());
+    }
   
   delete[] en;
   if(DEBUG)  std::cout<<" SpectObj initialized ! ( " << sourceType <<")"<<std::endl;
@@ -322,6 +330,13 @@ photon SpectObj::GetPhoton(double t0, double enph)
     } 
 else if (sourceType == 1) //Periodic //Max
       {
+	
+	if (!PeriodicSpectrumIsComputed)
+	  {
+	    PeriodicSpectrum = Integral_T(1,nt,ei);
+	    PeriodicSpectrumIsComputed = true;
+	  }
+	
 	double TimeToFirstPeriod = 0.0;
 	double TimeFromLastPeriod = 0.0;
 	int IntNumPer = 0;
@@ -362,12 +377,16 @@ else if (sourceType == 1) //Periodic //Max
 	      {
 		tBinCurrent++;
 	      }	 
-	    TimeFromLastPeriod = Nv->GetXaxis()->GetBinCenter(tBinCurrent-1);
-	    ProbRest = ProbRest - (Probability->GetBinContent(tBinCurrent-1) - Probability->GetBinContent(1));
+	    TimeFromLastPeriod = Nv->GetXaxis()->GetBinCenter(tBinCurrent);
+	    ProbRest = ProbRest - (Probability->GetBinContent(tBinCurrent) - Probability->GetBinContent(1));
 	    TimeFromLastPeriod += m_SpRandGen->Uniform()*m_TimeBinWidth - m_TimeBinWidth/2 ;
 	  }
 	
 	//std::cout << " At End ProbRest is (should be 0 ) " << ProbRest << std::endl;
+
+
+	
+	
 	if(DEBUG)
 	  {
 	    std::cout << " First Step " << t0 
@@ -379,22 +398,17 @@ else if (sourceType == 1) //Periodic //Max
 	    std::cout << " Third Step " << t0 + TimeToFirstPeriod + IntNumPer*m_Tmax 
 		      << " to " << t0 + TimeToFirstPeriod + IntNumPer*m_Tmax + TimeFromLastPeriod 
 		      << " (" << TimeFromLastPeriod << ")" << std::endl;  
+
+	    //	    std::cout << "--> Time = " << ph.time << " s. , Energy = " << ph.energy << " keV" << std::endl; 
 	  }
-	
+
 	// Now evaluate the Spectrum Histogram
-
+	
 	ph.time   = t0 + TimeToFirstPeriod + IntNumPer*m_Tmax +TimeFromLastPeriod;
- 	ph.energy = Integral_T(1,nt,ei)->GetRandom();
-	//	delete P;
-
-	if (((ph.time - 1000*Int_t(ph.time/1000)) > 0) 
-	     && ((ph.time - 1000*Int_t(ph.time/1000)) < 10))
-	  {
-	    std::cout << " Time " << ph.time << " Energy " << ph.energy << std::endl;
-	  }
+ 	ph.energy = PeriodicSpectrum->GetRandom();
+	
       }
   
-
   if(DEBUG)  std::cout<< " New Photon at ("<<t0<<"): time =  " << ph.time << " Energy  (KeV) " << ph.energy << std::endl;
   return ph;
 }
