@@ -25,20 +25,6 @@
 
 #include "genericSources/Pulsar.h"
 
-namespace {
-   void readLines(std::string inputFile, 
-                  std::vector<std::string> &lines) {
-      std::ifstream file(inputFile.c_str());
-      lines.clear();
-      std::string line;
-      while (std::getline(file, line, '\n')) {
-         if (line != "" && line != " ") { //skip (most) blank lines
-            lines.push_back(line);
-         }
-      }
-   }
-}
-
 ISpectrumFactory &PulsarFactory() {
    static SpectrumFactory<Pulsar> myFactory;
    return myFactory;
@@ -103,7 +89,7 @@ void Pulsar::readLightCurve(const std::string & templateFile,
                             std::vector<double> & light_curve) {
    light_curve.clear();
    std::vector<std::string> lines;
-   ::readLines(templateFile, lines);
+   genericSources::Util::readLines(templateFile, lines);
    std::vector<std::string> tokens;
    for (std::vector<std::string>::iterator it = lines.begin();
         it != lines.end(); it++) {

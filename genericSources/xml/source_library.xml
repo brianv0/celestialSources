@@ -151,4 +151,11 @@
       </spectrum>
    </source>
 
+   <source name="spectral_transient">
+      <spectrum escale="MeV">
+          <SpectrumClass name="SpectralTransient"
+          params="1e-1, 0., 1e4, $(GENERICSOURCESROOT)/data/testTemplate.dat"/>
+          <celestial_dir ra="193.4" dec="-5.82"/>
+      </spectrum>
+   </source>
 </source_library>

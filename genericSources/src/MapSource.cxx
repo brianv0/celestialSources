@@ -147,6 +147,9 @@ void MapSource::readFitsFile(std::string fitsFile) {
       m_integralDist[i] = m_integralDist[i-1] + m_solidAngles[i]*m_image[i];
       totalSolidAngle += m_solidAngles[i];
    }
+//    std::cerr << "total solid angle in map: " 
+//              << totalSolidAngle/M_PI << "*pi" 
+//              << std::endl;
    m_mapIntegral = m_integralDist[npix-1];
    for (int i = 1; i < npix; i++) {
       m_integralDist[i] /= m_integralDist[npix-1];
