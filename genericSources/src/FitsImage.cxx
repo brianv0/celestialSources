@@ -264,6 +264,54 @@ int FitsImage::findHdu(const std::string & fitsFile,
    return -1;
 }
 
+void FitsImage::readColumn(fitsfile * fptr, const std::string & colname,
+                           std::vector<double> & coldata) {
+   std::string routineName("FitsImage::readColumn");
+   int status(0);
+   int colnum(0);
+   fits_get_colnum(fptr, CASEINSEN, const_cast<char *>(colname.c_str()),
+                   &colnum, &status);
+   fitsReportError(status, routineName);
+
+   long nrows(0);
+   fits_get_num_rows(fptr, &nrows, &status);
+   fitsReportError(status, routineName);
+
+   int anynul(0), nulval(0);
+   coldata.resize(nrows);
+   fits_read_col(fptr, TDOUBLE, colnum, 1, 1, nrows, &nulval, &coldata[0],
+                 &anynul, &status);
+   fitsReportError(status, routineName);
+}
+
+void FitsImage::
+readRowVector(fitsfile * fptr, const std::string & colname, 
+              int row, int nelements, std::vector<double> & data) {
+   std::string routineName("FitsImage::readRowVector");
+   int status(0);
+   int colnum(0);
+   fits_get_colnum(fptr, CASEINSEN, const_cast<char *>(colname.c_str()),
+                   &colnum, &status);
+   fitsReportError(status, routineName);
+
+   long nrows(0);
+   fits_get_num_rows(fptr, &nrows, &status);
+   fitsReportError(status, routineName);
+   if (row >= nrows) {
+      std::ostringstream message;
+      message << routineName << "\n"
+              << "Request for row " << row << " from a table that "
+              << "has only " << nrows << "rows.";
+      throw std::runtime_error(message.str());
+   }
+
+   int anynul(0), nulval(0);
+   data.resize(nelements);
+   fits_read_col(fptr, TDOUBLE, colnum, row+1, 1, nelements, &nulval,
+                 &data[0], &anynul, &status);
+   fitsReportError(status, routineName);
+}
+
 void FitsImage::fitsReportError(int status, std::string routine) {
    if (status == 0) {
       return;

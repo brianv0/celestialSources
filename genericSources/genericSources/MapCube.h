@@ -76,9 +76,6 @@ private:
 
    void readEnergyVector(const std::string & fitsFile);
    
-   void readColumn(fitsfile * fptr, const std::string & colname,
-                   std::vector<double> & coldata) const;
-
    void makeCumulativeSpectra();
 
    double powerLawIntegral(double x1, double x2, double y1, double y2,

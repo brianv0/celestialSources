@@ -25,6 +25,7 @@
 #include "flux/EventSource.h"
 
 #include "Util.h"
+#include "FitsImage.h"
 #include "genericSources/SpectralTransient.h"
 
 ISpectrumFactory & SpectralTransientFactory() {
@@ -33,7 +34,7 @@ ISpectrumFactory & SpectralTransientFactory() {
 }
 
 SpectralTransient::SpectralTransient(const std::string & paramString) 
-   : m_emin(20.), m_emax(2e5) {
+   : m_emin(20.), m_emax(2e5), m_nspec(0) {
    std::vector<std::string> params;
    facilities::Util::stringTokenize(paramString, ", ", params);
 
@@ -43,6 +44,7 @@ SpectralTransient::SpectralTransient(const std::string & paramString)
    std::string templateFile = params[3];
    if (params.size() > 4) m_emin = std::atof(params[4].c_str());
    if (params.size() > 5) m_emax = std::atof(params[5].c_str());
+   if (params.size() > 6) m_nspec = std::atoi(params[6].c_str());
 
    createEvents(templateFile);
 }
@@ -65,7 +67,12 @@ void SpectralTransient::createEvents(std::string templateFile) {
 
    genericSources::Util::file_ok(templateFile);
 
-   readLightCurve(templateFile);
+   if (genericSources::Util::isFitsFile(templateFile)) {
+      readFitsLightCurve(templateFile);
+   } else {
+      readLightCurve(templateFile);
+   }
+   rescaleLightCurve();
 
    unsigned int npts(m_lightCurve.size());
    std::vector<double> tt(npts+1);
@@ -94,6 +101,52 @@ void SpectralTransient::createEvents(std::string templateFile) {
 }
 
 void SpectralTransient::
+readFitsLightCurve(const std::string & templateFile) {
+   std::string routineName("SpectralTransient::readFitsLightCurve");
+   int hdu = genericSources::FitsImage::findHdu(templateFile, "TIMES");
+
+   int status(0);
+   fitsfile * fptr = 0;
+   fits_open_file(&fptr, templateFile.c_str(), READONLY, &status);
+   genericSources::FitsImage::fitsReportError(status, routineName);
+
+   int hdutype(0);
+   fits_movabs_hdu(fptr, hdu, &hdutype, &status);
+   genericSources::FitsImage::fitsReportError(status, routineName);
+
+   std::vector<double> startTimes;
+   genericSources::FitsImage::readColumn(fptr, "Time", startTimes);
+   unsigned int nelements(startTimes.size());
+
+   std::vector<double> stopTimes(nelements);
+   std::copy(startTimes.begin() + 1, startTimes.end(), stopTimes.begin());
+   stopTimes.at(nelements-1) = 2.*startTimes.at(nelements-1) 
+      - startTimes.at(nelements-2);
+
+   hdu = genericSources::FitsImage::findHdu(templateFile, "LIGHT_CURVES");
+   fits_movabs_hdu(fptr, hdu, &hdutype, &status);
+   genericSources::FitsImage::fitsReportError(status, routineName);
+
+   std::vector<double> flux, gamma1, gamma2, ebreak;
+   genericSources::FitsImage::readRowVector(fptr, "Flux", m_nspec,
+                                            nelements, flux);
+   genericSources::FitsImage::readRowVector(fptr, "Gamma1", m_nspec,
+                                            nelements, gamma1);
+   genericSources::FitsImage::readRowVector(fptr, "Gamma2", m_nspec,
+                                            nelements, gamma2);
+   genericSources::FitsImage::readRowVector(fptr, "Ebreak", m_nspec,
+                                            nelements, ebreak);
+   m_lightCurve.clear();
+   m_lightCurve.reserve(nelements);
+   for (unsigned int i = 0; i < nelements; i++) {
+      double x[] = {startTimes.at(i), stopTimes.at(i), flux.at(i),
+                    gamma1.at(i), gamma2.at(i), ebreak.at(i)};
+      std::vector<double> data(x, x+6);
+      m_lightCurve.push_back(ModelInterval(data, m_emin, m_emax));
+   }
+}
+
+void SpectralTransient::
 readLightCurve(const std::string & templateFile) {
    std::vector<std::string> lines;
    genericSources::Util::readLines(templateFile, lines, "#");
@@ -103,6 +156,9 @@ readLightCurve(const std::string & templateFile) {
    for (line = lines.begin(); line != lines.end(); ++line) {
       m_lightCurve.push_back(ModelInterval(*line, m_emin, m_emax));
    }
+}
+
+void SpectralTransient::rescaleLightCurve() {
    double tscale = (m_tstop - m_tstart)/(m_lightCurve.back().stopTime - 
                                          m_lightCurve.front().startTime);
    std::vector<ModelInterval>::iterator interval;
@@ -153,6 +209,22 @@ double SpectralTransient::drawEnergy(const ModelInterval & interval) const {
    return energy;
 }
 
+SpectralTransient::ModelInterval::
+ModelInterval(const std::vector<double> & data, double emin, double emax) {
+   startTime = data.at(0);
+   stopTime = data.at(1);
+   if (startTime > stopTime) {
+      throw std::runtime_error("SpectralTransient::ModelInterval:\n"
+                               + std::string("Poorly formed entry in FITS ")
+                               + std::string("template file."));
+   }
+   flux = data.at(2);
+   gamma1 = data.at(3);
+   gamma2 = data.at(4);
+   ebreak = data.at(5);
+   brokenPowerLawFractions(emin, emax);
+}
+
 SpectralTransient::ModelInterval::ModelInterval(const std::string & line,
                                                 double emin, double emax) {
    std::vector<std::string> tokens;
@@ -173,7 +245,11 @@ SpectralTransient::ModelInterval::ModelInterval(const std::string & line,
    gamma1 = std::atof(tokens[3].c_str());
    gamma2 = std::atof(tokens[4].c_str());
    ebreak = std::atof(tokens[5].c_str());
+   brokenPowerLawFractions(emin, emax);
+}
 
+void SpectralTransient::ModelInterval::
+brokenPowerLawFractions(double emin, double emax) {
    double one_m_g1 = 1. - gamma1;
    double one_m_g2 = 1. - gamma2;
    if (emin < ebreak && ebreak < emax) {
@@ -186,3 +262,4 @@ SpectralTransient::ModelInterval::ModelInterval(const std::string & line,
       m_lowerFraction = 1.;
    }
 }
+                 

@@ -14,6 +14,8 @@
 #include <string>
 #include <vector>
 
+#include "fitsio.h"
+
 namespace genericSources {
 
 /** 
@@ -68,6 +70,15 @@ public:
    /// @return The HDU number of the specified extension.
    static int findHdu(const std::string & fitsFile,
                       const std::string & extension);
+
+#ifndef SWIG
+   static void readColumn(fitsfile * fptr, const std::string & colname,
+                          std::vector<double> & coldata);
+
+   static void readRowVector(fitsfile * fptr, const std::string & colname,
+                             int row, int nelements,
+                             std::vector<double> & data);
+#endif // SWIG
 
    static void fitsReportError(int status, std::string routine="");
 

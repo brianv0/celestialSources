@@ -2,6 +2,7 @@
 %module sources
 %{
 #include "flux/EventSource.h"
+#include "genericSources/../src/Util.h"
 #include "genericSources/SpectralTransient.h"
 #include "genericSources/MapCube.h"
 %}
@@ -14,9 +15,11 @@
       return NULL;
    }
 }
+%template(StringVector) std::vector<std::string>;
 %template(DoublePair) std::pair<double, double>;
 %template(PairVector) std::vector<std::pair<double, double> >;
 %include $(FLUXROOT)/flux/Spectrum.h
+%include $(GENERICSOURCESROOT)/src/Util.h
 %include $(GENERICSOURCESROOT)/genericSources/SpectralTransient.h
 %include $(GENERICSOURCESROOT)/genericSources/MapSource.h
 %include $(GENERICSOURCESROOT)/genericSources/MapCube.h

@@ -58,21 +58,21 @@ namespace genericSources {
                                  std::vector<std::string> &files) {
       facilities::Util::expandEnvVar(&filename);
       files.clear();
-// Read the first line of the file and see if the first 6 characters
-// are "SIMPLE".  If so, then we assume it's a FITS file.
-      std::ifstream file(filename.c_str());
-      std::string firstLine;
-      std::getline(file, firstLine, '\n');
-      if (firstLine.find("SIMPLE") == 0) {
-// This is a FITS file. Return that as the sole element in the files
-// vector.
+      if (isFitsFile(filename)) {
          files.push_back(filename);
          return;
-      } else {
-// filename contains a list of fits files.
+      } else { // filename contains a list of fits files.
          readLines(filename, files);
          return;
       }
+   }
+
+   bool Util::isFitsFile(std::string filename) {
+      facilities::Util::expandEnvVar(&filename);
+      std::ifstream file(filename.c_str());
+      std::string firstLine;
+      std::getline(file, firstLine, '\n');
+      return firstLine.find("SIMPLE") == 0;
    }
 
    bool Util::isXmlFile(std::string filename) {

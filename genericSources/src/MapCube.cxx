@@ -100,7 +100,7 @@ double MapCube::mapValue(unsigned int i, unsigned int j, unsigned int k) {
 
 void MapCube::readEnergyVector(const std::string & fitsFile) {
 
-   std::string routineName("readEnergyVector");
+   std::string routineName("MapCube::readEnergyVector");
 
    int hdu = genericSources::FitsImage::findHdu(fitsFile, "ENERGIES");
    
@@ -114,33 +114,9 @@ void MapCube::readEnergyVector(const std::string & fitsFile) {
    fits_movabs_hdu(fptr, hdu, &hdutype, &status);
    genericSources::FitsImage::fitsReportError(status, routineName);
 
-   long nrows(0);
-   fits_get_num_rows(fptr, &nrows, &status);
-   genericSources::FitsImage::fitsReportError(status, routineName);
-
-   readColumn(fptr, "Energy", m_energies);
+   genericSources::FitsImage::readColumn(fptr, "Energy", m_energies);
 
    fits_close_file(fptr, &status);
-   genericSources::FitsImage::fitsReportError(status, routineName);
-}
-
-void MapCube::readColumn(fitsfile * fptr, const std::string & colname,
-                         std::vector<double> & coldata) const {
-   std::string routineName("MapCube::readColumn");
-   int status(0);
-   int colnum(0);
-   fits_get_colnum(fptr, CASEINSEN, const_cast<char *>(colname.c_str()),
-                   &colnum, &status);
-   genericSources::FitsImage::fitsReportError(status, routineName);
-
-   long nrows(0);
-   fits_get_num_rows(fptr, &nrows, &status);
-   genericSources::FitsImage::fitsReportError(status, routineName);
-
-   int anynul(0), nulval(0);
-   coldata.resize(nrows);
-   fits_read_col(fptr, TDOUBLE, colnum, 1, 1, nrows, &nulval, &coldata[0],
-                 &anynul, &status);
    genericSources::FitsImage::fitsReportError(status, routineName);
 }
 

@@ -61,6 +61,10 @@ public:
    static void resolve_fits_files(std::string filename, 
                                   std::vector<std::string> &files);
 
+   /// @brief Determine if a file is a FITS file by looking for the "SIMPLE"
+   ///        keyword as the first six characters of the file.
+   static bool isFitsFile(std::string filename);
+
    /// @return true if the filename ends in ".xml" extension
    static bool isXmlFile(std::string filename);
 

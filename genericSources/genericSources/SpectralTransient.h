@@ -66,6 +66,7 @@ private:
    double m_tstop;
    double m_emin;
    double m_emax;
+   int m_nspec;
 
    double m_currentEnergy;
 
@@ -80,6 +81,10 @@ private:
 
       /// Read data members from a line in the template file.
       ModelInterval(const std::string & line, double emin, double emax);
+
+      /// Pass the data members via an ordered vector.
+      ModelInterval(const std::vector<double> & data,
+                    double emin, double emax);
 
       /// Fractional start time of the interval; the entire light curve 
       /// will be rescaled to fit the interval [m_tstart, m_tstop]
@@ -101,11 +106,16 @@ private:
 
    private:
       double m_lowerFraction;
+
+      void brokenPowerLawFractions(double emin, double emax);
    };
 
    std::vector<ModelInterval> m_lightCurve;
 
    void readLightCurve(const std::string & templateFile);
+   void readFitsLightCurve(const std::string & templateFile);
+
+   void rescaleLightCurve();
 
    std::pair<double, double> 
    drawEvent(const std::vector<double> & integralDist) const;
