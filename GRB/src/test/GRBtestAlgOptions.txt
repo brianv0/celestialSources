@@ -20,16 +20,13 @@ MessageSvc.OutputLevel      = 2;
 FluxSvc.source_lib ={"$(FLUXSVCROOT)/xml/source_library.xml"};
 
 // Append to a list of source library documents
-FluxSvc.source_lib += {"$(FLUXSVCROOT)/xml/user_library.xml"};
-
-// Append to a list of source library documents
 FluxSvc.source_lib += {"$(GRBROOT)/xml/GRB_user_library.xml"};
 
 //------------------------------------------------------------
 // Primary source name (default GRBSpectrum)
 // From here we can select the model for GRB ... 
-GRBTestAlg.source_name="GRBspectrum_Gal";  
-//GRBTestAlg.source_name="GRBspectrum_Test"; // with fixed direcion
+//GRBTestAlg.source_name="GRBspectrum_Gal";  
+GRBTestAlg.source_name="GRBspectrum_Test"; // with fixed direcion
 
 //GRBTestAlg.source_name="GRBobsSpectrum_Gal";
 //GRBTestAlg.source_name="GRBobsspectrum_Test"; // with fixed direcion
@@ -38,14 +35,13 @@ GRBTestAlg.source_name="GRBspectrum_Gal";
 
 //------------------------------------------------------------
 // Background source name
-//GRBTestAlg.background_name={"electronavg"};
-//GRBTestAlg.background_name+={"chimeavg"};
+GRBTestAlg.background_name={"backgndmix"};
 
 //------------------------------------------------------------
 //Maximum observation time (default 10 s)
 GRBTestAlg.observation_time=10;
 // Maximum number of photons generated (default 100000)
-//GRBTestAlg.EvtMax=1000;
+GRBTestAlg.EvtMax=100;
 
 //----------------- Saveing options --------------------------
 // Is possible to save in root file

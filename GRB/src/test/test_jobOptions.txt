@@ -18,7 +18,7 @@ MessageSvc.OutputLevel      = 3;
 FluxSvc.source_lib ={"$(FLUXSVCROOT)/xml/source_library.xml"};
 
 // Append to a list of source library documents
-FluxSvc.source_lib += {"$(FLUXSVCROOT)/xml/user_library.xml"};
+//FluxSvc.source_lib += {"$(FLUXSVCROOT)/xml/user_library.xml"};
 
 // Append to a list of source library documents
 FluxSvc.source_lib += {"$(GRBROOT)/xml/GRB_user_library.xml"};
@@ -29,12 +29,12 @@ FluxSvc.source_lib += {"$(GRBROOT)/xml/GRB_user_library.xml"};
 GRBTestAlg.source_name="GRBspectrum_Test";
 //------------------------------------------------------------
 // Background source name
-GRBTestAlg.background_name={"electronavg"};
+GRBTestAlg.background_name={"backgndmix"};
 
 //Maximum observation time (default 10 s)
 GRBTestAlg.observation_time=10;
 // Maximum number of photons generated (default 100000)
-GRBTestAlg.EvtMax=500;
+GRBTestAlg.EvtMax=100;
 
 // No idea...
 ApplicationMgr.EvtSel = "NONE";

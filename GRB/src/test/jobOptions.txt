@@ -12,9 +12,6 @@
 // This will test the LatTrigger algorithm
 //#include "$GRBROOT/src/test/LatGRBAlertOptions.txt"
 
-// override this for the unit test program
-ApplicationMgr.EvtMax = 100;
-
 //==============================================================
 //
 // End of job options file

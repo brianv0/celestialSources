@@ -128,6 +128,7 @@ StatusCode GRBTestAlg::initialize() {
  */
 StatusCode GRBTestAlg::execute() {
   m_loop++;
+  cout<<m_loop<<endl;
   StatusCode  sc = StatusCode::SUCCESS;
   MsgStream   log( msgSvc(), name() );    
   
