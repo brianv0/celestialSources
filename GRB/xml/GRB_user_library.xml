@@ -1,19 +1,20 @@
 <source_library>
 
 <!-- Type of GRB spectrums : -->
-
-<!-- 1) GRBSpectrum: the physical model for simulating GRBs based on the fireball model. The reference frame is galactic. -->
+<!-- 1) GRBSpectrum: the physical model for simulating GRBs based on the fireball model.-->
+<!-- The reference frame is galactic. -->
 
     <source name=" GRBspectrum_Gal" >
-    <spectrum> <SpectrumClass name="GRBSpectrum"/> 
+    <spectrum> <SpectrumClass name="GRBSpectrum"/>
     <!--This will live the direction free-->
     <use_spectrum frame="galaxy"/>
     </spectrum> </source>
 
-<!-- 2) GRBobsspectrum: the phenomenological model of GRB. The high energy part is extrapolated from the BATSE data. The reference frame is galactic. -->
+<!-- 2) GRBobsspectrum: the phenomenological model of GRB. The high energy part is extrapolated from the BATSE data -->
+<!-- The reference frame is galactic. -->
 
     <source name=" GRBobsspectrum_Gal" >
-    <spectrum> <SpectrumClass name="GRBobsspectrum"/>
+    <spectrum> <SpectrumClass name="GRBobsSpectrum"/>
     <!--This will live the direction free-->
     <use_spectrum frame="galaxy"/>
     </spectrum> </source>
@@ -25,7 +26,7 @@
     <use_spectrum frame="galaxy"/> 
     </spectrum> </source>
 
-<!-- ==================TEST SPECTRUMS ==================== -->
+<!--                  TEST SPECTRUMS                      -->
 <!-- The reference frame is galactic and a fixed direction is given to avoid the occlusion by the Earth. -->
 
         <source name=" GRBspectrum_Test" >
@@ -35,19 +36,18 @@
 	</spectrum> </source>
 
 	<source name=" GRBobsspectrum_Test" >
-	<spectrum> <SpectrumClass name="GRBobsspectrum"/>
+	<spectrum> <SpectrumClass name="GRBobsSpectrum"/>
 	<!--This will fix the direction -->
 	<galactic_dir l="120" b="-50"/>
         </spectrum>
 	</source>
-
 	
 	<source name=" GRBmanager_Test" >
 	<spectrum> <SpectrumClass name="GRBmanager"/>
 	<galactic_dir l="120" b="-50"/>
 	</spectrum> </source>
 
-<!-- ================= GRBs and BACKGROUND MIXTURES ================= -->	
+<!--     GRBs and BACKGROUND MIXTURES    -->	
 	<!-- Only background mixture -->
 	<source name="backgndmix">
         <nestedSource sourceRef="chimeavg"/>
@@ -55,17 +55,18 @@
         <nestedSource sourceRef="albedo_gamma"/>
         <nestedSource sourceRef="electronavg"/>
 	</source>
-
-	<!-- background mixture -->
+	<!--GRB spectrum + diffuse -->
 	<source name="GRBbckmix">
         <nestedSource sourceRef="GRBspectrum_Gal"/>
         <nestedSource sourceRef="diffuse"/>
 	</source>
+	
 
-	<!-- background mixture -->
+	<!-- GRB obs spectrum + diffuse -->
 	<source name="GRBobsbckmix">
         <nestedSource sourceRef="GRBobsspectrum_Gal"/>
         <nestedSource sourceRef="diffuse"/>
 	</source>
 
 </source_library>
+
