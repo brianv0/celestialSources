@@ -12,7 +12,7 @@
 #include "flux/SpectrumFactory.h"
 #include "CLHEP/Random/RandFlat.h"
 
-const double INVTIME=1.0e+6;
+const double INVTIME=-1;
 const double INVENERGY=-1;
 
 
@@ -207,11 +207,47 @@ double GRBobsSpectrum::nextTime() const
 
 std::pair<float,float> GRBobsSpectrum::dir(float energy) const
 {
-    return m_grb->dir();
+	// >>>>>>>>>>>> TEMPORARILY RETURN PHOTON DIRECTION -- 12/08/03 <<<<<<<<<<<<<<<<<<<<<<<<
+    //return m_grb->dir();
+
+	static bool qNew=true;
+    static std::vector<TimeEnergy>::iterator it = m_grb->photonlist().begin();
+
+	if (qNew)
+	{
+		qNew = false;
+	    it = m_grb->photonlist().begin();
+	}
+    
+    if (it != m_grb->photonlist().end())
+        return (*it++).photonDir();
+    else
+ 	{
+		qNew = true;
+		return std::make_pair<float,float>(-1,-1);
+	}
 }
 
 
 std::pair<double,double> GRBobsSpectrum::dir(double energy)
 {
-	return m_grb->dir();
+	// >>>>>>>>>>>> TEMPORARILY RETURN PHOTON DIRECTION -- 12/08/03 <<<<<<<<<<<<<<<<<<<<<<<<
+	//return m_grb->dir();
+
+	static bool qNew=true;
+    static std::vector<TimeEnergy>::iterator it = m_grb->photonlist().begin();
+
+	if (qNew)
+	{
+		qNew = false;
+	    it = m_grb->photonlist().begin();
+	}
+    
+    if (it != m_grb->photonlist().end())
+        return (*it++).photonDir();
+    else
+ 	{
+		qNew = true;
+		return std::make_pair<float,float>(-1,-1);
+	}
 }

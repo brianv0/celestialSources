@@ -81,12 +81,12 @@ public:
     
 
     // Accessors
-    std::pair<float,float> dir() const                 { return m_grbdir; }
-    double univFWHM() const                            { return m_univFWHM; }
-    const std::vector<double> &specnorm() const        { return m_specnorm; }
-    long nphoton() const                               { return m_nphoton; } 
-    const std::vector<TimeEnergy> &photonlist() const  { return m_photonlist; }
-    GlobalData *globalData() const                     { return m_globalData; }
+    const std::pair<float,float> &dir() const           { return m_grbdir; }
+    double univFWHM() const                             { return m_univFWHM; }
+    const std::vector<double> &specnorm() const         { return m_specnorm; }
+    long nphoton() const                                { return m_nphoton; } 
+    const std::vector<TimeEnergy> &photonlist() const   { return m_photonlist; }
+    GlobalData *globalData() const                      { return m_globalData; }
     
     void setSpecnorm(const std::vector<double> &specnorm)   { m_specnorm = specnorm; }
     
@@ -243,13 +243,18 @@ public:
     
     inline void setTime(double time)   {m_time=time;}
     inline void setEnergy(double energy) {m_energy=energy;}
+    inline void setDir(std::pair<float,float> &photonDir) {m_photonDir=photonDir;}
     
     inline double time() const   {return m_time;}
     inline double energy() const {return m_energy;}
+	inline const std::pair<float,float> &photonDir() const   { return m_photonDir; }
     
 private:
     double m_time;
     double m_energy;
+
+	// >>>>>>>>>>>>>>>>>> TEMPORARY DATA MEMBERS -- 12/08/03 <<<<<<<<<<<<<<<<<<<
+	std::pair<float,float>  m_photonDir;
 };
 
 

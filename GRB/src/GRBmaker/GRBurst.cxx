@@ -449,40 +449,50 @@ void GRBurst::makeTimes(HepRandomEngine *engine, bool first, double ethres)
 std::ifstream &operator>>(std::ifstream &is, GRBurst &grb)
 {
     std::string str;
-    is >> str >> str >> str >> str >> str >> str;
+	// >>>>>>>>>>>>>> TEMPORARILY COMMENT OUT READING OF HEADER FOR NOW -- 12/08/03 <<<<<<<<<<<<<<<
+    //is >> str >> str >> str >> str >> str >> str;
     
     double duration, flux, beta, specnorm;
     int    npuls;
     
-    is >> flux >> duration >> beta >> specnorm >> npuls >> grb.m_univFWHM;
-    grb.m_globalData->setFlux(flux);
-    grb.m_globalData->setDuration(duration);
-    grb.m_globalData->setBeta(beta);
-    grb.m_globalData->setNpuls(npuls);
-    grb.m_globalData->setSpecnorm(specnorm);
-    //is >> grb.m_globalData->m_flux >> grb.m_globalData->m_duration >> grb.m_globalData->m_beta >> 
-    //	grb.m_specnorm >> grb.m_globalData->m_npuls >> grb.m_globalData->m_univFWHM;
-    is >> str >> str >> str;
+	// >>>>>>>>>>>>>> TEMPORARILY COMMENT OUT READING OF HEADER FOR NOW -- 12/08/03 <<<<<<<<<<<<<<<
+    //is >> flux >> duration >> beta >> specnorm >> npuls >> grb.m_univFWHM;
+    grb.m_globalData->setFlux(2.5);
+    //grb.m_globalData->setFlux(flux);
+    //grb.m_globalData->setFlux(flux);
+    //grb.m_globalData->setDuration(duration);
+    //grb.m_globalData->setBeta(beta);
+    //grb.m_globalData->setNpuls(npuls);
+    //grb.m_globalData->setSpecnorm(specnorm);
+
+	// >>>>>>>>>>>>>> TEMPORARILY COMMENT OUT READING OF ZENITH/AZIMUTH FOR NOW -- 12/08/03 <<<<<<<<<<<<<<<
+    //is >> str >> str >> str;
+    //float zenith, azimuth;
+    //is >> zenith >> azimuth;
+    //grb.m_grbdir = std::make_pair<float,float> (zenith, azimuth);
     
-    float zenith, azimuth;
-    is >> zenith >> azimuth;
-    grb.m_grbdir = std::make_pair<float,float> (zenith, azimuth);
-    
-    is >> str >> str;
+    //is >> str >> str;
     is >> grb.m_nphoton;
-    is >> str >> str >> str >> str;
+    //is >> str >> str >> str >> str;
     
     grb.m_photonlist.resize(grb.m_nphoton);
     
-    double t, e;
+    //double t, e;
+	double t, e, ra, dec;
     for (long i=0; i<grb.m_nphoton; ++i)
     {
-        is >> t >> e;
+        //s >> t >> e;
+
+		// >>>>>>>>>>>>>>> TEMPORARILY READ TIME, ENERGY, RA, DEC FROM PHOTON LIST -- 12/08/03 <<<<<<<<<<<<<<<<<<<
+        is >> t >> e >> ra >> dec;
         
         grb.m_photonlist[i].setTime(t);
         grb.m_photonlist[i].setEnergy(e);
+
+		grb.m_photonlist[i].setDir(std::make_pair<float,float> (ra,dec));
     }
     
+	std::cout << "Finished reading file...\n";
     return is;
 }
 
