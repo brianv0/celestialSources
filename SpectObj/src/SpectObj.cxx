@@ -403,7 +403,9 @@ photon SpectObj::GetPhoton(double t0, double enph)
       //      ProbRest = ProbRest - (Probability->GetBinContent(tBinCurrent-1) - Probability->GetBinContent(1));
 	 
       TimeFromLastPeriod = Nv->GetXaxis()->GetBinCenter(tBinCurrent) - m_TimeBinWidth/2 +  m_TimeBinWidth*m_SpRandGen->Uniform(); 
-      //std::cout << "TimeForm " << TimeFromLastPeriod << " width " << m_TimeBinWidth/2 << " --> " << TimeFromLastPeriod - Nv->GetXaxis()->GetBinCenter(tBinCurrent) << " phase " << TimeFromLastPeriod*m_Tmax << std::endl;
+      //     std::cout << "TimeForm " << TimeFromLastPeriod << " width " << m_TimeBinWidth/2 
+      //	<< " --> " << TimeFromLastPeriod - Nv->GetXaxis()->GetBinCenter(tBinCurrent) 
+      //	<< " phase " << TimeFromLastPeriod/m_Tmax << std::endl;
       
       
       if(DEBUG)
