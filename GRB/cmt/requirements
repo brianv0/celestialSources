@@ -19,9 +19,11 @@ macro_append ROOT_linkopts " $(ROOT_GUI_libs) "
 macro_append ROOT_linkopts "-lGui -lGX11" \
 	             WIN32 "libGUI.lib "
 
+
+apply_pattern package_Cshlibflags  
+
 private
 
-apply_pattern package_Cshlibflags
 apply_pattern package_headers
 
 apply_pattern package_stamps
