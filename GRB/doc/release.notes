@@ -7,6 +7,7 @@
 *   $Header$
 *@verbatim
 *
+*   v2r1p2 04-oct-2003 THB clean up Windows build 
 *   v2r1p1 01-oct-2003 THB Disambiguate a few math args for vc7.1 
 *   v2r0 28-Jan-2003 big cleaning for the code review.
 *@endverbatim
