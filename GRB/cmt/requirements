@@ -1,6 +1,5 @@
 package GRB
-package GRB
-version v4r0p3
+version v4r0p4
 author Nicola Omodei<nicola.omodei@pi.infn.it> Johann Cohen-Tanugi <johann.cohen@pi.infn.it> Sandhia Bansal <sandhiab@lheapop.gsfc.nasa.gov>
 
 # $Id$
@@ -31,5 +30,5 @@ library GRB -no_share \
 
 application test_GRB      test/testMgr.cxx 
 
-macro_append ROOT_libs " - -lGpad " WIN32 " libGpad.lib " 
+macro_append ROOT_libs " -lGpad " WIN32 " libGpad.lib " 
 application test_GRBROOT  test/other/GRBROOTtest.cxx 
