@@ -1,0 +1,14 @@
+package celestialSources
+
+version v0r0p0
+
+# $Header$
+#
+# Container package for astrophysical sources to be used by Gleam and
+# observationSim
+
+use flux v*
+
+use genericSources v0* celestialSources
+
+#use GRB v* celestialSources
