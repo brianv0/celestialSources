@@ -23,7 +23,6 @@ class GRBobsSpectrum : public ISpectrum
 {
   
  public:
-  GRBobsSpectrum();
   GRBobsSpectrum(const std::string &filename);
   GRBobsSpectrum(double duration, int npuls, double flux, double fraction, double powerLawIndex, bool flag);
 
@@ -67,6 +66,8 @@ class GRBobsSpectrum : public ISpectrum
 	 double nextEnergy() const;
 
 	 double nextTime() const;
+
+     void parseParamList(const std::string &input, std::vector<std::string>& output) const;
 
 	 void swap(GRBobsSpectrum &other) throw();
 

@@ -14,21 +14,16 @@
 
 
 // Constructors
-GRBobsSpectrum::GRBobsSpectrum()
+
+GRBobsSpectrum::GRBobsSpectrum(const std::string &params)
 	:ISpectrum(),
 	 m_title("GRBobsSpectrum"),
-	 m_particleName("gamma"),
-	 m_grbMaker(new GRBmaker)
+	 m_particleName("gamma")
 {
-}
+	std::vector<std::string> paramVector;
+	parseParamList(params, paramVector);
 
-
-GRBobsSpectrum::GRBobsSpectrum(const std::string &filename)
-	:ISpectrum(),
-	 m_title("GRBobsSpectrum"),
-	 m_particleName("gamma"),
-	 m_grbMaker(new GRBmaker)
-{
+	m_grbMaker = new GRBmaker(paramVector);
 }
 
 
@@ -74,6 +69,27 @@ GRBobsSpectrum &GRBobsSpectrum::operator=(const GRBobsSpectrum &right)
 	GRBobsSpectrum temp(right);   // does all the work
 	swap(temp);   // this can't throw
 	return *this;
+}
+
+
+// Parse input parameter list obtained from the xml file
+void GRBobsSpectrum::parseParamList(const std::string &input, std::vector<std::string>& output) const
+{   
+	int i = input.find_first_of(",");
+
+	if (i > 0)
+	{
+		std::string temp = input.substr(0,i);
+		output.push_back(temp);
+		temp = input.substr(i+1);
+		output.push_back(temp);
+	}
+
+	else
+	{
+		std::string temp = input;
+        output.push_back(temp);
+	}
 }
 
 
