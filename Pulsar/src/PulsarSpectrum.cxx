@@ -32,8 +32,8 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
   std::cout << " \n*****\nPulsarSpectrum initialized ! " << std::endl;
   std::cout << " **   Flux above 100 MeV " << m_flux << " ph/cm2/s " 
 	    << " | " << m_numpeaks << " peaks " << std::endl;
-  std::cout << " **   Epoch  " << m_t0 << " , Period " << m_period << " f0 " << m_f0 << std::endl;
-  std::cout << "                         Pdot " <<  m_pdot  << " f1 " << m_f1 << std::endl; 
+  //std::cout << " **   Epoch  " << m_t0 << " , Period " << m_period << " f0 " << m_f0 << std::endl;
+  //std::cout << "                         Pdot " <<  m_pdot  << " f1 " << m_f1 << std::endl; 
   std::cout << " **   Enphmin " << m_enphmin << " | Enphmax " << m_enphmax << std::endl;
 
 
@@ -80,11 +80,11 @@ double PulsarSpectrum::interval(double time)
   // Variable with suffix tilde are reffered to dilated system
   double timeTilde = time;
   time = timeTilde - timeTilde*m_pdot;
-  std::cout << " t0~ = " << timeTilde  << " --> t0 = " << time << std::endl;
+  //std::cout << " t0~ = " << timeTilde  << " --> t0 = " << time << std::endl;
   inte = m_spectrum->interval(time,m_enphmin);
   double nextTime = time + inte;
   double nextTimeTilde = nextTime + m_pdot*nextTime;
-  std::cout << " t1 = " << nextTime  << " --> t1~ = " << nextTimeTilde << std::endl;
+  //std::cout << " t1 = " << nextTime  << " --> t1~ = " << nextTimeTilde << std::endl;
   inte = nextTimeTilde - timeTilde;
 
 
