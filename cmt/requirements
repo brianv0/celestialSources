@@ -10,4 +10,6 @@ version v0r0p1
 use flux v*
 
 use genericSources v0 celestialSources
-use GRB v4r0p4 celestialSources
+use GRB v4r0p5 celestialSources
+use Pulsar v0 celestialSources
+use SpectObj  v0 celestialSources
