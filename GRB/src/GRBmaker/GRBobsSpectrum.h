@@ -15,7 +15,7 @@
 #include <string>
 #include <functional>  // for unary_function
 
-#include "FluxSvc/ISpectrum.h"
+#include "flux/ISpectrum.h"
 
 class GRBurst;
 

@@ -5,9 +5,9 @@
 #include <string>
 #include <map>
 #include <cmath>
-#include "FluxSvc/ISpectrum.h"
+#include "flux/ISpectrum.h"
 #include "facilities/Observer.h"
-#include "src/GPS.h"
+#include "flux/GPS.h"
 #include "GRBSim.h"
 #include "SpectObj.h"
 

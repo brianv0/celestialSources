@@ -1,6 +1,6 @@
 // Include files
 #include "FluxSvc/IFluxSvc.h"
-#include "FluxSvc/IFlux.h"
+#include "flux/IFlux.h"
 #include <fstream>
 // GlastEvent for creating the McEvent stuff
 #include "Event/TopLevel/Event.h"

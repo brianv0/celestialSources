@@ -6,6 +6,7 @@ author Johann Cohen-Tanugi <johann.cohen@pi.infn.it> Nicola Omodei<nicola.omodei
 
 
 use FluxSvc    *
+use flux       *
 use ROOT       *  IExternal
 use RootIo     *
 use GlastSvc   *  

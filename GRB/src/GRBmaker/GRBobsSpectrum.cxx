@@ -8,8 +8,8 @@
 #include "GRBurst.h"
 #include "GRBobsSpectrum.h"
 #include "GRBobsConstants.h"
-#include "src/GPS.h"
-#include "src/SpectrumFactory.h"
+#include "flux/GPS.h"
+#include "flux/SpectrumFactory.h"
 #include "CLHEP/Random/RandFlat.h"
 
 
