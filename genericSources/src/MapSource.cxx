@@ -24,6 +24,7 @@
 #include "flux/EventSource.h"
 
 #include "st_facilities/FitsImage.h"
+#include "st_facilities/Util.h"
 
 #include "genericSources/MapSource.h"
 
@@ -125,6 +126,7 @@ double MapSource::mapValue(unsigned int i, unsigned int j) {
 void MapSource::readFitsFile(std::string fitsFile) {
    facilities::Util::expandEnvVar(&fitsFile);
 
+   st_facilities::Util::file_ok(fitsFile);
    st_facilities::FitsImage fitsImage(fitsFile);
 
    fitsImage.getAxisNames(m_axisTypes);

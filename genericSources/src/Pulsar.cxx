@@ -18,6 +18,8 @@
 
 #include "facilities/Util.h"
 
+#include "st_facilities/Util.h"
+
 #include "flux/SpectrumFactory.h"
 #include "flux/EventSource.h"
 
@@ -74,6 +76,8 @@ double Pulsar::interval(double current_time) {
 
 void Pulsar::computeIntegralDist(std::string templateFile) {
    facilities::Util::expandEnvVar(&templateFile);
+
+   st_facilities::Util::file_ok(templateFile);
 
 // Assume the phases are bin-centered and spaced uniformly.
    std::vector<double> light_curve;
