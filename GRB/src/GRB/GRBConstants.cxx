@@ -52,76 +52,88 @@ int GRBConstants::ReadParam(){
       std::cout<<"Error Opening $(GRBROOT)/src/test/GRBParam.txt\n";
       exit(1);
     }
-  f1.getline(buf,100);
-  
-  f1.getline(buf,100);
-  sscanf(buf,"%d",&m_nshell);
-  
-  f1.getline(buf,100);
-  sscanf(buf,"%lf",&m_d0);
 
-  f1.getline(buf,100);
-  
   f1.getline(buf,100);
   sscanf(buf,"%d",&m_nshock);
 
-  f1.getline(buf,100);  
-  sscanf(buf,"%lf",&m_duration);
+  f1.getline(buf,100);
+  sscanf(buf,"%lf",&m_etot);
 
   f1.getline(buf,100);
-  sscanf(buf,"%lf",&m_rt);
-
-  f1.getline(buf,100);
-  sscanf(buf,"%lf",&m_dt);
-
-  f1.getline(buf,100);
-  sscanf(buf,"%lf",&m_peak);
+  sscanf(buf,"%lf",&m_redshift);
   
   f1.getline(buf,100);
+  sscanf(buf,"%lf",&m_enph);
 
   f1.getline(buf,100);
+  sscanf(buf,"Shell type = %d",&m_shellType);
+  
+  f1.getline(buf,100); //## If Shell == 1 : Jet Shells
   
   f1.getline(buf,100);
   sscanf(buf,"%lf",&m_r0);
   
   f1.getline(buf,100);
   sscanf(buf,"%lf",&m_angle);
+
+  f1.getline(buf,100); //## If Shell == 0 : Isotropic Shells
   
   f1.getline(buf,100);
+  sscanf(buf,"%lf",&m_d0);
+
+  f1.getline(buf,100);
+  sscanf(buf,"Engine type = %d",&m_engineType); 
   
+  f1.getline(buf,100); // ## If  Engine type == 0 (Observables pparameters are):
+  
+  f1.getline(buf,100);  
+  sscanf(buf,"%lf",&m_duration);
+  
+  f1.getline(buf,100);
+  sscanf(buf,"%lf",&m_rt);
+  
+  f1.getline(buf,100);
+  sscanf(buf,"%lf",&m_dt);
+  
+  f1.getline(buf,100);
+  sscanf(buf,"%lf",&m_peak);
+  
+  f1.getline(buf,100); //## If  Engine type == 1 or 2 (Observables pparameters are):
+
   f1.getline(buf,100);
   sscanf(buf,"%lf",&m_t0);
-  
-  f1.getline(buf,100);
-  sscanf(buf,"%lf",&m_etot);
-  
+    
   f1.getline(buf,100);
   sscanf(buf,"%lf",&m_g0);   
   
   f1.getline(buf,100);
   sscanf(buf,"%lf",&m_g1);
   
-  f1.getline(buf,100);
-  sscanf(buf,"%lf",&m_redshift);
+  //////////////////////////////////////////////////
+  setNshock(m_nshock);
+  setEtot(m_etot);
+  setRedshift(m_redshift);
+  setEnergyPh(m_enph);
   
-  f1.getline(buf,100);
-  sscanf(buf,"%lf",&m_enph);
-  
+  //## If Shell == 1 : Jet Shells
+  setShellType(m_shellType);
+  setJetRadius(m_r0);
+  setJetAngle(m_angle);
+
+  //## If Shell == 0 : Isotropic Shells
+  setShellRadius(m_d0);
+
+  setEngineType(m_engineType);
+  // ## If  Engine type == 0 (Observables pparameters are):
   setDuration(m_duration);
   setRiseTime(m_rt);
   setDecayTime(m_dt);
   setPeakEnergy(m_peak);
-  
-  setNshell(m_nshell);
-  setRedshift(m_redshift);
-  setEtot(m_etot);
-  setJetRadius(m_r0);
-  setJetAngle(m_angle);
+  //  ## If  Engine type == 1 or 2 (Observables pparameters are)
   setThickness(m_t0);
-  setShellRadius(m_d0);
   setGammaMin(m_g0);
   setGammaMax(m_g1);
-  setEnergyPh(m_enph);
+
   return 0;
 }
 
@@ -136,14 +148,45 @@ void GRBConstants::Print()
 {
   // std::cout<<"Read the file: "<<paramFile.c_str()<<std::endl;
   std::cout<<"********** Selected Parameters: **********"<<std::endl;
-  std::cout<<" Number of shells               = "<<Nshell()<<std::endl;
-  std::cout<<" Redshift of the Source         = "<<Redshift()<<std::endl;
+  std::cout<<" Number of Shocks               = "<<Nshock()<<std::endl;
   std::cout<<" Total Energy at the Source     = "<<Etot()<<std::endl;
-  std::cout<<" Initial shell radius (cm)      = "<<ShellRadius()<<std::endl;
-  std::cout<<" Initial thickness  (cm)        = "<<Thickness()<<std::endl;
-  std::cout<<" Radius of the shell(cm)        = "<<JetRadius()<<std::endl;
-  std::cout<<" Minimum Lorentz factor         = "<<GammaMin()<<std::endl;
-  std::cout<<" Maximum Lorentz factor         = "<<GammaMax()<<std::endl;
+  std::cout<<" Redshift of the Source         = "<<Redshift()<<std::endl;
+  std::cout<<" Minimum energy extracted       = "<<EnergyPh()<<std::endl;
+  if(m_shellType==1)
+    {
+      std::cout<<""<<std::endl;
+      std::cout<<" Shell type selected : JET "<<std::endl;
+      std::cout<<"    Angle  of the Jet     = "<<JetAngle()<<std::endl;
+    }
+  if(m_shellType==0)
+    {
+      std::cout<<""<<std::endl;
+      std::cout<<" Shell type selected : ISO "<<std::endl;
+    }
+  if(m_engineType==0)
+    {
+      std::cout<<""<<std::endl;
+      std::cout<<" Engine type selected : Observed Parameters "<<std::endl;
+      std::cout<<"    Duration of the Burst = "<<Duration()<<std::endl;
+      std::cout<<"    Rise  time of a peak  = "<<RiseTime()<<std::endl;
+      std::cout<<"    Decay time of a peak  = "<<DecayTime()<<std::endl;
+      std::cout<<"    Peak  energy (MeV)    = "<<PeakEnergy()<<std::endl;
+    } 
+  if((m_engineType==1) || (m_engineType==2))
+    {
+      std::cout<<" Engine type selected : Physical Parameters "<<std::endl;
+      if(m_shellType==1)     
+	{  
+	  std::cout<<"    Radius of the Jet(cm) = "<<JetRadius()<<std::endl;
+	}
+      if(m_shellType==0)
+	{
+	  std::cout<<"    Shell radius (cm)     = "<<ShellRadius()<<std::endl;
+	}     
+      std::cout<<"    Shell Thickness  (cm)  = "<<Thickness()<<std::endl;
+      std::cout<<"    Minimum Lorentz factor = "<<GammaMin()<<std::endl;
+      std::cout<<"    Maximum Lorentz factor = "<<GammaMax()<<std::endl;
+    }
   std::cout<<"*******************************************"<<std::endl;
 }
 

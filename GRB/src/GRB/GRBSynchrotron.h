@@ -45,6 +45,14 @@ class GRBSynchrotron : virtual public RadiationProcess
 	    const double Vol       = 1.0e+40,
 	    const double dr        = 1.0e+10); 
 
+  /*! \brief Synchrotron Function
+   *
+   * This Function represents the approximated version of the Synchrotron 
+   * function (eq. [6.31c] in Rybiki & Lightman 1979) and is the normalized 
+   * emission of an electron with gyrofrequency \e esyn in function of the 
+   * photon \e energy.
+   */
+  double SynchrotronFunction(double esyn, double energy);
  private:
 };
 #endif

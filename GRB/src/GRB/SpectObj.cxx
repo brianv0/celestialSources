@@ -92,13 +92,13 @@ std::vector<double> SpectObj::getEnergyVector(const double value)
   return EnergyVector;
 }
 
-std::vector<double> SpectObj::getSpectrumVector()
+std::vector<double> SpectObj::getSpectrumVector(const double value)
 {
   std::vector<double> SpectrumVector;
   std::map<double,double>::const_iterator it = m_spectrum.begin();
   while(it != m_spectrum.end()) 
     {
-      SpectrumVector.push_back((*it++).second);
+      SpectrumVector.push_back(((*it++).second)*value);
     }
   return SpectrumVector;
 }

@@ -27,7 +27,7 @@ GRBSim::GRBSim(long seed)
   m_de     = m_spectobj.getBinVector();
   //////////////////////////////////////////////////
   m_synchrotron = GRBSynchrotron(m_spectobj);
-  m_icompton = GRBICompton(m_spectobj);
+  
   //////////////////////////////////////////////////
 }	
 
@@ -51,7 +51,7 @@ GRBSim::GRBSim(const std::string& params)
   m_de     = m_spectobj.getBinVector();
   //////////////////////////////////////////////////
   m_synchrotron = GRBSynchrotron(m_spectobj);
-  m_icompton = GRBICompton(m_spectobj);
+  
   //////////////////////////////////////////////////
 }	
 
@@ -108,7 +108,7 @@ void GRBSim::MakeGRB(double time_offset)
   std::cout<<" Duration of the Burst = "<<m_duration-time_offset<<std::endl;
   //std::cout<<" Total Energy Radiated = "<<0<<std::endl;
   //////////////////////////////////////////////////
-  std::cout<<m_energy.size()<<" "<<m_de.size()<<std::endl;
+  //  std::cout<<m_energy.size()<<" "<<m_de.size()<<std::endl;
   if (m_duration-time_offset<2.)
     {std::cout<<"The burst is Short "<<std::endl;}
   else
@@ -130,7 +130,7 @@ std::vector<double> GRBSim::ComputeFlux(const double time)
   //  std::cout<<"Compute the flux @ time ="<<time<<std::endl;
   m_spectobj *= 0.0 ;
   std::vector<double> spectrum(enstep+1 ,0.);
-  if (time<=0) return spectrum;
+  if (time<0) return spectrum;
   std::vector<GRBShock>::iterator itr=theShocks.begin();
   while(itr != theShocks.end())
     {
@@ -140,7 +140,9 @@ std::vector<double> GRBSim::ComputeFlux(const double time)
       
       if (cst::flagIC!=0.0)
 	{
+	  m_icompton = GRBICompton(m_synchrotron.getSpectrumObj());
 	  m_icompton.load((itr),time,m_jetangle,m_distance);
+	  //m_icompton.setSpectrumObj(m_synchrotron.getSpectrumObj());
 	  m_spectobj+=m_icompton.getSpectrumObj();
 	}
       

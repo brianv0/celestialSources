@@ -63,7 +63,7 @@ void GRBShock::Write()
   std::cout<< " Magnetic Field [Gauss]     = "<< m_Beq<<std::endl;
   std::cout<< " Magnetic Energy [erg/cm^3] = "<< m_Ub<<std::endl;
   std::cout<< " Rise  time                 = "<<m_thickness/(cst::c)/m_gf<<std::endl;
-  std::cout<< " Decay time                 = "<<1.e+7*m_volume/m_Eint/m_gf<<std::endl;
+  std::cout<< " Decay time                 = "<<1.e+7*m_volume/m_Eint/(m_gf*m_gf)<<std::endl;
   std::cout<< " Duration                   = "<<duration()<<std::endl;
 }
 

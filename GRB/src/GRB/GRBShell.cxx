@@ -16,13 +16,17 @@ GRBShell::GRBShell(double gamma, double mass,
 { 
   if(type =="jet")
     {
-      std::cout<<" Sell type = jet "<<std::endl;
       m_volume = cst::pi*pow(m_radius,2.)*m_thickness;
     }
-  else
+  else if (type =="iso")
     {
-      std::cout<<" Sell type = isotropic "<<std::endl;
       m_volume = 4.*cst::pi*pow(m_distance,2.)*m_thickness;
+    }
+  else 
+    {
+      std::cout<<" Option for shell type, not recognized !! "<<std::endl;
+      std::cout<<" Please eneter 0 for isotropic fireballs, \n 
+or 1 for beamed fireballs in the GRBParam.txt file!! "<<std::endl;
     }
 }
 

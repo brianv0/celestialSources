@@ -28,7 +28,7 @@
  *
  *    \f$t_r\propto\displaystyle{\delta_r\over \Gamma c}\f$.
  *
- *    \f$t_d\propto\displaystyle{jet_r^2 \delta_r \over \Gamma E_i  }\f$.
+ *    \f$t_d\propto\displaystyle{jet_r^2 \delta_r \over \Gamma^2 E_i  }\f$.
  *
  *    \f$E_b\propto\displaystyle{\Gamma^3 \sqrt{E_i/\delta_r}\over jet_r  }\f$.
  *

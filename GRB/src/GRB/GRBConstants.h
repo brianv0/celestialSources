@@ -43,7 +43,7 @@ namespace cst
   const double viscosity = 0.0;
   // Internal Parameters
   const int    nstep        = 400;
-  const int    enstep       = 50;
+  const int    enstep       = 100;
   const double enmin     = 1.0e+3;
   const double enmax     =1.0e+12;
   // Minimal Temporal separation between 2 photons
@@ -55,7 +55,21 @@ namespace cst
   // If true it save into an output file 
   const bool savef=false;
   // Name of the output file
-  const std::string paramFile= "GRBdata.txt";  
+  const std::string paramFile= "GRBdata.txt";
+  /* Different pulse shape are considered.
+   * The pulse shape depends on how the particle are accelerated in a shock 
+   * as function of time.
+   * - sgauss = Simmetric pulse shape. It is a double exponential with 
+   * the two characteristic time equal to the cooling time of the radiative
+   *  process. No intrinsic delay (or 'lag' has been considered between 
+   * different energies.
+   * - agauss = asimmetric exponential function, the rise time and the decay
+   * time are different. The peak time depend on the energy, 
+   * and this give up a delay between high energies and low energies. 
+   * -else . any other choiche set up a default function expressed by a FRED
+   *  like function. A Fast Rise pulse followed by an Exponential Decay.
+   */
+  const std::string pulse_shape="agauss"; 
 }
 
 class GRBConstants 
@@ -79,12 +93,17 @@ class GRBConstants
   
   //! Save the parameters in a file. It could be usefull to mantain trace of the models runned.
   void Save(bool flag=false);
+
+  //! Defines the engine`s type
+  inline int EngineType(){return m_engineType;}
+  
+  inline void setEngineType(int value){m_engineType = value;}
   
   ////////////////////  Engine: Shell Generator
 
-  inline int Nshell() {return m_nshell;}
+  //  inline int Nshell() {return m_nshell;}
 
-  inline void setNshell(int value=10){m_nshell = value;}
+  //  inline void setNshell(int value=10){m_nshell = value;}
     
   ////////////////////  Engine: Shock Generator
 
@@ -107,11 +126,14 @@ class GRBConstants
   inline double PeakEnergy(){return m_peak;}
  
   inline void setPeakEnergy(double value=0.4){m_peak = value;}
+  //! Defines the shell`s type
+  inline int ShellType(){return m_shellType;}
   
+  inline void setShellType(int value){m_shellType = value;}
   //////////////////// Shell: Spherical Shells
 
   inline double ShellRadius(){return m_d0;}
-
+  
   inline void setShellRadius(double value){m_d0 = value;}
 
   //////////////////// Shell: Jet Shells
@@ -157,7 +179,7 @@ class GRBConstants
  
  private:
   char* m_burst_type;
-  int m_nshell;
+  //  int m_nshell;
   double m_d0;
   int m_nshock;
   double m_r0;
@@ -170,6 +192,8 @@ class GRBConstants
   double m_rt,m_dt,m_peak;
   double m_enph;
   std::string m_paramFile;
+  int m_engineType;
+  int m_shellType;
 };
 
 #endif

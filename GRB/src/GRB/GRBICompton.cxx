@@ -41,32 +41,55 @@ void GRBICompton::load(const double time,
 		       const double dr)
   
 {
+
   if (time <= 0.){m_spectrumObj *= 0.; return;}
-  
-  int type = 2; // 0 -> Power Law Approximation
+  //int type = 0; // 0 -> Power Law, from Sari and Esin, astro-ph/0005253
+  //int type = 1; // 0 -> Power Law, the electron have gamma_min, Low IC
+  //int type = 2; // 0 -> Power Law, The electron have gc, High IC
+  int type = 3; // 0 -> Integration, Slow computation but all the 
+  //                                 electrons are considered
   
   double ComovingTime; 
   
   const double EnergyTransformation = (1.e+6*cst::mec2)*
-    ( GAMMAF + sqrt(GAMMAF*GAMMAF+1.)*cos(angle) );
+    ( GAMMAF + sqrt(GAMMAF*GAMMAF+1.)*cos(angle) );  // mc2->eV
   
+  double   dgamma     = pow((gamma_max/gamma_min),1./cst::enstep);
   //////////////////////////////////////////////////
   // Gamma e+-
   //////////////////////////////////////////////////
+  std::vector<double>   
+    x    = m_spectrumObj.getEnergyVector(1./(EnergyTransformation)); //eV -> mc2
+  std::vector<double>   
+    dx   = m_spectrumObj.getBinVector(1.e+6/(EnergyTransformation));    //MeV -> mc2
+  std::vector<double> 
+    fsyn = m_spectrumObj.getSpectrumVector(); // is in ph/s/MeV
+  std::vector<double> fIC(cst::enstep+1, 0.0);
   
-  std::vector<double>   x  = m_spectrumObj.getEnergyVector(1./(EnergyTransformation));
-  std::vector<double>   dx = m_spectrumObj.getBinVector(1./(EnergyTransformation));
-  std::vector<double> fsyn(cst::enstep+1, 0.0);
+  std::vector<double>::iterator x1  =    x.begin();
+  std::vector<double>::iterator dx1 =   dx.begin();
+  std::vector<double>::iterator isy = fsyn.begin();
+  std::vector<double>::iterator its =  fIC.begin();
   
   const double Psyn_0    = 4./3.*Umag(B)*cst::erg2MeV*cst::c*cst::st; //MeV/s      
   const double esyn_0    = (3.*cst::pi/8.)*(B/cst::BQ)*cst::mec2; //MeV
   const double Psyn_esyn = Psyn_0/esyn_0; //1/sec
   const double tau_0     = (cst::flagIC == 1.) ? cst::c*cst::st*N0/Vol : cst::flagIC; //1/s
+  const double tcross  = dr/cst::c;
   
+  while(dx1!= dx.end()) 
+    {
+      (*isy) /= GAMMAF*(Psyn_esyn)/(*dx1); //Now fsyn is in ph
+      isy++;
+      dx1++;
+    }
+
+
   if (type==0) //Power law from Sari and Esin, astro-ph/0005253
     {
-      std::vector<double>::iterator x1 = x.begin();
-      std::vector<double>::iterator its = fsyn.begin();
+      x1 = x.begin();
+      its = fIC.begin();
+      
       while(x1!=x.end()) 
 	{
 	  ComovingTime = comovingTime(time,GAMMAF,EnergyTransformation*(*x1),distance_to_source);
@@ -89,7 +112,6 @@ void GRBICompton::load(const double time,
 	  // The syn cooling time of the original electron is:
 	  double tsyn    = ((gi)*cst::mec2)/Psyn;
 	  
-	  double tcross  = dr/cst::c;
 	  double tau = tau_0;
 	  tau *= (tsyn<tcross)? tsyn: tcross;
 	  if(tau>1.) tau = 1.;
@@ -109,8 +131,8 @@ void GRBICompton::load(const double time,
     }
   else if (type==1) // The electron have gamma_min, Low IC
     {
-      std::vector<double>::iterator x1 = x.begin();
-      std::vector<double>::iterator its = fsyn.begin();
+      x1 = x.begin();
+      its = fIC.begin();
       while(x1!=x.end()) 
 	{
 	  ComovingTime = comovingTime(time,GAMMAF,EnergyTransformation*(*x1),distance_to_source);
@@ -131,14 +153,13 @@ void GRBICompton::load(const double time,
 	  double gi2     = pow(gi,2.);
 	  double Psyn    = Psyn_0*(gi2-1.); //MeV/s
 	  double tsyn    = ((gi)*cst::mec2)/Psyn;
-	  double tcross  = dr/cst::c;
 	  double tau = tau_0;
 	  tau *= (tsyn<tcross)? tsyn: tcross;
 	  if(tau>1.) tau = 1.;
 	  
 	  
 	  double N_e = (tau)*electronNumber(2.*gamma_min, gamma_min, gamma_max,
-					    dr, ComovingTime, Psyn_0, N0);
+					    dr, ComovingTime, tsyn, N0);
 	  if(*x1<ekn)
 	    (*its) = processFlux(*x1,ec,em);
 	  else 
@@ -151,8 +172,8 @@ void GRBICompton::load(const double time,
     }
   else if (type==2) // The electron have gc, High IC
     {
-      std::vector<double>::iterator x1 = x.begin();
-      std::vector<double>::iterator its = fsyn.begin();
+      x1 = x.begin();
+      fIC.begin();
       while(x1!=x.end()) 
 	{
 	  ComovingTime = comovingTime(time,GAMMAF,EnergyTransformation*(*x1),distance_to_source);
@@ -172,14 +193,13 @@ void GRBICompton::load(const double time,
 	  double gi2     = pow(gi,2.);
 	  double Psyn    = Psyn_0*(gi2-1.); //MeV/s
 	  double tsyn    = ((gi)*cst::mec2)/Psyn;
-	  double tcross  = dr/cst::c;
 	  double tau = tau_0;
 	  tau *= (tsyn<tcross)? tsyn: tcross;
 	  if(tau>1.) tau = 1.;
 	  
 
 	  double N_e = (tau)*electronNumber(2.*gamma_min, gamma_min, gamma_max,
-					    dr, ComovingTime, Psyn_0, N0);
+					    dr, ComovingTime, tsyn, N0);
 	  
 	  if(*x1<ekn)
 	    (*its) = processFlux(*x1,ec,em);
@@ -191,28 +211,80 @@ void GRBICompton::load(const double time,
 	  (x1++);
 	}
     }
+  else if (type==3)
+    {
+      x1  =    x.begin();
+      //dx1 =   dx.begin();
+      its =  fIC.begin();
+      while(x1!=x.end())  // Output photon energy
+	{ 
+	  ComovingTime = comovingTime(time,GAMMAF,EnergyTransformation*(*x1),
+				      distance_to_source);
+	  if(ComovingTime<=0){its++; x1++; continue;}
+	  for (int j = 0; j < cst::enstep;) // gamma electron
+	    {
+	      double gi      = gamma_min*pow(dgamma,j); 
+	      double gi2     = pow(gi,2.);
+	      double temp    = (esyn_0*(gi2-1.))/cst::mec2;
+	      temp = (temp>0.0) ? 1./temp : 0.0; 
+	      double tsyn    = (gi*cst::mec2)/(Psyn_0*(gi2-1.));  
+	      double tau = tau_0;
+	      tau *= (tsyn<tcross)? tsyn: tcross;
+	      if(tau>1.) tau = 1.;
+	      double N_e = (tau)*electronNumber(gi, gamma_min, gamma_max,
+						dr, ComovingTime, tsyn, N0/Vol);
+	      int e0=0;
+	      isy=fsyn.begin();
+	      while(isy<fsyn.end()) // Initial energy
+		{
+		  (*its) += N_e*(*isy)*(pow(dgamma,j+2)-pow(dgamma,j))
+		    *InverseComptonFunction(gi,x[e0],(*x1));
+		  //cout<<" gamma  "
+		  e0++;
+		  isy+=cst::enstep/5; // To speed up the integration. 
+		}
+	      j+=2;
+	    }
+	  its++;
+	  x1++;
+	}
+    }
   //////////////////////////////////////////////////
   // COMMON 
   //////////////////////////////////////////////////
   m_spectrumObj.clear();
-  std::vector<double>::iterator x1  =    x.begin();
-  std::vector<double>::iterator dx1 =   dx.begin();
-  std::vector<double>::iterator its = fsyn.begin();
+  x1  =    x.begin();
+  dx1 =   dx.begin();
+  its = fIC.begin();
   while(dx1!=dx.end()) 
     {
       (*x1 ) *= EnergyTransformation; //eV
       (*dx1) *= 1.0e-6*EnergyTransformation; //MeV
       (*its) *= GAMMAF*(Psyn_esyn)/(*dx1); //1/s/MeV
+      
       x1++;
       dx1++;
       its++;
     }
   (*x1) *= EnergyTransformation; //eV 
   (*its) = 0.0;
-  m_spectrumObj.SetSpectrum(x,fsyn);
+  m_spectrumObj.SetSpectrum(x,fIC);
   return;
 }
 
-
-
+double GRBICompton::InverseComptonFunction(double g0,double e0,double energy)
+{
+  // note that e0 and energy are in unit of mec2
+  double x0 = g0*e0;
+  double q  = energy/(4.*g0*g0*e0)/(1.-(energy/g0));
+  // ALSO E_MIN AND E_MAX
+  double e_min= e0/(4.*g0*g0)/(1.+(e0/g0));
+  double e_max= 4.*g0*g0*e0/(1.+(4.*g0*e0));
+  
+  if(( energy >= e_max) || (energy <= e_min)) return 0.;
+  
+  double f0 = (pow(4.*x0*q,2.)/(8.*x0*q+2.)+2.*q+1.)*(1.-q)+2.*q*log(q);
+  //cout<<f0*energy/(4.*g0*g0*e0)<<endl;
+  return f0*energy/(4.*g0*g0*e0);
+}
 

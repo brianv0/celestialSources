@@ -43,8 +43,17 @@ class GRBICompton : virtual public RadiationProcess
 	    const double gamma_min = 1.,
 	    const double gamma_max = 1.0e+10,
 	    const double Vol       = 1.0e+40,
-	    const double dr        = 1.0e+10); 
-
+	    const double dr        = 1.0e+10);
+  /*! \brief Inverse Compton Function
+   *
+   * This Function represents the probability to obtain a photon with energy 
+   * \param energy, from the IC scattering between a photon of energy 
+   * \e e0 and an electron of energy \f& g0 m_e c^2\f$.  
+   * This function has been derived by Blumenthal and Gould (1970)
+   * To obtain the Inverse vompton emissivity we have to integrate over
+   * the distribution of the seed photon and over the electron distribution.
+   */
+  double InverseComptonFunction(double g0,double e0,double energy);
  private:
 };
 #endif

@@ -119,7 +119,7 @@ class SpectObj
    */
   std::vector<double> getBinVector(const double value = 1.);
 
-  std::vector<double> getSpectrumVector();
+  std::vector<double> getSpectrumVector(const double value = 1.);
   
   /*! creates a new SpectObj with energy range [start,end]
    * \param start const iterator positioned at the min of the energy range
