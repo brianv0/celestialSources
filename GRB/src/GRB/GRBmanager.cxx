@@ -34,9 +34,9 @@ GRBmanager::GRBmanager(const std::string& params)
   m_fluence   = m_GRB->GetFluence();
   m_GRBnumber = m_GRB->GetGRBNumber();
   m_GRBdir    =  m_GRB->GRBdir();
-
-    std::ofstream os("grb_generated.txt",std::ios::out);
-
+  
+  std::ofstream os("grb_generated.txt",std::ios::out);
+  
   os<<m_GRBnumber<<" "<<m_startTime<<" "<<m_endTime<<" "<<m_fluence<<" "<<m_GRBdir.first<<" "<<m_GRBdir.second<<std::endl;
   std::cout<<"GRB ("<<m_GRBnumber<<") starting at "<<m_startTime<<", ending at time: "<<m_endTime
 	   <<" l,b ="<<m_GRBdir.first<<", "<<m_GRBdir.second<<" Fluence = "<<m_fluence<<std::endl;

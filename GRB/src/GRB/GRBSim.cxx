@@ -233,6 +233,8 @@ void GRBSim::GetGBMFlux()
   GBM.SetMaximum(1e6);
   double t=0;
   double dt = m_Nv->GetXaxis()->GetBinWidth(1);
+  std::ofstream os("GBM_spectrum.txt",std::ios::out);
+  os<<"    t      a      b    E0    Const"<<std::endl;
   for(int ti = 0; ti<Tbin; ti++)
     {
       t = ti*dt;
@@ -248,7 +250,10 @@ void GRBSim::GetGBMFlux()
       E0=pow(10.,band.GetParameter(2));
       Const=pow(10.,band.GetParameter(3));
       band.SetParameters(a,b,band.GetParameter(2),band.GetParameter(3));
-      //Ep=(a+2)*E0;
+      //Ep=(a+2)*E0;  
+      os<<t<<" "<<a<<" "<<b<<" "<<E0<<" "<<Const<<std::endl;
+      std::cout<<t<<" "<<a<<" "<<b<<" "<<E0<<" "<<Const<<std::endl;
+      band.Draw("same");
       gPad->SetLogx();
       gPad->SetLogy();
       gPad->Update();
@@ -257,6 +262,7 @@ void GRBSim::GetGBMFlux()
       gbmFlux+=".gif";
       if(ti%10==0) gPad->Print(gbmFlux);
     }
+  os.close();
   //////////////////////////////////////////////////
   delete[] e;
 }
