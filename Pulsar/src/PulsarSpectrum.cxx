@@ -253,7 +253,9 @@ double PulsarSpectrum::flux(double time) const
  */
 double PulsarSpectrum::interval(double time)
 {  
-  double timeTilde = time + (StartMissionDateMJD)*SecsOneDay;
+  double timeTildeDecorr = time + (StartMissionDateMJD)*SecsOneDay;
+  double timeTilde = timeTildeDecorr + getBaryCorr(timeTildeDecorr);
+
   if ((int(timeTilde - (StartMissionDateMJD)*SecsOneDay) % 20000) < 1.5)
     std::cout << "**  Time reached is: " << timeTilde-(StartMissionDateMJD)*SecsOneDay
 	      << " seconds from Mission Start  - pulsar " << m_PSRname << std::endl;
@@ -269,11 +271,13 @@ double PulsarSpectrum::interval(double time)
   double finPh =  modf(initTurns,&intPart);
   finPh = modf(finPh + inteTurns,&intPart); //finPh is the expected phase corresponding to the nextTimeTilde
   double nextTimeTilde = retrieveNextTimeTilde(timeTilde, totTurns, (1e-6/m_period));
-    
+  
+  // std::cout << " corr " << getBaryCorr(nextTimeTilde) << std::endl;  
+
 
   //Find the TT from TDB. Bisection method.
-  double deltaMax = 510.0/SecsOneDay;
-  double err = 5e-3;
+  double deltaMax = 510.0; //secs
+  double err = 5e-5;
 
   double ttUp = nextTimeTilde + deltaMax;
   double ttDown = nextTimeTilde - deltaMax;
@@ -282,15 +286,19 @@ double PulsarSpectrum::interval(double time)
   int i = 0;
 
   double hMid = 1e30;
-  while ( fabs(hMid) > err)
+  while (fabs(hMid)>err )
     {
-      double hUp = nextTimeTilde - (ttUp + getBaryCorr(ttUp)/SecsOneDay);
-      double hDown = nextTimeTilde -(ttDown + getBaryCorr(ttDown)/SecsOneDay );
-      hMid = (nextTimeTilde - (ttMid + getBaryCorr(ttMid)/SecsOneDay))*SecsOneDay;
-      //std::cout << "\n" << i << "**ttUp " << ttUp << " ttDown " << ttDown << " mid " << ttMid << std::endl;
-      //std::cout << "  hUp " << hUp << " hDown " << hDown << " hMid " << hMid << std::endl;
+      double hUp = (nextTimeTilde - (ttUp + getBaryCorr(ttUp)));
+      double hDown = (nextTimeTilde - (ttDown + getBaryCorr(ttDown)));
+      hMid = (nextTimeTilde - (ttMid + getBaryCorr(ttMid)));
 
+      /*    
+      std::cout << std::setprecision(30) 
+		<< "\n" << i << "**ttUp " << ttUp << " ttDown " << ttDown << " mid " << ttMid << std::endl;
+      std::cout << "  hUp " << hUp << " hDown " << hDown << " hMid " << hMid << std::endl;
+      */
 
+      if (fabs(hMid) < err) break;
       if ((hDown*hMid)>0)
 	{
 	  ttDown = ttMid;
@@ -303,13 +311,22 @@ double PulsarSpectrum::interval(double time)
 	}
       i++;
     }
+  /*
+  std::cout << i << " Diff is " << std::setprecision(30) << " TDB " << nextTimeTilde/SecsOneDay 
+	    << " TDB computed " << (ttMid + getBaryCorr(ttMid)/SecsOneDay)/SecsOneDay 
+	    << " corr " << getBaryCorr(ttMid) 
+	     << " -->Diff " << (nextTimeTilde-(ttMid + (getBaryCorr(ttMid)/SecsOneDay))) <<std::endl; 
+  */
+  std::cout << "\nTimeTildeDEcorr in TDB is" << timeTildeDecorr - (StartMissionDateMJD)*SecsOneDay << "sec." << std::endl;
+  std::cout << "TimeTilde in TDB is" << timeTilde - (StartMissionDateMJD)*SecsOneDay << "sec." << std::endl;
+  std::cout << "nextTimeTilde in TDB is" << nextTimeTilde - (StartMissionDateMJD)*SecsOneDay << "sec." << std::endl;
+  double nextTimeDecorr = ttMid;
 
-  std::cout << i << " Diff is " << std::setprecision(30) << " TDB " << nextTimeTilde 
-	    << " TDB computed " << nextTimeTilde + getBaryCorr(ttMid)/SecsOneDay 
-	    << " corr " << getBaryCorr(ttMid) << std::endl;
+  std::cout << " nextTimeTilde decorrected is" << nextTimeDecorr - (StartMissionDateMJD)*SecsOneDay << "sec." << std::endl;
+  std::cout << " corrected is " << nextTimeDecorr + getBaryCorr(nextTimeDecorr) - (StartMissionDateMJD)*SecsOneDay << std::endl;
+  std::cout << " interval is " <<  nextTimeDecorr - timeTildeDecorr << std::endl;
 
-
-  return nextTimeTilde - timeTilde; //+ getBaryDeCorr(nextTimeTilde)  - timeTilde;
+  return nextTimeDecorr - timeTildeDecorr; //+ getBaryDeCorr(nextTimeTilde)  - timeTilde;
 }
 
 /////////////////////////////////////////////
@@ -447,7 +464,7 @@ double PulsarSpectrum::getBaryCorr( double ttInput )
   // std::cout << std::setprecision(15) << "** --> TDB-TT = " << tdb_min_tt << std::endl;
   // std::cout << std::setprecision(15) << "** --> Geom. delay = " << GeomCorr << std::endl;
   // std::cout << std::setprecision(15) << "** --> Shapiro delay = " << ShapiroCorr << std::endl;
-  std::cout << std::setprecision(15) << "** ====> Total= " << tdb_min_tt + GeomCorr + ShapiroCorr  << std::endl;
+  //  std::cout << std::setprecision(15) << "** ====> Total= " << tdb_min_tt + GeomCorr + ShapiroCorr  << std::endl;
   
   return tdb_min_tt + GeomCorr + ShapiroCorr;
 
