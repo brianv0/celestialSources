@@ -82,7 +82,7 @@ void Parameters::SetInverseCompton(double ic)
 int Parameters::ReadParametersFromFile(std::string paramFile, int NGRB)
 {
   
-  ifstream f1(paramFile.c_str());
+  std::ifstream f1(paramFile.c_str());
   if (!f1.is_open()) 
     {
       std::cout<<"Error Opening paramFile\n";

@@ -1,8 +1,7 @@
-#include "stdio.h"
 #include <string>
-#include "SpectObj.h"
-#include <iostream.h>
+#include <iostream>
 #include <fstream>
+#include "SpectObj.h"
 
 const double erg2meV   = 624151.0;
 
