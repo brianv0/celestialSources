@@ -38,7 +38,8 @@ class SpectObj
       delete Nv;
       delete m_SpRandGen;
       //      if (PeriodicSpectrumIsComputed == true ) 
-	delete PeriodicSpectrum;
+      delete PeriodicSpectrum;
+      std::cout<<" SpectObj: Generated photons : "<<counts<<" over "<<m_AreaDetector<<" m^2 "<<std::endl;
     }
   void GetUniqueName(const void *ptr, std::string & name);
   
@@ -75,6 +76,7 @@ class SpectObj
   TH1D *CloneTimes();
     
  private:
+  int counts;
   double  m_AreaDetector;
   TRandom *m_SpRandGen;
   TH2D* Nv;
