@@ -75,14 +75,6 @@ SpectObj::SpectObj(const TH2D* In_Nv, int type)
   Probability->SetName(name.c_str());
   ProbabilityIsComputed=false;
 
-  if (sourceType ==1)
-    {
-      PeriodicSpectrum = new TH1D("PeriodicSpectrum","PeriodicSpectrum",nt,m_Tmin,m_Tmax);
-      GetUniqueName(PeriodicSpectrum,name);
-      gDirectory->Delete(name.c_str());
-      PeriodicSpectrum->SetName(name.c_str());
-    }
-  
   delete[] en;
   if(DEBUG)  std::cout<<" SpectObj initialized ! ( " << sourceType <<")"<<std::endl;
   //////////////////////////////////////////////////
@@ -231,9 +223,14 @@ TH1D *SpectObj::Integral_T(int ti1, int ti2, int e1)
 {
   TH1D *en = CloneSpectrum();
   en->Scale(0.0);
+
   for(int i = e1; i<=ne; i++)
+    {
     en->SetBinContent(i,Nv->Integral(ti1,ti2,i,i));
-  return en; // ph
+
+    }
+    return en; // ph
+    // delete en;
 }
 
 TH1D *SpectObj::Integral_T(int ti1, int ti2, int e1, int e2)
@@ -336,25 +333,32 @@ photon SpectObj::GetPhoton(double t0, double enph)
     } 
   else if (sourceType == 1) //Periodic //Max
     {
-      
+
       if (!PeriodicSpectrumIsComputed)
 	{
+	  std::string name;
+	  PeriodicSpectrum = new TH1D("PeriodicSpectrum","PeriodicSpectrum",nt,m_Tmin,m_Tmax);
+	  GetUniqueName(PeriodicSpectrum,name);
+	  gDirectory->Delete(name.c_str());
+	  PeriodicSpectrum->SetName(name.c_str());
 	  PeriodicSpectrum = Integral_T(1,nt,ei);
 	  PeriodicSpectrumIsComputed = true;
 	}
-      
+
       double TimeToFirstPeriod = 0.0;
       double TimeFromLastPeriod = 0.0;
       int IntNumPer = 0;
       double ProbRest = 0.0;
       double nextTime = 0.0;
       double InternalTime = t0 - Int_t(t0/m_Tmax)*m_Tmax; // InternalTime is t0 reduced to a period
+      
       double Ptot = Probability->GetBinContent(nt) - Probability->GetBinContent(1); //Total proability in a period 
       
       //First checks if next photon lies in the same period
       if (((Probability->GetBinContent(nt) - Probability->GetBinContent(Nv->GetXaxis()->FindBin(InternalTime))) < 1.0 ))
 	{
 	  TimeToFirstPeriod = m_Tmax - InternalTime;
+	
 	}
       else
 	{
@@ -383,8 +387,11 @@ photon SpectObj::GetPhoton(double t0, double enph)
 	      tBinCurrent++;
 	    }	 
 	  TimeFromLastPeriod = Nv->GetXaxis()->GetBinCenter(tBinCurrent);
+	  
 	  ProbRest = ProbRest - (Probability->GetBinContent(tBinCurrent) - Probability->GetBinContent(1));
+	  
 	  TimeFromLastPeriod += m_SpRandGen->Uniform()*m_TimeBinWidth - m_TimeBinWidth/2 ;
+	  
 	}
       
       //std::cout << " At End ProbRest is (should be 0 ) " << ProbRest << std::endl;
@@ -411,7 +418,7 @@ photon SpectObj::GetPhoton(double t0, double enph)
       
       ph.time   = t0 + TimeToFirstPeriod + IntNumPer*m_Tmax +TimeFromLastPeriod;
       ph.energy = PeriodicSpectrum->GetRandom();
-      
+            
     }
   
   if(DEBUG)  std::cout<< " New Photon at ("<<t0<<"): Internal time =  " << ph.time << " Energy  (KeV) " << ph.energy << std::endl;
