@@ -10,8 +10,8 @@ version v0r3p1
 use flux v*
 
 use genericSources v1 celestialSources
-use GRB v4r1 celestialSources
-use Pulsar v1r0p0 celestialSources
 use SpectObj v0r1p0 celestialSources
-use DarkMatter JCT celestialSources
+use GRB v4r1 celestialSources
 use GRBobs v0r1p1 celestialSources
+use Pulsar v1r0p0 celestialSources
+#use DarkMatter JCT celestialSources
