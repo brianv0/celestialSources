@@ -47,8 +47,8 @@ MapSource::MapSource(const std::string &paramString)
 
    readFitsFile(fitsFile);
 
-   std::cerr << "Integral over the map: " 
-             << m_mapIntegral << std::endl;
+//    std::cerr << "Integral over the map: " 
+//              << m_mapIntegral << std::endl;
 }
 
 float MapSource::operator()(float xi) const {
