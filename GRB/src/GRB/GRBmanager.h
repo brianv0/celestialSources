@@ -86,7 +86,7 @@ class GRBmanager : public ISpectrum
   GRBSim   *m_GRB;
   SpectObj *m_spectrum;
   Parameters *m_par;
-
+  
   const std::string& m_params;
   std::string paramFile;
 

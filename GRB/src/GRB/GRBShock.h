@@ -30,16 +30,23 @@ class GRBShock
   
   GRBShell *MergedShell() {return MS;}
   void SetTime(double time);
-  inline void SetSpectralParameters(double alpha, double beta)
+  /*
+    inline void SetSpectralParameters(double alpha, double beta)
     {
-      a = alpha;
-      b = beta;
+    a = alpha;
+    b = beta;
     }
+  */
   inline   void SetICComponent(double ic){m_IC = ic;}
   
   double GetTime(){return tsh;}
-  double GetDuration(){return sqrt(ta*ta + tc*tc + ts*ts);}
-  double GetEfficiency(){return eff;}
+  inline double EsynObs(double g){ return 1.1447e-11 * B * gf *pow(g,2.0);} //kev
+  inline double GammaElectron(double Eobs){return TMath::Max(1.0,8.736e10*Eobs/(B * gf));} //kev;}
+  inline double Psyn(double g)   { return 6.6e-7 * pow(B,2.) *pow(g,2.0);}     //KeV/s
+  inline double gt(double g0, double tcom)    { return TMath::Max(1.0,g0/(1.0+TMath::Max(0.0,tcom)/ts0));}
+  inline   double GetDuration(){return sqrt(ta*ta + tc*tc + pow(ts0/GammaElectron(20.0),2.));}
+  inline double GetEfficiency(){return eff;}
+  
   double Peak(double time, double energy);
   double SynSpectrum(double time, double energy);
   double ICSpectrum(double time, double energy);
@@ -52,8 +59,9 @@ class GRBShock
   inline double GetEsyn(){return Es0;}
   inline double GetPeak()
     {
-      if(gec/tc > gem) return Es0*gec*gec/(tc*tc);
       return Es0*gem*gem;
+      //      if(gec/tc > gem) return Es0*gec*gec/(tc*tc);
+      //      return Es0*gem*gem;
     }
   
  private:
@@ -62,8 +70,8 @@ class GRBShock
   double eff;
   double gf,ei,ef,mf, eint_o,eint_c,rf,drf;
   double nsh,gsh,B;
-  double ta,tc,ts;
-  double Es0;
+  double ta,tc;
+  double Es0,ts0;
   double gem,gec,geM;
   double a,b,p;
   double m_IC;

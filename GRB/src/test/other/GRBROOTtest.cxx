@@ -11,8 +11,10 @@
 #include "TCanvas.h"
 #include "TLegend.h"
 #include "TGaxis.h"
+#include "TTree.h"
 
 
+//#include "../../GRB/SpectObj.h"
 #include "SpectObj/SpectObj.h"
 #include "../../GRB/GRBSim.h"
 #include "../../GRB/GRBConstants.h"
@@ -23,6 +25,10 @@ int    TBIN, EBIN;
 //////////////////////////////////////////////////
 
 Parameters *params;
+double Band(double *var, double *par);
+void ScanParameters(int Ngrb);
+
+#define DEBUG=0
 
 double Band(double *var, double *par)
 {
@@ -36,15 +42,15 @@ double Band(double *var, double *par)
   double C   = pow((a-b)*E0,a-b)*exp(b-a);
   double H   = (a-b) * E0;
   if(E <= H) 
-    return NT * pow(E,a) * exp(-E/E0)*E;
-  return C* NT * pow(E,b)*E; // ph cm^(-2) s^(-1) keV^(-1)
+    return E * NT * pow(E,a) * exp(-E/E0);
+  return E * C* NT * pow(E,b); // ph cm^(-2) s^(-1) keV^(-1)
 }
 
 TH2D *Load(char name[100]="grb_65540.root")
 {
   TFile *mod = new TFile(name);
   TH2D *Nv = (TH2D*) mod->Get("Nv"); //ph m^(-2) s^(-1) keV^(-1)
-    
+  
   TMIN = Nv->GetXaxis()->GetXmin();
   TMAX = Nv->GetXaxis()->GetXmax();
   EMIN = Nv->GetYaxis()->GetXmin();
@@ -88,14 +94,16 @@ void PlotGRB(double enph = 0,char name[100]="grb_65540.root")
   TCanvas *cNv = new TCanvas("cNv","Nv");
   cNv->SetLogy();
   cNv->SetLogz();
-  
-  TH2D *Nv = Load(name);
+  std::cout<<name<<std::endl;
+  TH2D *Nv = Load(name); // [ph/keV/s/m²]
   
   // Ne =  [ph/keV/s/m²]
   gDirectory->Delete("Ne");
   Nv->ProjectionY("Ne");
   TH1D *Ne = (TH1D*) gDirectory->Get("Ne");
+
   Ne->Scale(DT);
+
   Ne->SetYTitle("Ne [ph/keV/m^{2}]");
   Ne->SetXTitle(" Energy[keV] ");
   // Fv = Ne * de: [ph/s/m^2]
@@ -136,28 +144,39 @@ void PlotGRB(double enph = 0,char name[100]="grb_65540.root")
   animatedCanvas->SetLogy();
   int i1=0;
   int i2;
+  TH1D *AnimatedSpectrum;
+
+  int l=1;
   for(int i=0; i < TBIN; i++)
     {
       i2=i;
-      if(i%5==0)
+      if(5==0)
 	{
-	  TH1D *AnimatedSpectrum =   Nv->ProjectionY("Animated",i1,i2);
+	  TString Name="frame";
+	  AnimatedSpectrum =   Nv->ProjectionY("Animated",i1,i2);
 	  AnimatedSpectrum->GetXaxis()->SetTitle("Energy [keV]");
-	  AnimatedSpectrum->GetYaxis()->SetTitle("F_{#nu} [ph/m^{2}/s]");
+	  AnimatedSpectrum->GetYaxis()->SetTitle("#nu F_{#nu} [erg/cm^{2}/s]");
 	  AnimatedSpectrum->GetXaxis()->SetTitleOffset(1.1);
 	  AnimatedSpectrum->GetYaxis()->SetTitleOffset(1.5);
+	  AnimatedSpectrum->SetLineColor(2);
+	  AnimatedSpectrum->SetLineWidth(2);
 	  for(int j=0; j < EBIN; j++)
 	    {
 	      double ne = AnimatedSpectrum->GetBinContent(j+1);
-	      double de = AnimatedSpectrum->GetBinWidth(j+1);//GetBinCenter(i+1);
-	      //double e = AnimatedSpectrum->GetBinCenter(j+1);
+	      double de = AnimatedSpectrum->GetBinWidth(j+1);
+	      double ee = AnimatedSpectrum->GetBinCenter(j+1);
 	      //	      AnimatedSpectrum->SetBinContent(i+1,de*ne);
-	      AnimatedSpectrum->SetBinContent(j+1,ne*de);
+	      AnimatedSpectrum->SetBinContent(j+1,ee*ne*de/624151.0*1e-7);
 	    }  
-	  AnimatedSpectrum->SetMaximum(1e7);
-	  AnimatedSpectrum->SetMinimum(1e-3);
+	  AnimatedSpectrum->SetMaximum(1e-3);
+	  AnimatedSpectrum->SetMinimum(1e-10);
 	  AnimatedSpectrum->Draw("l");
 	  animatedCanvas->Update();
+	  Name+=l;
+	  Name+=".gif";
+	  animatedCanvas->Print(Name);
+	  l++;
+
 	  i1=i;
 	}
     }
@@ -173,7 +192,7 @@ void PlotGRB(double enph = 0,char name[100]="grb_65540.root")
   else if (enph<EMIN)  enph = EMIN;
   
   //////////////////////////////////////////////////
-  SpectObj *sp = new SpectObj(Nv,0);              //ph/m² 
+  SpectObj *sp = new SpectObj(Nv,0);              //ph
   
   std::pair<float,float> dir = std::make_pair((float)0.0,(float)0.0);
   
@@ -187,70 +206,106 @@ void PlotGRB(double enph = 0,char name[100]="grb_65540.root")
   csp->SetLogy();
   
   clc->Divide(1,2);
-  TH1D *Lct_GRB = sp->Integral_E(EMIN,EMAX);  // ph/m^2
-  TH1D *Lct_GBM = sp->Integral_E(GBM1,GBM2);  // ph/m^2
+  TH1D *Lct_GBM = sp->Integral_E(GBM1,GBM2);  // ph
+  TH1D *Lct_BATSE1 = sp->Integral_E(BATSE1,BATSE2);  // ph
+  TH1D *Lct_BATSE2 = sp->Integral_E(BATSE2,BATSE3);  // ph
+  TH1D *Lct_BATSE3 = sp->Integral_E(BATSE3,BATSE4);  // ph
+  TH1D *Lct_BATSE4 = sp->Integral_E(BATSE4,BATSE5);  // ph
  
-  TH1D *Lct_LAT = sp->Integral_E(LAT1,LAT2);  // ph/m^2
-  TH1D *Lct_EXT = sp->Integral_E(enph,EMAX);  // ph/m^2
+  TH1D *Lct_LAT = sp->Integral_E(LAT1,LAT2);  // ph
+  TH1D *Lct_EXT = sp->Integral_E(enph,EMAX);  // ph
   
-  Lct_GRB->SetStats(0);
+  Lct_GBM->SetStats(0);
   Lct_LAT->SetStats(0);
   
-  Lct_GRB->SetNameTitle("flux [ph]","flux [ph]");
-  Lct_GRB->SetXTitle("Time (s)");
-  Lct_GRB->SetYTitle("photons/m^{2}");
-
+  Lct_GBM->SetNameTitle("flux [ph]","flux [ph]");
+  Lct_GBM->SetXTitle("Time (s)");
+  Lct_GBM->SetYTitle("photons");
+  
   Lct_LAT->SetNameTitle("flux [ph]","flux [ph]");
   Lct_LAT->SetXTitle("Time (s)");
-  Lct_LAT->SetYTitle("photons/m^{2}");
-    
-  //  Lct_GRB->SetName("flux GRB [ph]");
+  Lct_LAT->SetYTitle("photons");
+  
+  //  Lct_BATSE->SetName("flux GRB [ph]");
   Lct_GBM->SetName("flux GBM [ph]");
   Lct_LAT->SetName("flux LAT [ph]"); 
   Lct_EXT->SetName("flux EXT [ph]"); 
  
-  Lct_GRB->SetLineWidth(2);
-  Lct_GBM->SetLineWidth(2);
+  Lct_BATSE1->SetLineWidth(1);
+  Lct_BATSE2->SetLineWidth(1);
+  Lct_BATSE3->SetLineWidth(1);
+  Lct_BATSE4->SetLineWidth(1);
+  Lct_GBM->SetLineWidth(1);
   Lct_LAT->SetLineWidth(2);
-  Lct_EXT->SetLineWidth(2);
+  Lct_EXT->SetLineWidth(1);
+  Lct_EXT->SetLineStyle(2);
   
-  Lct_GRB->SetLineColor(2);
-  Lct_GBM->SetLineColor(3);
+  Lct_BATSE1->SetLineColor(2);
+  Lct_BATSE2->SetLineColor(3);
+  Lct_BATSE3->SetLineColor(4);
+  Lct_BATSE4->SetLineColor(6);
+  //  Lct_GBM->SetLineColor(1);
   Lct_LAT->SetLineColor(4);
-  Lct_EXT->SetLineColor(6);
+  //  Lct_EXT->SetLineColor(6);
  
   csp->cd();
   vFv->SetMinimum(.1);
   vFv->Draw("al");
   Fv->Draw("samel");
   Ne->Draw("samel");
-  gDirectory->Delete("band");
+  //  gDirectory->Delete("band");
   
-  TF1 band("grb_f",Band,EMIN,1.0e+3,4); 
+  TF1 band("grb_f",Band,EMIN,1.0e+4,4); 
+  TF1 pl("PL_f","10^([0])*(x/10000)^(-[1])",3.0e+3,1.0e+6);
+ 
   band.SetParNames("a","b","Log10(E0)","Log10(Const)");
   band.SetLineStyle(2);
+  pl.SetLineStyle(2);
+  pl.SetLineColor(2);
 
-  band.SetParLimits(0,-2.0,0.0);
+  band.SetParLimits(0,-2.0,1.0);
   band.SetParLimits(1,-3.0,-1.0);
   band.SetParLimits(2,1.0,3.0);
   band.SetParLimits(3,0.0,10.0);
 
-  band.FixParameter(0,-0.86);
-  band.FixParameter(1,-2.5);
-  band.FixParameter(2,2.65);
+  band.SetParameter(0,-0.86);
+  //  band.FixParameter(1,-2.125);
+  band.SetParameter(2,2.5);
   band.SetParameter(3,3.0);
   //band.Draw("lsame");
-  Fv->Fit("grb_f","v","lsame");
+  pl.SetParameters(4.0,-2.5);
+  pl.SetParLimits(0,-8,8);
+    
+  Fv->Fit("grb_f","QR+","lsame");
+
   double a=band.GetParameter(0);
   double b=band.GetParameter(1);
   double E0=pow(10.,band.GetParameter(2));
   double Ep=(a+2)*E0;
-  std::cout<<"--------------------------------------------------"<<std::endl;
+  std::cout<<"-- BAND FUNCTION Fv FIT ---------------------------"<<std::endl;
   std::cout<<" a     = "<<a<<std::endl;
   std::cout<<" b     = "<<b<<std::endl;
   std::cout<<" E0    = "<<E0<<std::endl;
   std::cout<<" Ep    = "<<Ep<<std::endl;
   std::cout<<" Const = "<<pow(10.,band.GetParameter(3))<<std::endl;
+  std::cout<<"--------------------------------------------------"<<std::endl;
+  //////////////////////////////////////////////////
+  Ne->Fit("PL_f","QR+","lsame");
+  std::cout<<"---PL FUNTION Nv FIT------------------------------"<<std::endl;
+  std::cout<<" No    = "<<pow(10.,pl.GetParameter(0))<<std::endl;
+  std::cout<<" Index = "<<pl.GetParameter(1)<<std::endl;
+  std::cout<<"--------------------------------------------------"<<std::endl;
+
+  Fv->Fit("PL_f","QR+","lsame");
+  std::cout<<"---PL FUNTION Fv FIT------------------------------"<<std::endl;
+  std::cout<<" No    = "<<pow(10.,pl.GetParameter(0))<<std::endl;
+  std::cout<<" Index = "<<pl.GetParameter(1)<<std::endl;
+  std::cout<<"--------------------------------------------------"<<std::endl;
+
+  vFv->Fit("PL_f","QR+","lsame");
+  std::cout<<"---PL FUNTION vFv FIT------------------------------"<<std::endl;
+  std::cout<<" No    = "<<pow(10.,pl.GetParameter(0))<<std::endl;
+  std::cout<<" Index = "<<pl.GetParameter(1)<<std::endl;
   std::cout<<"--------------------------------------------------"<<std::endl;
    
   TLegend *leg = new TLegend(0.11,0.12,0.37,0.25);
@@ -265,7 +320,7 @@ void PlotGRB(double enph = 0,char name[100]="grb_65540.root")
   TH1D *Lc = sp->GetTimes();  
   Lc->SetNameTitle("Counts[ph]","Counts[ph]");
   Lc->SetXTitle("Time (s)");
-  Lc->SetYTitle("photons/m^{2}");
+  Lc->SetYTitle("photons");
 
   TF1  *f1 = new TF1("f1","[0]*1./x"); 
   TF1  *f2 = new TF1("f2","[0]*1./x^2");   
@@ -283,7 +338,7 @@ void PlotGRB(double enph = 0,char name[100]="grb_65540.root")
 	{
 	  Interval = sp->interval(time,enph); // s  
 	  energy   = sp->energy(time,enph);   // keV
-	  flux     = sp->flux(time,enph);     // ph/s
+	  flux     = sp->flux(time,enph);     // ph/s/m2
 	  
 	  Counts->Fill(energy); // ph
 	  Lc->Fill(time);       // ph
@@ -310,26 +365,36 @@ void PlotGRB(double enph = 0,char name[100]="grb_65540.root")
     {
       Counts->SetMaximum(1.5*Ne->GetMaximum());
       Counts->SetStats(1);
+      Counts->Scale(1./6.0);
       Counts->Draw("E1same");
       Counts->SetStats(1);
     }
   //////////////////////////////////////////////////      
   //clc->cd();
-  double LowEnergyMax  = 1.05*Lct_GRB->GetMaximum();
+  double LowEnergyMax  = 1.05*Lct_GBM->GetMaximum();
   double HighEnergyMax = Lct_LAT->GetMaximum();
-  double tmax = Lct_GRB->GetXaxis()->GetXmax();
-  double tmin = Lct_GRB->GetXaxis()->GetXmin();
+  double tmax = Lct_GBM->GetXaxis()->GetXmax();
+  double tmin = Lct_GBM->GetXaxis()->GetXmin();
   /*
     Lct_LAT->Scale(LowEnergyMax/(1.1*HighEnergyMax));
     Lct_EXT->Scale(LowEnergyMax/(1.1*HighEnergyMax));
   */
   
   clc->cd(1);
-  Lct_GRB->Draw("l");
-  Lct_GBM->Draw("lsame");
-
+  Lct_GBM->Draw("l");
+  Lct_BATSE1->Draw("lsame");
+  Lct_BATSE2->Draw("lsame");
+  Lct_BATSE3->Draw("lsame");
+  Lct_BATSE4->Draw("lsame");
+  TLegend *legL = new TLegend(0.7,0.7,0.99,0.99);
+  legL->AddEntry(Lct_BATSE1,"BATSE (ch1)");
+  legL->AddEntry(Lct_BATSE2,"BATSE (ch2)");
+  legL->AddEntry(Lct_BATSE3,"BATSE (ch3)");
+  legL->AddEntry(Lct_BATSE4,"BATSE (ch4)");
+  legL->AddEntry(Lct_GBM,"GBM (tot)");
+  legL->Draw();
   clc->cd(2);
-  
+  TLegend *legH = new TLegend(0.7,0.8,0.99,0.99);
   if(ExtractPhotons)
     {
       Lc->SetMarkerStyle(20);
@@ -340,9 +405,11 @@ void PlotGRB(double enph = 0,char name[100]="grb_65540.root")
       Lc->Draw();
       Lct_EXT->Draw("lsame");
       Lct_LAT->Draw("lsame");
+      if(enph!=LAT1)    legH->AddEntry(Lct_EXT,"Extracted Photons (Theory)");
+      legH->AddEntry(Lc,"Extracted Photons (Sampled)");
       std::cout<<" Photons Extracted : = "<<Lc->GetEntries()<<std::endl;
-      std::cout<<" flux (exp)        : = "<<Counts->Integral(0,EBIN,"width")<<" keV/m^2"<<std::endl;
-      std::cout<<" flux (exp)        : = "<<Counts->Integral(0,EBIN,"width")*1.0e-7/erg2meV<<" erg/cm^2"<<std::endl;
+      std::cout<<" flux (exp)        : = "<<Counts->Integral(0,EBIN,"width")<<" keV"<<std::endl;
+      std::cout<<" flux (exp)        : = "<<Counts->Integral(0,EBIN,"width")*1.0e-7/erg2meV/6.0<<" erg/cm^2"<<std::endl;
       
     } 
   else
@@ -350,48 +417,68 @@ void PlotGRB(double enph = 0,char name[100]="grb_65540.root")
       Lct_LAT->Draw("l");
     }
 
+  legH->AddEntry(Lct_LAT,"LAT (tot)");
+  legH->Draw();
 
 
-  std::cout<<" Nph GRB ("<<EMIN<<","<<EMAX<<")  = "<<sp->Integral_T(Lct_GRB,0.0,TMAX)<<std::endl;
+  std::cout<<" Nph BATSE1 ("<<BATSE1<<","<<BATSE2<<")  = "<<sp->Integral_T(Lct_BATSE1,0.0,TMAX)<<std::endl;
+  std::cout<<" Nph BATSE1 ("<<BATSE2<<","<<BATSE3<<")  = "<<sp->Integral_T(Lct_BATSE2,0.0,TMAX)<<std::endl;
+  std::cout<<" Nph BATSE1 ("<<BATSE3<<","<<BATSE4<<")  = "<<sp->Integral_T(Lct_BATSE3,0.0,TMAX)<<std::endl;
+  std::cout<<" Nph BATSE1 ("<<BATSE4<<","<<BATSE5<<")  = "<<sp->Integral_T(Lct_BATSE4,0.0,TMAX)<<std::endl;
   std::cout<<" Nph GBM ("<<GBM1<<","<<GBM2<<")  = "<<sp->Integral_T(Lct_GBM,0.0,TMAX)<<std::endl;
   std::cout<<" Nph LAT ("<<LAT1<<","<<LAT2<<")  = "<<sp->Integral_T(Lct_LAT,0.0,TMAX)<<std::endl;
   if(ExtractPhotons) std::cout<<" Nph EXT ("<<enph<<","<<EMAX<<")  = "<<sp->Integral_T(Lct_EXT,0.0,TMAX)<<std::endl;
   std::cout<<" -------------------------------------------------- "<<std::endl;
   
-  int iBATSE1 = Ne->FindBin(BATSE1);
+  /*int iBATSE1 = Ne->FindBin(BATSE1);
   int iBATSE2 = Ne->FindBin(BATSE2);
   int iGBM1 = Ne->FindBin(GBM1);
   int iGBM2 = Ne->FindBin(GBM2);
   int iLAT1 = Ne->FindBin(LAT1);
   int iLAT2 = Ne->FindBin(LAT2);
   int iEXP = Ne->FindBin(enph);
+  */
+  double fBATSE1 = sp->GetFluence(BATSE1,BATSE2);
+  double fBATSE2 = sp->GetFluence(BATSE2,BATSE3);
+  double fBATSE3 = sp->GetFluence(BATSE3,BATSE4);
+  double fBATSE4 = sp->GetFluence(BATSE4,BATSE5);
+  double fLAT   = sp->GetFluence(LAT1,LAT2);
+  double fGBM   = sp->GetFluence(GBM1,GBM2);
+  double fEXP   = sp->GetFluence(enph,emax);
+  double fTOT   = sp->GetFluence();
+  Ep = vFv->GetBinCenter(vFv->GetMaximumBin());
+  std::cout<<"* Theoretical values:  *****************************"<<std::endl;
+  std::cout<<" T90 = "<<sp->GetT90()<<" Epeak = "<<Ep<<std::endl;
+  std::cout<<" GRB   flux ("<< emin <<","<< emax <<") = "<<fTOT<<" erg/cm^2"<<std::endl;
+  std::cout<<" BASTE flux (ch1) ("<<BATSE1<<","<<BATSE2<<") = "<<fBATSE1<<" erg/cm^2"<<std::endl;
+  std::cout<<" BASTE flux (ch2) ("<<BATSE2<<","<<BATSE3<<") = "<<fBATSE2<<" erg/cm^2"<<std::endl;
+  std::cout<<" BASTE flux (ch3) ("<<BATSE3<<","<<BATSE4<<") = "<<fBATSE3<<" erg/cm^2"<<std::endl;
+  std::cout<<" BASTE flux (ch4) ("<<BATSE4<<","<<BATSE5<<") = "<<fBATSE4<<" erg/cm^2"<<std::endl;
+  std::cout<<" GBM   flux ("<< GBM1 <<","<< GBM2 <<") = "<<fGBM<<" erg/cm^2"<<std::endl;
+  std::cout<<" LAT   flux ("<< LAT1 <<","<< LAT2 <<") = "<<fLAT<<" erg/cm^2"<<std::endl;
+  if(ExtractPhotons) std::cout<<" EXP   flux ("<< enph <<","<< emax <<") = "<<fEXP<<" erg/cm^2"<<std::endl;
   
+  /*
   std::cout<<" Flux[ erg/cm^2] GRB ("<<EMIN<<","<<EMAX<<")  = "<<Fv->Integral(0,EBIN,"width")*1.0e-7/erg2meV<<" erg/cm^2"<<std::endl;
 std::cout<<" Flux[ erg/cm^2] BATSE ("<<BATSE1<<","<<BATSE2<<")  = "<<Fv->Integral(iBATSE1,iBATSE2,"width")*1.0e-7/erg2meV<<" erg/cm^2"<<std::endl;
   std::cout<<" Flux[ erg/cm^2] GBM ("<<GBM1<<","<<GBM2<<")  = "<<Fv->Integral(iGBM1,iGBM2,"width")*1.0e-7/erg2meV<<" erg/cm^2"<<std::endl;
   std::cout<<" Flux[ erg/cm^2] LAT ("<<LAT1<<","<<LAT2<<")  = "<<Fv->Integral(iLAT1,iLAT2,"width")*1.0e-7/erg2meV<<" erg/cm^2"<<std::endl;
   if(ExtractPhotons) std::cout<<" Flux[ erg/cm^2] EXT ("<<enph<<","<<EMAX<<")  = "<<Fv->Integral(iEXP,EBIN,"width")*1.0e-7/erg2meV<<" erg/cm^2"<<std::endl;
-  
+  */
 }
 
 
-void MakeGRB(long seed, double enph)
+void MakeGRB(int NGRB=1, UInt_t seed=1, double enph=0)
 {
-  
   std::cout<<" ****** GRB and ROOT test ****** "<<std::endl;
   
   std::string path = ::getenv("GRBROOT");
-  //std::string paramFile = "../../test/GRBParam.txt";
   std::string paramFile = path+"/src/test/GRBParam.txt";
-  //  facilities::Util::expandEnvVar(&paramFile);
-  
+    
   params = new Parameters();  
-
-  long seedN = params->GetGRBNumber();
-  if(seed>=1) params->SetGRBNumber(seedN+seed);
+  if (seed > 1) params->SetGRBNumber(seed);
   //////////////////////////////////////////////////
-  params->ReadParametersFromFile(paramFile,seed);
-  params->PrintParameters();
+  params->ComputeParametersFromFile(paramFile,NGRB);
   GRBSim* m_grb = new GRBSim(params);
   TH2D *matrix = m_grb->Fireball();
   m_grb->SaveNv(matrix);
@@ -408,8 +495,11 @@ int main(int argc, char** argv)
   
   std::string arg_name("");
   int current_arg = 1;
-  long seed=1;
+  UInt_t seed = 1;
+  int    ngrb = 1;
   double enph=0.0;
+  int ngrbs=0;
+  bool video_out=true;
   while(current_arg < argc)
     {
       arg_name = argv[current_arg];
@@ -422,10 +512,168 @@ int main(int argc, char** argv)
 	{
 	  seed=atoi(argv[++current_arg]);
 	}
+      else if("-grb"==arg_name)
+	{
+	  ngrb=atoi(argv[++current_arg]);
+	}
+      else if("-scan"==arg_name)
+	{
+	  ngrbs=atoi(argv[++current_arg]);
+	}
       current_arg++;
     }
-
+  
   TApplication theApp("App",0,0);
-  MakeGRB(seed,enph);
+
+  if(ngrbs>0)
+    {
+      ScanParameters(ngrbs);
+    }
+  else
+    MakeGRB(ngrb,seed,enph);
+
   theApp.Run();
+}
+
+void ScanParameters(int Ngrb)
+{
+  
+  std::string path = ::getenv("GRBROOT");
+  std::string paramFile = path+"/src/test/GRBParam.txt";  
+  params = new Parameters();    
+
+
+  //////////////////////////////////////////////////
+  // INPUT:
+  UInt_t GRBN;
+  int    Nshell;
+  double Fluence,Etot,r0,dr0,gmin,gmax, ic;
+  // OUTPUT
+  double T90;
+  double fBATSE1,fBATSE2,fBATSE3,fBATSE4;
+  double fBATSE, fLAT,fGBM,fEXP,fTOT;
+  double nBATSE,nLAT,nGBM,nEXP,nTOT,Ep;
+  //////////////////////////////////////////////////
+  TTree *GRBTree = new TTree("GRBTree","GRB Catalogue");
+  GRBTree->Branch("GRBN",&GRBN,"/i");
+  GRBTree->Branch("LogFluence",&Fluence,"LogFluence/D");
+  GRBTree->Branch("Nshell",&Nshell,"Nshell/I");
+  GRBTree->Branch("LogEtot",&Etot,"LogEtot/D");
+  GRBTree->Branch("LogR0",&r0,"LogR0/D");
+  GRBTree->Branch("LogDr0",&dr0,"LogDr0/D");
+  GRBTree->Branch("gmin",&gmin,"gmin/D");
+  GRBTree->Branch("gmax",&gmax,"gmax/D");
+  GRBTree->Branch("ic",&ic,"ic/D");
+  
+  GRBTree->Branch("T90",&T90,"T90/D");
+  
+  GRBTree->Branch("LogfBATSE",&fBATSE,"fBATSE/D");  
+  GRBTree->Branch("Logf1BATSE",&fBATSE1,"fBATSE1/D");
+  GRBTree->Branch("Logf2BATSE",&fBATSE2,"fBATSE2/D");
+  GRBTree->Branch("Logf3BATSE",&fBATSE3,"fBATSE3/D");
+  GRBTree->Branch("Logf4BATSE",&fBATSE4,"fBATSE4/D");
+
+  GRBTree->Branch("LogfLAT",&fLAT,"LogfLAT/D");
+  GRBTree->Branch("LogfGBM",&fGBM,"LogfGBM/D");
+  GRBTree->Branch("LogfEXP",&fEXP,"LogfEXP/D");
+  GRBTree->Branch("LogfTOT",&fTOT,"LogfTOT/D");
+  
+  GRBTree->Branch("LognBATSE",&nBATSE,"LognBATSE/D");
+  GRBTree->Branch("LognLAT",&nLAT,"LognLAT/D");
+  GRBTree->Branch("LognGBM",&nGBM,"LognGBM/D");
+  GRBTree->Branch("LognEXP",&nEXP,"LognEXP/D");
+  GRBTree->Branch("LognTOT",&nTOT,"LognTOT/D");
+  GRBTree->Branch("LogEp",&Ep,"LogEp/D");
+  
+  
+  
+  for(long grbn=1;grbn<=Ngrb;grbn++)
+    {
+      std::cout<<" GRB number : "<<grbn<<" / "<<Ngrb<<std::endl;
+      
+      //      params->SetGRBNumber(grbn);
+      params->ComputeParametersFromFile(paramFile,grbn);
+      GRBN    = params->GetGRBNumber();
+      GRBSim m_grb(params);
+      TH2D *Nv = m_grb.Fireball();
+      
+
+      Nshell  = params->GetNshell();
+      Fluence = log10(params->GetFluence());
+      Etot    = log10(params->GetEtot());
+      r0      = log10(params->GetInitialSeparation());
+      dr0     = log10(params->GetInitialThickness());
+      gmin    = params->GetGammaMin();
+      gmax    = params->GetGammaMax();
+      ic      = params->GetInverseCompton();
+      
+      //      m_grb.SaveNv(Nv);
+      TMIN = Nv->GetXaxis()->GetXmin();
+      TMAX = Nv->GetXaxis()->GetXmax();
+      EMIN = Nv->GetYaxis()->GetXmin();
+      EMAX = Nv->GetYaxis()->GetXmax();
+      EBIN = Nv->GetYaxis()->GetNbins();
+      
+      
+      // vFv = e * Ne * de: [keV/s/m^2]
+      gDirectory->Delete("vFv");
+      Nv->ProjectionY("vFv");
+      TH1D *vFv = (TH1D*) gDirectory->Get("vFv");
+      Ep=0.0;
+      double FEp=0.0;
+      for(int i=0; i < EBIN; i++)
+	{
+	  double ne = vFv->GetBinContent(i+1);
+	  double de = vFv->GetBinWidth(i+1);//GetBinCenter(i+1);
+	  double en = vFv->GetBinCenter(i+1);
+	  vFv->SetBinContent(i+1,en*de*ne);
+	  //if(en*de*ne > FEp && en < 1e4) Ep=e;
+	}
+      Ep = log10(vFv->GetBinCenter(vFv->GetMaximumBin()));
+      
+      SpectObj *sp = new SpectObj(Nv,0);              //ph² 
+      
+      
+      TH1D *Lct_TOT   = sp->Integral_E(EMIN,EMAX);  // ph
+      TH1D *Lct_BATSE = sp->Integral_E(BATSE1,BATSE5);  // ph
+      TH1D *Lct_GBM   = sp->Integral_E(GBM1,GBM2);  // ph
+      TH1D *Lct_LAT   = sp->Integral_E(LAT1,LAT2);  // ph
+      TH1D *Lct_EXT   = sp->Integral_E(enph,EMAX);  // ph
+      
+      T90    = log10(sp->GetT90());
+      fTOT   = log10(sp->GetFluence());
+      fBATSE = log10(sp->GetFluence(BATSE1,BATSE5));
+      fBATSE1 = log10(sp->GetFluence(BATSE1,BATSE2));
+      fBATSE2 = log10(sp->GetFluence(BATSE2,BATSE3));
+      fBATSE3 = log10(sp->GetFluence(BATSE3,BATSE4));
+      fBATSE4 =log10( sp->GetFluence(BATSE4,BATSE5));
+
+      fGBM   = log10(sp->GetFluence(GBM1,GBM2));
+      fLAT   = log10(sp->GetFluence(LAT1,LAT2));
+      fEXP   = log10(sp->GetFluence(enph,emax));
+      
+      nTOT   = log10(sp->Integral_T(Lct_TOT,0.0,TMAX));
+      nBATSE = log10(sp->Integral_T(Lct_BATSE,0.0,TMAX));
+      nGBM   = log10(sp->Integral_T(Lct_GBM,0.0,TMAX));
+      nLAT   = log10(sp->Integral_T(Lct_LAT,0.0,TMAX));
+      
+      std::cout<<"* Theoretical values:  *****************************"<<std::endl;
+      std::cout<<" log T90 = "<<T90<<" Epeak = "<<Ep<<std::endl;
+      std::cout<<" log TOT   flux ("<< emin <<","<< emax <<") = "<<fTOT<<" erg/cm^2"<<std::endl;
+      std::cout<<" BASTE flux (ch1) ("<<BATSE1<<","<<BATSE2<<") = "<<pow(10,fBATSE1)<<" erg/cm^2"<<std::endl;
+      std::cout<<" BASTE flux (ch2) ("<<BATSE2<<","<<BATSE3<<") = "<<pow(10,fBATSE2)<<" erg/cm^2"<<std::endl;
+      std::cout<<" BASTE flux (ch3) ("<<BATSE3<<","<<BATSE4<<") = "<<pow(10,fBATSE3)<<" erg/cm^2"<<std::endl;
+      std::cout<<" BASTE flux (ch4) ("<<BATSE4<<","<<BATSE5<<") = "<<pow(10,fBATSE4)<<" erg/cm^2"<<std::endl;
+      std::cout<<" BASTE flux (tot) ("<<BATSE1<<","<<BATSE5<<") = "<<pow(10,fBATSE)<<" erg/cm^2"<<std::endl;
+      std::cout<<" log GBM   flux ("<< GBM1 <<","<< GBM2 <<") = "<<fGBM<<" erg/cm^2"<<std::endl;
+      std::cout<<" log LAT   flux ("<< LAT1 <<","<< LAT2 <<") = "<<fLAT<<" erg/cm^2"<<std::endl;
+      std::cout<<" log Nph TOT    ("<<EMIN<<","<<EMAX<<")  = "<<nTOT<<std::endl;
+      std::cout<<" log Nph BATSE  ("<<BATSE1<<","<<BATSE5<<") = "<<nBATSE<<std::endl;
+      std::cout<<" log Nph GBM    ("<<GBM1<<","<<GBM2<<")  = "<<nGBM<<std::endl;
+      std::cout<<" log Nph LAT    ("<<LAT1<<","<<LAT2<<")  = "<<nLAT<<std::endl;
+      //	  if(output) delete sp;
+      GRBTree->Fill();
+    }
+  TFile aFile("GRBCatalogueFile.root","RECREATE");
+  GRBTree->Write();
 }

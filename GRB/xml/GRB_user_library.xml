@@ -19,6 +19,11 @@
         <use_spectrum frame="galaxy"/> 
     </spectrum> </source>
 
+    <source name=" GRB_myDC ">
+        <spectrum escale="MeV"> <SpectrumClass name="GRBmanager" params="0,100"/>
+        <use_spectrum frame="galaxy"/> 
+    </spectrum> </source>
+
     <!-- 2) GRBobsSpectrum: the phenomenological model of GRB. -->
     <!-- The high energy part is extrapolated from the BATSE data. The reference frame is galactic. -->
 

@@ -49,20 +49,23 @@ namespace cst
   
   //  const double tmax = 10;
   
-  const double emin =  1.0; //keV
-  const double emax = 1e8;  //keV
-  const double enph = 1e5;  //keV (100 MeV) 
+  const double emin =  10.0; //keV
+  const double emax = 1e9;  //keV
+  const double enph = 1.0e+5;  //keV (30 MeV) 
   
   const    int Ebin =  50; 
-  const    int Tbin =  1000; 
+  const    int Tbin =  500; 
   static const double de   = pow(emax/emin,1.0/Ebin);
   //  static const double dt   = tmax/(Tbin-1);
   const double erg2meV   = 624151.0;
   
   const double BATSE1=20.0;                   //20 keV
-  const double BATSE2=1.0e+3;                 // 1 MeV
+  const double BATSE2=50.0;;                 // 1 MeV
+  const double BATSE3=100.0;                   //20 keV
+  const double BATSE4=300.0;                 // 1 MeV
+  const double BATSE5=1000.0;                 // 1 MeV
   const double GBM1=10.0;                     // 10 keV 
-  const double GBM2=25.0e3;                   // 25 MeV 
+  const double GBM2=30.0e3;                   // 25 MeV 
   const double LAT1=50.0e3;                   // 50 MeV 
   const double LAT2=3.0e6;                    //300 GeV 
   //////////////////////////////////////////////////
@@ -73,7 +76,7 @@ class Parameters
  public:
   Parameters();
   ~Parameters(){ delete rnd;}
-  double GetNshell() {return m_Nshell;}
+  int    GetNshell() {return m_Nshell;}
   double GetFluence(){return m_Fluence;}
   double GetEtot()   {return m_Etot;}
   double GetInitialSeparation(){return m_InitialSeparation;}
@@ -83,8 +86,6 @@ class Parameters
   double GetInverseCompton() {return m_InverseCompton;}
 
   double GetBATSEFluence();
-  double GetLESI();
-  double GetHESI();
   
   void SetGalDir(double l, double b);
   void SetNshell(int nshell);
@@ -95,21 +96,26 @@ class Parameters
   void SetGammaMin(double gmin);
   void SetGammaMax(double gmax);
   void SetInverseCompton(double ic);
-  int ReadParametersFromFile(std::string paramFile, int NGRB=1);
+  void ReadParametersFromFile(std::string paramFile, int NGRB=1);
+
+  void ComputeParametersFromFile(std::string paramFile, int NGRB=1);
 
   void PrintParameters();
-  inline long GetGRBNumber(){return m_GRBnumber;}
+  inline UInt_t GetGRBNumber(){return m_seed;}
   inline std::pair<double,double> GetGalDir(){return m_GalDir;}
-
-  inline void SetGRBNumber(long GRBnumber)
+  inline double GetGamma(double gmin=0,double gmax=0)
     {
-      m_GRBnumber = GRBnumber;
-      rnd->SetSeed(m_GRBnumber);
-      rnd->Uniform();
+      if(gmin==0) gmin = m_Gmin;
+      if(gmax==0) gmax = m_Gmax;
+      return rnd->Uniform(gmin,gmax);
     }
-  TRandom *rnd;
- 
+  void SetGRBNumber(UInt_t GRBnumber);
+
+  TRandom *rnd; 
+
  private:
+
+  UInt_t m_seed;
   int    m_Nshell;
   double m_Gmin;
   double m_Gmax ;
@@ -118,7 +124,6 @@ class Parameters
   double m_InitialSeparation;
   double m_InitialThickness ;
   double m_InverseCompton ;
-  long   m_GRBnumber;
   std::pair<double,double> m_GalDir;
 };
 

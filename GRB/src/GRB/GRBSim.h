@@ -23,6 +23,9 @@
 #include "GRBengine.h"
 #include "TH2D.h"
 #include <vector>
+#include <string>
+#include <sstream>
+#include <iostream>
 
 #ifndef GRBSIM_H
 #define GRBSIM_H 1
@@ -38,9 +41,10 @@ class GRBSim
     {
       delete m_GRBengine;
       delete m_Nv;
+      //      delete m_params;
     }
   
-  
+  void GetUniqueName(const void *ptr, std::string & name);  
   
   /*!
    * \brief Starts the GRB simulation
@@ -55,6 +59,8 @@ class GRBSim
   TH2D *GRBSim::Nph(const TH2D *Nv);
   inline std::pair<double,double> GRBdir(){return m_GRBengine->GetDirection();}
   inline double Tmax(){return m_tfinal;}
+  inline double GetFluence(){return m_fluence * 1.0e-4 ;} //erg/cm^2
+  inline double GetGRBNumber(){return m_params->GetGRBNumber();} //erg/cm^2
   void SaveNv(TH2D *Nv);
  private:
   

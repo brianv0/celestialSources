@@ -5,6 +5,8 @@
 #include "GRBShock.h"
 #include "GRBShell.h"
 
+#define DEBUG 0
+
 using namespace cst;
 
 double Beta(double gamma)
@@ -40,21 +42,28 @@ std::vector<GRBShock*> GRBengine::CreateShocksVector()
   
   for(int i = 0; i < Nshell ; i++ )
     {
-      double g  = m_params->rnd->Uniform(Gmin,Gmax); // lorentz factor;
+      double g;
+      if(Nshell ==2 && i==1 )
+	g += m_params->rnd->Uniform(Gmax-g+1,Gmax); 
+      else 
+	g = m_params->rnd->Uniform(Gmin,Gmax); // lorentz factor;
       double r  = InitialSeparation + (Nshell-(i+1))*(InitialSeparation+InitialThickness); // initial radius
       //      double dr = r/(g*g); 
-      GRBShell *ashell = new GRBShell(g,r,InitialThickness,Etot);
+      GRBShell *ashell;
+      ashell = new GRBShell(g,r,InitialThickness,Etot);
       theShells.push_back(ashell);
     }
   
-  int N      = theShells.size();
-  int Nshock = 0;
-  while (N > 1)
+  //  int N      = theShells.size();
+  
+  bool Continue = true;
+
+  while (theShells.size()>1)
     {
       double ShockTime     = 1e50;
       int FirstShell       =  -1;
       GRBShell *sh1,*sh2;
-      for(int i = 0; i < N-1 ; i++ )
+      for(int i = 0; i < theShells.size()-1 ; i++ )
 	{
 	  sh1 = theShells[i];
 	  sh2 = theShells[i+1];
@@ -71,37 +80,60 @@ std::vector<GRBShock*> GRBengine::CreateShocksVector()
 		}
 	    }
 	}
-      if(FirstShell==-1) return CreateShocksVector();
-      
-      for(int i = 0; i < N; i++ )
+
+      if(FirstShell>-1)
 	{  
-	  theShells[i]->Evolve(ShockTime);
+	  for(int i = 0; i < theShells.size(); i++ )
+	    {  
+	      theShells[i]->Evolve(ShockTime);
+	    }
+	  
+	  tGRB += ShockTime;
+	  sh1  = theShells[FirstShell];
+	  sh2  = theShells[FirstShell+1];
+	  
+	  tobs = tGRB - sh2->GetRadius()/c;
+	  if(DEBUG) std::cout<<" Shock: GRB time = "<<tGRB<<" Obs time ="<<tobs<<" radius = "<<sh2->GetRadius()<<std::endl;
+	  
+	  GRBShock *ashock = new GRBShock(sh1,sh2,tobs);
+	  theShocks.push_back(ashock);	 
+	  theShells[FirstShell] = ashock->MergedShell();
+	  std::vector<GRBShell*>::iterator pos = theShells.begin();
+	  for (int i = 0;i<FirstShell+1;i++) pos++;
+	  theShells.erase(pos);
 	}
-      
-      tGRB += ShockTime;
-      sh1  = theShells[FirstShell];
-      sh2  = theShells[FirstShell+1];
-      
-      tobs = tGRB - sh2->GetRadius()/c;
-      //std::cout<<" Shock: GRB time = "<<tGRB<<" Obs time ="<<tobs<<" radius = "<<sh2->GetRadius()<<std::endl;
-      
-      GRBShock *ashock = new GRBShock(sh1,sh2,tobs);
-      theShocks.push_back(ashock);	 
-      GRBShell *Ms = ashock->MergedShell();
-      delete theShells[FirstShell];
-      theShells[FirstShell] = Ms;
-      std::vector<GRBShell*>::iterator pos = theShells.begin();
-      for (int i = 0;i<FirstShell+1;i++) pos++;
-      theShells.erase(pos);
-      Nshock++;
-      N = theShells.size();
-      //std::cout<<"Nshock = "<<Nshock<<" Nshell "<<N<<std::endl;
+      else
+	if(theShocks.size()==0) 
+	  {
+	    std::cout<<" RECOMPUTING ShocksVector "<<std::endl;
+	    for(int i =0; i<(int) theShells.size();i++)
+	      delete theShells[i];
+	    return CreateShocksVector();
+	  }
+	else
+	  break;
     }
-  
+  //////////////////////////////////////////////////
   
   for(int i =0; i<(int) theShells.size();i++)
     delete theShells[i];
   
+  std::vector<GRBShock*>::iterator pos = theShocks.begin();
+  
+  while(pos!=theShocks.end())
+    {
+      if((*pos)->GetEfficiency()<1.0e-2)
+	theShocks.erase(pos);
+      else
+	{
+	  pos++;
+	}
+    }
+
+  if(theShocks.size()==0) 
+    {
+      return CreateShocksVector();
+    }
   
   std::sort(theShocks.begin(), theShocks.end(), ShockCmp());
   double T0 = theShocks[0]->GetTime();
@@ -111,25 +143,20 @@ std::vector<GRBShock*> GRBengine::CreateShocksVector()
       theShocks[theShocks.size()-i]->
 	SetTime(theShocks[theShocks.size()-i]->GetTime() - T0);
     }
-  
-  for(int i = 0; i< (int) theShocks.size(); i++)
-    {   
-      std::cout<<"---- Shock N = "<<i
-	       <<" at tobs = "<<theShocks[i]->GetTime()
-	       <<" Efficiency: "<<theShocks[i]->GetEfficiency()
-	       <<std::endl;
+  if(DEBUG)
+    {
+      for(int i = 0; i< (int) theShocks.size(); i++)
+	{   
+	  std::cout<<"---- Shock N = "<<i
+		   <<" at tobs = "<<theShocks[i]->GetTime()
+		   <<" Efficiency: "<<theShocks[i]->GetEfficiency()
+		   <<std::endl;
+	}
     }
   return theShocks;
 }
 
 //////////////////////////////////////////////////
-double GRBengine::GenerateGamma(double gammamin,double gammamax)
-{
-  // cout<<1.+fabs(m_params->rnd->Gaus(gammamax-gammamin,gammamax-gammamin))<<endl;
-  // return 1.+fabs(m_params->rnd->Gaus(gammamax-gammamin,gammamax-gammamin));
-  // return 1.+m_params->rnd->Exp(gammamax-gammamin/2);//,gammamax-gammamin));
-  return m_params->rnd->Uniform(gammamin,gammamax);
-}
 
 /*
   double GRBengine::getDistance()

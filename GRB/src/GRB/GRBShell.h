@@ -27,12 +27,12 @@ class GRBShell
   double GetThickness(){return m_dr;}
   double GetMass(){return m_m;} //
   double GetEnergy(){return m_e;}
-  double GetVolume(){return 4./3.*cst::pi*(pow(m_r+m_dr,3.)-pow(m_r,3.));}  // cm^3
+  double GetVolume(){return 4.*cst::pi*m_r*m_r*m_dr;}  // cm^3 return 4./3.*cst::pi*(pow(m_r+m_dr,3.)-pow(m_r,3.));}  // cm^3
   double GetComovingVolume(){return GetVolume()*m_g;} // cm^3
-  double GetComPartDens() {return m_m*cst::c2*cst::erg2meV/(cst::mpc2*GetComovingVolume());} //1/cm^3
- private:
+  double GetComPartDens() {return (m_e * cst::erg2meV)/(m_g*cst::mpc2)/(4.0*cst::pi*pow(m_r,2.0)*m_dr*m_g);} //1/cm^3
+  private:
   double m_g, m_r,m_dr,m_e, m_m;
-
+  
 };
 //////////////////////////////////////////////////
 #endif

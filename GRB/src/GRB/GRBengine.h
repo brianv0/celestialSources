@@ -22,7 +22,6 @@ class GRBengine
   ~GRBengine(){;}
     
   std::vector<GRBShock*> CreateShocksVector();
-  double GenerateGamma(double gammamax,double gammamin);
   //double getDistance();
   inline std::pair<double,double> GetDirection(){return m_dir;}
  private:
