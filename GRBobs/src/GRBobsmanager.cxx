@@ -189,14 +189,14 @@ double GRBobsmanager::flux(double time) const
     flux = 0.0;
   else 
     {
-      if(!m_grbGenerated) GenerateGRB();
+      if(!m_grbGenerated) const_cast<GRBobsmanager*>(this)->GenerateGRB();
       if(time < m_endTime)
 	{
 	  flux = m_spectrum->flux(time-m_startTime,m_MinPhotonEnergy);
 	}
       else 
 	{
-	  DeleteGRB();
+	  const_cast<GRBobsmanager*>(this)->DeleteGRB();
 	  flux = 0.0;
 	}
     }
@@ -242,7 +242,7 @@ double GRBobsmanager::energy(double time)
   return ene;
 }
 
-double GRBobsmanager::parseParamList(std::string input, int index)
+double GRBobsmanager::parseParamList(std::string input, unsigned int index)
 {
   std::vector<double> output;
   unsigned int i=0;

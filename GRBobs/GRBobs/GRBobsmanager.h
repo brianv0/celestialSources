@@ -64,6 +64,7 @@ class GRBobsmanager : public ISpectrum
   //! direction, taken from GRBobsSim
   inline std::pair<double,double> dir(double energy) 
     {
+      (void)(energy);//energy is not used here
       return m_GalDir;
     } 
   
@@ -82,7 +83,7 @@ class GRBobsmanager : public ISpectrum
     \param index if the position of the parameter in the input list. 
     \retval output is the value of the parameter as float number.
   */  
-  double parseParamList(std::string input, int index);  
+  double parseParamList(std::string input, unsigned int index);  
   
  private:
   double m_Rest;
