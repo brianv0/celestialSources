@@ -311,7 +311,7 @@ else if (sourceType == 1) //Periodic //Max
 	      }	 
 	    TimeFromLastPeriod = Nv->GetXaxis()->GetBinCenter(tBinCurrent-1);
 	    ProbRest = ProbRest - (P->GetBinContent(tBinCurrent-1) - P->GetBinContent(1));
-	    TimeFromLastPeriod += m_SpRandGen->Uniform()*m_TimeBinWidth;
+	    TimeFromLastPeriod += m_SpRandGen->Uniform()*m_TimeBinWidth - m_TimeBinWidth/2 ;
 	  }
 	
 	//std::cout << " At End ProbRest is (should be 0 ) " << ProbRest << std::endl;
@@ -339,8 +339,15 @@ else if (sourceType == 1) //Periodic //Max
  	ph.energy = Sp->GetRandom();
 	delete Sp;
 	delete P;
+
+	if (((ph.time - 1000*Int_t(ph.time/1000)) > 0) 
+	     && ((ph.time - 1000*Int_t(ph.time/1000)) < 10))
+	  {
+	    std::cout << " Time " << ph.time << " Energy " << ph.energy << std::endl;
+	  }
       }
   
+
   if(DEBUG)  std::cout<< " New Photon at ("<<t0<<"): time =  " << ph.time << " Energy  (KeV) " << ph.energy << std::endl;
   return ph;
 }
