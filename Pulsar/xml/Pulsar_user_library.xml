@@ -27,7 +27,7 @@
     </source>
 
     <source name=" PSRVelaPolarPhen " >
-       <spectrum escale="MeV"> <SpectrumClass name="PulsarSpectrum" params=" 1,9e-6,0.089,0.0,2,1e6,8e6,-1.62,1.7,1.0e5,1e8"/>
+       <spectrum escale="MeV"> <SpectrumClass name="PulsarSpectrum" params=" 1,9e-6,0.089,2.0e-15,2,1e6,8e6,-1.62,1.7,1.0e5,2e7"/>
          <galactic_dir l="263.55" b="-2.79"/> 
        </spectrum> 
     </source>
