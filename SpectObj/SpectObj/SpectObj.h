@@ -21,7 +21,10 @@ class SpectObj
       delete spec;
       delete times;
       delete Nv;
+      
     }
+  void GetUniqueName(const void *ptr, std::string & name);
+    
   TH1D *Integral_E(double e1, double e2);
   TH1D *Integral_E(int ei1, int ei2); 
   TH1D *Integral_T(double t1, double t2, double e1, double e2);
@@ -55,5 +58,6 @@ class SpectObj
   double emin,emax;
   double tmin,tmax,deltat;
   TH1D *spec,*times;
+  photon ph;
 };
 #endif

@@ -1,16 +1,29 @@
 #include <string>
+#include <sstream>
 #include <iostream>
 #include <fstream>
+//#include "SpectObj.h"
 #include "SpectObj/SpectObj.h"
 
-const double erg2meV   = 624151.0;
+#define DEBUG 0
 
+const double erg2meV      = 624151.0;
+const double AreaDetector = 6.0; //m2
 
-SpectObj::SpectObj(const TH2D* In_Nv, int type) //Max
+SpectObj::SpectObj(const TH2D* In_Nv, int type)
 {
-  gDirectory->Delete("newNv");
   Nv   = (TH2D*)In_Nv->Clone(); // ph/kev/s/m²
-  Nv->SetName("newNv");
+  std::string name;
+  GetUniqueName(Nv,name);
+  gDirectory->Delete(name.c_str());
+  Nv->SetName(name.c_str());
+  sourceType = type;
+  
+  /*
+    gDirectory->Delete("newNv");
+    Nv   = (TH2D*)In_Nv->Clone(); // ph/kev/s/m²
+    Nv->SetName("newNv");
+  */
   ne   = Nv->GetNbinsY();
   sourceType = type; //Max
   
@@ -39,38 +52,53 @@ SpectObj::SpectObj(const TH2D* In_Nv, int type) //Max
 			    Nv->GetBinContent(ti+1, ei+1)*dei*deltat); //[ph/m²]
 	}  
     }
+  Nv->Scale(AreaDetector); // ph
+
+  //  std::cout<<"delete spec "<<std::endl;
   gDirectory->Delete("spec");
+  //  std::cout<<"delete times "<<std::endl;
   gDirectory->Delete("times");
   spec  = new TH1D("spec","spec",ne,en);
   times = new TH1D("times","times",nt+1,tmin-deltat/2.,tmax+deltat/2.);
-  delete en;
-  std::cout << "Selected type source " << sourceType << std::endl;
-  std::cout<<" GRB SpectObj initialized !"<<std::endl;
+  delete[] en;
+  if(DEBUG)  std::cout<<" SpectObj initialized ! ( " << sourceType <<")"<<std::endl;
   //////////////////////////////////////////////////
 }
+
+void SpectObj::GetUniqueName(const void *ptr, std::string & name)
+{
+  std::ostringstream my_name;
+  my_name << reinterpret_cast<int> (ptr);
+  name = my_name.str();
+}
+
+
 //////////////////////////////////////////////////
 TH1D *SpectObj::GetSpectrum(double t)
 {
   if (t == 0.0) return spec;
   int ti = Nv->GetXaxis()->FindBin(t);
+  //  std::cout<<"delete sp "<<std::endl;
   gDirectory->Delete("sp");
   TH1D *sp = (TH1D*) spec->Clone();
   sp->SetName("sp");
   for(int ei = 1; ei <= ne; ei++)
     sp->SetBinContent(ei,Nv->GetBinContent(ti,ei));
-  return sp; //ph/m²
+  return sp; //ph
 }
 
 TH1D *SpectObj::GetTimes(double en)
 {
   if (en == 0.0) return times;
   int ei = Nv->GetYaxis()->FindBin(en);
+
+  //  std::cout<<"delete lc "<<std::endl;
   gDirectory->Delete("lc");
   TH1D *lc = (TH1D*) times->Clone();
   lc->SetName("lc");
   for(int ti = 1; ti <= nt; ti++)
     lc->SetBinContent(ti,Nv->GetBinContent(ti,ei));
-  return lc; //ph/m²
+  return lc; //ph
 }
 
 //////////////////////////////////////////////////
@@ -83,101 +111,110 @@ TH1D *SpectObj::Integral_E(double e1, double e2)
 
 TH1D *SpectObj::Integral_E(int ei1, int ei2)
 {
+  //  std::cout<<"delete ts "<<std::endl;
   //  gDirectory->Delete("ts");
   TH1D *ts = (TH1D*) times->Clone();
   ts->SetName("ts");  
   
   for(int i = 0; i<nt; i++)
     ts->SetBinContent(i+1,Nv->Integral(i+1,i+1,ei1,ei2));
-  return ts; //ph/m²
+  return ts; //ph
 }
 
 double SpectObj::Integral_E(TH1* Sp, double e1, double e2)
 {
-  // Sp in ph/m²
+  // Sp in ph
   int ei1 = Sp->FindBin(e1);
   int ei2  = Sp->FindBin(e2);
-  return Integral_E(Sp,ei1,ei2); //ph/m²
+  return Integral_E(Sp,ei1,ei2); //ph
 }
 
 double SpectObj::Integral_E(TH1* Sp, int ei1, int ei2)
 {
-  // Sp in ph/m²
-  return Sp->Integral(ei1,ei2);//ph/m²
+  // Sp in ph
+  return Sp->Integral(ei1,ei2);//ph
 }
 
 //////////////////////////////////////////////////
 TH1D *SpectObj::Integral_T(double t1, double t2, double en)
 {
-  //nv is in ph/m²
+  //nv is in ph
   int ti1 = Nv->GetXaxis()->FindBin(t1);
   int ti2 = Nv->GetXaxis()->FindBin(t2);
   int ei  = TMath::Max(1,Nv->GetYaxis()->FindBin(en));
-  return Integral_T(ti1,ti2,ei); //ph/m²
+  return Integral_T(ti1,ti2,ei); //ph
 }
 TH1D *SpectObj::Integral_T(double t1, double t2, double e1, double e2)
 {
-  //nv is in ph/m²
+  //nv is in ph
   int ti1 = Nv->GetXaxis()->FindBin(t1);
   int ti2 = Nv->GetXaxis()->FindBin(t2);
   int ei1  = Nv->GetYaxis()->FindBin(e1);
   int ei2  = Nv->GetYaxis()->FindBin(e2);
-  return Integral_T(ti1,ti2,ei1,ei2); //ph/m²
+  return Integral_T(ti1,ti2,ei1,ei2); //ph
 }
 
 TH1D *SpectObj::Integral_T(int ti1, int ti2, int e1)
 {
+  //  std::cout<<"delete en "<<std::endl;
+  gDirectory->Delete("en");
   TH1D *en = (TH1D*) spec->Clone();
   en->SetName("en");
   
   for(int i = e1; i<=ne; i++)
     en->SetBinContent(i,Nv->Integral(ti1,ti2,i,i));
-  return en; // ph/m²
+  return en; // ph
 }
 
 TH1D *SpectObj::Integral_T(int ti1, int ti2, int e1, int e2)
 {
+  //  std::cout<<"delete en "<<std::endl;
+  gDirectory->Delete("en");
   TH1D *en = (TH1D*) spec->Clone();
   en->SetName("en");
   
   for(int i = e1; i<=e2; i++)
     en->SetBinContent(i,Nv->Integral(ti1,ti2,i,i));
-  return en; // ph/m²
+  return en; // ph
 }
 
 double SpectObj::Integral_T(TH1* Pt, double t1, double t2)
 {
-  // Pt in ph/m²
+  // Pt in ph
   int ti1 = Pt->FindBin(t1);
   int ti2 = Pt->FindBin(t2);
-  return Integral_T(Pt,ti1,ti2); //ph/m²
+  return Integral_T(Pt,ti1,ti2); //ph
 }
 
 double SpectObj::Integral_T(TH1* Pt, int ti1, int ti2)
 {
-  // Pt in ph/m²
-  return Pt->Integral(ti1,ti2); //ph/m²
+  // Pt in ph
+  return Pt->Integral(ti1,ti2); //ph
 }
 
 //////////////////////////////////////////////////
 TH1D *SpectObj::ComputeProbability(double enph)
 {
-  
-  TH1D *P = (TH1D*) times->Clone(); //ph/m²
+  //  std::cout<<"delete P "<<std::endl;
+  gDirectory->Delete("P");
+  TH1D *P = (TH1D*) times->Clone(); //ph
   P->SetName("P");
-  TH1D *pt = Integral_E(enph,emax); //ph/m²
+  TH1D *pt = Integral_E(enph,emax); //ph
   for(int ti = 1; ti <= nt; ti++)
     {
-      P->SetBinContent(ti,Integral_T(pt,0,ti)); //ph/m²
+      P->SetBinContent(ti,Integral_T(pt,0,ti)); //ph
+    
     }
+  //  std::cout<<"delete pt "<<std::endl;
+
   delete pt;
-  return P; //ph/m²
+  return P; //ph
 }
 
 //////////////////////////////////////////////////
 photon SpectObj::GetPhoton(double t0, double enph)
 {
-  photon ph;
+  //  photon ph;
   
   if (sourceType == 0 ) // Transient
     {
@@ -188,32 +225,37 @@ photon SpectObj::GetPhoton(double t0, double enph)
 	{
 	  ph.time   = time;
 	  ph.energy = energy;
-	  return ph;
+	  //	  std::cout<< " ! time =  " << ph.time << " Energy  (KeV) " << ph.energy << std::endl;
+  	  return ph;
 	}
       
-      TH1D *P = ComputeProbability(enph); //ph/m²
+      TH1D *P = ComputeProbability(enph); //ph
+
       int t1 = Nv->GetXaxis()->FindBin(t0);
       int t2 = t1;
       int ei  = TMath::Max(1,Nv->GetYaxis()->FindBin(enph));
+      
       while(P->GetBinContent(t2) - P->GetBinContent(t1) < 1.0 && t2 < nt)
 	{
 	  t2++;
-	} 
+	}
+      
       double dp1 = P->GetBinContent(t2) - P->GetBinContent(t2-1);
       double dp2 = 1.0 + P->GetBinContent(t1) - P->GetBinContent(t2-1);
       double dt = Nv->GetXaxis()->GetBinWidth(t2);
       double Dt = Nv->GetXaxis()->GetBinCenter(t2-1)- Nv->GetXaxis()->GetBinCenter(t1);
       
-      if(t2 <= nt) // the burst has finished  dp < 1 or dp >=1
+      if(t2 < nt) // the burst has finished  dp < 1 or dp >=1
 	{
-	  TH1D* Sp = Integral_T(t1,t2,ei); //ph/m²
 	  time    = t0 + Dt + dp2/dp1*dt;//dt/dp + t0;       
-	  energy  = Sp->GetRandom();
+	  energy  = Integral_T(t1,t2,ei)->GetRandom();
 	}
       ph.time   = time;
       ph.energy = energy;
       delete P;  
-    } else if (sourceType == 1) //Periodic //Max
+
+    } 
+else if (sourceType == 1) //Periodic //Max
       {
 	double TimeToFirstPeriod = 0.0;
 	double TimeFromLastPeriod = 0.0;
@@ -288,19 +330,9 @@ photon SpectObj::GetPhoton(double t0, double enph)
  	delete Sp;
  	delete P;
        }
-   return ph;
- }
-
-void SpectObj::ScaleAtBATSE(double fluence)
-{
   
-  double BATSE1 = 20.0;    // 20 keV
-  double BATSE2 = 1.0e+3;  // 1 MeV
-  int ei1 = Nv->GetYaxis()->FindBin(BATSE1);
-  int ei2 = Nv->GetYaxis()->FindBin(BATSE2);
-  double norm = Nv->Integral(0,nt,ei1,ei2,"width")*1.0e-7/(deltat*erg2meV); //KeV/cm²
-  Nv->Scale(fluence/norm);
-  //return fluence/norm;
+  if(DEBUG)  std::cout<< " New Photon at ("<<t0<<"): time =  " << ph.time << " Energy  (KeV) " << ph.energy << std::endl;
+  return ph;
 }
 
 double SpectObj::GetFluence(double BL, double BH)
@@ -308,14 +340,25 @@ double SpectObj::GetFluence(double BL, double BH)
   if(BH<=0) BH = emax;
   int ei1 = Nv->GetYaxis()->FindBin(TMath::Max(emin,BL));
   int ei2 = Nv->GetYaxis()->FindBin(TMath::Min(emax,BH));
-  return Nv->Integral(0,nt,ei1,ei2,"width")*1.0e-7/(deltat*erg2meV); //KeV/cm²
+  return Nv->Integral(0,nt,ei1,ei2,"width")*1.0e-7/(deltat*erg2meV)/AreaDetector; //KeV/cm²
 }
+
+
+void SpectObj::ScaleAtBATSE(double fluence)
+{
+
+  double BATSEL = 20.0;    //20 keV
+  double BATSEH = 1.0e+3;  // 1 MeV
+  double norm = GetFluence(BATSEL,BATSEH);
+  Nv->Scale(fluence/norm);
+}
+
 
 double SpectObj::GetT90(double BL, double BH)
 {
   if(BL<emin) BL = emin;
   if(BH<=0) BH = emax;
-  TH1D* LC     = Integral_E(BL,BH); //ph/m²
+  TH1D* LC     = Integral_E(BL,BH); //ph
   LC->Scale(1.0/LC->Integral());
   int i=1;
   double inte = LC->GetBinContent(i);
@@ -338,6 +381,8 @@ double SpectObj::GetT90(double BL, double BH)
 //////////////////////////////////////////////////
 TH1D *SpectObj::N(TH1D *EN)
 {
+  //  std::cout<<"delete N "<<std::endl;
+  gDirectory->Delete("N");
   TH1D* n = (TH1D*) EN->Clone();
   n->SetName("N");
   for(int i = 1; i <= EN->GetNbinsX();i++)
@@ -350,10 +395,10 @@ double SpectObj::flux(double time, double enph)
 {
   if (time >= tmax) return 1.0e-6;
 
-  TH1D* fl = GetSpectrum(time);    //ph/m²
-  double integral = Integral_E(fl,enph,emax)/deltat; //ph/m²/s
+  TH1D* fl = GetSpectrum(time);    //ph
+  double integral = Integral_E(fl,enph,emax)/deltat; //ph/s
   //  delete fl;
-  return integral;//ph/m²/s
+  return integral/AreaDetector;//ph/m2/s
 }
 
 double SpectObj::interval(double time, double enph)
@@ -364,7 +409,7 @@ double SpectObj::interval(double time, double enph)
 
 double SpectObj::energy(double time, double enph)
 {
-  return GetPhoton(time,enph).energy;
+  return ph.energy;
 }
 
 //////////////////////////////////////////////////
@@ -393,19 +438,4 @@ void SpectObj::SaveParameters(double tstart, std::pair<double,double> direction)
   std::cout<<" LAT   flux ("<< LATL <<","<< LATH <<") = "<<fLAT<<" erg/cm^2"<<std::endl;
   std::cout<<" GRB   flux ("<< emin <<","<< emax <<") = "<<fTOT<<" erg/cm^2"<<std::endl;
   std::cout<<"**************************************************"<<std::endl;
-    
-  /*
-    ofstream f1( "GRBData.txt",ios::app);
-    if (! f1.is_open()) 
-    {
-    std::cout<<"Error Opening output file"<<std::endl;
-    exit(1);
-    }
-    f1<<tstart<<" "<<T95-T05<<" "<<direction.first<<" "<<direction.second<<std::endl;
-    f1<<Spectr->Integral(i1,i2,"width")*1.0e-7/erg2meV<<" "<<
-    Spectr->Integral(i3,i4,"width")*1.0e-7/erg2meV<<" "<<
-    Spectr->Integral(i5,i6,"width")*1.0e-7/erg2meV<<" "<<
-    Spectr->Integral(0,ne,"width")*1.0e-7/erg2meV<<" "<<std::endl;
-    f1.close();
-  */
 }
