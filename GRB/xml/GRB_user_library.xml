@@ -7,20 +7,21 @@
     <!-- The direction are random in the sky-->
     <!-- - The first parameter is the starting time of the first BURST -->
     <!-- - The second parameter is the time to wait for the next burst (1hour = 3600 seconds., 1day = 86400 seconds.) -->     
+    <!-- - The Third parameter is the minimum energy for sampled photons (MeV) -->     
     <source name="GRB">
       <spectrum escale="MeV"> 
-        <SpectrumClass name="GRBmanager" params="10,86400"/>
+        <SpectrumClass name="GRBmanager" params="10,86400,30.0"/>
         <use_spectrum frame="galaxy"/> 
       </spectrum> 
     </source>
 
     <source name=" GRB_DC1 ">
-        <spectrum escale="MeV"> <SpectrumClass name="GRBmanager" params="3000,4000"/>
+        <spectrum escale="MeV"> <SpectrumClass name="GRBmanager" params="3000,4000, 30"/>
         <use_spectrum frame="galaxy"/> 
     </spectrum> </source>
 
     <source name=" GRB_myDC ">
-        <spectrum escale="MeV"> <SpectrumClass name="GRBmanager" params="0,100"/>
+        <spectrum escale="MeV"> <SpectrumClass name="GRBmanager" params="0, 1000, 30"/>
         <use_spectrum frame="galaxy"/> 
     </spectrum> </source>
 
@@ -39,46 +40,48 @@
       <!-- The reference frame is galactic and a fixed direction is given to avoid the occlusion by the Earth. -->
 
       <source name=" One_GRB_each_Minute ">
-          <spectrum escale="MeV"> <SpectrumClass name="GRBmanager" params="60,60"/>
+          <spectrum escale="MeV"> <SpectrumClass name="GRBmanager" params="60,60, 30"/>
           <use_spectrum frame="galaxy"/> 
       </spectrum> </source>
 
       <source name=" One_GRB_each_10Minutes ">
-          <spectrum escale="MeV"> <SpectrumClass name="GRBmanager" params="60,600"/>
+          <spectrum escale="MeV"> <SpectrumClass name="GRBmanager" params="60,600, 30"/>
           <use_spectrum frame="galaxy"/> 
       </spectrum> </source>
 
       <source name=" One_GRB_each_Hour ">
-          <spectrum escale="MeV"> <SpectrumClass name="GRBmanager" params="60,3600"/>
+          <spectrum escale="MeV"> <SpectrumClass name="GRBmanager" params="60,3600, 30"/>
           <use_spectrum frame="galaxy"/> 
       </spectrum> </source>
     
       <source name=" GRB_0_0 ">
-          <spectrum escale="MeV"> <SpectrumClass name="GRBmanager" params="1800,3600"/>
+          <spectrum escale="MeV"> <SpectrumClass name="GRBmanager" params="0,100,100"/>
           <galactic_dir l="0" b="0"/>
       </spectrum> </source>
 
       <source name=" GRB_120_10 ">
-          <spectrum escale="MeV"> <SpectrumClass name="GRBmanager" params="3600,7200"/>
+          <spectrum escale="MeV"> <SpectrumClass name="GRBmanager" params="3600,7200, 30"/>
           <galactic_dir l="120" b="10"/>
       </spectrum> </source>
 
       <source name=" GRB_GLAST_0_0 ">
-          <spectrum escale="MeV"> <SpectrumClass name="GRBmanager" params="3000,4000"/>
+          <spectrum escale="MeV"> <SpectrumClass name="GRBmanager" params="0,1000, 700"/>
           <direction theta="0" phi="0" />
       </spectrum> </source>
 
 
       <source name=" GRB_GLAST_30_45 ">
-          <spectrum escale="MeV"> <SpectrumClass name="GRBmanager" params="3000,4000"/>
+          <spectrum escale="MeV"> <SpectrumClass name="GRBmanager" params="3000,4000, 30"/>
           <direction theta="30" phi="45" />
       </spectrum> </source>
+
       <!-- diffuse extraglactic from 100 MeV: see flux package, from which it is stolen-->
-      <source name="grb_diffuse" flux="0.145">
+      <source name="grb_diffuse" flux="10">
         <spectrum escale="GeV">
-          <particle name="gamma">  <power_law emin="0.1" gamma="2.1"/></particle>
+          <particle name="gamma">  <power_law emin="0.02" gamma="2.5"/></particle>
           <solid_angle mincos="-0.4" maxcos="1.0"/>
-        </spectrum>
+          <!-- direction theta="0" phi="0" / -->
+         </spectrum>
       </source>
 
       <!--GRB spectrum + diffuse -->
