@@ -12,7 +12,6 @@ EventPersistencySvc.CnvServices = {"EventCnvSvc"};
 EventSelector.Input = "NONE";
 
 #include "$FLUXSVCROOT/src/defaultOptions.txt"
-FluxSvc.source_lib += {"$(FLUXSVCROOT)/xml/user_library.xml"};
 
 // ----->  Basic Options <----
 ApplicationMgr.DLLs +={ "GRB"};
