@@ -11,8 +11,14 @@
 #include "GRBobsSpectrum.h"
 #include "GRBobsConstants.h"
 #include "astro/GPS.h"
-#include "flux/SpectrumFactory.h"
 #include "CLHEP/Random/RandFlat.h"
+
+#include "flux/SpectrumFactory.h"
+ISpectrumFactory &GRBobsFactory() 
+ {
+   static SpectrumFactory<GRBobsSpectrum> myFactory;
+   return myFactory;
+ }
 
 
 namespace {

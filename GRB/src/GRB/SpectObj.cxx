@@ -40,10 +40,8 @@ SpectObj::SpectObj(const TH2D* In_Nv)
   gDirectory->Delete("times");
   spec  = new TH1D("spec","spec",ne,en);
   times = new TH1D("times","times",nt+1,tmin-deltat/2.,tmax+deltat/2.);
-  delete en;
+  delete [] en;
 
-  std::cout<<" GRB SpectObj initialized !"<<std::endl;
-  //////////////////////////////////////////////////
 }
 //////////////////////////////////////////////////
 TH1D *SpectObj::GetSpectrum(double t)

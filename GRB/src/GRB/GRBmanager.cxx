@@ -1,6 +1,14 @@
 #include "GRBmanager.h"
 #include <iostream>
 
+#include "flux/SpectrumFactory.h" 
+ISpectrumFactory &GRBmanagerFactory() 
+ {
+   static SpectrumFactory<GRBmanager> myFactory;
+   return myFactory;
+ }
+
+ 
 GRBmanager::GRBmanager(const std::string& params)
   : m_params(params)
 {
@@ -20,7 +28,8 @@ GRBmanager::GRBmanager(const std::string& params)
   m_startTime = TMath::Max(0.,parseParamList(params,0));
   m_endTime   = m_startTime + m_GRB->Tmax();
   m_nextBurst = m_endTime   + m_timeToWait;
-  
+  std::cout<<"GRB starting at time: "<<m_startTime<<std::endl;
+  std::cout<<"GRB ending at time: "<<m_endTime<<std::endl;
 }
 
 GRBmanager::~GRBmanager() 
