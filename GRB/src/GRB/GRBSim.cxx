@@ -1,4 +1,3 @@
-#include <iostream.h>
 #include <fstream>
 
 #include "GRBConstants.h"
@@ -132,7 +131,7 @@ void GRBSim::SaveNv(TH2D *Nv)
   Nv->Write();
   mod.Close();
   
-  std::ofstream os("grb_generated.txt",ios::app);
+  std::ofstream os("grb_generated.txt",std::ios::app);
   os<<m_params->GetGRBNumber()<<" "<<Tmax()<<" "<<m_fluence<<" "<<GRBdir().first<<" "<<GRBdir().second<<std::endl;
   
 };
