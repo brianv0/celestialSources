@@ -192,7 +192,6 @@ double PulsarSpectrum::interval(double time)
   double inte = m_spectrum->interval(tStart,m_enphmin); //deltaT (in system where Pdot = 0
   double inteTurns = inte/m_period; // conversion to # of turns
   double totTurns = initTurns + inteTurns; //Total turns at the nextTimeTilde
-
   double finPh =  modf(initTurns,&intPart);
   finPh = modf(finPh + inteTurns,&intPart); //finPh is the expected phase corresponding to the nextTimeTilde
   double nextTimeTilde = retrieveNextTimeTilde(timeTilde, totTurns, (1e-6/m_period));
@@ -282,7 +281,7 @@ double PulsarSpectrum::retrieveNextTimeTilde( double tTilde, double totalTurns, 
       nIter++;
 
       //If the procedure not converge within the err,  the tolerance is amplyfied.
-      if (nIter == 50)
+      if (nIter == 30)
 	{
 	  //	  	  std::cout << std::setprecision(30) << " Warning!! Amplifying tolerance for convergence at time " 
 	  //		    << tTilde - (StartMissionDateMJD)*SecsOneDay << std::endl;
