@@ -9,6 +9,8 @@
 #include "SpectObj/SpectObj.h"
 #include "flux/SpectrumFactory.h"
 #include "astro/JulianDate.h"
+#include "astro/EarthOrbit.h"
+#include "astro/GPS.h"
 #include <cmath>
 #include <fstream>
 #include <iomanip>
@@ -126,10 +128,11 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
   std::cout << "**   P2dot : " <<  m_p2dot  << " | f2: " << m_f2 << std::endl; 
   std::cout << "**   Enphmin : " << m_enphmin << " keV | Enphmax: " << m_enphmax << " keV" << std::endl;
   std::cout << "**   Mission started at (MJD) : " << StartMissionDateMJD << " (" 
-	    << (StartMissionDateMJD+JDminusMJD)*SecsOneDay << " sec.) - Jan,1 2001 00:00.00" << std::endl;
+	    << std::setprecision(12) << (StartMissionDateMJD+JDminusMJD)*SecsOneDay << " sec.) - Jul,18 2005 00:00.00" << std::endl;
   std::cout << "**************************************************" << std::endl;
 
-  m_JDCurrent = new astro::JulianDate(2001, 1, 1, 0.0);
+  astro::EarthOrbit m_earthOrbit();
+  
   m_Pulsar    = new PulsarSim(m_PSRname, m_seed, m_flux, m_enphmin, m_enphmax, m_period, m_numpeaks);
 
   if (m_model == 1)
@@ -145,6 +148,18 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
       exit(1);
     }
   
+  //Test for Baryc corrections..
+  //ofstream file;
+  //file.open ("example.bin", ios::out | ios::app | ios::binary);
+
+  ofstream BaryOutFile;
+  
+  BaryOutFile.open("BaryDeCorr.txt",std::ios::app);
+
+  //  BaryOutFile << "TestFile for barycentric decorrections " << std::endl;
+  std::cout  << "TestFile for barycentric decorrections " << std::endl;
+  //..to be removed...
+
 }
 
 /////////////////////////////////////////////////
@@ -152,7 +167,7 @@ PulsarSpectrum::~PulsarSpectrum()
 {  
   delete m_Pulsar;
   delete m_spectrum;
-  delete m_JDCurrent;
+  BaryOutFile.close();
 }
 
 /////////////////////////////////////////////////
@@ -185,6 +200,8 @@ double PulsarSpectrum::interval(double time)
   if ((int(timeTilde - (StartMissionDateMJD)*SecsOneDay) % 20000) < 1.5)
     std::cout << "**  Time reached is: " << timeTilde-(StartMissionDateMJD)*SecsOneDay
 	      << " seconds from Mission Start " << std::endl;
+
+  //First part: Ephemerides calculations...
   double initTurns = getTurns(timeTilde); //Turns made at this time 
   double intPart; //Integer part
   double tStart = modf(initTurns,&intPart)*m_period; // Start time for interval
@@ -198,6 +215,32 @@ double PulsarSpectrum::interval(double time)
   
   //std::cout << std::setprecision(30) << "phCalc " << modf(getTurns(nextTimeTilde),&intPart) << " exp " << finPh << std::endl;
   //std::cout << std::setprecision(30) << "       diff " << fabs(modf(getTurns(nextTimeTilde),&intPart)-finPh) << std::endl;
+
+
+  //Second Part barycentric de-corrections
+
+  astro::JulianDate JDStartMission(2005, 7, 18, 0.0);
+  astro::SkyDir PsrDir(m_RA,m_dec,astro::SkyDir::EQUATORIAL);
+
+
+  //Conversion TT to TDB
+  double tdb_min_tt = m_earthOrbit.tdb_minus_tt(JDStartMission+(nextTimeTilde - (StartMissionDateMJD)*SecsOneDay)/86400.)/86400.;//jd
+  //Correction due to geometric time delay of light propagation 
+  double GeomCorr = m_earthOrbit.calcTravelTime(JDStartMission+tdb_min_tt, PsrDir); // seconds
+  //Shapiro Correction
+  double ShapiroCorr = m_earthOrbit.calcShapiroDelay(JDStartMission+tdb_min_tt, PsrDir); //seconds
+
+  BaryOutFile.open("BaryDeCorr.txt",std::ios::app);
+  BaryOutFile << "****  BaryCentric Correction : Start " << JDStartMission 
+	    << " PSR position : RA " << PsrDir.ra() << " dec " << PsrDir.dec() << std::endl;
+  BaryOutFile << std::setprecision(30) << nextTimeTilde - (StartMissionDateMJD)*SecsOneDay 
+	    << "\t" << PsrDir.ra() << "\t" << PsrDir.dec() 
+	    << "\t" << tdb_min_tt << "\t" << GeomCorr << "\t" << ShapiroCorr << "\t";
+
+  nextTimeTilde = nextTimeTilde - tdb_min_tt - GeomCorr + ShapiroCorr;
+ 
+  BaryOutFile << std::setprecision(30) << nextTimeTilde - (StartMissionDateMJD)*SecsOneDay << std::endl;
+  BaryOutFile.close();
 
    return nextTimeTilde - timeTilde;
 }

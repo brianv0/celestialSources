@@ -3,15 +3,19 @@
 
 #include <vector>
 #include <string>
+#include <fstream>
 #include <map>
 #include <cmath>
 #include "flux/ISpectrum.h"
 #include "flux/EventSource.h"
 #include "facilities/Util.h"
-#include "astro/JulianDate.h" 
+#include "astro/JulianDate.h"
+#include "astro/EarthOrbit.h"
 #include "PulsarConstants.h"
 #include "PulsarSim.h"
 #include "SpectObj/SpectObj.h"
+#include "CLHEP/Vector/ThreeVector.h"
+
 
 /*! 
 * \class PulsarSpectrum
@@ -70,13 +74,19 @@ class PulsarSpectrum : public ISpectrum
   PulsarSim *m_Pulsar;
   SpectObj  *m_spectrum;
   
-  astro::JulianDate *JDStartMission; 
-  astro::JulianDate *JDStartSimulation; 
-  astro::JulianDate *m_JDCurrent; 
+  // astro::JulianDate JDStartMission; 
+  // astro::JulianDate *JDStartSimulation; 
+  //astro::JulianDate m_JDCurrent; 
+
+  astro::EarthOrbit m_earthOrbit;
+
+  ofstream BaryOutFile;
 
   const std::string& m_params; 
   
   std::string m_PSRname;
+
+  //  double m_JDStartMission = 2453569.5; //corresponding to  2005,7,18,0.0
   double m_RA, m_dec, m_l, m_b;  
   double m_period, m_pdot, m_p2dot, m_t0, m_phi0, m_f0, m_f1, m_f2;
   int m_numpeaks;
