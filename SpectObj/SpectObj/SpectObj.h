@@ -37,11 +37,11 @@ class SpectObj
       delete Probability;
       delete Nv;
       delete m_SpRandGen;
-      if (PeriodicSpectrumIsComputed == true ) 
+      //      if (PeriodicSpectrumIsComputed == true ) 
 	delete PeriodicSpectrum;
     }
   void GetUniqueName(const void *ptr, std::string & name);
-    
+  
   TH1D *Integral_E(double e1, double e2);
   TH1D *Integral_E(int ei1, int ei2); 
   TH1D *Integral_T(double t1, double t2, double e1, double e2);
@@ -81,10 +81,12 @@ class SpectObj
   int ne,nt;
   int sourceType; //"0=Transient,1=Periodic"
   double emin,emax;
+
   double m_Tmin,m_Tmax, m_TimeBinWidth;
   double Ptot;
   TH1D *spec,*times,*Probability,*PeriodicSpectrum;
   photon ph;
   bool ProbabilityIsComputed, PeriodicSpectrumIsComputed;
+  
 };
 #endif

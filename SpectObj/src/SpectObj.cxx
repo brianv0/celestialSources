@@ -11,28 +11,27 @@ const double erg2meV      = 624151.0;
 
 SpectObj::SpectObj(const TH2D* In_Nv, int type)
 {
-  m_AreaDetector=1.0;
-  PeriodicSpectrumIsComputed = false;
-	    
-  //  AreaDetector = EventSource::totalArea()
+  m_AreaDetector = 1.0;
+  sourceType = type;
+  
   Nv   = (TH2D*)In_Nv->Clone(); // ph/kev/s/m²
   std::string name;
   GetUniqueName(Nv,name);
-  gDirectory->Delete(name.c_str());
   Nv->SetName(name.c_str());
-  sourceType = type;
+  
   if(DEBUG) std::cout<<type<<" ->SpectObj<-  "<<name<<std::endl;
   m_SpRandGen = new TRandom();
   sourceType = type; //Max
   
   ne   = Nv->GetNbinsY();
-  double* en   = new double[ne+1];
+  double *en   = new double[ne+1];
   emin = Nv->GetYaxis()->GetXmin();
   emax = Nv->GetYaxis()->GetXmax();
   
   nt   = Nv->GetNbinsX();
   m_Tmin = Nv->GetXaxis()->GetXmin();
   m_Tmax = Nv->GetXaxis()->GetXmax();
+  
   m_TimeBinWidth   = Nv->GetXaxis()->GetBinWidth(0);
   
   for(int ei = 0 ; ei<=ne ; ei++) 
@@ -52,30 +51,33 @@ SpectObj::SpectObj(const TH2D* In_Nv, int type)
 	}  
     }
   SetAreaDetector(); // this fix the area to 6 square meters (default value) and rescale the histogram
-
+  
   gDirectory->Delete("spec");
   gDirectory->Delete("times");
   gDirectory->Delete("Probability");
-
-  spec        = new TH1D("spec","spec",ne,en);
-  times       = new TH1D("times","times",nt,m_Tmin,m_Tmax);
-  Probability = new TH1D("Probability","Probability",nt,m_Tmin,m_Tmax);
+  gDirectory->Delete("PeriodicSpectrum");
   
-    //times = new TH1D("times","times",nt,m_Tmin,m_Tmax);
+  spec             = new TH1D("spec","spec",ne,en);
   GetUniqueName(spec ,name);
-  gDirectory->Delete(name.c_str());
   spec->SetName(name.c_str());
 
+  times       = new TH1D("times","times",nt,m_Tmin,m_Tmax);
   GetUniqueName(times,name);
-  gDirectory->Delete(name.c_str());
   times->SetName(name.c_str());
 
+  Probability = new TH1D("Probability","Probability",nt,m_Tmin,m_Tmax);
   GetUniqueName(Probability,name);
-  gDirectory->Delete(name.c_str());
   Probability->SetName(name.c_str());
+  
+  PeriodicSpectrum = new TH1D("PeriodicSpectrum","PeriodicSpectrum",ne,en);
+  GetUniqueName(PeriodicSpectrum,name);
+  PeriodicSpectrum->SetName(name.c_str());
+  
   ProbabilityIsComputed=false;
+  PeriodicSpectrumIsComputed = false;
 
   delete[] en;
+      
   if(DEBUG)  std::cout<<" SpectObj initialized ! ( " << sourceType <<")"<<std::endl;
   //////////////////////////////////////////////////
 }
@@ -93,6 +95,7 @@ void SpectObj::GetUniqueName(const void *ptr, std::string & name)
   std::ostringstream my_name;
   my_name << reinterpret_cast<int> (ptr);
   name = my_name.str();
+  gDirectory->Delete(name.c_str());
 }
 
 TH1D *SpectObj::CloneSpectrum()
@@ -100,7 +103,6 @@ TH1D *SpectObj::CloneSpectrum()
   std::string name;
   TH1D *sp = (TH1D*) spec->Clone();
   GetUniqueName(sp ,name);
-  gDirectory->Delete(name.c_str());
   sp->SetName(name.c_str());
   return sp;
 }
@@ -110,7 +112,7 @@ TH1D *SpectObj::CloneTimes()
   TH1D *lc = (TH1D*) times->Clone();
   std::string name;
   GetUniqueName(lc ,name);
-  gDirectory->Delete(name.c_str());
+  //  gDirectory->Delete(name.c_str());
   lc->SetName(name.c_str());
   return lc;
 } 
@@ -121,11 +123,11 @@ TH1D *SpectObj::CloneTimes()
 //////////////////////////////////////////////////
 TH1D *SpectObj::GetSpectrum(double t)
 {
-  if (t == 0.0) return spec;
+  TH1D *sp = CloneSpectrum();
+  sp->Scale(0.0);
+  if (t == 0.0) return sp;
   int ti = Nv->GetXaxis()->FindBin(t);
   double dt0 = t - (Nv->GetXaxis()->GetBinCenter(ti));
-  TH1D *sp = CloneSpectrum();
-  //  sp->Scale(0.0);
   double sp0,sp1,sp2;
   if(dt0>0 && ti<nt)
     {
@@ -223,14 +225,13 @@ TH1D *SpectObj::Integral_T(int ti1, int ti2, int e1)
 {
   TH1D *en = CloneSpectrum();
   en->Scale(0.0);
-
+  
   for(int i = e1; i<=ne; i++)
     {
-    en->SetBinContent(i,Nv->Integral(ti1,ti2,i,i));
-
+      en->SetBinContent(i,Nv->Integral(ti1,ti2,i,i));
     }
-    return en; // ph
-    // delete en;
+  return en; // ph
+  // delete en;
 }
 
 TH1D *SpectObj::Integral_T(int ti1, int ti2, int e1, int e2)
@@ -273,6 +274,7 @@ photon SpectObj::GetPhoton(double t0, double enph)
 {
   //  photon ph;
   int ei  = TMath::Max(1,Nv->GetYaxis()->FindBin(enph));
+  
   if(!ProbabilityIsComputed)
     ComputeProbability(enph);
   
@@ -329,27 +331,25 @@ photon SpectObj::GetPhoton(double t0, double enph)
       ph.time   = time;
       ph.energy = energy;
       //      delete P;  
-
+      
     } 
   else if (sourceType == 1) //Periodic //Max
     {
-
       if (!PeriodicSpectrumIsComputed)
 	{
-	  std::string name;
-	  //	  PeriodicSpectrum = new TH1D("PeriodicSpectrum","PeriodicSpectrum",nt,m_Tmin,m_Tmax);
 	  PeriodicSpectrum = Integral_T(1,nt,ei);
-	  GetUniqueName(PeriodicSpectrum,name);
-	  gDirectory->Delete(name.c_str());
-	  PeriodicSpectrum->SetName(name.c_str());
+	  /*	  for(int i = ei; i<=ne; i++)
+		  {
+		  PeriodicSpectrum->SetBinContent(i,Nv->Integral(1,nt,i,i));
+		  }	  
+	  */
 	  PeriodicSpectrumIsComputed = true;
 	}
-
+      
       double TimeToFirstPeriod = 0.0;
       double TimeFromLastPeriod = 0.0;
       int IntNumPer = 0;
       double ProbRest = 0.0;
-      double nextTime = 0.0;
       double InternalTime = t0 - Int_t(t0/m_Tmax)*m_Tmax; // InternalTime is t0 reduced to a period
       
       double Ptot = Probability->GetBinContent(nt) - Probability->GetBinContent(1); //Total proability in a period 
@@ -358,7 +358,6 @@ photon SpectObj::GetPhoton(double t0, double enph)
       if (((Probability->GetBinContent(nt) - Probability->GetBinContent(Nv->GetXaxis()->FindBin(InternalTime))) < 1.0 ))
 	{
 	  TimeToFirstPeriod = m_Tmax - InternalTime;
-	
 	}
       else
 	{
@@ -484,9 +483,11 @@ double SpectObj::GetT90(double BL, double BH)
 TH1D *SpectObj::N(TH1D *EN)
 {
   //  std::cout<<"delete N "<<std::endl;
-  gDirectory->Delete("N");
+  //  gDirectory->Delete("N");
   TH1D* n = (TH1D*) EN->Clone();
-  n->SetName("N");
+  std::string name;
+  GetUniqueName(n,name);
+  n->SetName(name.c_str());
   for(int i = 1; i <= EN->GetNbinsX();i++)
     n->SetBinContent(i,EN->GetBinContent(i)/EN->GetBinWidth(i));
   return n;
