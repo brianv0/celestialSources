@@ -1,6 +1,6 @@
 package celestialSources
 
-version v0r0p0
+version v0r0p1
 
 # $Header$
 #
@@ -10,5 +10,4 @@ version v0r0p0
 use flux v*
 
 use genericSources v0 celestialSources
-
-#use GRB v* celestialSources
+use GRB v4r0p4 celestialSources
