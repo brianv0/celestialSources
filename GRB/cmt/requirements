@@ -10,7 +10,7 @@ use ROOT       v2r*  IExternal
 
 macro_prepend includes " -I$(GRBROOT)/src/ "
 
-macro GRB_linkopts "-L $(GRB_root)/$(BINDIR) -lGRBLib" \
+macro GRB_linkopts " -L $(GRB_root)/$(BINDIR) -lGRBLib " \
                        WIN32 ""
 
 macro_append ROOT_linkopts " $(ROOT_GUI_libs) "
