@@ -9,6 +9,6 @@ version v0r0p0
 
 use flux v*
 
-use genericSources v0* celestialSources
+use genericSources v0 celestialSources
 
 #use GRB v* celestialSources
