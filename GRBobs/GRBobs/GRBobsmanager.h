@@ -47,7 +47,6 @@ class GRBobsmanager : public ISpectrum
   */
   
   GRBobsmanager(const std::string& params);
-  
   virtual  ~GRBobsmanager();
    
   /*! If a burst is shining it returns the flux method 
@@ -64,7 +63,7 @@ class GRBobsmanager : public ISpectrum
   inline std::pair<double,double>
     dir(double energy) 
     {
-      return m_GRB->GRBdir();
+      return m_par->GetGalDir();
     } 
 
   double energy(double time);
@@ -72,7 +71,9 @@ class GRBobsmanager : public ISpectrum
   std::string title() const {return "GRBobsmanager";} 
   const char * particleName() const {return "gamma";}
   const char * nameOf() const {return "GRBobsmanager";}
-  
+
+  void GenerateGRB();  
+
   /*! 
     This method parses the parameter list
     \param input is the string to parse
@@ -91,11 +92,15 @@ class GRBobsmanager : public ISpectrum
   const std::string& m_params;
   std::string paramFile;
 
+  bool m_grbGenerated;
 
+  double m_l;
+  double m_b;
   double m_fluence;
   int    m_Npulses;
   long   m_GRBnumber;
-  double m_ExponentialTau;
+  double m_alpha;
+  double m_beta;
   double m_MinPhotonEnergy;
   double m_startTime;
   double m_endTime;

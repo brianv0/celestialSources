@@ -71,19 +71,26 @@ TH2D* GRBobsSim::MakeGRB()
 	  // [ph/(cm² s keV)]
 	}
     }
-  // Conersion 1/cm² -> 1/m²
-  m_Nv->Scale(1.0e+4); // [ph/(m² s keV)]
-  // double fluence = 1.0e-6; //erg/cm²
-  m_fluence *= 1.0e+4;        //erg/m²
-  // nph = nv * dE * TimeBinWidth
-  TH2D *nph = Nph(m_Nv); //ph/m²
+
+  TH2D *nph = Nph(m_Nv); //ph/cm²
   
   int ei1 = nph->GetYaxis()->FindBin(BATSE1);
-  int ei2 = nph->GetYaxis()->FindBin(BATSE4);
-  double norm = nph->Integral(0,m_tbin,ei1,ei2,"width")*(1.0e-3)/(erg2meV)/s_TimeBinWidth; //erg/m²
+  int ei2 = nph->GetYaxis()->FindBin(BATSE5);
+  double F=0.0;
+  double en;
+  for (int ei = ei1; ei<=ei2; ei++)
+    {
+      en   = nph->GetYaxis()->GetBinCenter(ei);
+      for(int ti = 1; ti<=m_tbin; ti++)
+	{
+	  F+= nph->GetBinContent(ti, ei) * en;//[keV/cm²]
+	}  
+    }
+  double norm = F*1.0e-3/(erg2meV); //erg/cm²  
+  //  double norm = nph->Integral(0,m_tbin,ei1,ei2,"width")*(1.0e-3)/(erg2meV)/s_TimeBinWidth; //erg/m²
   
   // IMPORTANT m_Nv has to  be in [ph/(m² s keV)]
-  m_Nv->Scale(m_fluence/norm);
+  m_Nv->Scale(1.0e4 * m_fluence/norm);
   Pulses.erase(Pulses.begin(), Pulses.end());
   delete e;
   delete nph;
@@ -108,7 +115,7 @@ TH2D *GRBobsSim::Nph(const TH2D *Nv)
       for(int ti = 0; ti<m_tbin; ti++)
 	{
 	  Nph->SetBinContent(ti+1, ei+1, 
-			     Nph->GetBinContent(ti+1, ei+1)*dei*deltat); //[1]
+			     Nph->GetBinContent(ti+1, ei+1)*dei*deltat); //[ph/(m²)]  
 	}   
     }
   return Nph;
@@ -143,17 +150,18 @@ void GRBobsSim::SaveNv()
 //////////////////////////////////////////////////
 double BandObsF(double *var, double *par)
 {
+  // GRB function from Band et al.(1993) ApJ.,413:281-292
   double a  = par[0];
   double b  = par[1];
   double E0 = pow(10.,par[2]);
   double NT = pow(10.,par[3]);
   
   double E   = var[0];
-  double C   = pow((a-b)*E0,a-b)*exp(b-a);
+  double C   = pow((a-b)*E0/100.0,a-b)*exp(b-a);
   double H   = (a-b) * E0;
   if(E <= H) 
-    return NT *E* E* pow(E,a) * exp(-E/E0);
-  return C* NT *E* E* pow(E,b); // ph cm^(-2) s^(-1) keV
+    return NT *  pow(E/100.0,a) * exp(-E/E0);
+  return C* NT * pow(E/100.0,b); // ph cm^(-2) s^(-1) keV
 }
 
 void GRBobsSim::GetGBMFlux()
@@ -167,11 +175,11 @@ void GRBobsSim::GetGBMFlux()
   // GBM Spectrum:
   TF1 band("grb_f",BandObsF,emin,1.0e+4,4); 
   band.SetParNames("a","b","Log10(E0)","Log10(Const)");
-  band.SetParameters(-1.4,-2.4,2.5,-3.0);
-  band.SetParLimits(0,-9.0,0.0);
+  band.SetParameters(-1.0,-2.25,2.5,-3.0);
+  band.SetParLimits(0,-3.0,0.0);
   band.SetParLimits(1,-10.0,0.0);
   band.SetParLimits(2,log10(emin),4.0);
-  band.SetParLimits(3,-5.0,5.0);
+  band.SetParLimits(3,-10.0,3.0);
   double a,b,E0,Const;
   TH1D GBM("GBM","GBM",Ebin, e);
   GBM.SetMinimum(1e-5);
@@ -180,14 +188,14 @@ void GRBobsSim::GetGBMFlux()
   double dt = m_Nv->GetXaxis()->GetBinWidth(1);
   double tbin = m_Nv->GetXaxis()->GetNbins();
   std::ofstream os("GBM_spectrum.txt",std::ios::out);
-  os<<"    t      a      b    E0    Const"<<std::endl;
+  os<<" t   Norm   alf   beta  E_p "<<std::endl;
   for(int ti = 0; ti<tbin; ti++)
     {
       t = ti*dt;
       for(int ei = 0; ei < Ebin; ei++)
 	{
 	  double nv = m_Nv->GetBinContent(ti+1, ei+1); // [ph/(m² s keV)]
-	  GBM.SetBinContent(ei+1, e[ei]*e[ei]* nv *1.0e-4); // [(keV*keV)/(cm² s keV)]
+	  GBM.SetBinContent(ei+1, /*e[ei] * e[ei] */ nv * 1.0e-4); // [(ph)/(cm² s keV)]
 	}
       GBM.Fit("grb_f","rq");
       
@@ -197,16 +205,18 @@ void GRBobsSim::GetGBMFlux()
       Const=pow(10.,band.GetParameter(3));
       band.SetParameters(a,b,band.GetParameter(2),band.GetParameter(3));
       //Ep=(a+2)*E0; 
-      os<<t<<" "<<a<<" "<<b<<" "<<E0<<" "<<Const<<std::endl;
-      std::cout<<t<<" "<<a<<" "<<b<<" "<<E0<<" "<<Const<<std::endl;
-      band.Draw("same");
+      os<<t<<" "<<Const<<" "<<a<<" "<<b<<" "<<E0<<" "<<std::endl;
+      //      std::cout<<t<<" "<<Const<<" "<<a<<" "<<b<<" "<<E0<<" "<<std::endl;
+      //band.Draw("same");
       gPad->SetLogx();
       gPad->SetLogy();
       gPad->Update();
-      TString gbmFlux= "GBMFlux";
-      gbmFlux+=ti;
-      gbmFlux+=".gif";
-      if(ti%10==0) gPad->Print(gbmFlux);
+      /*
+	TString gbmFlux= "GBMFlux";
+	gbmFlux+=ti;
+	gbmFlux+=".gif";
+	if(ti%10==0) gPad->Print(gbmFlux);
+      */
     }   
   os.close();
   //////////////////////////////////////////////////

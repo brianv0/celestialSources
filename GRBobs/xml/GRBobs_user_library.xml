@@ -4,62 +4,62 @@
 
 <source name=" GRB_0 ">
 <spectrum escale="MeV">
- <SpectrumClass name="GRBobsmanager" params="0 , 5.72335e-05 , 32 , -1 , -2 , 30"/>
-<galactic_dir l="-141.151" b="15.7455" />
+ <SpectrumClass name="GRBobsmanager" params="-141.151 , 15.7455 ,0 , 5.72335e-05 , 3 , -1 , -2 , 30"/>
+<use_spectrum frame="galaxy" />
 </spectrum> </source>
 
 <source name=" GRB_1 ">
 <spectrum escale="MeV">
- <SpectrumClass name="GRBobsmanager" params="3201.51 , 2.31218e-06 , 48 , -1 , -2 , 30"/>
-<galactic_dir l="-125.236" b="82.1647" />
+ <SpectrumClass name="GRBobsmanager" params="-125.236 , 82.1647 ,3201.51 , 2.31218e-06 , 5 , -1 , -2 , 30"/>
+<use_spectrum frame="galaxy" />
 </spectrum> </source>
 
 <source name=" GRB_2 ">
 <spectrum escale="MeV">
- <SpectrumClass name="GRBobsmanager" params="4624.46 , 3.05723e-06 , 47 , -1 , -2 , 30"/>
-<galactic_dir l="122.162" b="-34.4891" />
+ <SpectrumClass name="GRBobsmanager" params="122.162 , -34.4891 ,4624.46 , 3.05723e-06 , 5 , -1 , -2 , 30"/>
+<use_spectrum frame="galaxy" />
 </spectrum> </source>
 
 <source name=" GRB_3 ">
 <spectrum escale="MeV">
- <SpectrumClass name="GRBobsmanager" params="5987.43 , 1.85831e-05 , 19 , -1 , -2 , 30"/>
-<galactic_dir l="82.0134" b="-7.47508" />
+ <SpectrumClass name="GRBobsmanager" params="82.0134 , -7.47508 ,5987.43 , 1.85831e-05 , 2 , -1 , -2 , 30"/>
+<use_spectrum frame="galaxy" />
 </spectrum> </source>
 
 <source name=" GRB_4 ">
 <spectrum escale="MeV">
- <SpectrumClass name="GRBobsmanager" params="6024.29 , 7.40667e-05 , 38 , -1 , -2 , 30"/>
-<galactic_dir l="-101.22" b="4.53688" />
+ <SpectrumClass name="GRBobsmanager" params="-101.22 , 4.53688 ,6024.29 , 7.40667e-05 , 4 , -1 , -2 , 30"/>
+<use_spectrum frame="galaxy" />
 </spectrum> </source>
 
 <source name=" GRB_5 ">
 <spectrum escale="MeV">
- <SpectrumClass name="GRBobsmanager" params="6516.21 , 6.15082e-06 , 17 , -1 , -2 , 30"/>
-<galactic_dir l="-65.6263" b="8.81552" />
+ <SpectrumClass name="GRBobsmanager" params="-65.6263 , 8.81552 ,6516.21 , 6.15082e-06 , 2 , -1 , -2 , 30"/>
+<use_spectrum frame="galaxy" />
 </spectrum> </source>
 
 <source name=" GRB_6 ">
 <spectrum escale="MeV">
- <SpectrumClass name="GRBobsmanager" params="6738.26 , 2.70049e-06 , 25 , -1 , -2 , 30"/>
-<galactic_dir l="92.5068" b="36.3308" />
+ <SpectrumClass name="GRBobsmanager" params="92.5068 , 36.3308 ,6738.26 , 2.70049e-06 , 3 , -1 , -2 , 30"/>
+<use_spectrum frame="galaxy" />
 </spectrum> </source>
 
 <source name=" GRB_7 ">
 <spectrum escale="MeV">
- <SpectrumClass name="GRBobsmanager" params="7690.15 , 2.1775e-07 , 85 , -1 , -2 , 30"/>
-<galactic_dir l="16.2716" b="-26.7845" />
+ <SpectrumClass name="GRBobsmanager" params="16.2716 , -26.7845 ,7690.15 , 2.1775e-07 , 8 , -1 , -2 , 30"/>
+<use_spectrum frame="galaxy" />
 </spectrum> </source>
 
 <source name=" GRB_8 ">
 <spectrum escale="MeV">
- <SpectrumClass name="GRBobsmanager" params="7829.87 , 2.3068e-05 , 11 , -1 , -2 , 30"/>
-<galactic_dir l="-68.4974" b="36.1793" />
+ <SpectrumClass name="GRBobsmanager" params="-68.4974 , 36.1793 ,7829.87 , 2.3068e-05 , 1 , -1 , -2 , 30"/>
+<use_spectrum frame="galaxy" />
 </spectrum> </source>
 
 <source name=" GRB_9 ">
 <spectrum escale="MeV">
- <SpectrumClass name="GRBobsmanager" params="8148.38 , 2.54229e-06 , 31 , -1 , -2 , 30"/>
-<galactic_dir l="-119.361" b="-88.6519" />
+ <SpectrumClass name="GRBobsmanager" params="-119.361 , -88.6519 ,8148.38 , 2.54229e-06 , 3 , -1 , -2 , 30"/>
+<use_spectrum frame="galaxy" />
 </spectrum> </source>
 
 <source name=" AllGRBobs" >

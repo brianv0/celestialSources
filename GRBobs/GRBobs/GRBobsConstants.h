@@ -15,8 +15,8 @@
 namespace ObsCst
 {
   const double emin = 10.0; //keV
-  const double emax = 1e8;  //keV
-  const double enph = 1e5;  //keV (100 MeV) 
+  const double emax = 1e9;  //keV
+  const double enph = 3e4;  //keV (30 MeV) 
   
   const    int Ebin =  50; 
   const    double  TimeBinWidth   =  0.016; //s
@@ -32,7 +32,7 @@ namespace ObsCst
   const double GBM1=10.0;                     // 10 keV 
   const double GBM2=30.0e3;                   // 25 MeV 
   const double LAT1=30.0e3;                   // 50 MeV 
-  const double LAT2=3.0e6;                    //300 GeV 
+  const double LAT2=3.0e8;                    //300 GeV 
   //////////////////////////////////////////////////
 };
 
