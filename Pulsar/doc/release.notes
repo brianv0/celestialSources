@@ -10,5 +10,7 @@
 *   v0r0    Sep-2004 THB  Initial Phase
 *   v1r0 28-Sep-2004 THB  Version for the ST first checkout
 *   v1r0p1 15-Jan-2005 HMK Use any version of ROOT
+*   v1r0p2 16-Jan-2005 THB  Decorrections for ephemerides
+*   v1r0p3 17-Jan-2005 THB Optimization for speed and for multiple pulsars
 *@endverbatim
 */

@@ -258,13 +258,15 @@ double PulsarSpectrum::flux(double time) const
  */
 double PulsarSpectrum::interval(double time)
 {  
+  //std::cout << " pippo 1 " << std::endl;
   double timeTildeDecorr = time + (StartMissionDateMJD)*SecsOneDay; //Arrivat time decorrected
   double timeTilde = timeTildeDecorr + getBaryCorr(timeTildeDecorr); //should be corrected before applying ephem de-corrections
-
-  if ((int(timeTilde - (StartMissionDateMJD)*SecsOneDay) % 20000) < 1.5)
-    std::cout << "**  Time reached is: " << timeTilde-(StartMissionDateMJD)*SecsOneDay
-	      << " seconds from Mission Start  - pulsar " << m_PSRname << std::endl;
-
+  if (DEBUG)
+    {
+      if ((int(timeTilde - (StartMissionDateMJD)*SecsOneDay) % 20000) < 1.5)
+	std::cout << "**  Time reached is: " << timeTilde-(StartMissionDateMJD)*SecsOneDay
+		  << " seconds from Mission Start  - pulsar " << m_PSRname << std::endl;
+    }
 
   //First part: Ephemerides calculations...
   double initTurns = getTurns(timeTilde); //Turns made at this time 
@@ -275,8 +277,6 @@ double PulsarSpectrum::interval(double time)
   double inteTurns = inte/m_period; // conversion to # of turns
   double totTurns = initTurns + inteTurns; //Total turns at the nextTimeTilde
   double nextTimeTilde = retrieveNextTimeTilde(timeTilde, totTurns, (1e-6/m_period));
-
-
   //Second part: baycentric decorrection
   //Use the bisection method to find the inverse of the de-corrected time, i.e. the time (in TT)
   //that after correction is equal to Time in TDB
@@ -288,15 +288,13 @@ double PulsarSpectrum::interval(double time)
   double ttMid = (ttUp + ttDown)/2;
 
   int i = 0;
-  
   double hMid = 1e30; //for the 1st iteration
   while (fabs(hMid)>err )
     {
       double hUp = (nextTimeTilde - (ttUp + getBaryCorr(ttUp)));
       double hDown = (nextTimeTilde - (ttDown + getBaryCorr(ttDown)));
       hMid = (nextTimeTilde - (ttMid + getBaryCorr(ttMid)));
-
-          
+                
       // std::cout << std::setprecision(30) 
       //	<< "\n" << i << "**ttUp " << ttUp << " ttDown " << ttDown << " mid " << ttMid << std::endl;
       //std::cout << "  hUp " << hUp << " hDown " << hDown << " hMid " << hMid << std::endl;
@@ -441,8 +439,16 @@ double PulsarSpectrum::getBaryCorr( double ttInput )
 
   ttJD = ttJD+(ttInput - (StartMissionDateMJD)*SecsOneDay)/86400.;
 
+  //std::cout << std::setprecision(30) << " JD " << ttJD << std::endl;
+
   // Conversion TT to TDB, from JDMissionStart (that glbary uses as MJDref)
   double tdb_min_tt = m_earthOrbit.tdb_minus_tt(ttJD);
+
+  //ATTENTION!!!!
+  // the Current version of astro probably has a strange behaviour and the ephemeris 
+  // are compute for a time that is JD-05, so at this time we need to add 0.5 to the value
+  // to be put into getSolarVector and getBarycenter
+
 
   //Correction due to geometric time delay of light propagation 
   Hep3Vector GeomVect = (m_earthOrbit.position(ttJD)/clight) - m_solSys.getBarycenter(ttJD);
