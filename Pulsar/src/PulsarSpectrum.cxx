@@ -178,10 +178,18 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
   PulsarLog.close();
 
   astro::JulianDate JDStart(2007, 1, 1, 0.0);
+  //  astro::JulianDate JDStart(2007, 1, 1, 0.0);
+
+  // astro::JulianDate JDStart(2006, 12, 31, 23.99888);
+  
+  std::cout << std::setprecision(30) << " start is " << JDStart <<
+    " in MJD " << JDStart - JDminusMJD << " ole'!" << std::endl;
+
+
   // astro::JulianDate JDStart(2006, 12, 31, 12.0);
 
    std::cout << std::setprecision(30) << JDStart << "MJD " << JDStart - JDminusMJD << std::endl;
-   astro::EarthOrbit m_earthOrbit();//JDStart);
+   astro::EarthOrbit m_earthOrbit(JDStart);
    astro::SolarSystem m_solSys();
 
   //There id a strange difference of 0.5 days in astro package, so temporarly we use direct JPL ephem
@@ -458,6 +466,7 @@ double PulsarSpectrum::getBaryCorr( double ttInput )
   //Start Date;
   //astro::JulianDate ttJD(2005, 7, 18, 0.0);
   astro::JulianDate ttJD(2007, 1, 1, 0.0);
+  //astro::JulianDate ttJD(2006, 12, 31, 23.99888);
   ttJD = ttJD+(ttInput - (StartMissionDateMJD)*SecsOneDay)/86400.;
 
   //if (DEBUG)
