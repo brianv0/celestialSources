@@ -36,7 +36,7 @@
 <!--3) GRBmanager: several GRB are concatenated. When a GRB ends the next is created in a different position. --> 
 
     <source name=" GRBmanager_Gal">
-    <spectrum escale="GeV"> <SpectrumClass name="GRBmanager"  />
+    <spectrum escale="GeV"> <SpectrumClass name="GRBmanager" params="50 100"/>
     <use_spectrum frame="galaxy"/> 
     </spectrum> </source>
 
