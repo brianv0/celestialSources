@@ -17,7 +17,7 @@ GRBSim::GRBSim(long seed)
 {
   cout<<"******Staring The GRB Simulation******"<<endl;
   m_seed = seed;
-  cout<<"--------INT SEED = "<<m_seed<<endl;
+  //  cout<<"--------INT SEED = "<<m_seed<<endl;
   //////////////////////////////////////////////////
   m_spectobj = SpectObj(cst::enmin,cst::enmax,cst::enstep);
   //////////////////////////////////////////////////
@@ -41,7 +41,7 @@ GRBSim::GRBSim(const std::string& params)
   std::ofstream os (params.c_str());
   os<<m_seed;
   os.close();
-  cout<<"------PARAMS  SEED = "<<m_seed<<endl;
+  //  cout<<"------PARAMS  SEED = "<<m_seed<<endl;
   //////////////////////////////////////////////////
   m_spectobj = SpectObj(cst::enmin,cst::enmax,cst::enstep);
   //////////////////////////////////////////////////
@@ -87,9 +87,10 @@ void GRBSim::MakeGRB(double time_offset)
   GRBengine *m_CentralEngine = new GRBengine(myParam);
   theShocks   = m_CentralEngine->getShocksVector();
   m_duration  = m_CentralEngine->getDuration();
-  double dist = m_CentralEngine->getDistance();
+  m_distance  = m_CentralEngine->getDistance();
   m_direction = m_CentralEngine->getDirection();
-  m_area      = (4.*cst::pi)*pow(dist,2.)*1.0e-4; // [m^2]
+  m_area      = (4.*M_PI)*pow(m_distance,2.)*1.0e-4; // [m^2]
+  m_jetangle  = myParam->JetAngle();
   delete m_CentralEngine;
  
   //////////////////////////////////////////////////
@@ -101,7 +102,7 @@ void GRBSim::MakeGRB(double time_offset)
 
   
   //////////////////////////////////////////////////
-  cout<<" Dist  of the source   = "<<dist<<" cm "<<endl;
+  cout<<" Dist  of the source   = "<<m_distance<<" cm "<<endl;
   cout<<" Galactic Direction = [l= "<<m_direction.first<<" ,b = "<<m_direction.second<<"]"<<endl;
   cout<<" Number of Shocks      = " <<theShocks.size()<< endl;
   cout<<" Duration of the Burst = "<<m_duration-time_offset<<endl;
@@ -134,12 +135,12 @@ std::vector<double> GRBSim::ComputeFlux(const double time)
   while(itr != theShocks.end())
     {
       
-      m_synchrotron.load((itr),time,myParam->JetAngle());
+      m_synchrotron.load((itr),time,m_jetangle,m_distance);
       m_spectobj+=m_synchrotron.getSpectrumObj();
       
       if (cst::flagIC!=0.0)
 	{
-	  m_icompton.load((itr),time,myParam->JetAngle());
+	  m_icompton.load((itr),time,m_jetangle,m_distance);
 	  m_spectobj+=m_icompton.getSpectrumObj();
 	}
       

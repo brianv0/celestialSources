@@ -29,12 +29,14 @@ class GRBICompton : virtual public RadiationProcess
    */
   void load(const GRBShock *Shock,
 	    const double time  = 0.0,
-	    const double angle = 0.0);
+	    const double angle = 0.0,
+	    const double distance_to_source =0.0);
 
   /*! General Interface for computing the synchrotron spectrum at a certain /param time.
    */
   void load(const double time      = 0.0,
 	    const double angle     = 0.0,
+	    const double distance_to_source =0.0,
 	    const double GAMMAF    = 500.,
 	    const double B         = 1.0e+6,
 	    const double N0        = 1.0e+50,

@@ -7,12 +7,13 @@
 
 GRBengine::GRBengine(GRBConstants *myParam)
 {
-  int type=3;
-  switch(type)
+  int engine_type   = 3;
+  string shell_type = "jet";
+  switch(engine_type)
     {
     case 1: // jet, no shell evolution
       {
-	cout<<" CASE 1: jet like shells, no shell evolution, no collision, physical parameters "<<endl;  
+	cout<<" CASE 1: no shell evolution, no collision, physical parameters "<<endl;  
 	m_duration=0.0;
 	double BurstDuration     = myParam->Duration();
 	if (BurstDuration<=0) BurstDuration=getDurationFromBATSE();
@@ -32,7 +33,7 @@ GRBengine::GRBengine(GRBConstants *myParam)
 	    double gamma = gamma_min;
 	    double mass = (1.-1.0e-3)*ei/(gamma*cst::c2); // Shell mass
 	    
-	    GRBShell ShockedMaterial(gamma,mass,myParam->Thickness(),myParam->JetRadius(),0.0,"jet");	  
+	    GRBShell ShockedMaterial(gamma,mass,myParam->Thickness(),myParam->JetRadius(),myParam->ShellRadius(),shell_type);	  
 	    ShockedMaterial.setEint(1.0e-3*ei);
 	    GRBShock iShock(ShockedMaterial);
 	    
@@ -52,7 +53,7 @@ GRBengine::GRBengine(GRBConstants *myParam)
       break;
     case 2: // 2 shells that shock, jet, no shell evolution
       {
-	cout<<"CASE 2: jet like shells, no shell evolution, collision , physical parameters "<<endl;
+	cout<<"CASE 2: no shell evolution, collision , physical parameters "<<endl;
 	m_duration=0.0;
 	double BurstDuration     = myParam->Duration();
 	if (BurstDuration<=0) BurstDuration=getDurationFromBATSE();
@@ -72,10 +73,19 @@ GRBengine::GRBengine(GRBConstants *myParam)
 	    
 	    double gamma_front = gamma_min+(gamma_max-gamma_min)*RandFlat::shoot(1.0);
 	    double gamma_back  = gamma_front + (gamma_max-gamma_front)*RandFlat::shoot(1.0);
-	    double mass_front = .5*ei/(gamma_front*cst::c2); // Shell mass
-	    double mass_back =  .5*ei/(gamma_back*cst::c2); // Shell mass
-	    GRBShell fShell(gamma_front,mass_front,myParam->Thickness(),myParam->JetRadius(),0.0,"jet");	  
-	    GRBShell bShell(gamma_back ,mass_back ,myParam->Thickness(),myParam->JetRadius(),0.0,"jet");	  
+	    double mass_front  = .5*ei/(gamma_front*cst::c2); // Front Shell mass
+	    double mass_back   = .5*ei/(gamma_back *cst::c2); // Back  Shell mass
+	    GRBShell fShell(gamma_front,mass_front,
+			    myParam->Thickness(),
+			    myParam->JetRadius(),
+			    myParam->ShellRadius(),
+			    shell_type);	  
+	    GRBShell bShell(gamma_back ,mass_back,
+			    myParam->Thickness(),
+			    myParam->JetRadius(),
+			    myParam->ShellRadius(),
+			    shell_type);	  
+	    
 	    GRBShell ShockedMaterial = fShell + bShell;
 	    GRBShock iShock(ShockedMaterial);
 	    
@@ -87,7 +97,7 @@ GRBengine::GRBengine(GRBConstants *myParam)
 	      {
 		m_duration = (ShockTime+ComputedShockDuration < 1.5*BurstDuration) ? 
 		  ShockTime+ComputedShockDuration : 1.5*BurstDuration;
-
+		
 	      }
 	    ns++;
 	    ShockTime += timeBetweenShocks; 
@@ -97,24 +107,26 @@ GRBengine::GRBengine(GRBConstants *myParam)
       break;
     case 3: // jet, no shell evolution, obseravbles fixed
       {
-	cout<<" CASE 3: jet like shells, no shell evolution, no collision, observable fixed "<<endl;  
+	cout<<" CASE 3: no shell evolution, no collision, observable fixed "<<endl;  
 	double rise_time   = myParam->RiseTime(); //sec
 	double decay_time  = myParam->DecayTime(); //sec
 	double peak_energy = myParam->PeakEnergy(); //MeV
+
 	int NumberOfShocks       = myParam->Nshock();
 	double ei = myParam->Etot()/NumberOfShocks; // internal energy of the shocked material
 	//////////////////////////////////////////////////
-	const double C1=3.3e-11;
+	const double C1=3.3e-11*1.01688;
 	const double C2=cst::pi*1.e+10;
-	const double C3=7.21787e-15;
-	
-	double gamma       = pow(pow(peak_energy,2.)*decay_time/(C3*C3*C2),1./5.);
-	double thickness    = rise_time*gamma/C1;
-	double jet_radius  = sqrt(ei*gamma*decay_time/(thickness*C2));
+	const double C3=2.90851206811141e-14*pow((cst::p-2.)/(cst::p-1.),2.)/(2./(1+cos(myParam->JetAngle()))); // *7.78975e-16*72.*1.01;//7.21787e-15*9.;
+	double gamma             = pow(pow(peak_energy,2.)*decay_time/(C3*C3*C2),1./5.);
+	double thickness         = rise_time*gamma/C1;
+	double jet_radius        = sqrt(ei*gamma*decay_time/(thickness*C2));
+	double shell_radius      = 0.5*jet_radius;
 	myParam->setGammaMin(gamma);
 	myParam->setGammaMax(gamma);
 	myParam->setThickness(thickness);
 	myParam->setJetRadius(jet_radius);
+	myParam->setShellRadius(shell_radius);
 	
 	m_duration=0.0;
 	double BurstDuration     = myParam->Duration();
@@ -129,7 +141,7 @@ GRBengine::GRBengine(GRBConstants *myParam)
 	    double ComputedShockDuration = 0.0;
 	    double mass = (1.-1.0e-3)*ei/(gamma*cst::c2); // Shell mass
 	    //	    double internalEnergy  = ei/
-	    GRBShell ShockedMaterial(gamma,mass,thickness,jet_radius,0.0,"jet");	  
+	    GRBShell ShockedMaterial(gamma,mass,thickness,jet_radius,shell_radius,shell_type);	  
 	    ShockedMaterial.setEint(1.0e-3*ei);
 	    GRBShock iShock(ShockedMaterial);
 	    
@@ -145,9 +157,8 @@ GRBengine::GRBengine(GRBConstants *myParam)
 	    timeBetweenShocks = 2.*BurstDuration/NumberOfShocks*RandFlat::shoot(1.0);
 	    cout<<" **************************************************"<<endl;
 	    cout<<" Estimated Rise Time      = "<<C1*thickness/gamma<<endl;
-	    cout<<" Estimated Decay Time     = "<<C2*pow(jet_radius,2.)*thickness/(gamma*ei)
-		<<endl;
-	    cout<<" Estimated Break   Energy   = "<<C3*pow(gamma,3.)*sqrt(ei/thickness)/(jet_radius)<<endl;
+	    cout<<" Estimated Decay Time     = "<<C2*pow(jet_radius,2.)*thickness/(gamma*ei)<<endl;
+	    cout<<" Estimated Break Energy   = "<<C3*pow(gamma,3.)*sqrt(ei/thickness)/(jet_radius)<<endl;
 	  }
       }
       break;
@@ -186,3 +197,5 @@ double GRBengine::getDurationFromBATSE(char* burst_type)
     }
   return dur;
 }
+
+

@@ -18,8 +18,7 @@ double Bfield(double Ub)
 GRBShock::GRBShock(GRBShell Sh1) 
 {
   m_mass      = Sh1.getMass();
-  cout<<m_mass<<endl;
- 
+   
   m_thickness = Sh1.getThickness();
   m_volume    = Sh1.getVolCom(); // [cm^3]
   m_gf        = Sh1.getGamma();
@@ -48,7 +47,7 @@ double GRBShock::duration()
   double tau_decay   = 1.e+7*m_volume/m_Eint/m_gf;
   //  cout<<" Rise  Time "<<tau_rise<<endl;
   //  cout<<" Decay Time "<<tau_decay<<endl;
-  return (sqrt(tau_decay)+tau_rise);
+  return (1./2.7*sqrt(tau_decay)+tau_rise);
 }
 /*
   std::vector<double> GRBShock::FluxAtT(double time)

@@ -17,7 +17,8 @@
 namespace cst
 {
   /// Universal constants :
-  const double mpc2      = 938.2;
+  //! Electron Rest Mass (MeV)
+  const double mpc2      = 938.2; 
   const double erg2MeV   = 624151.0;
   const double mpc2cm    = 3.0857e+24;
 
@@ -38,19 +39,15 @@ namespace cst
   const double csi       = 1.0; //csi = 1, more efficient IC
   const double alphae    = .33;
   const double alphab    = .33; //smaller is alphab greater is the IC efficiency
-  const double p         = 3.;
+  const double p         = 2.5;
   const double viscosity = 0.0;
   /// Internal Parameters
-  const double enmax     = 3.0e+11;
-  //! Min. photon energy detectable by GLAST: set to 1 MeV
-  //  double enph= 25.0e+3;
-//const double enph      = 1.0e+7; 
-//    const double enph      = 25.0e+3; // = 25 KeV BGO band
+  const int    nstep        = 200;
+  const int    enstep       = 100;
+  const double enmin     = 1.0e+4;
+  const double enmax     = 1.0e+12;
   //! Minimal Temporal separation between 2 photons
   const double DeadTime  = 1.0e-5; //sec
-  const double enmin     = 1.0e+4;
-  const int nstep        = 200;
-  const int enstep       = 50;
   //! flag =[0,1], if ==0, No inverse compton;
   const float flagIC     = 1;
   //! If some of the constants in the GRBParam.txt file is ==0, it will be choosen randomly, accoding the to kind of burst selected.
@@ -90,9 +87,9 @@ class GRBConstants
   //! Set the number of shells. If the arguments is 0 it returns a random number.
   inline void setNshell(int value=10){m_nshell = value;}
   //! Initial separation between shells (cm)
-  inline double ShellSeparation(){return m_d0;}
+  inline double ShellRadius(){return m_d0;}
   //! Set the initial separation between the shells.
-  inline void setShellSeparation(double value){m_d0 = value;}
+  inline void setShellRadius(double value){m_d0 = value;}
     
   ////////////////////  Engine: Shock Generator
   //! Number of shells generated from the source
@@ -124,7 +121,7 @@ class GRBConstants
   inline void setJetRadius(double value){m_r0 = value;}
   
   inline double JetAngle(){return m_angle;}
-  inline void setJetAngle(double value){m_angle = value;}
+  inline void setJetAngle(double value){m_angle = M_PI/180. * value;}
   
   //////////////////// Common
   inline double Thickness(){return m_t0;}

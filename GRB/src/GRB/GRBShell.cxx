@@ -16,12 +16,12 @@ GRBShell::GRBShell(double gamma, double mass,
 { 
   if(type =="jet")
     {
-      cout<<"jet type"<<endl;
+      cout<<" Sell type = jet "<<endl;
       m_volume = cst::pi*pow(m_radius,2.)*m_thickness;
     }
   else
     {
-      cout<<"iso type"<<endl;
+      cout<<" Sell type = isotropic "<<endl;
       m_volume = 4.*cst::pi*pow(m_distance,2.)*m_thickness;
     }
 }
@@ -68,7 +68,7 @@ GRBShell GRBShell::operator+(GRBShell Sh)
   double dr2= Sh.getThickness();
   
   //Number and density of particles in the shocked material:
-  cout<<m_gamma<<endl;
+  //cout<<m_gamma<<endl;
   
   // Gamma of the resulting shell: 
   m_gamma=sqrt((m1*g1+m2*g2)/(m1/g1+m2/g2));

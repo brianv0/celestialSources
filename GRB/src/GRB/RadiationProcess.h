@@ -14,9 +14,8 @@ class RadiationProcess
   virtual ~RadiationProcess(){;}
 
   virtual double processFlux(double, double, double);
-  virtual double electronNumber(double, double, double,
-				double, double, double, 
-				double);
+  virtual double electronNumber(double, double, double, double, double,
+				double, double);
 
   double timeShiftForDispersion(const double time, 
 				const double E, 

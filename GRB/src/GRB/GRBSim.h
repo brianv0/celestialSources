@@ -121,9 +121,11 @@ class GRBSim
   double m_duration;
   double m_ftot;
   double m_phtot;
+  double m_distance;
   double m_area;
   double m_DeadTime;
   double m_enph;
+  double m_jetangle;
   long m_seed;
   HepRandomEngine *m_engine;
   GRBSynchrotron m_synchrotron;

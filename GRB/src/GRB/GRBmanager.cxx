@@ -9,10 +9,10 @@ GRBmanager::GRBmanager(const std::string& params)
   m_initialTime = m_FirstTime;
   m_GRB = new GRBSpectrum("temp.txt");
   m_endTime = m_FirstTime+m_GRB->m_grbsim->Tmax();
-  std::cout<<m_FirstTime<<std::endl;
-  std::cout<<m_timeToWait<<std::endl;
-  std::cout<<m_initialTime<<std::endl;
-  std::cout<<m_endTime<<std::endl;
+  //std::cout<<m_FirstTime<<std::endl;
+  //std::cout<<m_timeToWait<<std::endl;
+  //std::cout<<m_initialTime<<std::endl;
+  //std::cout<<m_endTime<<std::endl;
 }
 
 GRBmanager::~GRBmanager() 
@@ -33,11 +33,13 @@ double GRBmanager::flux(double time) const
   if(time < m_initialTime || (time > m_endTime)) flux = 1.;
  
   else flux = m_GRB->flux(time - m_initialTime);  
-  std::cout<<"-----------------------------------"<<std::endl; 
-  std::cout<<" flux @ internal time "<<time - m_initialTime<<" = "<<flux<<std::endl;
-  std::cout<<"	time = "<<time<<std::endl;
-  std::cout<<"	Initial time = "<<m_initialTime<<std::endl;
-  std::cout<<"-----------------------------------"<<std::endl;
+  /*
+    std::cout<<"-----------------------------------"<<std::endl; 
+    std::cout<<" flux @ internal time "<<time - m_initialTime<<" = "<<flux<<std::endl;
+    std::cout<<"	time = "<<time<<std::endl;
+    std::cout<<"	Initial time = "<<m_initialTime<<std::endl;
+    std::cout<<"-----------------------------------"<<std::endl;
+  */
   return flux;
 }
 
@@ -70,13 +72,15 @@ double GRBmanager::interval(double time)// const
 	 m_initialTime=time+inte;
 	 m_endTime=m_initialTime+m_GRB->m_grbsim->Tmax();
 	} 	
-  std::cout<<"-----------------------------------"<<std::endl;
-  std::cout<<" Interval @ int time "<<time - m_initialTime<<std::endl;
-  std::cout<<" 		time = "<<time<<std::endl;
-  std::cout<<"		Initial Time = "<<m_initialTime<<std::endl;
-  std::cout<<"		End Time = "<<m_endTime<<std::endl;
-  std::cout<<" INTERVAL = "<<inte<<std::endl;
-  std::cout<<"-----------------------------------"<<std::endl;
+  /*
+    std::cout<<"-----------------------------------"<<std::endl;
+    std::cout<<" Interval @ int time "<<time - m_initialTime<<std::endl;
+    std::cout<<" 		time = "<<time<<std::endl;
+    std::cout<<"		Initial Time = "<<m_initialTime<<std::endl;
+    std::cout<<"		End Time = "<<m_endTime<<std::endl;
+    std::cout<<" INTERVAL = "<<inte<<std::endl;
+    std::cout<<"-----------------------------------"<<std::endl;
+  */
   return inte;
 }
 
