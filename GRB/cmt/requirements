@@ -1,4 +1,5 @@
 package GRB
+package GRB
 version v4r0
 author Nicola Omodei<nicola.omodei@pi.infn.it> Johann Cohen-Tanugi <johann.cohen@pi.infn.it> Sandhia Bansal <sandhiab@lheapop.gsfc.nasa.gov>
 
@@ -6,36 +7,29 @@ author Nicola Omodei<nicola.omodei@pi.infn.it> Johann Cohen-Tanugi <johann.cohen
 
 
 use flux       v8r*
-use ROOT       v2r*  IExternal
+use ROOT       v2r*  IExternal 
 
-#==================================================	
+macro_append ROOT_libs " -lHist -lGraf "\
+                 WIN32 " libHist.lib libGraf.lib " 
 
-macro_prepend includes " -I$(GRBROOT)/src/ "
 
-macro_append ROOT_linkopts " $(ROOT_GUI_libs) "
+apply_pattern package_include
+apply_pattern package_linkopts
 
-apply_pattern package_headers
-apply_pattern package_stamps
 
+#=============================================================
 private
 
 macro source "*.cxx" WIN32 "*.cxx *.h"
 
-#  component library 
-
-library GRB      $(source)\
+library GRB -no_share \
+     -s=../src      $(source) \
      -s=GRB         $(source)\
      -s=GRBmaker    $(source)\
      -s=LatGRBAlert $(source)
 
 
-apply_pattern  ld_library_path
+application test_GRB      test/testMgr.cxx 
 
-apply_pattern  package_Cshlibflags
-apply_pattern  package_Lshlibflags
-
-apply_pattern shared_library
-
-application test_GRB      test/testMgr.cxx
-application test_GRBROOT  test/other/GRBROOTtest.cxx
-
+macro_append ROOT_libs " - -lGpad " WIN32 " libGpad.lib " 
+application test_GRBROOT  test/other/GRBROOTtest.cxx 
