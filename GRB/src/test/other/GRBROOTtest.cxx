@@ -48,18 +48,59 @@ using namespace std;
 #define TIMESIZE cst::nstep
 ////////////////////////////////////////////////////////////
 // Channel for the output Light Curves
-// BATSE 1 Channel:
-const double ch1L      = 20.0e+3;
-const double ch1H      = 50.0e+3;
-// BATSE 2 Channel
-const double ch2L      = 50.0e+3;
-const double ch2H      = 100.0e+3;
-// BATSE 3 Channel:
-const double ch3L      = 100.0e+3;
-const double ch3H      = 300.0e+3;
+/*
+  // GBM 1 Channel:
+  const double ch1L      =   10.0e+3;
+  const double ch1H      =   50.0e+3;
+  // GBM 2 Channel
+  const double ch2L      =   50.0e+3;
+  const double ch2H      =  300.0e+3;
+  // GBM 3 Channel:
+  const double ch3L      =  300.0e+3;
+  const double ch3H      = 1000.0e+3;
+  // LAT RANGE
+  double ch4L            = 10.0e+6; //!MeV this will be change by enph
+  const double ch4H      = 10.0e+9;  //!GeV 
+  const double ch5L      = 10.0e+9; 
+  const double ch5H      = cst::enmax;
+*/
+// GBM 1 Channel:
+const double ch1L      =   50.0e+3;
+const double ch1H      =  100.0e+3;
+const double Nch1      =  200.0;
+// GBM 2 Channel
+const double ch2L      =  100.0e+3;
+const double ch2H      =  300.0e+3;
+const double Nch2      =  150.0;
+
+// GBM 3 Channel:
+const double ch3L            = 300.0e+3;  //1GeV
+const double ch3H      = 1.0e+6; //2 GeV
+const double Nch3      =  100.0;
+
 // LAT RANGE
-double ch4L      = 10.0e+6; //!MeV
-const double ch4H      = cst::enmax;
+double ch4L      = 1.0e+9; //!MeV this will be change by enph
+const double ch4H      = 1.0e+9;  //!GeV 
+const double Nch4      =  10.0;
+
+const double ch5L      = 10.0e+9; 
+const double ch5H      = cst::enmax;
+const double Nch5      =  1.0;
+
+/*
+  // BATSE 1 Channel:
+  const double ch1L      = 20.0e+3;
+  const double ch1H      = 50.0e+3;
+  // BATSE 2 Channel
+  const double ch2L      = 50.0e+3;
+  const double ch2H      = 100.0e+3;
+  // BATSE 3 Channel:
+  const double ch3L      = 100.0e+3;
+  const double ch3H      = 300.0e+3;
+  // LAT RANGE
+  double ch4L      = 10.0e+6; //!MeV
+  const double ch4H      = cst::enmax;
+*/
 // GLAST Energies ?
 //const double ch1L      = 0.001e+9;
 //const double ch1H      = 0.0025e+9;
@@ -111,6 +152,7 @@ void Burst(int argc, char** argv)
   // definition and default options // 
   bool savef      = false;
   bool save_gif   = false;
+  bool save_root  = false;
   bool video_out  = true;
   bool set_tmax   = false;
   static const char * default_arg="GRBSpectrum";
@@ -133,6 +175,10 @@ void Burst(int argc, char** argv)
       else if("-save"==arg_name)
 	{
 	  savef=true;
+	}
+      else if("-root"==arg_name)
+	{
+	  save_root=true;
 	}
       else if("-mute"==arg_name)
 	{
@@ -178,13 +224,11 @@ void Burst(int argc, char** argv)
       ////////////////  Compute the Total Flux /////////////////
       //------------------------------------------------------//
       // Logaritmic Binning
-      //      double e_delta=pow(cst::enmax/cst::enmin,1.0/cst::enstep);
       double *e_bins;
       e_bins=(double*)malloc(sizeof(double)*(cst::enstep+1));
   
       for(int i = 0;i<=cst::enstep;i++)
 	{
-	  //	  e_bins[i]=cst::enmin*pow(e_delta,1.0*i)*1.0e-6;
 	  e_bins[i]=energy[i]*1.0e-6;
 	}
       
@@ -206,16 +250,19 @@ void Burst(int argc, char** argv)
       double fluence2=0.0;
       double fluence3=0.0;
       double fluence4=0.0;
+      double fluence5=0.0;
       double fluenceTOT=0.0;
       std::vector<double> m_time;
       
-      for (int t=0;t<cst::nstep;t++)
+      // to not have confusion between widows and linux...
+      int en,t;
+      for (t=0;t<cst::nstep;t++)
 	{
 	  m_time.push_back(t*m_dt);
 	  // Compute the flux @ time
 	  spectrum.clear();	  
 	  spectrum=_myGRB->ComputeFlux(m_time[t]); // is in ph/s/MeV/m^2
-	  for (int en=0;en<=cst::enstep;en++)
+	  for (en=0;en<=cst::enstep;en++)
 	    {
 	      m_flux[en][t]=spectrum[en]*energy[en]/(cst::erg2MeV*1.0e+6);  
 	      // m_flux is in erg/s/MeV/m^2
@@ -223,7 +270,7 @@ void Burst(int argc, char** argv)
 	  
 	  if (video_out) 
 	    {
-	      for (int en=0;en<cst::enstep;en++)
+	      for (en=0;en<cst::enstep;en++)
 		{
 		  h1->SetBinContent(en+1,m_flux[en][t]*1.0e-4); //erg/cm^2/s/MeV
 		}
@@ -269,6 +316,7 @@ void Burst(int argc, char** argv)
 	  fluence2+=_myGRB->IFlux(spectrum,ch2L,ch2H)              /(cst::erg2MeV*1.0e+6)*(1.0e-4)*m_dt;
 	  fluence3+=_myGRB->IFlux(spectrum,ch3L,ch3H)              /(cst::erg2MeV*1.0e+6)*(1.0e-4)*m_dt;
 	  fluence4+=_myGRB->IFlux(spectrum,ch4L,ch4H)              /(cst::erg2MeV*1.0e+6)*(1.0e-4)*m_dt;
+	  fluence5+=_myGRB->IFlux(spectrum,ch5L,ch5H)              /(cst::erg2MeV*1.0e+6)*(1.0e-4)*m_dt;
 	  // erg/cm^2
 	  if (video_out) 
 	    std::cout<<"Time / tmax = "<<m_time[t]<<"/" <<tmax<<" Ftot [erg]= "
@@ -308,6 +356,20 @@ void Burst(int argc, char** argv)
       std::cout<<"Fluence ("<<ch4L*1.0e-6<<" MeV - "<<ch4H*1.0e-6<<" MeV) [erg/cm^2] = "
 	  <<fluence4<<", photons expected =  "<<
 	fluence4*(cst::erg2MeV)*1.0e+10/(ch4H-ch4L)*6.<<std::endl;
+      std::cout<<"Fluence ("<<ch5L*1.0e-6<<" MeV - "<<ch5H*1.0e-6<<" MeV) [erg/cm^2] = "
+	  <<fluence5<<", photons expected =  "<<
+	fluence5*(cst::erg2MeV)*1.0e+10/(ch5H-ch5L)*6.<<std::endl;
+
+      std::cout<<"Fluence ("<<ch1L*1.0e-6<<" MeV - "<<ch1H*1.0e-6<<" MeV) [ph/cm^2/s] = "
+	  <<fluence1*(cst::erg2MeV)*1.0e+6/(ch4H-ch4L)/tmax<<std::endl;
+      std::cout<<"Fluence ("<<ch2L*1.0e-6<<" MeV - "<<ch2H*1.0e-6<<" MeV) [ph/cm^2/s] = "
+	  <<fluence2*(cst::erg2MeV)*1.0e+6/(ch4H-ch4L)/tmax<<std::endl;
+      std::cout<<"Fluence ("<<ch3L*1.0e-6<<" MeV - "<<ch3H*1.0e-6<<" MeV) [ph/cm^2/s] = "
+	  <<fluence3*(cst::erg2MeV)*1.0e+6/(ch4H-ch4L)/tmax<<std::endl;
+      std::cout<<"Fluence ("<<ch4L*1.0e-6<<" MeV - "<<ch4H*1.0e-6<<" MeV) [ph/cm^2/s] = "
+	  <<fluence4*(cst::erg2MeV)*1.0e+6/(ch4H-ch4L)/tmax<<std::endl;
+      std::cout<<"Fluence ("<<ch5L*1.0e-6<<" MeV - "<<ch5H*1.0e-6<<" MeV) [ph/cm^2/s] = "
+	  <<fluence5*(cst::erg2MeV)*1.0e+6/(ch4H-ch4L)/tmax<<std::endl;
       //////////////////////////////////////////////////
       // Save the results in the GRBlogfile...        //
       //////////////////////////////////////////////////
@@ -362,30 +424,35 @@ void Burst(int argc, char** argv)
 	    {
 	      timex[t]=m_time[t];
 	    }
-	  for (int en=0;en<=cst::enstep;en++)
+	  for (en=0;en<=cst::enstep;en++)
 	    {
 	      energyx[en]=energy[en];
 	    }
 	  
 	  TCanvas *c1 = new TCanvas("c1","GRB Flux",10,10,700,800);
-	  //TCanvas *c1b = new TCanvas("c1b","Photons Count");
 	  TCanvas *c2 = new TCanvas("c2","GRB Light Curve");
-	  //TCanvas *c4 = new TCanvas("c4","Countour Plot");
-	  TCanvas *c5 = new TCanvas("c5","3D Flux Rapresentation");
+	  TCanvas *c3 = new TCanvas("c3","3D Flux Rapresentation");
 	  //std::cout<<"xmin = "<< energyx[0] << "   xmax = "<<energyx[cst::nstep-1]<< "  ymin = "<<timex[0] <<"   ymax =" << timex[cst::nstep-1] <<std::endl;
 	 	  
 	  TH1D *fl = new TH1D("fl","fl",cst::enstep,e_bins);
 	  TH1D *ph = new TH1D("ph","ph",cst::enstep,e_bins);
 	  //TGraph *gfl = new TGraph(cst::enstep);
 	  //TGraph *gph = new TGraph(cst::enstep);
+	  /*	  
+		  TGraph *glct = new TGraph(cst::nstep);
+		  TGraph *gch1 = new TGraph(cst::nstep);
+		  TGraph *gch2 = new TGraph(cst::nstep);
+		  TGraph *gch3 = new TGraph(cst::nstep);
+		  TGraph *gch4 = new TGraph(cst::nstep);
+	  */
+	  TH1D *glct = new TH1D("glct","Ligh Curves",cst::nstep,timex[0],timex[cst::nstep-1]);
+	  TH1D *gch1 = new TH1D("gch1","gch1",cst::nstep,timex[0],timex[cst::nstep-1]);
+	  TH1D *gch2 = new TH1D("gch2","gch2",cst::nstep,timex[0],timex[cst::nstep-1]);
+	  TH1D *gch3 = new TH1D("gch3","gch3",cst::nstep,timex[0],timex[cst::nstep-1]);
+	  TH1D *gch4 = new TH1D("gch4","gch4",cst::nstep,timex[0],timex[cst::nstep-1]);
+	  TH1D *gch5 = new TH1D("gch5","gch5",cst::nstep,timex[0],timex[cst::nstep-1]);
 	  
-	  TGraph *glct = new TGraph(cst::nstep);
-	  TGraph *gch1 = new TGraph(cst::nstep);
-	  TGraph *gch2 = new TGraph(cst::nstep);
-	  TGraph *gch3 = new TGraph(cst::nstep);
-	  TGraph *gch4 = new TGraph(cst::nstep);
-	  
-	  TH2D *h2 = new TH2D("h2","H2",cst::enstep,e_bins,cst::nstep,timex[0],timex[cst::nstep-1]);
+	  TH2D *h2 = new TH2D("h2","3D flux",cst::enstep,e_bins,cst::nstep,timex[0],timex[cst::nstep-1]);
 	  //TH2D *h2 = new TH2D("h2","H2",cst::enstep-1,2,20,cst::nstep-1,0,1);
 	  //h1->SetOption("B");
 	  
@@ -397,6 +464,7 @@ void Burst(int argc, char** argv)
 	  double ch2[cst::nstep];
 	  double ch3[cst::nstep];
 	  double ch4[cst::nstep];
+	  double ch5[cst::nstep];
 	  
 	  for (t=0;t<cst::nstep;t++)
 	    {
@@ -404,6 +472,7 @@ void Burst(int argc, char** argv)
 	      ch2[t]=0.0;
 	      ch3[t]=0.0;
 	      ch4[t]=0.0;
+	      ch5[t]=0.0;
 	      lct[t]=0.0;
 	    }
 	  double loge[cst::enstep];
@@ -420,8 +489,8 @@ void Burst(int argc, char** argv)
 		{
 		  // m_flux is in erg/s/MeV/m^2
 		  Fv[en]+=(m_flux[en][t])*m_dt;  // is in erg/m^2/MeV
-		  //		  vFv[en]+=(m_flux[en][t])*m_dt*(energyx[en])*1.0e-6; // is in erg/m^2
-		  vFv[en]+=(m_flux[en][t])*(energyx[en])*cst::erg2MeV*1.0e-7; // is in KeV/s/cm^2
+		  vFv[en]+=(m_flux[en][t])*(energyx[en])*1.0e-4;
+		  // is in erg/s/cm^2
 		  // ph_m2[en]+=(m_flux[en][t])*(cst::erg2MeV*1.0e+6)/
 		  //energyx[en]; 
 		  // is in ph/MeV/m^2/s
@@ -449,10 +518,17 @@ void Burst(int argc, char** argv)
 		      ch3[t]+=(m_flux[en][t])*(cst::erg2MeV)
 			/energyx[en]*de*m_dt;
 		      // is in ph/m^2
-		    }
+
+ 		    }
 		  if (energyx[en]<ch4H &&energyx[en]>=ch4L)
 		    {
 		      ch4[t]+=(m_flux[en][t])*(cst::erg2MeV) 
+			/energyx[en]*de*m_dt;
+		      // is in ph/m^2
+		    }
+		  if (energyx[en]<ch5H &&energyx[en]>=ch5L)
+		    {
+		      ch5[t]+=(m_flux[en][t])*(cst::erg2MeV) 
 			/energyx[en]*de*m_dt;
 		      // is in ph/m^2
 		    }
@@ -465,28 +541,35 @@ void Burst(int argc, char** argv)
 	      fl->SetBinContent(en+1,vFv[en]); 
 	      ph->SetBinContent(en+1,ph_m2[en]);
 	    }
-	  //	  gfl=new TGraph(cst::enstep,energyx,vFv);
-	  //  gph=new TGraph(cst::enstep,energyx,ph_m2);
+	  TRandom *noise = new TRandom();
+	  for (t=0;t<cst::nstep;t++)
+	    {
+	      glct->SetBinContent(t+1,lct[t]);
+	      gch1->SetBinContent(t+1,ch1[t]+noise->Poisson(Nch1));
+	      gch2->SetBinContent(t+1,ch2[t]+noise->Poisson(Nch2));
+	      gch3->SetBinContent(t+1,ch3[t]+noise->Poisson(Nch3));
+	      gch4->SetBinContent(t+1,ch4[t]+noise->Poisson(Nch4));
+	      gch5->SetBinContent(t+1,ch5[t]+noise->Poisson(Nch5));
+	    }
 	  
-	  //glc=new TGraph(cst::nstep,timex,lct);
-	  glct = new TGraph(cst::nstep,timex,lct);
-	  gch1 = new TGraph(cst::nstep,timex,ch1);
-	  gch2 = new TGraph(cst::nstep,timex,ch2);
-	  gch3 = new TGraph(cst::nstep,timex,ch3);
-	  gch4 = new TGraph(cst::nstep,timex,ch4);
-	  
-	  //	  gfl->SetLineWidth(2);
-	  // gph->SetLineWidth(2);
-	  //glc->SetLineWidth(2);
-	  // gfl->SetLineColor(4);
-	  // gph->SetLineColor(4);
-   
 	  gch1->SetLineColor(2);
 	  gch2->SetLineColor(3);
 	  gch3->SetLineColor(4);
-	  gch4->SetLineColor(5);
-	  
+	  gch4->SetLineColor(8);
+	  gch5->SetLineColor(6);
+	  /*
+	    gch1->SetFillColor(2);
+	    gch2->SetFillColor(3);
+	    gch3->SetFillColor(4);
+	    gch4->SetFillColor(6);
+	    
+	    gch1->SetFillStyle(4050);
+	    gch2->SetFillStyle(4050);
+	    gch3->SetFillStyle(4050);
+	    gch4->SetFillStyle(4050);
+	  */
 	  c1->Divide(1,2);
+
 	  TPad *c1_1 = (TPad*) c1->GetPrimitive("c1_1");
 	  TPad *c1_2 = (TPad*) c1->GetPrimitive("c1_2");
 	
@@ -517,6 +600,9 @@ void Burst(int argc, char** argv)
 	  ph->Draw("AL");
 	  
 	  c1->cd(2);
+	  glct->SetLineColor(5);
+	  glct->SetLineStyle(3);
+	  
 	  c1_2->SetLogx();
 	  c1_2->SetLogy();
 	  c1_2->SetGridx();
@@ -530,10 +616,8 @@ void Burst(int argc, char** argv)
 	  fl->GetXaxis()->SetTitleSize(0.035);
 	  fl->GetXaxis()->SetLabelSize(0.035);
 	  fl->GetXaxis()->SetTitleOffset(1.4);
-	  //	  fl->GetYaxis()->SetTitle("F#nu[erg/m^2/MeV]");  
-	  fl->GetYaxis()->SetTitle("#nu F#nu[keV/s/cm^2]");  
-	  //	  fl->GetYaxis()->SetTitle("#nu F#nu[erg/m^2]");  
-	  
+	  fl->GetYaxis()->SetTitle("#nu F#nu[erg/s/cm^2]");  
+	  	  
 	  fl->GetYaxis()->SetTitleSize(0.035);
 	  fl->GetYaxis()->SetLabelSize(0.05);
 	  fl->GetYaxis()->SetTitleOffset(1.4);   	  
@@ -541,70 +625,83 @@ void Burst(int argc, char** argv)
 	  
 	  c1->Update();
 	  //c1b->Update();
-	  
+	  char legendName0[100];
 	  char legendName1[100];
 	  char legendName2[100];
 	  char legendName3[100];
 	  char legendName4[100];
+	  char legendName5[100];
 	  //char legendName5[100];
 	  
-	  c2->cd();
-	  glct->Draw("ALP");
-	  glct->SetTitle("Light Curves");
+	  c2->cd(); 
+	  c2->SetFillColor(1);
+	  c2->SetFrameLineColor(5);
+	  c2->SetFrameLineWidth(2);
+	  c2->SetBorderSize(2);
+	  c2->SetLeftMargin(0.12);
+	  c2->SetTopMargin(0.12);
+	  c2->SetBottomMargin(0.12);
+	  glct->SetStats(kFALSE);
+	  glct->GetXaxis()->SetAxisColor(5);
+	  glct->GetXaxis()->SetLabelColor(5);
+	  glct->GetXaxis()->SetTitleColor(5);
+	  glct->GetYaxis()->SetAxisColor(5);
+	  glct->GetYaxis()->SetLabelColor(5);
+	  glct->GetYaxis()->SetTitleColor(5);
+	  glct->GetYaxis()->SetAxisColor(5);
+	  
 	  glct->GetXaxis()->SetTitle("Time [sec]");
-	  glct->GetXaxis()->SetTitleSize(0.035);
 	  glct->GetXaxis()->SetLabelSize(0.035);
+	  glct->GetXaxis()->SetTitleSize(0.035);
 	  glct->GetXaxis()->SetTitleOffset(1.4);
 	  glct->GetYaxis()->SetTitle("Counts [ph/m^2]");
-	  glct->GetYaxis()->SetTitleSize(0.035);
 	  glct->GetYaxis()->SetLabelSize(0.035);
-	  glct->GetYaxis()->SetTitleOffset(1.4);
-	  glct->Draw("AP");
+	  glct->GetYaxis()->SetTitleOffset(1.2);
+	  glct->Draw("AL");
+	  	  
+	  gch1->Draw("same");
+	  gch2->Draw("same");
+	  gch3->Draw("same");
+	  gch4->Draw("same");
+	  gch5->Draw("same");
 	  
-	  gch1->Draw("LP");
-	  gch2->Draw("LP");
-	  gch3->Draw("LP");
-	  gch4->Draw("LP");
-	  
-	  
-	  TLegend *leg = new TLegend(0.6,0.75,0.98,0.98);
+	  //   LEGEND
+	  TLegend *leg = new TLegend(0.68,0.80,0.98,0.98);
 	  leg->SetTextFont(11);
-	  
+	  sprintf(legendName0,"(%6g GeV - %6g GeV) ",cst::enmin*1.0e-9,cst::enmax*1.0e-9);
 	  sprintf(legendName1,"(%6g GeV - %6g GeV) ",ch1L*1.0e-9,ch1H*1.0e-9);
 	  sprintf(legendName2,"(%6g GeV - %6g GeV) ",ch2L*1.0e-9,ch2H*1.0e-9);
 	  sprintf(legendName3,"(%6g GeV - %6g GeV) ",ch3L*1.0e-9,ch3H*1.0e-9);
 	  sprintf(legendName4,"(%6g GeV - %6g GeV) ",ch4L*1.0e-9,ch4H*1.0e-9);
+	  sprintf(legendName5,"(%6g GeV - %6g GeV) ",ch5L*1.0e-9,ch5H*1.0e-9);
 	  //  sprintf(legendName5,"(%6g GeV - %6g GeV) ",ch1L,ch1H);
-	  
+	  leg->AddEntry(glct,legendName0,"l");
 	  leg->AddEntry(gch1,legendName1,"l");
 	  leg->AddEntry(gch2,legendName2,"l");
 	  leg->AddEntry(gch3,legendName3,"l");
 	  leg->AddEntry(gch4,legendName4,"l");
-	  //  leg->AddEntry(gch5,legendName5,"l");
-	  //leg->AddEntry(glc,"Sum","l");
+	  leg->AddEntry(gch5,legendName5,"l");
 	  leg->Draw();
 	  
 	  
 	  c2->Update();
 	  
-	  c5->cd();
-	  c5->SetLogx();
-	  c5->SetLogz();
-	  h2->Draw("surf");
+	  c3->cd();
+	  c3->SetLogx();
+	  c3->SetLogz(); 
 	  h2->GetXaxis()->SetTitle("Energy [MeV]");
-	  //  h2->GetYaxis()->SetTitleSize(0.05);
-	  //  h2->GetXaxis()->SetLabelSize(0.05);
-	  h2->GetXaxis()->SetTitleOffset(1.2);
+	  h2->GetXaxis()->SetTitleOffset(2);
 	  h2->GetYaxis()->SetTitle("Time[sec]");
-	  //h2->GetYaxis()->SetTitleSize(0.035);
-	  //  h2->GetYaxis()->SetLabelSize(0.05);
-	  h2->GetYaxis()->SetTitleOffset(1.2);
+	  h2->GetYaxis()->SetLabelOffset(0);
+	  h2->GetYaxis()->SetTitleOffset(2);
 	  h2->GetZaxis()->SetTitle("vFv[erg/s/m^2/MeV]");
-	  // h2->GetYaxis()->SetTitleSize(0.035);
 	  h2->GetZaxis()->SetLabelSize(0.05);
 	  h2->GetZaxis()->SetTitleOffset(1.3);
+	  h2->GetXaxis()->CenterTitle(1);
+	  h2->GetYaxis()->CenterTitle(1);
+	  h2->GetZaxis()->CenterTitle(1);
 	  h2->Draw("surf3");
-	  c5->Update();
+	  c3->Update();
 	  /*
 	    c4->cd();  
 	    c4->SetLogx();
@@ -612,7 +709,29 @@ void Burst(int argc, char** argv)
 	    h2->Draw("CONT");
 	    c4->Update();
 	  */
-
+	  if(save_root)
+	    {
+	      std::cout<<"SAVING The Histograms in a root files..."<<std::endl;
+	      TFile f1("histos.root","recreate");
+	      //LigtCourves
+	      glct->Write();
+	      gch1->Write();
+	      gch2->Write();
+	      gch3->Write();
+	      gch4->Write();
+	      gch5->Write();
+	      //3d Plot
+	      h2->Write(); 
+	      //Flux
+	      ph->Write(); 
+	      fl->Write();
+	      c1->Write();
+	      c2->Write();
+	      c3->Write();
+	      //
+	      f1.Close();
+	      
+	    }
 	}
       ////////////////////////////////////////////
       
