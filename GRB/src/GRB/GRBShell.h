@@ -2,7 +2,7 @@
  * \class GRBShell 
  * \brief Describes a shell produced by the blast of the GRB inner engine.
  *
- * Different geometries can be used: jet and issotropic
+ * Different geometries can be used: jet and isotropic
  *
  * \author Nicola Omodei       nicola.omodei@pi.infn.it 
  * \author Johann Cohen-Tanugi johann.cohen@pi.infn.it
@@ -28,8 +28,8 @@ class GRBShell
    * \param radius of the jet. In cm.
    * \param distance of the Shell to the central engine. In cm.
    * \param type indicates the type of geometry. 
-   * If "jet" the emission of shells frm the central engine is beamed.
-   *  Else is isotropic.  
+   * If "jet" the emission of shells from the central engine is beamed.
+   * Else is isotropic.  
    */
   GRBShell(double gamma, double mass,
 	   double thickness, double radius,double distance = 0.0,std::string type = "jet");

@@ -59,6 +59,11 @@ using namespace channel;
  
  Time, energy direction and the source type (background or GRB) are
  stored in this class.
+ 
+ \author Nicola Omodei       
+ \author Johann Cohen-Tanugi 
+ \aoutor Franceso Longo
+
 */
 
 class DataOut{

@@ -27,13 +27,13 @@ class GRBSpectrum : public ISpectrum
   friend class GRBmanager;  
  public:
   /*! 
-    This initialize the simulation parseing the parameters.
+    This initializes the simulation parsing the parameters.
     
     \param params are set in the xml source library in xml directory.
     It contains the name of the file in which the seed is read.
     The seed is necessary to initialize the random number generator.
-    Saving the seed in an external file it is poossible to reproduce a particular 
-    GRB or increase the seed each time a simulation is running.
+    Saving the seed in an external file it is possible to reproduce a 
+    particular GRB or increase the seed each time a simulation is running.
 
     An example the xml source declaration for this spectrum should appears:
     \verbatim

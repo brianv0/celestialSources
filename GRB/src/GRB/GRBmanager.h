@@ -26,12 +26,12 @@ class GRBmanager : public ISpectrum
 {
 
  public:
-  /*! This initialize the simulation parseing the parameters.
+  /*! This initializes the simulation parsing the parameters.
     
     \param params are set in the xml source library in xml directory.
     They are: 
     - The time of the first burst
-    - The time to whait between the next burst
+    - The time to wait before the next burst
 
     An example the xml source declaration for this spectrum should appears:
     \verbatim
@@ -69,7 +69,7 @@ class GRBmanager : public ISpectrum
   const char * nameOf() const {return "GRBmanager";}
   
   /*! 
-    This method is used to parse the parametyer list
+    This method parses the parameter list
     \param input is the string to parse
     \param index if the position of the parameter in the input list. 
     \retval output is the value of the parameter as float number.

@@ -1,17 +1,22 @@
 /*!
- * \class GRBSim
- * \brief Simulator engine of a GRB source.
- *
- * This class initializes the simulation generating shells with random Lorentz factor and stacks the shells in a vector.
- * The evolution with the time is evaluated for all the shells and with two shells have the same radius they collide, and a GRBShock is created. 
- * All the shocks are staked in a vector. For each shock is evaluated the observed time at which it occurs.
- * This time is used to sort the vector. GRBsim compute the spectrum at a given time and returns it in a vector. 
- * This class returns the energy of a photon (chosen from the spectrum), the flux and the rate. 
- *
- * \author Nicola Omodei       nicola.omodei@pi.infn.it 
- * \author Johann Cohen-Tanugi johann.cohen@pi.infn.it
- *
- */
+  \class GRBSim
+  \brief Simulator engine of a GRB source.
+  
+  This class initializes the simulation generating shells with random 
+  Lorentz factors and stacks the shells in a vector.
+  The evolution with the time is evaluated for all the shells and when two 
+  shells have the same radius they collide, and a GRBShock is created. 
+  All the shocks are staked in a vector. For each shock is evaluated the 
+  observed time at which it occurs.
+  This time is used to sort the vector. GRBsim compute the spectrum at a 
+  given time and returns it in a vector. 
+  This class returns the energy of a photon (chosen from the spectrum), 
+  the flux and the rate. 
+ 
+  \author Nicola Omodei       nicola.omodei@pi.infn.it 
+  \author Johann Cohen-Tanugi johann.cohen@pi.infn.it
+ 
+*/
 
 #include "GRBShock.h"
 #include "GRBConstants.h"
@@ -48,30 +53,32 @@ class GRBSim
    * \param time is the time in which the spectrum is calculated.
    */
   std::vector<double> ComputeFlux(const double time);
-  //! Set the private data member m_spectrum to \e myspectrum.
+  //! Sets the private data member m_spectrum to \e myspectrum.
   inline void setSpectrum(std::vector<double> myspectrum) 
     {m_spectrum=myspectrum;}
   //! The direction of the GRB is chosen randomly in the sky.
   inline std::pair<float,float> GRBdir()       {return m_direction;}
-  //! The Spectrum() vector contains the flux \f$\phi\f$ in \f$ph/s/MeV/m^2\f$
+  //! Returns a vector contains the flux \f$\phi\f$ in \f$ph/(s MeV m^2)\f$
   inline std::vector<double>    Spectrum()     {return m_spectrum;}
-  //! Is the vector that contains the energy bin,in \f$eV\f$, in wich the flux is evaluated.
+  /*! Is the vector that contains the energy bin,in \f$eV\f$, 
+    in wich the flux is evaluated.
+   */
   inline std::vector<double>    Energy()       {return m_energy;}
   //! Is the energy bin size in \f$eV\f$ (the energy is in log scale!)
   inline std::vector<double>    DeltaE()       {return m_de;}
   
-  //! It conresponds to the time (in the GLAST frame) in which the burst ends
+  //! Corresponds to the time (in the GLAST frame) in which the burst ends
   inline double                 Tmax()         {return m_duration;}
   
   /*! Is the Area of sphere having as radius 
-   * the distance of the source (in \f$m^2\f$)
+    the distance of the source (in \f$m^2\f$)
    */ 
   inline double                 Area()         {return m_area;}
   
-  //!  Return the value of the flux (\f$ph/s/MeV/m^2\f$)
+  //!  Returns the value of the flux (\f$ph/(s MeV m^2)\f$)
   inline double                 Flux(int en)   {return m_spectrum[en];}
   
-  //! Return the \c en energy bin.
+  //! Return the \e en energy bin.
   inline double                 Energy(int en) {return m_energy[en];}
   
   /*! \brief Return the integrated flux (\f$eV/(m^2 s)\f$ for energy greather than \en enmin.

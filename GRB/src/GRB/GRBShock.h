@@ -3,8 +3,8 @@
  *
  * \brief This class implements the shock physics.
  * 
- * The input shell is the matherial already shocked, 
- * that cantains an ecces of energy due to the inhelastic collision.
+ * The input shell is the material already shocked, 
+ * that contains an excess of energy due to the inelastic collision.
  * This class calculates the magnetic field and the parameters to determine
  * the distribution of the shocked accelerated electrons.
  * 
@@ -43,11 +43,11 @@ class GRBShock
    *
    * Is the internal energy in the shocked material. 
    * Part of it is converted into magnetic field and 
-   * part of it needs to accelerate particles. 
+   * part of it is needed to accelerate particles. 
    */  
 
   inline double Eint() const {return m_Eint;}
-  /*! \brief The Lorentz factor af the shocked material.
+  /*! \brief The Lorentz factor of the shocked material.
    *
    *It is needed to compute the energy transformation.
    */
