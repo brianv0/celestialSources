@@ -12,6 +12,9 @@ struct photon
   double energy;
 };
 
+/*!
+  Constructor 
+*/
 class SpectObj
 {
  public:
@@ -43,7 +46,11 @@ class SpectObj
   TH1D *N(TH1D *EN);
   photon GetPhoton(double t0, double enph);
   
-  inline double SetAreaDetector(double AreaDetector=6.0){m_AreaDetector = AreaDetector;}
+  inline double SetAreaDetector(double AreaDetector=6.0)
+    {
+      Nv->Scale(AreaDetector/m_AreaDetector); // ph
+      m_AreaDetector = AreaDetector;
+    }
   double flux(double time, double enph);
   double interval(double time, double enph);
   double energy(double time, double enph);

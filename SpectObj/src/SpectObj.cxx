@@ -10,9 +10,12 @@
 const double erg2meV      = 624151.0;
 //const double AreaDetector = EventSource::totalArea();//AreaDetector;//6.0; //m2
 
+/*!
+  Constructor 
+*/
 SpectObj::SpectObj(const TH2D* In_Nv, int type)
 {
-  SetAreaDetector(); // this fix the area to 6 square meters (default value).
+  m_AreaDetector=1.0;
   //  AreaDetector = EventSource::totalArea()
   Nv   = (TH2D*)In_Nv->Clone(); // ph/kev/s/m²
   std::string name;
@@ -49,7 +52,7 @@ SpectObj::SpectObj(const TH2D* In_Nv, int type)
 			    Nv->GetBinContent(ti+1, ei+1)*dei*m_TimeBinWidth); //[ph/m²]
 	}  
     }
-  Nv->Scale(m_AreaDetector); // ph
+  SetAreaDetector(); // this fix the area to 6 square meters (default value) and rescale the histogram
 
   gDirectory->Delete("spec");
   gDirectory->Delete("times");
