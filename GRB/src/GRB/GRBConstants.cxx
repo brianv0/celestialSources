@@ -91,11 +91,7 @@ int Parameters::ReadParametersFromFile(std::string paramFile, int NGRB)
 
   char buf[100];
   f1.getline(buf,100);
-  /*
-    printf(buf);
-    std::cout<<" "<<std::endl;
-    std::cout<<"--------------------------------------------------"<<std::endl;
-  */  
+
   int i=1;
 
   while(i<NGRB && f1.getline(buf,100))
@@ -103,21 +99,15 @@ int Parameters::ReadParametersFromFile(std::string paramFile, int NGRB)
       i++;
     }
   i--;
-  //  SetGRBNumber((long)GetGRBNumber()+1);
-  
+    
   f1>>seed>>l0>>b0>>fluence>>nshell>>etot>>r0>>dr0>>gmin>>gmax>>ic;
-  //cout<<nshell<<endl;
+  
   if(nshell>1000)
     {
       f1.close();
       f1.open(paramFile.c_str());
 
       f1.getline(buf,100);
-      /*
-	printf(buf);
-	cout<<" "<<endl;
-      */
-      //      cout<<"NGRB= "<<NGRB<<", i = "<<i<<" NGRB % i = "<<(NGRB % i)<<endl;
       for(int j = 0; j< (NGRB %i);j++)
 	{
 	  f1.getline(buf,100);
@@ -125,13 +115,7 @@ int Parameters::ReadParametersFromFile(std::string paramFile, int NGRB)
       
       f1>>seed>>l0>>b0>>fluence>>nshell>>etot>>r0>>dr0>>gmin>>gmax>>ic;    
     }
-  
-  /*
-    cout<<seed<<" "<<l0<<" "<<b0
-    <<" "<<fluence<<" "<<nshell<<" "<<
-    etot<<" "<<r0<<" "<<dr0<<" "<<gmin<<" "<<gmax<<" "<<ic<<endl;
-  */
-  
+    
   SetGalDir(l0,b0);
   SetNshell(nshell);
   SetEtot(etot);
@@ -143,65 +127,9 @@ int Parameters::ReadParametersFromFile(std::string paramFile, int NGRB)
   SetInverseCompton(ic);
 
   if(seed>0) SetGRBNumber(65540+ (long) seed);
+  else SetGRBNumber(65540+ (long) NGRB);
   
 }
-
-/*
-  void Parameters::ReadParametersFromFile(std::string paramFile)
-  {
-  char buf[50];
-  ifstream f1(paramFile.c_str());
-  if (! f1.is_open()) 
-    {
-      std::cout<<"Error Opening paramFile.c_str()\n";
-      exit(1);
-    }
-  SetGRBNumber((long)GetGRBNumber()+1);
-
-  int    nshell, seed;
-  double fluence,etot,r0,dr0;
-  double gmin,gmax,ic;
-
-  f1.getline(buf,50);
-  sscanf(buf,"%d",&nshell);
-
-  f1.getline(buf,50);
-  sscanf(buf,"%lf",&etot);
-
-  f1.getline(buf,50);
-  sscanf(buf,"%lf",&fluence);
-  
-  f1.getline(buf,50);
-  sscanf(buf,"%lf",&r0);
-
-  f1.getline(buf,50);
-  sscanf(buf,"%lf",&dr0);
-
-  
-  f1.getline(buf,50);
-  sscanf(buf,"%lf",&gmin);
-  
-  f1.getline(buf,50);
-  sscanf(buf,"%lf",&gmax);
-
-  f1.getline(buf,50);
-  sscanf(buf,"%lf",&ic);
-
-  f1.getline(buf,5);
-  sscanf(buf,"%d",&seed);
-
-  SetNshell(nshell);
-  SetEtot(etot);
-  SetFluence(fluence);
-  SetInitialSeparation(r0);
-  SetInitialThickness(dr0);		
-  SetGammaMin(gmin);
-  SetGammaMax(gmax);
-  SetInverseCompton(ic);
-  if(seed>0) SetGRBNumber(GetGRBNumber()+ (long) seed);
-
-}
-*/
 
 void Parameters::PrintParameters()
 {

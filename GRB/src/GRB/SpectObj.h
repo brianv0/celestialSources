@@ -35,8 +35,6 @@ class SpectObj
   double Integral_T(TH1* Lc, int ti1, int ti2);
   TH1D *ComputeProbability(double enph);
   TH1D *N(TH1D *EN);
-  TH1D *EN(TH1D *N);
-  TH1D *E2N(TH1D *N);
   photon GetPhoton(double t0, double enph);
   
   double flux(double time, double enph);

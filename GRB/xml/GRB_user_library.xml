@@ -24,32 +24,33 @@
 <!-- The reference frame is galactic and a fixed direction is given to avoid the occlusion by the Earth. -->
 
       <source name=" One_GRB_each_Minute ">
-          <spectrum escale="MeV"> <SpectrumClass name="GRBmanager" params="5,60"/>
+          <spectrum escale="MeV"> <SpectrumClass name="GRBmanager" params="60,60"/>
           <use_spectrum frame="galaxy"/> 
      </spectrum> </source>
 
       <source name=" One_GRB_each_10Minutes ">
-          <spectrum escale="MeV"> <SpectrumClass name="GRBmanager" params="5,600"/>
+          <spectrum escale="MeV"> <SpectrumClass name="GRBmanager" params="60,600"/>
+	<!--direction theta="0" phi="0" /-->
           <use_spectrum frame="galaxy"/> 
      </spectrum> </source>
 
       <source name=" One_GRB_each_Hour ">
-          <spectrum escale="MeV"> <SpectrumClass name="GRBmanager" params="5,3600"/>
+          <spectrum escale="MeV"> <SpectrumClass name="GRBmanager" params="0,3600"/>
           <use_spectrum frame="galaxy"/> 
      </spectrum> </source>
      
      <source name=" GRB_0_0 ">
-          <spectrum escale="MeV"> <SpectrumClass name="GRBmanager" params="5,3600"/>
+          <spectrum escale="MeV"> <SpectrumClass name="GRBmanager" params="60,3600"/>
           <galactic_dir l="0" b="0"/>
      </spectrum> </source>
 
-     <source name=" GRB_120_50 ">
-	<spectrum escale="MeV"> <SpectrumClass name="GRBmanager" params="5,3600"/>
-	<galactic_dir l="120" b="50"/>
+     <source name=" GRB_120_10 ">
+	<spectrum escale="MeV"> <SpectrumClass name="GRBmanager" params="60,3600"/>
+	<galactic_dir l="120" b="-10"/>
      </spectrum> </source>
 
      <source name=" GRB_GLAST_0_0 ">
-	<spectrum escale="MeV"> <SpectrumClass name="GRBmanager" params="5,3600"/>
+	<spectrum escale="MeV"> <SpectrumClass name="GRBmanager" params="0,3600"/>
 	<direction theta="0" phi="0" />
      </spectrum> </source>
 
@@ -59,15 +60,6 @@
 	<galactic_dir l="120" b="-50"/>
      </spectrum> </source>
 	
-<!--	 GRBs and BACKGROUND MIXTURES    -->	
-<!-- Only background mixture, defined in FluxSvc 
-     <source name="backgndmix" >
-        <nestedSource sourceRef="chimeavg"/>
-	<nestedSource sourceRef="albedo_proton_avg"/>
-        <nestedSource sourceRef="albedo_gamma"/>
-	<nestedSource sourceRef="electronavg"/>
-     </source>
-	-->
 <!--GRB spectrum + diffuse -->
      <source name="GRB_DIFFUSE" >
 	<nestedSource sourceRef="One_GRB_each_Minute"/>
@@ -80,5 +72,6 @@
 	<nestedSource sourceRef="GRBobsSpectrum_Gal"/> 
 	<nestedSource sourceRef="diffuse"/>
      </source>
+
 </source_library>
 

@@ -9,6 +9,7 @@ const double erg2meV   = 624151.0;
 
 SpectObj::SpectObj(const TH2D* In_Nv)
 {
+  gDirectory->Delete("newNv");
   Nv   = (TH2D*)In_Nv->Clone(); // ph/kev/s/m²
   Nv->SetName("newNv");
   ne   = Nv->GetNbinsY();
@@ -79,6 +80,7 @@ TH1D *SpectObj::Integral_E(double e1, double e2)
 
 TH1D *SpectObj::Integral_E(int ei1, int ei2)
 {
+  //  gDirectory->Delete("ts");
   TH1D *ts = (TH1D*) times->Clone();
   ts->SetName("ts");  
   
@@ -157,14 +159,15 @@ double SpectObj::Integral_T(TH1* Pt, int ti1, int ti2)
 //////////////////////////////////////////////////
 TH1D *SpectObj::ComputeProbability(double enph)
 {
+  
   TH1D *P = (TH1D*) times->Clone(); //ph/m²
   P->SetName("P");
-  
   TH1D *pt = Integral_E(enph,emax); //ph/m²
   for(int ti = 1; ti <= nt; ti++)
     {
       P->SetBinContent(ti,Integral_T(pt,0,ti)); //ph/m²
     }
+  delete pt;
   return P; //ph/m²
 }
 
@@ -192,15 +195,17 @@ photon SpectObj::GetPhoton(double t0, double enph)
     } 
   double dp = P->GetBinContent(t2) - P->GetBinContent(t1);
   double dt = Nv->GetXaxis()->GetBinCenter(t2) - Nv->GetXaxis()->GetBinCenter(t1);
-  
+  TH1* Sp;
   if(t2 <= nt) // the burst has finished  dp < 1 or dp >=1
     {
-      TH1* Sp = Integral_T(t1,t2,ei); //ph/m²
+      Sp = Integral_T(t1,t2,ei); //ph/m²
       time    = dt/dp + t0;       
       energy  = Sp->GetRandom();
     }
   ph.time   = time;
   ph.energy = energy;
+  delete P;
+  delete Sp;
   return ph;
 }
 
@@ -258,30 +263,15 @@ TH1D *SpectObj::N(TH1D *EN)
   return n;
 }
 
-TH1D *SpectObj::EN(TH1D *N)
-{
-  TH1D* en = (TH1D*) N->Clone();
-  en->SetName("EN");
-  for(int i = 1; i <= N->GetNbinsX();i++)
-    en->SetBinContent(i,N->GetBinContent(i)*N->GetBinWidth(i));
-  return en;
-}
-
-TH1D *SpectObj::E2N(TH1D *N)
-{
-  TH1D* e2n = (TH1D*) N->Clone();
-  e2n->SetName("E2N");
-  for(int i = 1; i <= N->GetNbinsX();i++)
-    e2n->SetBinContent(i,N->GetBinContent(i)*pow(N->GetBinWidth(i),2.0));
-  return e2n;
-}
 //////////////////////////////////////////////////
 double SpectObj::flux(double time, double enph)
 {
   if (time >= tmax) return 1.0e-6;
 
   TH1D* fl = GetSpectrum(time);    //ph/m²
-  return Integral_E(fl,enph,emax)/deltat; //ph/m²/s
+  double integral = Integral_E(fl,enph,emax)/deltat; //ph/m²/s
+  delete fl;
+  return integral;//ph/m²/s
 }
 
 double SpectObj::interval(double time, double enph)
@@ -292,8 +282,7 @@ double SpectObj::interval(double time, double enph)
 
 double SpectObj::energy(double time, double enph)
 {
-  double en = GetPhoton(time,enph).energy;
-  return en;
+  return GetPhoton(time,enph).energy;
 }
 
 //////////////////////////////////////////////////

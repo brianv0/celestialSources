@@ -76,16 +76,12 @@ TH2D* GRBSim::Fireball()
   // IMPORTANT m_Nv has to  be in [ph/(m² s keV)]
   m_Nv->Scale(m_fluence/norm);
   
-  /*
-    nph = Nph(m_Nv); //ph/m²
-    cout<<nph->Integral(0,Tbin,ei1,ei2,"width")*(1.0e-7)/(dt*erg2meV)<<endl; //erg/cm²
-  */    
-  
+   
   /*
     for(int i =0; i<(int) Shocks.size();i++)
     delete Shocks[i]; 
   */
-  
+  delete e;
   delete nph;
   SaveNv(m_Nv);
   return m_Nv;
@@ -127,9 +123,9 @@ void GRBSim::SaveNv(TH2D *Nv)
   char root_name[100];
   sprintf(root_name,"grb_%d.root",(int)m_params->GetGRBNumber());
   
-  TFile *mod = new TFile(root_name,"RECREATE");
+  TFile mod(root_name,"RECREATE");
   Nv->Write();
-  mod->Close();
+  mod.Close();
   
   std::ofstream os("grb_generated.txt",ios::app);
   os<<m_params->GetGRBNumber()<<" "<<Tmax()<<" "<<m_fluence<<" "<<GRBdir().first<<" "<<GRBdir().second<<std::endl;

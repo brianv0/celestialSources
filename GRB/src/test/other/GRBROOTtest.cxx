@@ -184,14 +184,23 @@ void PlotGRB(double enph = 0,char name[100]="grb_65540.root")
   vFv->Draw("al");
   Fv->Draw("samel");
   Ne->Draw("samel");
-
-  TF1 *band = new TF1("band",Band,EMIN,1e4,4); 
-  band->SetParNames("a","b","Log10(E0)","Log10(Const)");
-  band->SetLineStyle(2);
-  band->SetParameters(-0.3,-2.,1.0,4.0);
-  //band->Draw("same");
-  Fv->Fit("band","","lsame");
-  
+  //  gDirectory->Delete("band");
+  TF1 band("grb_f",Band,EMIN,1.0e+3,4); 
+  //  band.SetParNames("a","b","Log10(E0)","Log10(Const)");
+  band.SetLineStyle(2);
+  band.SetParameters(-1.0,-2.5,1.0,4.0);
+  band.SetParLimits(0,-2.0,0.0);
+  band.SetParLimits(1,-4.0,-1.0);
+  band.SetParLimits(2,1.0,3.0);
+  band.SetParLimits(3,0.0,10.0);
+  //  band.Draw("lsame");
+  Ne->Fit("grb_f","v","lsame");
+  std::cout<<"--------------------------------------------------"<<std::endl;
+  std::cout<<" a     = "<<band.GetParameter(0)<<std::endl;
+  std::cout<<" b     = "<<band.GetParameter(1)<<std::endl;
+  std::cout<<" E0    = "<<pow(10.,band.GetParameter(2))<<std::endl;
+  std::cout<<" Const = "<<pow(10.,band.GetParameter(3))<<std::endl;
+  std::cout<<"--------------------------------------------------"<<std::endl;
   TLegend *leg = new TLegend(0.11,0.12,0.37,0.25);
   leg->SetFillStyle(0);
   leg->AddEntry(Ne," Ne  [ph/keV/m^2] ","lp");

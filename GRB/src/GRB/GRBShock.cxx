@@ -132,20 +132,6 @@ GRBShock::GRBShock(GRBShell *S1, GRBShell *S2, double tshock)
   
   //////////////////////////////////////////////////  
   /*
-  std::cout<<" e1= "<<e1<<" m1= "<<m1<<" g1= "<<g1<<" r1= "<<r1<<" dr1= "<<dr1<<std::endl;
-  std::cout<<" e2= "<<e2<<" m2= "<<m2<<" g2= "<<g2<<" r2= "<<r2<<" dr2= "<<dr2<<std::endl;
-  std::cout<<" ef= "<<ef<<" mf= "<<mf<<" gf= "<<gf<<" rf= "<<rf<<" drf= "<<drf<<std::endl;
-    
-      std::cout<<" ei= "<<ei<<" eint_o = "<<eint_o<<" eint_c= "<<eint_c<<std::endl;
-    //std::cout<<" Ub "<<Ub<<" Ue "<<Ue<<" B "<<B<<" ge "<<ge<<std::endl;
-    std::cout<<" B "<<B<<" Esyn "<<Esyn<<" Eic "<<Eic<<std::endl;
-    //std::cout<<" Tau Thompson  "<<tau_th<<" Tau Pair Prod."<<tau_pp<<std::endl;
-    std::cout<<" tang = L/c (obs) = "<<ta<<"tcross = l/c (obs) = "<<tc<<std::endl;
-    std::cout<<"G = "<<Y<<" Y = "<<Y<<" "<<" tv = "<<tv<<" C1 = "<<C1<<" C2 = "<<C2<<std::endl;
-  */
-  
-  //////////////////////////////////////////////////
-  /*
     ofstream fout;
     fout.open("pippo",ios::app);
     fout<<Esyn<<" "<<Eic<<" "<<B<<" "<<eint_o/1e52<<" "<<ta<<" "<<tc<<"\n";

@@ -85,6 +85,8 @@ class GRBmanager : public ISpectrum
   
   GRBSim   *m_GRB;
   SpectObj *m_spectrum;
+  Parameters *m_par;
+
   const std::string& m_params;
   std::string paramFile;
 
@@ -94,6 +96,5 @@ class GRBmanager : public ISpectrum
   double m_endTime;
   double m_nextBurst;
   int    m_Nbursts;
-  Parameters *m_par;
 };
 #endif

@@ -66,23 +66,13 @@ namespace cst
   const double LAT1=50.0e3;                   // 50 MeV 
   const double LAT2=3.0e6;                    //300 GeV 
   //////////////////////////////////////////////////
-  /*
-  int Nshell     = 10;
-  double Gmin    = 100.;
-  double Gmax    = 1000.;
-  double Fluence = 1e-5;
-  double Etot    = 1e52;
-  double InitialSeparation = 1e10;
-  double InitialThickness  = 1e10;
-  double InverseCompton    = 1.0;
-
-  */  
 };
 
 class Parameters
 {
  public:
   Parameters();
+  ~Parameters(){ delete rnd;}
   double GetNshell() {return m_Nshell;}
   double GetFluence(){return m_Fluence;}
   double GetEtot()   {return m_Etot;}
@@ -105,7 +95,6 @@ class Parameters
   void SetGammaMin(double gmin);
   void SetGammaMax(double gmax);
   void SetInverseCompton(double ic);
-  //  void ReadParametersFromFile(std::string paramFile);
   int ReadParametersFromFile(std::string paramFile, int NGRB=1);
 
   void PrintParameters();
@@ -118,8 +107,9 @@ class Parameters
       rnd->SetSeed(m_GRBnumber);
       rnd->Uniform();
     }
-  
   TRandom *rnd;
+ 
+ private:
   int    m_Nshell;
   double m_Gmin;
   double m_Gmax ;

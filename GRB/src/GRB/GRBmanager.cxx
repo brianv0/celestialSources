@@ -25,11 +25,9 @@ GRBmanager::GRBmanager(const std::string& params)
 
 GRBmanager::~GRBmanager() 
 {  
-  std::cout<<"**************************************************"<<std::endl;
   delete m_par;
   delete m_GRB;
   delete m_spectrum;
-
 }
 
 //return flux, given a time
@@ -56,7 +54,7 @@ double GRBmanager::interval(double time)
       delete m_spectrum;
       
       m_startTime = m_nextBurst;
-      std::cout<<" NEW GRB : TIME "<<m_startTime<<std::endl;
+      std::cout<<" GRB N "<<m_Nbursts<<" at TIME "<<m_startTime<<std::endl;
       //////////////////////////////////////////////////
       m_Nbursts++;
       m_par->ReadParametersFromFile(paramFile,m_Nbursts);
