@@ -73,8 +73,8 @@ void SimpleTransient::createEventTimes() {
    double duration = m_tstop - m_tstart;
    double npred = m_flux*EventSource::totalArea()*duration;
    long nevts = RandPoisson::shoot(npred);
-   std::cerr << "SimpleTransient: number of events = " 
-             << nevts << std::endl;
+//    std::cerr << "SimpleTransient: number of events = " 
+//              << nevts << std::endl;
    m_eventTimes.reserve(nevts);
    for (long i = 0; i < nevts; i++) {
       double xi = RandFlat::shoot();

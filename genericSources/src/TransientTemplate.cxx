@@ -75,8 +75,8 @@ void TransientTemplate::createEventTimes(std::string templateFile) {
 
    double npred = m_flux*EventSource::totalArea()*duration;
    long nevts = RandPoisson::shoot(npred);
-   std::cerr << "TemplateTransient: number of events = "
-             << nevts << std::endl;
+//    std::cerr << "TemplateTransient: number of events = "
+//              << nevts << std::endl;
    m_eventTimes.reserve(nevts);
    for (long i = 0; i < nevts; i++) {
       m_eventTimes.push_back(drawTime(tt, integralDist));

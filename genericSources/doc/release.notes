@@ -5,6 +5,8 @@
   @verbatim
   $Id$
 
+  21-Feb-05 v1r2    JC    SpectralTransient now able to ingest FITS files;
+                          comment out debug statements
   15-Feb-05 v1r1p1  JC    add some test code; windows fixes
   07-Feb-05 v1r1    JC    Added SpectralTransient and MapCube sources.
   13-Dec-04 v1      JC    remove dependence on st_facilities so that GR may

@@ -95,8 +95,8 @@ void SpectralTransient::createEvents(std::string templateFile) {
 
    double npred = m_flux*EventSource::totalArea()*(m_tstop - m_tstart);
    long nevts = RandPoisson::shoot(npred);
-   std::cerr << "SpectralTransient: number of events = "
-             << nevts << std::endl;
+//    std::cerr << "SpectralTransient: number of events = "
+//              << nevts << std::endl;
    m_events.clear();
    m_events.reserve(nevts);
    for (long i = 0; i < nevts; i++) {
