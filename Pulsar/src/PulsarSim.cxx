@@ -13,7 +13,7 @@
 #include "TFile.h"
 #include "TF1.h"
 
-#define DEBUG 1
+#define DEBUG 0
 
 using namespace cst;
 
@@ -38,14 +38,14 @@ using namespace cst;
 PulsarSim::PulsarSim(std::string name, int seed, double flux, double enphmin, double enphmax, double period, int numpeaks)
 {
 
-  m_flux = flux; //ph/cm2/s
-  m_period  = period;
-  m_numpeaks = numpeaks;
-  m_enphmin = enphmin;
-  m_enphmax = enphmax;
-  m_name = name;
+  m_flux = flux;         //ph/cm2/s
+  m_period  = period;    //sec
+  m_numpeaks = numpeaks; //1,2 or 3 for using timeprofile
+  m_enphmin = enphmin;   // KeV
+  m_enphmax = enphmax;   //KeV
+  m_name = name;   
   m_seed = seed;
-  m_Tbin = Tbin;
+  m_Tbin = Tbin;        //If m_numpeaks==3 then m_Tbin depends upon the the bins contained in the txt file
 }
 
 //////////////////////////////////////////////////
@@ -71,7 +71,7 @@ PulsarSim::PulsarSim(std::string name, int seed, double flux, double enphmin, do
  * where the fluxes are reported above 100MeV in ph/s/cm2. In our simulator we adopt the same convention.
  * The ROOT histogram is then saved to a ROOT file with the same name of the pulsar, and also a Txt Time profile id
  * saved.
- * For more informations and fot a brief tutorial please see:
+ * For more informations and for a brief tutorial please see:
  * <br>
  * <a href="#dejager02">http://www.pi.infn.it/~razzano/Pulsar/PulsarSpectrumTutorial/PsrSpectrumTut.html </a>
  * <br><br>
@@ -101,10 +101,9 @@ TH2D* PulsarSim::PSRPhenom(double par1, double par2, double par3, double par4)
     m_enphmax = cst::EnNormMax;
   double HighEnBound = TMath::Max(cst::EnNormMax,m_enphmax); 
   
-
   if (DEBUG)
     { 
-      //Write out informations about the model parameters
+      //Writes out informations about the model parameters
       std::cout << "\n******** Pulsar Phenomenological Model ********" << std::endl;
       std::cout << "**  Random seed for the model : " << m_seed << std::endl;
       std::cout << "**  Spectrum parameters: " << std::endl;
@@ -122,11 +121,10 @@ TH2D* PulsarSim::PSRPhenom(double par1, double par2, double par3, double par4)
     }
 
 
-  //writes out an output  log file
-  
+  //writes out an output log file fo rthe pulsar, instead of std::cout
   char logSimLabel[40];
 
-  for (int i=0; i< m_name.length()+1; i++)
+  for (unsigned int i=0; i< m_name.length()+1; i++)
     {
       logSimLabel[i] = m_name[i];
     }
@@ -152,9 +150,6 @@ TH2D* PulsarSim::PSRPhenom(double par1, double par2, double par3, double par4)
   PulsarLogSim << "**  Spectrum calculated between " << LowEnBound << " keV and " 
 	        << HighEnBound << " keV " << std::endl; 
 
-  //  PulsarLogSim.close();
-
-  
 
   //Create the spetrum profile
    double de = pow(HighEnBound/LowEnBound,1.0/Ebin);
@@ -278,10 +273,9 @@ TH2D* PulsarSim::PSRPhenom(double par1, double par2, double par3, double par4)
 	  PulsarLogSim << "***********************************************" << std::endl;
 	}
       
+
+      PulsarLogSim.close();
       
-      //    TF1 PulsarTimeCurve("PulsarTimeCurve",
-      //		  "([2]*(1/(((x-[0])^2)+(([1]/2)^2))) + [5]*(1/(((x-[3])^2)+(([4]/2)^2))))",
-      //		  0, m_period);
       PulsarTimeCurve.SetParameters(peak1,fwhm1,ampl1,peak2,fwhm2,ampl2);  
   
     }
@@ -293,8 +287,8 @@ TH2D* PulsarSim::PSRPhenom(double par1, double par2, double par3, double par4)
 
       char* pulsar_root = ::getenv("PULSARROOT");
       char TimeProfileFileName[100];
-      sprintf(logSimLabel,"");
-      for (int i=0; i< m_name.length()+1; i++)
+      sprintf(logSimLabel," ");
+      for (unsigned int i=0; i< m_name.length()+1; i++)
 	{
 	  logSimLabel[i] = m_name[i];
 	}
@@ -327,38 +321,26 @@ TH2D* PulsarSim::PSRPhenom(double par1, double par2, double par3, double par4)
 	  timeCounts.push_back(tempCount);
 	}
 
-      TH1D TempProfile("TempProfile","TempProfile",timeCounts.size(),0,m_period);
+      TH1D TempProfile("TempProfile","TempProfile",timeCounts.size()-1,0,m_period);
  
-      for (int i =0; i < timeCounts.size()-1; i++)
+      for (unsigned int i =0; i < timeCounts.size()-1; i++)
 	{
 	  TempProfile.SetBinContent(i+1,timeCounts[i]);
-	  std::cout << " bin " << i+1 << TempProfile.GetBinContent(i+1) <<std::endl;
-
 	}
       TimeProfileLightCurve = TempProfile;
-      TFile mod("prova.root","RECREATE");
-      TimeProfileLightCurve.Write();
-      mod.Close();
       m_Tbin = TimeProfileLightCurve.GetNbinsX();
-      std::cout << " bin " << m_Tbin << std::endl;
       dt = m_period/(m_Tbin-1);
     }
 
-  // test curve in case of stationary curve for flux calibration
-  // TF1 PulsarTimeCurve("PulsarTimeCurve","15.0"); //In order to have a stationary source
-    
   // Part 3 - Combination of Spectrum and lightCurve and filling of TH2D
 
   double *e = new double[Ebin +1];
   for(int i = 0; i<=Ebin; i++)
     {
       e[i] = LowEnBound*pow(de,1.0*i); //KeV
-      //     std::cout << " i " << i << " ei " << e[i] << std::endl;
     }
 
   gDirectory->Delete("Nv");
-
- 
 
   m_Nv = new TH2D("Nv","Nv",m_Tbin,0.,m_period,Ebin, e);
 
@@ -374,7 +356,6 @@ TH2D* PulsarSim::PSRPhenom(double par1, double par2, double par3, double par4)
 	}
       else if (m_numpeaks == 3 )
 	{
-	  //	  std::cout << " ciao " << std::endl;
 	  nt = TimeProfileLightCurve.GetBinContent(ti);
 	}
 
@@ -458,7 +439,7 @@ void PulsarSim::SaveNv(TH2D *Nv)
   
   char root_name[100];
 
-  for (int i=0; i< m_name.length()+1; i++)
+  for (unsigned int i=0; i< m_name.length()+1; i++)
     {
       root_name[i] = m_name[i];
     }
@@ -487,7 +468,7 @@ void PulsarSim::SaveTimeProfile(TH2D *Nv)
 
   char temp[30];
 
-  for (int i=0; i< m_name.length()+1; i++)
+  for (unsigned int i=0; i< m_name.length()+1; i++)
     {
       temp[i] = m_name[i];
     }

@@ -146,7 +146,7 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
 
   char logLabel[40];
 
-  for (int i=0; i< m_PSRname.length()+1; i++)
+  for (unsigned int i=0; i< m_PSRname.length()+1; i++)
     {
       logLabel[i] = m_PSRname[i];
     }
