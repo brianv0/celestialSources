@@ -50,4 +50,4 @@ public set JOBOPTIONS ${GRBROOT}/src/test/jobOptions.txt
 
 apply_pattern package_test
 set TESTJOBOPTIONS ${GRBROOT}/src/test/test_jobOptions.txt
-set TESTJOBOPTIONS ${GRBROOT}/src/test/jobOptions.txt
+
