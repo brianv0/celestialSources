@@ -7,11 +7,13 @@
 //    test_GRBROOT.exe [options] [option_args]
 //
 // Options:
+//    -help or -h print all the options
 //    -time <time in sec> fix the maximum time
 //    -save Save the parameters for the model and the output in a file ("GRBdata.txt").
 //    -root Save the histograms in a in a root file ("histos.root")
 //    -seed <seed> set the seed for the random engine
 //    -mute It turns off the graphical output
+//    -nomovie It turn off the visualization of the evolution of the flux
 //    -cycle <N> it runs the program N times
 //    -gif  It save the moovie of the evolving flux in a gif file.
 //
@@ -97,6 +99,9 @@ void Burst(int argc, char** argv);
 
 int main(int argc, char** argv)
 {
+  std::cout<<" ****** GRB and ROOT test ****** "<<std::endl;
+  std::cout<<" type test_GRBROOT.exe -help for help on the available options "
+	   <<std::endl;
   Burst(argc,argv);
   return 0;
 }
@@ -108,6 +113,7 @@ void Burst(int argc, char** argv)
   bool save_gif   = false;
   bool save_root  = false;
   bool video_out  = true;
+  bool movie      = true;
   bool set_tmax   = false;
   static const char * default_arg="GRBSpectrum";
   int current_arg = 1;
@@ -121,7 +127,41 @@ void Burst(int argc, char** argv)
   while(current_arg < argc)
     {
       arg_name = argv[current_arg]; 
-      if("-time"==arg_name)
+      if ("-help"==arg_name || "-h"==arg_name)
+	{
+  	  std::cout<<" ** HELP for test_GRBROOT.exe **"<<std::endl;
+	  std::cout<<" Description:"<<std::endl;
+	  std::cout<<"    GRBROOTTest is a test program for GRB simulation 
+studies."<<std::endl;
+	  std::cout<<"    This executable uses ROOT to display several 
+histograms at run time."<<std::endl;
+	  std::cout<<"    It is just an interface to GRBSim, which actually 
+does all the job."<<std::endl;
+	  std::cout<<" "<<std::endl;
+	  std::cout<<" Usage:                                      "<<std::endl;
+	  std::cout<<"    test_GRBROOT.exe [options] [option_args] "<<std::endl;
+	  std::cout<<" "<<std::endl;
+	  std::cout<<" Options:                                    "<<std::endl;
+	  std::cout<<"    -help or -h print this help         "<<std::endl;
+	  std::cout<<"    -time <time in sec> fix the maximum time "<<std::endl;
+	  std::cout<<"    -save Save the parameters for the model and 
+\t\t the output in a file (\'GRBdata.txt\')."<<std::endl;
+	  std::cout<<"    -root Save the histograms in a in a root file 
+\t\t (\'histos.root\')"<<std::endl;
+	  std::cout<<"    -seed <seed> set the seed for the random engine"
+		   <<std::endl;
+	  std::cout<<"    -mute It turns off the graphical output (fastest)"
+		   <<std::endl;
+	  std::cout<<"    -nomovie It turn off the visualization of the 
+\t\t evolution of the flux (faster)"<<std::endl;
+	  std::cout<<"    -cycle <N> it runs the program N times 
+(with mute option) "<<std::endl;
+	  std::cout<<"    -gif  It save the moovie of the evolving flux 
+\t\t in a gif file."<<std::endl;
+	  std::cout<<" Author:         Nicola Omodei "<<std::endl;
+	  exit(0);
+	}
+      else if("-time"==arg_name)
 	{
 	  set_tmax=true;
 	  tmax = atof(argv[++current_arg]);
@@ -137,7 +177,13 @@ void Burst(int argc, char** argv)
       else if("-mute"==arg_name)
 	{
 	  video_out=false;
+	  movie=false;
 	}
+      else if("-nomovie"==arg_name)
+	{
+	  movie=false;
+	}
+
       else if("-cycle"==arg_name)
 	{
 	  video_out=false;
@@ -183,7 +229,7 @@ void Burst(int argc, char** argv)
       TH1D *h1 = new TH1D("h1","h1",cst::enstep,e_bins);
       
       TCanvas *cc2;
-      if(video_out)
+      if(video_out && movie)
 	{
 	  cc2 = new TCanvas();
 	}
@@ -210,7 +256,7 @@ void Burst(int argc, char** argv)
 	      // m_flux is in erg/s/MeV/m^2
 	    }
 	  
-	  if (video_out) 
+	  if (video_out && movie) 
 	    {
 	      for (en=0;en<cst::enstep;en++)
 		{
@@ -260,7 +306,7 @@ void Burst(int argc, char** argv)
 	  fluence4+=myGRB->IFlux(spectrum,ch4L,ch4H)              /(cst::erg2MeV*1.0e+6)*(1.0e-4)*m_dt;
 	  fluence5+=myGRB->IFlux(spectrum,ch5L,ch5H)              /(cst::erg2MeV*1.0e+6)*(1.0e-4)*m_dt;
 	  // erg/cm^2
-	  if (video_out) 
+	  if (video_out)
 	    std::cout<<"Time / tmax = "<<m_time[t]<<"/" <<tmax<<" Ftot [erg]= "
 		<<fluenceTOT*(myGRB->Area()*1.0e+4)<<std::endl;
 	}
