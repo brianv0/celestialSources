@@ -23,6 +23,7 @@
 ISpectrumFactory & GaussianSourceFactory();
 ISpectrumFactory & GRBmanagerFactory();
 ISpectrumFactory & IsotropicFactory();
+ISpectrumFactory & MapCubeFactory();
 ISpectrumFactory & MapSourceFactory();
 ISpectrumFactory & PeriodicSourceFactory();
 ISpectrumFactory & PulsarFactory();
@@ -115,8 +116,9 @@ void TestApp::setSources() {
                         "Crab_Pulsar",
                         "Geminga_Pulsar",
                         "gaussian_source",
-                        "Extragalactic_diffuse"};
-   std::vector<std::string> sourceNames(srcNames, srcNames+10);
+                        "Extragalactic_diffuse",
+                        "map_cube_source"};
+   std::vector<std::string> sourceNames(srcNames, srcNames+11);
 
    m_compositeSource = new CompositeSource();
    unsigned long nsrcs(0);
@@ -163,6 +165,7 @@ void TestApp::createEvents(const std::string & filename) {
 void TestApp::load_sources() {
    GaussianSourceFactory();
    IsotropicFactory();
+   MapCubeFactory();
    MapSourceFactory();
    PeriodicSourceFactory();
    PulsarFactory();

@@ -88,7 +88,10 @@ private:
       const;
 
    static bool cmpPair(const std::pair<double, double> & x, 
-                       const std::pair<double, double> & y); 
+                       const std::pair<double, double> & y);
+
+   void checkForNonPositivePixels() const;
+
 };
 
 #endif // mySpectrum_MapCube_h

@@ -43,7 +43,10 @@ MapCube::MapCube(const std::string &paramString) : MapSource() {
    m_flux = std::atof(params[0].c_str());
    std::string fitsFile = params[1];
 
+   facilities::Util::expandEnvVar(&fitsFile);
+
    readFitsFile(fitsFile);
+   checkForNonPositivePixels();
    readEnergyVector(fitsFile);
    makeCumulativeSpectra();
    std::vector<double> totalCounts(m_solidAngles.size());
@@ -54,6 +57,16 @@ MapCube::MapCube(const std::string &paramString) : MapSource() {
 
 //    std::cerr << "Integral over the map: " 
 //              << m_mapIntegral << std::endl;
+}
+
+void MapCube::checkForNonPositivePixels() const {
+   std::vector<double>::const_iterator pixel = m_image.begin();
+   for ( ; pixel != m_image.end(); ++pixel) {
+      if (*pixel <= 0) {
+         throw std::runtime_error("MapCube: There are negative or zero-valued"
+                                  + std::string(" pixels in the FITS image."));
+      }
+   }
 }
 
 float MapCube::operator()(float xi) const {

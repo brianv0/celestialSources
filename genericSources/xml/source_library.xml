@@ -14,6 +14,18 @@
       </spectrum>
    </source>
 
+<!-- Map with spectral -->
+   <source name="map_cube_source">
+      <spectrum escale="MeV">
+<!-- Total photon flux from the map (#/m^2/s) = 1.
+     Fits file (plate-carree only) = test_image.fits
+-->
+         <SpectrumClass name="MapCube"
+          params="1., $(GENERICSOURCESROOT)/data/test_image.fits"/>
+         <use_spectrum frame="galaxy"/>
+      </spectrum>
+   </source>
+
 <!-- A short transient source, similar to a simple GRB -->
    <source name="simple_transient">
       <spectrum escale="MeV">
