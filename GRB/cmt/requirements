@@ -35,14 +35,14 @@ macro_append GRB_headers 	""  \
 
 macro source "*.cxx" WIN32 "*.cxx *.h"
 
-library GRBLIB -no_share 	$(source) \
+library GRBLib 	$(source) \
      -s=GRB $(source)\
      -s=GRBmaker $(source)\
      -s=LatGRBAlert $(source)
 
-macro libs ""   WIN32 " $(GRBDir)/GRBLIB.lib "
+macro libs ""   WIN32 " $(GRBDir)/GRBLib.lib "
 
-macro GRB_linkopts "-L $(GRBDir) -lGRBLIB" \
+macro GRB_linkopts "-L $(GRBDir) -lGRBLib" \
                        WIN32 ""
 
 macro_append ROOT_linkopts " -lHist  -lMatrix -lGraf -lGraf3d -lGpad "\ 
@@ -50,7 +50,7 @@ macro_append ROOT_linkopts " -lHist  -lMatrix -lGraf -lGraf3d -lGpad "\
 
 library GRB  Dll/*.cxx $(libs)
 
-macro GRB_extrastamps "$(GRBDir)/GRBLIB.stamp"
+macro GRB_extrastamps "$(GRBDir)/GRBLib.stamp"
 
 #
 #	Executables:	
