@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////
+/////////////////////////////////////////////////
 // File PulsarSim.cxx
 // contains the code for the implementation of the models
 //////////////////////////////////////////////////
@@ -253,7 +253,7 @@ double PulsarSpectrum::interval(double time)
   double timeTilde = time + (StartMissionDateMJD)*SecsOneDay;
   if ((int(timeTilde - (StartMissionDateMJD)*SecsOneDay) % 20000) < 1.5)
     std::cout << "**  Time reached is: " << timeTilde-(StartMissionDateMJD)*SecsOneDay
-	      << " seconds from Mission Start " << std::endl;
+	      << " seconds from Mission Start  - pulsar " << m_PSRname << std::endl;
 
   //First part: Ephemerides calculations...
   double initTurns = getTurns(timeTilde); //Turns made at this time 
@@ -267,36 +267,47 @@ double PulsarSpectrum::interval(double time)
   finPh = modf(finPh + inteTurns,&intPart); //finPh is the expected phase corresponding to the nextTimeTilde
   double nextTimeTilde = retrieveNextTimeTilde(timeTilde, totTurns, (1e-6/m_period));
   
-  //std::cout << std::setprecision(30) << "phCalc " << modf(getTurns(nextTimeTilde),&intPart) << " exp " << finPh << std::endl;
-  //std::cout << std::setprecision(30) << "       diff " << fabs(modf(getTurns(nextTimeTilde),&intPart)-finPh) << std::endl;
-
-
-  /*
+  
   //Second Part barycentric de-corrections
 
-  astro::JulianDate JDStartMission(2005, 7, 18, 0.0);
+  //  astro::JulianDate JDStartMission(2005, 7, 18, 0.0);
+  astro::JulianDate JDStartMission(2007, 1, 1, 0.0);
+
   astro::SkyDir PsrDir(m_RA,m_dec,astro::SkyDir::EQUATORIAL);
 
 
-  //Conversion TT to TDB
-  double tdb_min_tt = m_earthOrbit.tdb_minus_tt(JDStartMission+(nextTimeTilde - (StartMissionDateMJD)*SecsOneDay)/86400.)/86400.;//jd
+  //Conversion TT to TDB, from JDMissionStart (that glbary uses as MJDref)
+  double tdb_min_tt = m_earthOrbit.tdb_minus_tt(JDStartMission+(nextTimeTilde - (StartMissionDateMJD)*SecsOneDay)/86400.);//jd
+
+
+
+
+
+
+
   //Correction due to geometric time delay of light propagation 
-  double GeomCorr = m_earthOrbit.calcTravelTime(JDStartMission+tdb_min_tt, PsrDir); // seconds
+  //  double GeomCorr = m_earthOrbit.calcTravelTime(JDStartMission+tdb_min_tt, PsrDir); // seconds
+  double GeomCorr = m_earthOrbit.calcTravelTime(JDStartMission+(nextTimeTilde - (StartMissionDateMJD)*SecsOneDay)/86400., PsrDir); // seconds
+
   //Shapiro Correction
-  double ShapiroCorr = m_earthOrbit.calcShapiroDelay(JDStartMission+tdb_min_tt, PsrDir); //seconds
+  //  double ShapiroCorr = m_earthOrbit.calcShapiroDelay(JDStartMission+
+  //(nextTimeTilde - (StartMissionDateMJD)*SecsOneDay)/86400., PsrDir); //seconds
+  double ShapiroCorr = m_earthOrbit.calcShapiroDelay(JDStartMission+tdb_min_tt,PsrDir);
 
   BaryOutFile.open("BaryDeCorr.txt",std::ios::app);
-  BaryOutFile << "****  BaryCentric Correction : Start " << JDStartMission 
+  BaryOutFile << std::setprecision(20) << "****  BaryCentric Correction : Start " << JDStartMission 
 	    << " PSR position : RA " << PsrDir.ra() << " dec " << PsrDir.dec() << std::endl;
   BaryOutFile << std::setprecision(30) << nextTimeTilde - (StartMissionDateMJD)*SecsOneDay 
 	    << "\t" << PsrDir.ra() << "\t" << PsrDir.dec() 
-	    << "\t" << tdb_min_tt << "\t" << GeomCorr << "\t" << ShapiroCorr << "\t";
+	      << "\t" << std::setprecision(10) << tdb_min_tt << "\t" << GeomCorr << "\t" << ShapiroCorr << "\t";
 
-  nextTimeTilde = nextTimeTilde - tdb_min_tt - GeomCorr + ShapiroCorr;
- 
+  std::cout << std::setprecision(30) << " Bef " << nextTimeTilde  << std::endl;
+  // nextTimeTilde = nextTimeTilde - tdb_min_tt - GeomCorr + ShapiroCorr;
+  //std::cout << std::setprecision(30) << "    --> " << nextTimeTilde - (StartMissionDateMJD)*SecsOneDay << std::endl;
   BaryOutFile << std::setprecision(30) << nextTimeTilde - (StartMissionDateMJD)*SecsOneDay << std::endl;
   BaryOutFile.close();
-  */
+
+  
 
   return nextTimeTilde - timeTilde;
 }
@@ -374,8 +385,6 @@ double PulsarSpectrum::retrieveNextTimeTilde( double tTilde, double totalTurns, 
 	{
 	  tTildeLow = tTilde;
 	}
-      // std::cout <<  std::setprecision(30) << " Low is " << tTildeLow << " High is " << tTildeHigh 
-      //           << " -->turns " << tempTurns <<std::endl;;
       tStep = tStep/2;
       nIter++;
 

@@ -377,7 +377,7 @@ int main(int argc, char** argv)
 
   
   double Period  = 0.089; // s
-  double flux = 9e-6; // ph/cm2/s
+  double flux = 2e-14;//9e-6; // ph/cm2/s
   int npeaks = 2;
   double ppar1 = 1e6;
   double ppar2 = 8e6;
