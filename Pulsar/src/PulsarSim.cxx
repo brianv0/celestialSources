@@ -15,13 +15,14 @@
 using namespace cst;
 
 //////////////////////////////////////////////////
-PulsarSim::PulsarSim(double flux, double enphmin, double enphmax, double period, int numpeaks)
+PulsarSim::PulsarSim(std::string name, double flux, double enphmin, double enphmax, double period, int numpeaks)
 {
   m_flux = flux; //ph/cm2/s
   m_period  = period;
   m_numpeaks = numpeaks;
   m_enphmin = enphmin;
   m_enphmax = enphmax;
+  m_name = name;
 }
 
 TH2D* PulsarSim::PSRPhenom(double par1, double par2, double par3, double par4)
@@ -42,7 +43,6 @@ TH2D* PulsarSim::PSRPhenom(double par1, double par2, double par3, double par4)
   double E0 = par2;
   double b =  par4;
   double K1 = 138e-8; //This is the constant, will be overwritten by normalization
-
 
   std::cout << "\n******** Pulsar Phenomenological Model ********" << std::endl;
   std::cout << "**  Spectrum parameters: " << std::endl;
@@ -226,10 +226,11 @@ TH2D* PulsarSim::PSRPhenom(double par1, double par2, double par3, double par4)
   delete nph;
   
   SaveNv(m_Nv); // ph/m2/s/keV
+  SaveTimeProfile(m_Nv); //ph/m2/s/kev
 
   // Saving TimeProfile on a TXT Output file.
   // This will be moved onto PulsarSpectrum
-
+  /*
   ofstream OutTimeProf("PSRTimeProfile.txt");
   
   for (int t=0; t < Tbin; t++)
@@ -239,7 +240,7 @@ TH2D* PulsarSim::PSRPhenom(double par1, double par2, double par3, double par4)
 
 
   OutTimeProf.close();
-
+  */
 
   return m_Nv;
   delete m_Nv;
@@ -286,6 +287,33 @@ void PulsarSim::SaveNv(TH2D *Nv)
   Nv->Write();
   mod.Close();
   
+}
+
+///////////////////////////////////////////////
+void PulsarSim::SaveTimeProfile(TH2D *Nv)
+{
+  // Saving TimeProfile on a TXT Output file.
+
+  char temp[30];
+
+  for (int i=0; i< m_name.length()+1; i++)
+    {
+      temp[i] = m_name[i];
+    }
+
+  sprintf(temp,"%sTimeProfile.txt",temp);
+  ofstream OutTimeProf(temp);
+
+  int ei2 = Nv->GetYaxis()->FindBin(m_enphmin);
+  int ei3 = Nv->GetYaxis()->FindBin(m_enphmax);
+
+  for (int t=0; t < Tbin; t++)
+    {
+      OutTimeProf << t+1 << "\t" <<  Nv->Integral(t+1,t+1,ei2,ei3)*1e4 << "\n";
+    }
+
+  OutTimeProf.close();
+
 };
 
 

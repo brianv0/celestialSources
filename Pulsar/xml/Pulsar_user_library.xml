@@ -21,63 +21,63 @@
  <!-- Polar Cap model. When N,DJ95 give upper or lower limit, use parameters as in DeJager 2002 -->
  
    <source name=" PSRCrabPolarPhen " >
-       <spectrum escale="MeV"> <SpectrumClass name="PulsarSpectrum" params=" 1,2.3e-6,0.033,422e-15,2,1e6,30e6,-2.08,2.0,1.0e5,1e8"/>
+       <spectrum escale="MeV"> <SpectrumClass name="PulsarSpectrum" params="PSRCRAB, 1, 1.0e5, 2.0e7, 2, 1e6, 30e6, -2.08, 2.0"/>
          <galactic_dir l="184.56" b="-5.78"/>
        </spectrum> 
     </source>
 
     <source name=" PSRVelaPolarPhen " >
-       <spectrum escale="MeV"> <SpectrumClass name="PulsarSpectrum" params=" 1,9e-6,0.089,2.0e-15,2,1e6,8e6,-1.62,1.7,1.0e5,2e7"/>
+       <spectrum escale="MeV"> <SpectrumClass name="PulsarSpectrum" params="PSRVELA, 1, 1.0e5, 2.0e7, 2, 1e6, 8e6, -1.62, 1.7"/>
          <galactic_dir l="263.55" b="-2.79"/> 
        </spectrum> 
     </source>
 
     <source name=" PSRGemingaPolarPhen " >
-       <spectrum escale="MeV"> <SpectrumClass name="PulsarSpectrum" params="1,3.66e-6,0.237,11.4e-15,2,1e6,5e6,-1.42,2.2,1.0e5,1e8"/>
+       <spectrum escale="MeV"> <SpectrumClass name="PulsarSpectrum" params="PSRGEMINGA, 1, 1.0e5, 2.0e7, 2, 1e6, 5e6, -1.42, 2.2"/>
          <galactic_dir l="195.13" b="4.27"/>
        </spectrum> 
     </source>
   
     <source name=" PSR1706-44PolarPhen " >
-       <spectrum escale="MeV"> <SpectrumClass name="PulsarSpectrum" params="1,1.23e-6,0.102,92.2e-15,1,1e6,40e6,-2.1,2.0,1.0e5,1e8"/>
+       <spectrum escale="MeV"> <SpectrumClass name="PulsarSpectrum" params="PSR1706-44, 1, 1.0e5, 2.0e7, 2, 1e6, 40e6, -2.1, 2.0"/>
          <galactic_dir l="343.10" b="-2.69"/>
       </spectrum> 
     </source>
 
     <source name=" PSR1055-52PolarPhen " >
-       <spectrum escale="MeV"> <SpectrumClass name="PulsarSpectrum" params="1,0.22e-6,0.197,5.8e-15,1,1e6,20e6,-1.8,2.0,1.0e5,1e8"/>
+       <spectrum escale="MeV"> <SpectrumClass name="PulsarSpectrum" params="PSR1055-52, 1, 1.0e5, 2.0e7, 2, 1e6, 20e6, -1.8, 2.0"/>
          <galactic_dir l="285.98" b="6.65"/>
        </spectrum> 
     </source>
 
 <!-- Outer Gap Model, same spectral index, but now cutoff parameter is 1 according to Cheng, ApJ431, 724 (1994) -->
 
-    <source name=" PSRCrabOuterPhen " >
-       <spectrum escale="MeV"> <SpectrumClass name="PulsarSpectrum" params=" 1,2.3e-6,0.033,422e-15,2,1e6,30e6,-2.08,1.0,1.0e5,1e8"/>
+   <source name=" PSRCrabOuterPhen " >
+       <spectrum escale="MeV"> <SpectrumClass name="PulsarSpectrum" params="PSRCRAB, 1, 1.0e5, 2.0e7, 2, 1e6, 30e6, -2.08, 1.0"/>
          <galactic_dir l="184.56" b="-5.78"/>
        </spectrum> 
     </source>
 
     <source name=" PSRVelaOuterPhen " >
-       <spectrum escale="MeV"> <SpectrumClass name="PulsarSpectrum" params=" 1,9e-6,0.089,124e-15,2,1e6,8e6,-1.7,1.0,1.0e5,1e8"/>
-         <galactic_dir l="263.55" b="-2.79"/>
+       <spectrum escale="MeV"> <SpectrumClass name="PulsarSpectrum" params="PSRVELA, 1, 1.0e5, 2.0e7, 2, 1e6, 8e6, -1.62, 1.0"/>
+         <galactic_dir l="263.55" b="-2.79"/> 
        </spectrum> 
     </source>
 
     <source name=" PSRGemingaOuterPhen " >
-       <spectrum escale="MeV"> <SpectrumClass name="PulsarSpectrum" params="1,3.66e-6,0.237,11.4e-15,2,1e6,5e6,-1.42,1.0,1.0e5,1e8"/>
+       <spectrum escale="MeV"> <SpectrumClass name="PulsarSpectrum" params="PSRGEMINGA, 1, 1.0e5, 2.0e7, 2, 1e6, 5e6, -1.42, 1.0"/>
          <galactic_dir l="195.13" b="4.27"/>
        </spectrum> 
     </source>
-
+  
     <source name=" PSR1706-44OuterPhen " >
-       <spectrum escale="MeV"> <SpectrumClass name="PulsarSpectrum" params="1,1.23e-6,0.102,92.2e-15,1,1e6,40e6,-2.1,1.0,1.0e5,1e8"/>
+       <spectrum escale="MeV"> <SpectrumClass name="PulsarSpectrum" params="PSR1706-44, 1, 1.0e5, 2.0e7, 2, 1e6, 40e6, -2.1, 1.0"/>
          <galactic_dir l="343.10" b="-2.69"/>
-       </spectrum> 
+      </spectrum> 
     </source>
 
     <source name=" PSR1055-52OuterPhen " >
-       <spectrum escale="MeV"> <SpectrumClass name="PulsarSpectrum" params="1,0.22e-6,0.197,5.8e-15,1,1e6,20e6,-1.8,1.0,1.0e5,1e8"/>
+       <spectrum escale="MeV"> <SpectrumClass name="PulsarSpectrum" params="PSR1055-52, 1, 1.0e5, 2.0e7, 2, 1e6, 20e6, -1.8, 1.0"/>
          <galactic_dir l="285.98" b="6.65"/>
        </spectrum> 
     </source>

@@ -59,8 +59,8 @@ class PulsarSpectrum : public ISpectrum
     \param index if the position of the parameter in the input list. 
     \retval output is the value of the parameter as float number.
   */  
-  double parseParamList(std::string input, int index);  
-    
+  std::string parseParamList(std::string input, int index);  
+      
  private:
   
   PulsarSim *m_Pulsar;
@@ -72,9 +72,13 @@ class PulsarSpectrum : public ISpectrum
 
   const std::string& m_params; 
 
-  double m_period, m_pdot, m_flux;
-  double m_enphmin, m_enphmax;
+  
+  std::string m_PSRname;
+  double m_RA, m_dec, m_l, m_b;  
+  double m_period, m_pdot, m_t0, m_phi0, m_f0, m_f1;
   int m_numpeaks;
-  double m_t0,m_phi0, m_f0, m_f1;
+  int m_model;
+  double m_flux, m_enphmin, m_enphmax;
+  
 };
 #endif

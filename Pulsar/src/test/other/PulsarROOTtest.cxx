@@ -396,7 +396,7 @@ int main(int argc, char** argv)
 
 
 
-  PulsarSim* m_pulsar = new PulsarSim(flux,enphmin, enphmax, Period, npeaks);
+  PulsarSim* m_pulsar = new PulsarSim("PSRTest",flux,enphmin, enphmax, Period, npeaks);
   m_pulsar->SaveNv((TH2D*)m_pulsar->PSRPhenom(ppar1,ppar2,ppar3,ppar4));
   char name[100];
   sprintf(name,"pulsar.root");
