@@ -30,7 +30,7 @@ namespace cst
   const    int Ebin =  50 ; 
 
   //! Number of time bins used in the TH2D histogram
-  const    int Tbin =  200; 
+  const int Tbin =  200; 
 
   //! Conversion erg-->MeV
   const double erg2meV   = 624151.0;

@@ -78,7 +78,10 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
 
   //Read from PulsarDataList.txt
   sprintf(sourceFileName,"%s/data/PulsarDataList.txt",pulsar_root);  
-  std::cout << "\nOpening Pulsar Datalist File : " << sourceFileName << std::endl;
+  if (DEBUG)
+    {
+      std::cout << "\nOpening Pulsar Datalist File : " << sourceFileName << std::endl;
+    }
   PulsarDataTXT.open(sourceFileName, std::ios::in);
   
   if (! PulsarDataTXT.is_open()) 
@@ -102,7 +105,10 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
   
   if (std::string(tempName) == m_PSRname)
     {
-      std::cout << "Pulsar " << m_PSRname << " found in Datalist file! " << std::endl;
+      if (DEBUG)
+	{
+	  std::cout << "Pulsar " << m_PSRname << " found in Datalist file! " << std::endl;
+	}    
     }
   else
     {
@@ -113,11 +119,11 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
   m_f0 = 1.0/m_period;
   m_f1 = -m_pdot/(m_period*m_period);
   m_f2 = 2*pow((m_pdot/m_period),2.0)/m_period - m_p2dot/(m_period*m_period);
-  std::cout << " \n********   PulsarSpectrum initialized for Pulsar " << m_PSRname << std::endl;
+  std::cout << " ********   PulsarSpectrum initialized for Pulsar " << m_PSRname << std::endl;
   if (DEBUG)
     {
       //Writes out Pulsar Info
-      std::cout << " \n********   PulsarSpectrum initialized !   ********" << std::endl;
+      std::cout << " \********   PulsarSpectrum initialized !   ********" << std::endl;
       std::cout << "**   Name : " << m_PSRname << std::endl;
       std::cout << "**   Position : (RA,Dec)=(" << m_RA << "," << m_dec 
 		<< ") ; (l,b)=(" << m_l << "," << m_b << ")" << std::endl; 
@@ -150,7 +156,7 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
   PulsarLog.open(logLabel);
 
   PulsarLog << "\n********   PulsarSpectrum Log for pulsar" << m_PSRname << std::endl;
-  PulsarLog << "\n**   Name : " << m_PSRname << std::endl;
+  PulsarLog << "**   Name : " << m_PSRname << std::endl;
   PulsarLog << "**   Position : (RA,Dec)=(" << m_RA << "," << m_dec 
 	    << ") ; (l,b)=(" << m_l << "," << m_b << ")" << std::endl; 
   PulsarLog << "**   Flux above 100 MeV : " << m_flux << " ph/cm2/s " << std::endl;
@@ -205,7 +211,7 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
   BaryOutFile.open("BaryDeCorr.txt",std::ios::app);
 
   //  BaryOutFile << "TestFile for barycentric decorrections " << std::endl;
-  std::cout  << "TestFile for barycentric decorrections " << std::endl;
+  //  std::cout  << "TestFile for barycentric decorrections " << std::endl;
   //..to be removed...
 
 }

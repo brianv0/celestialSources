@@ -51,6 +51,7 @@ class PulsarSim
   //! Gathers all relevant constants for the simulation 
   double m_period;
   double m_flux;
+  int m_Tbin;
   int m_numpeaks;
   double m_enphmin, m_enphmax;
   int m_seed;

@@ -5,6 +5,7 @@
 
 #include <fstream>
 #include <iostream>
+#include <vector>
 #include <iomanip>
 #include <ctime>
 #include "Pulsar/PulsarConstants.h"
@@ -12,7 +13,7 @@
 #include "TFile.h"
 #include "TF1.h"
 
-#define DEBUG 0
+#define DEBUG 1
 
 using namespace cst;
 
@@ -26,8 +27,12 @@ using namespace cst;
  * \param period Period of the pulsar;
  * \param numpeaks Number of peaks : 1 - Only one peak;
  *                                   2 - Two peaks;
- *                                   3 - One delta shaped peak (for test purposes);
- *                                   4 - Two delta shaped peaks (for test purposes);
+ *                                   3 - LightCurve from an user-defined Time Profile txt file (1)
+ *
+ *
+ *(1) - <b>Note</b>: If you want to use the option 3 to obtain the lightcurve from a template, you should 
+ *      have the txt file in the <i>data</i> directory.For Example if you have in the PulsarDataList a pulsar
+ *      named PSRTEST you must have a correspondant file PSRTESTTimeProfile.txt in the <i>data</I. directory.
  * 
  */
 PulsarSim::PulsarSim(std::string name, int seed, double flux, double enphmin, double enphmax, double period, int numpeaks)
@@ -40,6 +45,7 @@ PulsarSim::PulsarSim(std::string name, int seed, double flux, double enphmin, do
   m_enphmax = enphmax;
   m_name = name;
   m_seed = seed;
+  m_Tbin = Tbin;
 }
 
 //////////////////////////////////////////////////
@@ -51,7 +57,8 @@ PulsarSim::PulsarSim(std::string name, int seed, double flux, double enphmin, do
  *
  * This method creates a ROOT TH2D histogram according to a phenomenological model. The 2d hist is 
  * obtained by multiplying the lightcurve and the spectrum. The lightcurve is obtained by random generating 
- * a profile of 1 or 2 peaks separated by a minimum distance, that currently is set to one half of the period. 
+ * a profile of 1 or 2 peaks separated by a minimum distance, that currently is set to one half of the period.
+ * Or you can have the lightcurve starting from a TXT file that contain the time profile. 
  * The spectrum is generated from an analytical form :
  *
  * \image html NJSnForm.gif 
@@ -145,7 +152,7 @@ TH2D* PulsarSim::PSRPhenom(double par1, double par2, double par3, double par4)
   PulsarLogSim << "**  Spectrum calculated between " << LowEnBound << " keV and " 
 	        << HighEnBound << " keV " << std::endl; 
 
-   PulsarLogSim.close();
+  //  PulsarLogSim.close();
 
   
 
@@ -157,107 +164,186 @@ TH2D* PulsarSim::PSRPhenom(double par1, double par2, double par3, double par4)
   PulsarSpectralShape.SetParameters(K1,En,G1,E0,b);
 
 
-
-  // Part 2- LightCurve
-
-  double fwhm1,fwhm2,peak1,peak2,ampl1,ampl2,mindist;
-  mindist = 0.5*m_period; //minimum distance in seconds (minPhase * m_period)
-  
-  //Set the Random engine.
-  TRandom engine;
-  engine.SetSeed(m_seed);
-  
-  // LightCurve generation:
-  ampl1 = engine.Uniform();
-  while (ampl1 < 0.1)  ampl1 = engine.Uniform();
-  
-  ampl2 = engine.Uniform();
-  while (ampl2 < 0.1)  ampl2 = engine.Uniform();
-
-  peak1 = engine.Uniform()*m_period; 
-  fwhm1 = engine.Uniform()*m_period;
-
-  while ((peak1 > 0.5*m_period)
-	 || (peak1 < (fwhm1*2)))
-    {
-      peak1 = engine.Uniform()*m_period; 
-      fwhm1 = engine.Uniform()*m_period;
-    }    
-  
-  peak2 = engine.Uniform()*m_period; 
-  fwhm2 = engine.Uniform()*m_period;
-
-  while ((peak2 > (m_period-2*fwhm2))
-	 || (peak2 <(peak1+mindist)))
-    {
-      peak2 = engine.Uniform()*m_period; 
-      fwhm2 = engine.Uniform()*m_period;
-    }
-
-  if (fwhm1 < (0.01*m_period))
-    fwhm1 = 0.01*m_period;
-
-  if (fwhm2 < (0.01*m_period))
-    fwhm2 = 0.01*m_period;
-  
-    
-  //Remove first or second peak.
-  if ((m_numpeaks == 1) || (m_numpeaks == 3))
-    {
-      if (engine.Uniform() < 0.5) 
-	{
-	  ampl1 = 0;
-	}
-      else 
-	{
-	  ampl2 = 0;
-	}
-    }
-
-  //Case of delta Function (numPeaks =3 or =4)
-  TH1D deltaFunction("deltaFunction","DeltaFuction",Tbin,0,m_period);
-
-  double dt = m_period/(Tbin-1);
-
-  if ((m_numpeaks == 3 ) || (m_numpeaks == 4 ))
-    {
-      deltaFunction.SetBinContent(int(peak1/dt),ampl1);
-      deltaFunction.SetBinContent(int(peak2/dt),ampl2);
-    } 
-
-  //writes out informations about hte lightcurves.
-  if (DEBUG)
-    {
-
-      std::cout << std::setprecision(3) << "**\n**  Lightcurve parameters: (midist = " 
-		<< mindist  << " s.)" << std::endl;
-    }
-
-  if (ampl1 !=0)
-    {
-      if (DEBUG)
-	{
-	  std::cout << std::setprecision(3) << "**           Peak 1 t = " << peak1 << "(Ph.= " << peak1/m_period << " ) " 
-		    << " , FWHM " << fwhm1 << " ampl1 " << ampl1 << std::endl; 
-	}
-
-    }
-  if (ampl2 !=0)
-    {
-      if (DEBUG)
-	{
-	  std::cout << std::setprecision(3) << "**           Peak 2 t = " << peak2 << "(Ph.= " << peak2/m_period << " ) " 
-		    << " , FWHM " << fwhm2 << " ampl2 " << ampl2 << std::endl; 
-	  std::cout << "***********************************************" << std::endl;
-	}    
-    }
-  
-
   TF1 PulsarTimeCurve("PulsarTimeCurve",
 		      "([2]*(1/(((x-[0])^2)+(([1]/2)^2))) + [5]*(1/(((x-[3])^2)+(([4]/2)^2))))",
 		      0, m_period);
-  PulsarTimeCurve.SetParameters(peak1,fwhm1,ampl1,peak2,fwhm2,ampl2);  
+
+  TH1D TimeProfileLightCurve;//("TimeProfileLightCurve","TimeProfileLightCurve",m_Tbin,0,m_period);
+
+  //  int m_Tbins = m_Tbin;
+  //  double dt = m_period/(m_Tbin-1);
+
+
+  // Part 2- LightCurve
+
+  double dt = 0.0;
+
+
+  if ((m_numpeaks ==1) || (m_numpeaks == 2)) //case of random lorentz peak generation
+    {
+      dt = m_period/(m_Tbin-1);
+
+      double fwhm1,fwhm2,peak1,peak2,ampl1,ampl2,mindist;
+      mindist = 0.5*m_period; //minimum distance in seconds (minPhase * m_period)
+      
+      //Set the Random engine.
+      TRandom engine;
+      engine.SetSeed(m_seed);
+      
+      // LightCurve generation:
+      ampl1 = engine.Uniform();
+      while (ampl1 < 0.1)  ampl1 = engine.Uniform();
+      
+      ampl2 = engine.Uniform();
+      while (ampl2 < 0.1)  ampl2 = engine.Uniform();
+      
+      peak1 = engine.Uniform()*m_period; 
+      fwhm1 = engine.Uniform()*m_period;
+      
+      while ((peak1 > 0.5*m_period)
+	     || (peak1 < (fwhm1*2)))
+	{
+	  peak1 = engine.Uniform()*m_period; 
+	  fwhm1 = engine.Uniform()*m_period;
+	}    
+      
+      peak2 = engine.Uniform()*m_period; 
+      fwhm2 = engine.Uniform()*m_period;
+      
+      while ((peak2 > (m_period-2*fwhm2))
+	     || (peak2 <(peak1+mindist)))
+	{
+	  peak2 = engine.Uniform()*m_period; 
+	  fwhm2 = engine.Uniform()*m_period;
+	}
+
+      if (fwhm1 < (0.01*m_period))
+	fwhm1 = 0.01*m_period;
+      
+      if (fwhm2 < (0.01*m_period))
+	fwhm2 = 0.01*m_period;
+      
+      
+      //Remove first or second peak.
+      if (m_numpeaks == 1)
+	{
+	  if (engine.Uniform() < 0.5) 
+	    {
+	      ampl1 = 0;
+	    }
+	  else 
+	    {
+	      ampl2 = 0;
+	    }
+	}
+      
+      //writes out informations about hte lightcurves.
+      if (DEBUG)
+	{
+	  
+	  std::cout << std::setprecision(3) << "**\n**  Lightcurve parameters: (midist = " 
+		    << mindist  << " s.)" << std::endl;
+	}
+      
+      PulsarLogSim << std::setprecision(3) << "**\n**  Lightcurve parameters: (midist = " 
+		   << mindist  << " s.)" << std::endl;
+      
+      if (ampl1 !=0)
+	{
+	  if (DEBUG)
+	    {
+	      std::cout << std::setprecision(3) << "**           Peak 1 t = " 
+			<< peak1 << "(Ph.= " << peak1/m_period << " ) " 
+			<< " , FWHM " << fwhm1 << " ampl1 " << ampl1 << std::endl; 
+	    }
+	  
+	  PulsarLogSim << std::setprecision(3) << "**           Peak 1 t = " << peak1 
+		       << "(Ph.= " << peak1/m_period << " ) " 
+		       << " , FWHM " << fwhm1 << " ampl1 " << ampl1 << std::endl; 
+	}
+      if (ampl2 !=0)
+	{
+	  if (DEBUG)
+	    {
+	      std::cout << std::setprecision(3) << "**           Peak 2 t = " 
+			<< peak2 << "(Ph.= " << peak2/m_period << " ) " 
+			<< " , FWHM " << fwhm2 << " ampl2 " << ampl2 << std::endl; 
+	      std::cout << "***********************************************" << std::endl;
+	    }
+	  
+	  
+	  PulsarLogSim << std::setprecision(3) << "**           Peak 2 t = " << peak2 
+		       << "(Ph.= " << peak2/m_period << " ) " 
+		       << " , FWHM " << fwhm2 << " ampl2 " << ampl2 << std::endl; 
+	  PulsarLogSim << "***********************************************" << std::endl;
+	}
+      
+      
+      //    TF1 PulsarTimeCurve("PulsarTimeCurve",
+      //		  "([2]*(1/(((x-[0])^2)+(([1]/2)^2))) + [5]*(1/(((x-[3])^2)+(([4]/2)^2))))",
+      //		  0, m_period);
+      PulsarTimeCurve.SetParameters(peak1,fwhm1,ampl1,peak2,fwhm2,ampl2);  
   
+    }
+  else if (m_numpeaks == 3)
+    {
+
+      //Look for NAMETimeProfile.txt in the data directory...
+    
+
+      char* pulsar_root = ::getenv("PULSARROOT");
+      char TimeProfileFileName[100];
+      sprintf(logSimLabel,"");
+      for (int i=0; i< m_name.length()+1; i++)
+	{
+	  logSimLabel[i] = m_name[i];
+	}
+
+      sprintf(TimeProfileFileName,"%s/data/%sTimeProfile.txt",pulsar_root,logSimLabel);
+      
+      if (DEBUG)
+	{
+	  std::cout << "Building lightcurve from file " << TimeProfileFileName << std::endl;
+	}
+
+
+
+      ifstream TimeProfileFile;
+      TimeProfileFile.open(TimeProfileFileName, std::ios::in);
+  
+      if (! TimeProfileFile.is_open()) 
+	{
+	  std::cout << "Error opening TimeProfile file " << TimeProfileFileName << " for Pulsar " << m_name
+		    << " (check whether $PULSARROOT is set" << std::endl; 
+	  exit (1);
+	}
+
+      std::vector <double> timeCounts;
+      double tempCount = 0.0;
+      int i = 0;
+      while (TimeProfileFile.eof() != 1)
+	{
+	  TimeProfileFile >> i >> tempCount;
+	  timeCounts.push_back(tempCount);
+	}
+
+      TH1D TempProfile("TempProfile","TempProfile",timeCounts.size(),0,m_period);
+ 
+      for (int i =0; i < timeCounts.size()-1; i++)
+	{
+	  TempProfile.SetBinContent(i+1,timeCounts[i]);
+	  std::cout << " bin " << i+1 << TempProfile.GetBinContent(i+1) <<std::endl;
+
+	}
+      TimeProfileLightCurve = TempProfile;
+      TFile mod("prova.root","RECREATE");
+      TimeProfileLightCurve.Write();
+      mod.Close();
+      m_Tbin = TimeProfileLightCurve.GetNbinsX();
+      std::cout << " bin " << m_Tbin << std::endl;
+      dt = m_period/(m_Tbin-1);
+    }
+
   // test curve in case of stationary curve for flux calibration
   // TF1 PulsarTimeCurve("PulsarTimeCurve","15.0"); //In order to have a stationary source
     
@@ -271,18 +357,27 @@ TH2D* PulsarSim::PSRPhenom(double par1, double par2, double par3, double par4)
     }
 
   gDirectory->Delete("Nv");
-  m_Nv = new TH2D("Nv","Nv",Tbin,0.,m_period,Ebin, e);
+
+ 
+
+  m_Nv = new TH2D("Nv","Nv",m_Tbin,0.,m_period,Ebin, e);
 
   //Filling the TH2D Histogram
   double t = 0.0;
-  for(int ti = 0; ti<Tbin; ti++)
+  for(int ti = 0; ti<m_Tbin; ti++)
     {
       t = ti*dt;
-      double nt = PulsarTimeCurve.Eval(t);
-      if ((m_numpeaks == 3 ) || (m_numpeaks == 4 ))
+      double nt = 0.0;
+      if ((m_numpeaks == 1) || (m_numpeaks == 2))
 	{
-	  nt = deltaFunction.GetBinContent(ti);
+	  nt = PulsarTimeCurve.Eval(t);
 	}
+      else if (m_numpeaks == 3 )
+	{
+	  //	  std::cout << " ciao " << std::endl;
+	  nt = TimeProfileLightCurve.GetBinContent(ti);
+	}
+
       for(int ei = 0; ei < Ebin; ei++)
 	{
 	  double nv = PulsarSpectralShape.Eval(e[ei]);
@@ -305,7 +400,7 @@ TH2D* PulsarSim::PSRPhenom(double par1, double par2, double par3, double par4)
  
   //Normalisation factor according to band between EGRET1 and EGRET2 energies
   //Integration is on a averaged flux over period
-  double norm = m_Nv->Integral(0,Tbin,ei2,ei3,"width")/m_period; // ph/m2/s
+  double norm = m_Nv->Integral(0,m_Tbin,ei2,ei3,"width")/m_period; // ph/m2/s
 
   m_Nv->Scale(m_flux/norm);
 
@@ -330,7 +425,7 @@ TH2D *PulsarSim::Nph(const TH2D *Nv)
   for (int ei = 0; ei<Ebin; ei++)
     {
       dei   = Nv->GetYaxis()->GetBinWidth(ei+1);
-      for(int ti = 0; ti<Tbin; ti++)
+      for(int ti = 0; ti<m_Tbin; ti++)
 	{
 	  Nph->SetBinContent(ti+1, ei+1, 
 			     Nph->GetBinContent(ti+1, ei+1)*dei*deltat); //[1]
@@ -403,7 +498,7 @@ void PulsarSim::SaveTimeProfile(TH2D *Nv)
   int ei2 = Nv->GetYaxis()->FindBin(m_enphmin);
   int ei3 = Nv->GetYaxis()->FindBin(m_enphmax);
 
-  for (int t=0; t < Tbin; t++)
+  for (int t=0; t < m_Tbin; t++)
     {
       OutTimeProf << t+1 << "\t" <<  Nv->Integral(t+1,t+1,ei2,ei3)*1e4 << "\n";
     }
