@@ -41,8 +41,8 @@ double Band(double *var, double *par)
   double C   = pow((a-b)*E0,a-b)*exp(b-a);
   double H   = (a-b) * E0;
   if(E <= H) 
-    return E * NT * pow(E,a) * exp(-E/E0);
-  return E * C* NT * pow(E,b); // ph cm^(-2) s^(-1) keV^(-1)
+    return  NT * pow(E,a) * exp(-E/E0);
+  return  C* NT * pow(E,b); // ph cm^(-2) s^(-1) keV^(-1)
 }
 
 TH2D *Load(char name[100]="grb_65540.root")
@@ -266,15 +266,15 @@ void PlotGRB(double enph = 0,char name[100]="grb_65540.root")
   band.SetParLimits(2,1.0,3.0);
   band.SetParLimits(3,0.0,10.0);
 
-  band.SetParameter(0,-0.86);
-  //  band.FixParameter(1,-2.125);
+  band.SetParameter(0,-1.0);
+  band.SetParameter(1,-2.0);
   band.SetParameter(2,2.5);
   band.SetParameter(3,3.0);
   //band.Draw("lsame");
   pl.SetParameters(4.0,-2.5);
   pl.SetParLimits(0,-8,8);
     
-  Fv->Fit("grb_f","QR+","lsame");
+  Ne->Fit("grb_f","QR+","lsame");
 
   double a=band.GetParameter(0);
   double b=band.GetParameter(1);
@@ -477,7 +477,7 @@ void MakeGRB(int NGRB=1, double enph=0, bool gbm=false)
   GRBobsSim* m_grb = new GRBobsSim(params);
   m_grb->MakeGRB();
   m_grb->SaveNv();
-  if (gbm)  m_grb->GetGBMFlux();
+  if (gbm)  m_grb->GetGBMFlux(1);
 
   char name[100];
   sprintf(name,"grbobs_%d.root",params->GetGRBNumber());

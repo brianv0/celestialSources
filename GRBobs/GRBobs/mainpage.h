@@ -28,7 +28,8 @@ where the params are:
 - Starting time of the burst
 - Fluence in \f$ erg/cm^{2}\f$. If it is 0 then it has sampled from the BATSE fluence distribution.
 - The number of pulses of the bursts.
-- The time scale (in seconds) for the exponential distribution of the intervals between pulses (see GRBobsParameters::GenerateParameters()).
+- The time scale (in seconds) for the width of exponential distribution of the pulse FWHM (see GRBobsParameters::GenerateParameters()).
+  Generally this parameter should be fixed to ~0.1, (100 ms) but more regular burst (with a lower value of sigma) can be simulated as well as bursts with high range of puls whidths. 
 - The minimim energy for extractint photons (in MeV).
 
 <br>

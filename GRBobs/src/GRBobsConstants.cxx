@@ -82,20 +82,23 @@ void GRBobsParameters::SetGalDir(double l, double b)
 
 void GRBobsParameters::GenerateParameters()
 {
-  m_Peakedness      = pow(10.0,rnd->Gaus(0.0,.3));
-  m_FWHM            = pow(10.0,rnd->Gaus(-0.4,.5));//rnd->Uniform(2,4);
+  m_Peakedness      = pow(10.0,rnd->Gaus(0.15,.3));
+  m_FWHM            = pow(10.0,rnd->Gaus(0.25,m_Tau)); //FWHM @ 20keV 
   m_decayTime       = 0.75*pow(0.69,1./m_Peakedness)*m_FWHM;
   m_riseTime        = 0.33*pow(m_decayTime,0.83);
   m_pulseHeight     = rnd->Uniform();
-  m_pulseSeparation = rnd->Exp(m_Tau);//rnd->PeakSeparationDist->GetRandom();
-
+  m_pulseSeparation = pow(10.0,rnd->Gaus(0.12,0.4));//rnd->Exp(m_Tau);//rnd->PeakSeparationDist->GetRandom();
   m_Epeak           = pow(10.,rnd->Gaus(2.5,0.1));
-  m_LowEnergy       = rnd->Gaus(-1.0,0.4);
-  while(m_LowEnergy<-2.0)
+  /*
     m_LowEnergy       = rnd->Gaus(-1.0,0.4);
-  m_HighEnergy      = m_LowEnergy;
-  while(m_HighEnergy >= m_LowEnergy)
+    while(m_LowEnergy<-2.0)
+    m_LowEnergy       = rnd->Gaus(-1.0,0.4);
+    m_HighEnergy      = m_LowEnergy;
+    while(m_HighEnergy >= m_LowEnergy)
     m_HighEnergy    = rnd->Gaus(-2.25,0.4);
+  */
+  m_LowEnergy       = -.6;
+  m_HighEnergy      = -1.85;
 }
 
 void GRBobsParameters::PrintParameters()
@@ -135,22 +138,22 @@ void GRBobsParameters::ReadParametersFromFile(std::string paramFile, int NGRB)
       i++;
     } 
   i--;
+  f1.close();
 
   if(i<NGRB)
     {
-      f1.close();
-      f1.open(paramFile.c_str());
-      f1.getline(buf,100);
-
+      std::ifstream f2(paramFile.c_str());
+      f2.getline(buf,100);
+      
       for(int j = 1; j<=(NGRB %i);j++)
 	{
-	  f1.getline(buf,100);
+	  f2.getline(buf,100);
 	  sscanf(buf,"%d %lf %lf %lf %d %lf",
 		 &seed,&l0,&b0,&fluence,&NumberOfPulses,&Tau);
 	}
       seed=NGRB;
+      f2.close();
     }
-  f1.close();
   SetGRBNumber(65540+ (long) seed);  
   SetGalDir(l0,b0);
   SetNumberOfPulses(NumberOfPulses);

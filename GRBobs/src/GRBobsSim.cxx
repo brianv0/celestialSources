@@ -159,8 +159,9 @@ double BandObsF(double *var, double *par)
   return C* NT *E* E* pow(E,b); // ph cm^(-2) s^(-1) keV
 }
 
-void GRBobsSim::GetGBMFlux()
+void GRBobsSim::GetGBMFlux(int view)
 {
+  std::ofstream fout("GBMSpectralParameters.dat");
   double *e = new double[Ebin +1];
   for(int i = 0; i<=Ebin; i++)
     {
@@ -170,9 +171,9 @@ void GRBobsSim::GetGBMFlux()
   // GBM Spectrum:
   TF1 band("grb_f",BandObsF,emin,1.0e+4,4); 
   band.SetParNames("a","b","Log10(E0)","Log10(Const)");
-  band.SetParameters(-1.4,-2.4,2.5,-3.0);
-  band.SetParLimits(0,-9.0,0.0);
-  band.SetParLimits(1,-10.0,0.0);
+  band.SetParameters(-2,-4,1,0.0);
+  band.SetParLimits(0,-9.0,1.0);
+  band.SetParLimits(1,-10.0,-1.0);
   band.SetParLimits(2,log10(emin),4.0);
   band.SetParLimits(3,-5.0,5.0);
   double a,b,E0,Const;
@@ -182,6 +183,7 @@ void GRBobsSim::GetGBMFlux()
   double t=0;
   double dt = m_Nv->GetXaxis()->GetBinWidth(1);
   double tbin = m_Nv->GetXaxis()->GetNbins();
+  fout<<"t  a  b   E0  Const"<<std::endl;
   for(int ti = 0; ti<tbin; ti++)
     {
       t = ti*dt;
@@ -199,14 +201,19 @@ void GRBobsSim::GetGBMFlux()
       band.SetParameters(a,b,band.GetParameter(2),band.GetParameter(3));
       //Ep=(a+2)*E0;
       std::cout<<t<<" "<<a<<" "<<b<<" "<<E0<<" "<<Const<<std::endl;
-      band.Draw("same");
-      gPad->SetLogx();
-      gPad->SetLogy();
-      gPad->Update();
-      TString gbmFlux= "GBMFlux";
-      gbmFlux+=ti;
-      gbmFlux+=".gif";
-      if(ti%10==0) gPad->Print(gbmFlux);
+      fout<<t<<" "<<a<<" "<<b<<" "<<E0<<" "<<Const<<std::endl;
+      if(view) 
+	{
+	  TString gbmFlux= "GBMFlux";
+	  gbmFlux+=ti;
+	  gbmFlux+=".gif";
+	  band.Draw("same");
+	  gPad->SetLogx();
+	  gPad->SetLogy();
+	  gPad->Update();
+	  //	  if(ti%10==0) gPad->Print(gbmFlux);
+  	}
+          
     }
   //////////////////////////////////////////////////
   delete[] e;

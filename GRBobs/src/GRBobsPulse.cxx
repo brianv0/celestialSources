@@ -41,8 +41,8 @@ void GRBobsPulse::Print()
 double GRBobsPulse::PulseShape(double t, double e)
 {
   //  double tp = m_ts + m_tp;
-  double rt = m_riseTime  * pow(e,-0.4);
-  double dt = m_decayTime * pow(e,-0.4);
+  double rt = m_riseTime  * pow(e/20.0,-0.4);
+  double dt = m_decayTime * pow(e/20.0,-0.4);
   double pulse=0;
   if (t<m_peakTime)
     {
@@ -59,9 +59,6 @@ double GRBobsPulse::PulseShape(double t, double e)
   
   double Eb = m_Epeak;
   double Ep = (2.+a)/(a-b)*Eb;
-  
-  //double Ep = m_Epeak;
-  //  double Eb = (a-b)/(2. + a)*Ep;
   double C  = pow(Eb,a-b)*exp(b-a);
   
   double bandf;

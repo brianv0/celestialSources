@@ -20,14 +20,14 @@ GRBobsmanager::GRBobsmanager(const std::string& params)
   m_fluence         = parseParamList(params,1);
   m_Npulses         = (int) parseParamList(params,2);
   m_ExponentialTau  = parseParamList(params,3);
-  m_MinPhotonEnergy = parseParamList(params,4); //MeV
+  m_MinPhotonEnergy = parseParamList(params,4)*1.0e3; //MeV
   
   m_par = new GRBobsParameters();
 
   m_par->SetGRBNumber(65540+m_Npulses);  
   m_par->SetNumberOfPulses(m_Npulses);
   m_par->SetTau(m_ExponentialTau);
-  m_par->SetMinPhotonEnergy(m_MinPhotonEnergy*1.0e3);
+  m_par->SetMinPhotonEnergy(m_MinPhotonEnergy); //keV
   m_par->SetFluence(m_fluence);
   
   //////////////////////////////////////////////////
@@ -74,7 +74,9 @@ double GRBobsmanager::interval(double time)
 
 double GRBobsmanager::energy(double time)
 {
-  return m_spectrum->energy(time-m_startTime,m_MinPhotonEnergy)*1.0e-3; //MeV
+  double ene = m_spectrum->energy(time-m_startTime,m_MinPhotonEnergy)*1.0e-3; //MeV
+  //  std::cout<<time<<" "<<ene<<std::endl;
+  return ene;
 }
 
 double GRBobsmanager::parseParamList(std::string input, int index)

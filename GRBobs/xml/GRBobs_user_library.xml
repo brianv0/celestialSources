@@ -3,21 +3,21 @@
 <source_library title="GRBobs_user_library">
     <source name=" GRB1 ">
         <spectrum escale="MeV"> 
-        <SpectrumClass name="GRBobsmanager" params="10,0.0e-5,10,0.1,100"/>
-        <celestial_dir ra="83." dec="22."/>
+        <SpectrumClass name="GRBobsmanager" params="10,1.0e-5,1,1,100"/>
+          <direction theta="0" phi="0" />
     </spectrum> </source>
 
 
     <source name=" GRB2 ">
         <spectrum escale="MeV"> 
-        <SpectrumClass name="GRBobsmanager" params="20,0.0e-5,20,0.1,100"/>
+        <SpectrumClass name="GRBobsmanager" params="100,0.0e-5,20,0.1,100"/>
         <celestial_dir ra="10." dec="22."/>
     </spectrum> </source>
 
 
     <source name=" GRB3 ">
         <spectrum escale="MeV"> 
-        <SpectrumClass name="GRBobsmanager" params="30,0.0e-5,5,0.1,100"/>
+        <SpectrumClass name="GRBobsmanager" params="300,0.0e-5,5,0.1,100"/>
         <celestial_dir ra="10." dec="-10."/>
     </spectrum> </source>
 
