@@ -1,4 +1,5 @@
-/*!\class  GRBmanager
+/*!
+  \class  GRBmanager
   
   \brief Spectrum class for many GRBs 
   This class concatenates several GRB one after the other 
@@ -81,8 +82,8 @@ class GRBmanager : public ISpectrum
   double parseParamList(std::string input, int index);  
   
  private:
-
-  GRBSim*            m_GRB;
+  
+  GRBSim   *m_GRB;
   SpectObj *m_spectrum;
   const std::string& m_params;
   std::string paramFile;

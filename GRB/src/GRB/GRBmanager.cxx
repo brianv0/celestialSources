@@ -12,7 +12,7 @@ GRBmanager::GRBmanager(const std::string& params)
   //////////////////////////////////////////////////
   m_par->ReadParametersFromFile(paramFile);
   m_par->PrintParameters();
-  m_GRB = new GRBSim(m_par);
+  m_GRB      = new  GRBSim(m_par);
   m_spectrum = new  SpectObj(m_GRB->Fireball());
   //////////////////////////////////////////////////
   m_startTime = TMath::Max(0.,parseParamList(params,0));
@@ -24,6 +24,7 @@ GRBmanager::GRBmanager(const std::string& params)
 GRBmanager::~GRBmanager() 
 {  
   std::cout<<"**************************************************"<<std::endl;
+  delete m_par;
   delete m_GRB;
   delete m_spectrum;
 
@@ -57,7 +58,7 @@ double GRBmanager::interval(double time)
       //////////////////////////////////////////////////
       m_par->ReadParametersFromFile(paramFile);
       m_par->PrintParameters();
-      m_GRB = new GRBSim(m_par);
+      m_GRB      = new  GRBSim(m_par);
       m_spectrum = new  SpectObj(m_GRB->Fireball());
       //////////////////////////////////////////////////
       m_endTime   = m_startTime + m_GRB->Tmax();

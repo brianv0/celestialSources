@@ -98,6 +98,11 @@ std::vector<GRBShock*> GRBengine::CreateShocksVector()
       //std::cout<<"Nshock = "<<Nshock<<" Nshell "<<N<<std::endl;
     }
   
+  /*
+    for(int i =0; i<(int) theShells.size();i++)
+    delete theShells[i];
+  */
+  
   std::sort(theShocks.begin(), theShocks.end(), ShockCmp());
   double T0 = theShocks[0]->GetTime();
   

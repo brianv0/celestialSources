@@ -23,7 +23,11 @@ class GRBShock
 {
  public:
   GRBShock(GRBShell *SF, GRBShell *SB, double tshock);
-  ~GRBShock(){;}
+  ~GRBShock()
+    {
+      delete MS;
+    }
+  
   GRBShell *MergedShell() {return MS;}
   void SetTime(double time);
   inline void SetSpectralParameters(double alpha, double beta)
@@ -41,6 +45,7 @@ class GRBShock
   double ICSpectrum(double energy);
   double ComputeFlux(double time, double energy);
   void Print();
+
  private:
   GRBShell *MS; 
   double tsh;

@@ -34,7 +34,12 @@ class GRBSim
   //! The simulation can be initialized by setting the seed of the Random engine generator. If seed is 0, a Random GRB is computed.
   GRBSim(Parameters *params);
   //! destructor
-  ~GRBSim(){;}
+  ~GRBSim()
+    {
+      delete m_GRBengine;
+      delete m_Nv;
+    }
+  
   
   
   /*!
@@ -43,19 +48,19 @@ class GRBSim
    * Initialize the simulation
    */
   TH2D* Fireball();
-  
+
   /*! Compute the Flux, as a function of time. It returns a matrix.
    * \param time is the time in which the spectrum is calculated.
    */
   TH2D *GRBSim::Nph(const TH2D *Nv);
-  inline std::pair<float,float> GRBdir(){return m_GRB->GetDirection();}
+  inline std::pair<double,double> GRBdir(){return m_GRBengine->GetDirection();}
   inline double Tmax(){return m_tfinal;}
-  void SaveNv();
+  void SaveNv(TH2D *Nv);
  private:
   
   //! Gathers all relevant constants for the simulation 
   Parameters *m_params;
-  GRBengine  *m_GRB;
+  GRBengine  *m_GRBengine;
   double m_tfinal;
   double m_fluence;
   TH2D *m_Nv;

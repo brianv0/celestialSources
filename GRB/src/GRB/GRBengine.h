@@ -19,15 +19,14 @@ class GRBengine
   
  public:
   GRBengine(Parameters *params);
-  
-  //  void   EraseShocksVector();
-  
+  ~GRBengine(){;}
+    
   std::vector<GRBShock*> CreateShocksVector();
   double GenerateGamma(double gammamax,double gammamin);
   //double getDistance();
   inline std::pair<double,double> GetDirection(){return m_dir;}
  private:
-  std::pair<double,double> m_dir;
+  std::pair<float,float> m_dir;
   Parameters *m_params;
 };
 

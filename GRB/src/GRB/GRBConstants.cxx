@@ -75,7 +75,7 @@ void Parameters::ReadParametersFromFile(std::string paramFile)
     }
   SetGRBNumber((long)GetGRBNumber()+1);
 
-  int    nshell;
+  int    nshell, seed;
   double fluence,etot,initialSeparation,initialThickness;
   double gmin,gmax,ic;
 
@@ -104,6 +104,9 @@ void Parameters::ReadParametersFromFile(std::string paramFile)
   f1.getline(buf,50);
   sscanf(buf,"%lf",&ic);
 
+  f1.getline(buf,5);
+  sscanf(buf,"%d",&seed);
+
   SetNshell(nshell);
   SetEtot(etot);
   SetFluence(fluence);
@@ -112,6 +115,7 @@ void Parameters::ReadParametersFromFile(std::string paramFile)
   SetGammaMin(gmin);
   SetGammaMax(gmax);
   SetInverseCompton(ic);
+  if(seed>0) SetGRBNumber(GetGRBNumber()+ (long) seed);
 
 }
 

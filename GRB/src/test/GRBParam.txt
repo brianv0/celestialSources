@@ -1,8 +1,9 @@
-10	        // Nshock
+10	        // Nshell
 1.0e+53	        // Etot
-0.0e-5          // Fluence
+1.0e-6          // Fluence
 1.0e+10		// initial separation
 5.0e+9		// initial Thickness
 100.0		// Minimum Lorentz Factor
 1000.0		// Maximum Lorentz Factor
-1.0             // Inverse Compton Power/Synchrotron Power
+1.0             // IC/Syn Power
+-1		// GRBNumber (Seed)

@@ -341,8 +341,8 @@ int main(int argc, char** argv)
   params->ReadParametersFromFile(paramFile);
   params->PrintParameters();
   GRBSim* m_grb = new GRBSim(params);
-  m_grb->Fireball();
-  m_grb->SaveNv();
+  //  m_grb->Fireball();
+  m_grb->SaveNv((TH2D*)m_grb->Fireball());
   char name[100];
   sprintf(name,"grb_%d.root",params->GetGRBNumber());
   PlotGRB(enph,name);

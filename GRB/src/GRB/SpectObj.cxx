@@ -36,7 +36,8 @@ SpectObj::SpectObj(const TH2D* In_Nv)
 			    Nv->GetBinContent(ti+1, ei+1)*dei*deltat); //[ph/m²]
 	}  
     }
-  
+  gDirectory->Delete("spec");
+  gDirectory->Delete("times");
   spec  = new TH1D("spec","spec",ne,en);
   times = new TH1D("times","times",nt+1,tmin-deltat/2.,tmax+deltat/2.);
 
