@@ -1,3 +1,8 @@
+//////////////////////////////////////////////////
+// File PulsarSim.cxx
+// contains the code for the implementation of the models
+//////////////////////////////////////////////////
+
 #include <iostream>
 #include "Pulsar/PulsarSpectrum.h"
 #include "Pulsar/PulsarConstants.h"
@@ -11,12 +16,26 @@
 
 using namespace cst;
 
+/////////////////////////////////////////////////
 ISpectrumFactory &PulsarSpectrumFactory() 
  {
    static SpectrumFactory<PulsarSpectrum> myFactory;
    return myFactory;
  }
 
+/////////////////////////////////////////////////
+/*!
+ * \param params string containing the XML parameters
+ *
+ * This method takes from the XML file the name of the pulsar to be simulated, the model
+ * to be used and the parameter specific for the model choosen. Then extract from the
+ * txt DataList file the characteristics of the pulsar choosen (period, flux, period derivatives
+ * ,ephemerides, flux, etc...)
+ * Then it calls the PulsarSim class in order to have the TH2D histogram.
+ * For more informations and fot a brief tutorial about the use of PulsarSpectrum  please see:
+ * <br>
+ * <a href="#dejager02">http://www.pi.infn.it/~razzano/Pulsar/PulsarSpectrumTutorial/PsrSpectrumTut.html </a>
+ */
 PulsarSpectrum::PulsarSpectrum(const std::string& params)
   : m_params(params)
 {
@@ -40,7 +59,6 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
   std::ifstream PulsarDataTXT;
 
   //Read from XML file
-
   m_PSRname    = parseParamList(params,0).c_str();
   m_model      = std::atoi(parseParamList(params,1).c_str());
 
@@ -56,7 +74,6 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
   double ppar4 = std::atof(parseParamList(params,9).c_str());
 
   //Read from PulsarDataList.txt
-  
   sprintf(sourceFileName,"%s/data/PulsarDataList.txt",pulsar_root);  
   std::cout << "\nOpening Pulsar Datalist File : " << sourceFileName << std::endl;
   PulsarDataTXT.open(sourceFileName, std::ios::in);
@@ -76,7 +93,8 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
   while ((std::string(tempName) != m_PSRname) && ( PulsarDataTXT.eof() != 1))
     {
       PulsarDataTXT >> tempName >> m_RA >> m_dec >> m_l >> m_b >> m_flux >> m_period >> m_pdot >> m_p2dot >> m_t0 >> m_phi0;
-      //  std::cout << tempName  << m_RA << m_dec << m_l << m_b << m_flux << m_period << m_pdot << m_t0 << m_phi0 << std::endl;  
+      //  std::cout << tempName  << m_RA << m_dec << m_l << m_b << m_flux 
+      //  << m_period << m_pdot << m_t0 << m_phi0 << std::endl;  
     } 
   
   if (std::string(tempName) == m_PSRname)
@@ -94,7 +112,7 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
   m_f2 = 2*pow((m_pdot/m_period),2.0)/m_period - m_p2dot/(m_period*m_period);
   
  
-  //Writing out Pulsar Info
+  //Writes out Pulsar Info
   std::cout << " \n********   PulsarSpectrum initialized !   ********" << std::endl;
   std::cout << "**   Name : " << m_PSRname << std::endl;
   std::cout << "**   Position : (RA,Dec)=(" << m_RA << "," << m_dec 
@@ -111,7 +129,6 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
 	    << (StartMissionDateMJD+JDminusMJD)*SecsOneDay << " sec.) - Jan,1 2001 00:00.00" << std::endl;
   std::cout << "**************************************************" << std::endl;
 
-
   m_JDCurrent = new astro::JulianDate(2001, 1, 1, 0.0);
   m_Pulsar    = new PulsarSim(m_PSRname, m_seed, m_flux, m_enphmin, m_enphmax, m_period, m_numpeaks);
 
@@ -127,11 +144,10 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
       std::cout << "ERROR!  Model choice not implemented " << std::endl;
       exit(1);
     }
-
-  //////////////////////////////////////////////////
   
 }
 
+/////////////////////////////////////////////////
 PulsarSpectrum::~PulsarSpectrum() 
 {  
   delete m_Pulsar;
@@ -139,7 +155,7 @@ PulsarSpectrum::~PulsarSpectrum()
   delete m_JDCurrent;
 }
 
-//return flux, given a time
+/////////////////////////////////////////////////
 double PulsarSpectrum::flux(double time) const
 {
   double flux;	  
@@ -147,50 +163,83 @@ double PulsarSpectrum::flux(double time) const
   return flux;
 }
 
+
+/////////////////////////////////////////////////
+/*!
+ * \param time time to start the computing of the next photon
+ *
+ * This method find the time when the next photon will come. The decorrections for the ephemerides
+ * are taken into account. The parameters used for this computation are:
+ * <ul>
+ * <li> <i>Epoch</i>, espressed in MJD;</li>
+ * <li> <i>Initial Phase Phi0</i>;</li>
+ * <li> <i>First Period derivative</i>;</li>
+ * <li> <i>Second Period derivative</i>;</li>
+ * </ul>
+ * <br>
+ * The interval method is taken from SpectObj. 
+ */
 double PulsarSpectrum::interval(double time)
 {  
   double timeTilde = time + (StartMissionDateMJD)*SecsOneDay;
   if ((int(timeTilde - (StartMissionDateMJD)*SecsOneDay) % 20000) < 1.5)
     std::cout << "**  Time reached is: " << timeTilde-(StartMissionDateMJD)*SecsOneDay
 	      << " seconds from Mission Start " << std::endl;
-  //std::cout << " 1 " << std::endl;
   double initTurns = getTurns(timeTilde); //Turns made at this time 
-  //std::cout << " 2 " << std::endl;
-
   double intPart; //Integer part
   double tStart = modf(initTurns,&intPart)*m_period; // Start time for interval
-  // std::cout << " 3 " << tStart << " " << m_enphmin << std::endl;
-  
+  //determines the interval to the next photon (at nextTime) in the case of period constant.
   double inte = m_spectrum->interval(tStart,m_enphmin); //deltaT (in system where Pdot = 0
-  //std::cout << " 4 " << std::endl;
-
   double inteTurns = inte/m_period; // conversion to # of turns
-  //std::cout << " 5 " << std::endl;
-   
   double totTurns = initTurns + inteTurns; //Total turns at the nextTimeTilde
-  //std::cout <<  std::setprecision(30) << "**  Inte " << inte 
-  //    << " initTurns " << initTurns << " totTurns " << totTurns << std::endl;
-
 
   double finPh =  modf(initTurns,&intPart);
   finPh = modf(finPh + inteTurns,&intPart); //finPh is the expected phase corresponding to the nextTimeTilde
   double nextTimeTilde = retrieveNextTimeTilde(timeTilde, totTurns, (1e-6/m_period));
-  // std::cout << " 6 " << std::endl;
   
-//std::cout << std::setprecision(30) << "phCalc " << modf(getTurns(nextTimeTilde),&intPart) << " exp " << finPh << std::endl;
+  //std::cout << std::setprecision(30) << "phCalc " << modf(getTurns(nextTimeTilde),&intPart) << " exp " << finPh << std::endl;
   //std::cout << std::setprecision(30) << "       diff " << fabs(modf(getTurns(nextTimeTilde),&intPart)-finPh) << std::endl;
 
    return nextTimeTilde - timeTilde;
 }
 
 /////////////////////////////////////////////
+/*!
+ * \param time time where the number of turns is computed
+ *
+ * This method compute the number of turns made by the pulsar according to the ephemerides.
+ * <br>
+ * <blockquote>
+ * f(t) = f<sub>0</sub> + f<sub>1</sub>(t - t<sub>0</sub>) +
+ *      f<sub>2</sub>/2(t - t<sub>0</sub>)<sup>2</sup>.
+ * <br>The number of turns is related to the ephemerides as:<br>
+ * dN(t) = f<sub>0</sub> + f<sub>1</sub>(t-t<sub>0</sub>) + 1/2f<sub>2</sub>(t-t<sub>0</sub>)<sup>2</sup>
+ * </blockquote>
+ * <br>where 
+ * <blockquote>
+ *<ul>
+ * <li> t<sub>0</sub> is an ephemeris epoch.In this simulator epoch has to be expressed in MJD</li>
+ * <li>f<sub>0</sub> pulse frequency at time t<sub>0</sub> (usually given in Hz)</li>,
+ * <li>f<sub>1</sub> the 1st time derivative of frequency at time t< sub>0</sub> (Hz s<sup>-1</sup>);</li>
+ * <li>f<sub>2</sub> the 2nd time derivative of frequency at time t<sub>0</sub> (Hz s<sup>-2</sup>).</li>
+ * </ul>
+ * </blockquote>
+ */
 double PulsarSpectrum::getTurns( double time )
 {
   double dt = time - m_t0*SecsOneDay;
   return m_phi0 + m_f0*dt + 0.5*m_f1*dt*dt + ((m_f2*dt*dt*dt)/6.0);
 }
 
-////////////////////////////////////////////
+/////////////////////////////////////////////
+/*!
+ * \param tTilde Time from where retrieve the nextTime;
+ * \param totalTurns Number of turns completed by the pulsar at nextTime;
+ * \param err Tolerance between totalTurns and the number of turns at nextTime
+ *
+ * <br>In this method a recursive way is used to find the <i>nextTime</i>. Starting at <i>tTilde</i>, the method returns 
+ * nextTime, the time where the number of turns completed by the pulsar is equal to totalTurns.  
+ */
 double PulsarSpectrum::retrieveNextTimeTilde( double tTilde, double totalTurns, double err )
 {
   //err = 1e-6;
@@ -198,25 +247,22 @@ double PulsarSpectrum::retrieveNextTimeTilde( double tTilde, double totalTurns, 
   double tempTurns = 0.0;
   double tTildeHigh = 0.0;
   double tTildeLow = tTilde;
-  //std::cout << " Retrieving Period " << std::endl;
+ 
   //std::cout << std::setprecision(30) << " tTilde " << tTilde << " totalTurns " << totalTurns << " err " << err << std::endl;
-  //First part to find Extrema...
 
+  //First part to find Extrema...
   while (tempTurns < totalTurns)
     {
       tTilde = tTilde + tStep;
       tempTurns = getTurns(tTilde);
     }
   tTildeHigh = tTilde;
-  //std::cout << "\n **First Iter: Low is " << tTildeLow << " High is " << tTildeHigh << " -->turns " << tempTurns <<std::endl;
-
-
+  
   //Iterative procedure to find the correct nextTime
-
- tStep = (tTildeHigh-tTildeLow)/2;
- 
- int nIter = 0;
-
+  tStep = (tTildeHigh-tTildeLow)/2;
+  
+  int nIter = 0;
+  
   while (fabs(tempTurns - totalTurns ) > err)
     {
 
@@ -230,9 +276,12 @@ double PulsarSpectrum::retrieveNextTimeTilde( double tTilde, double totalTurns, 
 	{
 	  tTildeLow = tTilde;
 	}
-      //std::cout <<  std::setprecision(30) << " Low is " << tTildeLow << " High is " << tTildeHigh << " -->turns " << tempTurns <<std::endl;;
+      // std::cout <<  std::setprecision(30) << " Low is " << tTildeLow << " High is " << tTildeHigh 
+      //           << " -->turns " << tempTurns <<std::endl;;
       tStep = tStep/2;
       nIter++;
+
+      //If the procedure not converge within the err,  the tolerance is amplyfied.
       if (nIter == 50)
 	{
 	  //	  	  std::cout << std::setprecision(30) << " Warning!! Amplifying tolerance for convergence at time " 
@@ -250,13 +299,22 @@ double PulsarSpectrum::retrieveNextTimeTilde( double tTilde, double totalTurns, 
   return tTilde;
 }
 
-
+/////////////////////////////////////////////
 double PulsarSpectrum::energy(double time)
 {
   return m_spectrum->energy(time,m_enphmin)*1.0e-3; //MeV
 }
 
-std::string PulsarSpectrum::parseParamList(std::string input, int index)
+/////////////////////////////////////////////
+/*!
+ * \param input String to be parsed;
+ * \param index Position of the parameter to be extracted from input;
+ *
+ * <br>
+ * From a string contained in the XML file a parameter is extracted according to the position 
+ * specified in <i>index</i> 
+ */
+std::string PulsarSpectrum::parseParamList(std::string input, unsigned int index)
 {
   std::vector<std::string> output;
   unsigned int i=0;
@@ -272,6 +330,3 @@ std::string PulsarSpectrum::parseParamList(std::string input, int index)
   if(index>=output.size()) return "";
   return output[index];
 };
-
-
-

@@ -1,20 +1,20 @@
+#ifndef PulsarSIM_H
+#define PulsarSIM_H 
+
 #include "PulsarConstants.h"
 #include "SpectObj/SpectObj.h"
 #include <vector>
 
-#ifndef PulsarSIM_H
-#define PulsarSIM_H 
-
 /*! 
-* \class PulsarSim
-* \brief Class that contains the generation of the TH2D ROOT Histogram for Pulsar flux according to a selected model.
-*  
-* \author Nicola Omodei        nicola.omodei@pi.infn.it 
-* \author Massimiliano Razzano massimiliano.razzano@pi.infn.it
+ * \class PulsarSim
+ * \brief Class that contains the generation of the TH2D ROOT Histogram for Pulsar flux according to a selected model.
+ *  
+ * \author Nicola Omodei        nicola.omodei@pi.infn.it 
+ * \author Massimiliano Razzano massimiliano.razzano@pi.infn.it
  *
  * This class creates the TH2D ROOT histogram that contains the differential photon flux (dN/dE/dt/dA) of the simulated
  * pulsar espressed in ph/keV/s/m2.
- * The user can specify the emission model.Now the default model is a phenomenological one thata cna simulate the emissione
+ * The user can specify the emission model.Now the default model is a phenomenological one that can simulate the emission
  * from Polar Cap or Outer Gap.
 */
 
@@ -43,7 +43,7 @@ class PulsarSim
   //! Save a ROOT file with the TH2D ROOT histogram
   void SaveNv(TH2D *Nv);
 
-  //! Save a TXT file with the Pulsar rime profile
+  //! Save a TXT file with the Pulsar time profile
   void SaveTimeProfile(TH2D *Nv);
   
  private:

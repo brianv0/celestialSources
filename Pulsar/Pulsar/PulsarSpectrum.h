@@ -1,6 +1,5 @@
 #ifndef PulsarSpectrum_H
 #define PulsarSpectrum_H
-#include "PulsarConstants.h"
 
 #include <vector>
 #include <string>
@@ -8,37 +7,45 @@
 #include <cmath>
 #include "flux/ISpectrum.h"
 #include "flux/EventSource.h"
+#include "facilities/Util.h"
+#include "astro/JulianDate.h" 
+#include "PulsarConstants.h"
 #include "PulsarSim.h"
 #include "SpectObj/SpectObj.h"
 
-#include "facilities/Util.h"
-#include "astro/JulianDate.h" //de-corr
-
-
-//class ISpectrum;
+/*! 
+* \class PulsarSpectrum
+* \brief Class that starts the Pulsar simulation according to the parameters specified in the XML file. 
+*  
+* \author Nicola Omodei        nicola.omodei@pi.infn.it 
+* \author Massimiliano Razzano massimiliano.razzano@pi.infn.it
+*
+* It takes the parameters of the model and the name of the pulsar from the XML file. Then looks in the DataList file for the* name of the pulsar and extract the speficic parameters of the pulsar (period, flux, ephemerides, etc.). 
+* The DataFile is placed in <i>data</i> directory. This class, derived from ISpectrum, takes into account 
+* the decorretions for the ephemerides, as described in the method <b>Interval</b>.
+*/
 
 class PulsarSpectrum : public ISpectrum
 {
   
  public:
-  /*! This initializes the simulation parsing the parameters.
 
-  */
-  
+  //! Constructor of PulsarSpectrum  
   PulsarSpectrum(const std::string& params);
   
+  //! Constructor of PulsarSpectrum  
   virtual  ~PulsarSpectrum();
    
-  /*! If a burst is shining it returns the PulsarSpectrum::flux method 
-   */
+  //! Return the flux of the Pulsar at time t
   double flux(double time)const;
-  /*! \brief Returns the time interval
-   *
-   * If a burst is shining it returns the PulsarSpectrum::interval method.
-   * If not it returns the time to whait for the first photon of the next burst.
-   */
+
+  //! Returns the time interval to the next photon
   double interval(double time);
+
+  //! Returns the number of turns made at a specified time
   double getTurns(double time);
+
+  //Retrieve the nextTime from the number of turns to be completed
   double retrieveNextTimeTilde( double tTilde, double totalTurns, double err );
   
   //! direction, taken from PulsarSim
@@ -47,6 +54,7 @@ class PulsarSpectrum : public ISpectrum
     {
       return std::make_pair(1,1);
     } 
+
   //! calls PulsarSpectrum::energySrc
   double energy(double time);
   
@@ -54,27 +62,19 @@ class PulsarSpectrum : public ISpectrum
   const char * particleName() const {return "gamma";}
   const char * nameOf() const {return "PulsarSpectrum";}
 
-  
-
-  /*! 
-    This method parses the parameter list
-    \param input is the string to parse
-    \param index if the position of the parameter in the input list. 
-    \retval output is the value of the parameter as float number.
-  */  
-  std::string parseParamList(std::string input, int index);  
+  //! Parse parameters from XML file
+  std::string parseParamList(std::string input, unsigned int index);  
       
  private:
   
   PulsarSim *m_Pulsar;
-  SpectObj *m_spectrum;
+  SpectObj  *m_spectrum;
   
-  astro::JulianDate *JDStartMission; //de-corr
-  astro::JulianDate *JDStartSimulation; //de-corr
-  astro::JulianDate *m_JDCurrent; //de-corr
+  astro::JulianDate *JDStartMission; 
+  astro::JulianDate *JDStartSimulation; 
+  astro::JulianDate *m_JDCurrent; 
 
   const std::string& m_params; 
-
   
   std::string m_PSRname;
   double m_RA, m_dec, m_l, m_b;  

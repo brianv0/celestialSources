@@ -1,6 +1,10 @@
 #ifndef PulsarCONSTANT_HH
 #define PulsarCONSTANT_HH 
 
+#include <vector> 
+#include <string>
+#include "TRandom.h"
+
 /*! 
  * \class PulsarConstants
  * \brief Class instantiated to access general parameters and constants.
@@ -12,9 +16,6 @@
  * \author Massimiliano Razzano massimiliano.razzano@pi.infn.it
  */
 
-#include <vector> 
-#include <string>
-#include "TRandom.h"
 
 //! Namespace containing general parameters and constants
 namespace cst
