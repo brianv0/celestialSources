@@ -2,6 +2,7 @@
 #include <sstream>
 #include <iostream>
 #include <fstream>
+#include <iomanip>
 //#include "SpectObj.h"
 #include "SpectObj/SpectObj.h"
 
@@ -345,67 +346,66 @@ photon SpectObj::GetPhoton(double t0, double enph)
       
       double TimeToFirstPeriod = 0.0;
       double TimeFromLastPeriod = 0.0;
-      double IntNumPer = 0;
-      double ProbRest = 0.0;
+      double IntNumPer = 0.0;
+      double ProbRest = 1.0;
       double InternalTime = t0 - Int_t(t0/m_Tmax)*m_Tmax; // InternalTime is t0 reduced to a period
       double Pnt = Probability->GetBinContent(nt);
       double Ptot = Pnt - Probability->GetBinContent(1); //Total proability in a period 
-      //First checks if next photon lies in the same period
-      if (((Pnt - Probability->GetBinContent(Nv->GetXaxis()->FindBin(InternalTime))) < 1.0 ))
+      
+      if (DEBUG)
+	{
+	  std::cout << std::setprecision(30) << "\n\n**t0 is " << t0 << std::endl;
+	  std::cout << std::setprecision(30) << "Interval start : Ptot in a period is :" << Ptot << std::endl; 
+	}
+
+
+
+      //Step 1 
+
+      int InternalBin = Nv->GetXaxis()->FindBin(InternalTime) ;  
+      double InternalBinProbCont = Probability->GetBinContent(InternalBin) - Probability->GetBinContent(InternalBin-1);
+      double LowEdge = (Nv->GetXaxis()->GetBinCenter(InternalBin)-m_TimeBinWidth/2);
+      if (InternalBin == 1) 
+	LowEdge = 0.0;
+
+      ProbRest =  InternalBinProbCont*(1.0 - ((InternalTime - LowEdge)/(2*m_TimeBinWidth)));
+      
+      ProbRest = ProbRest + (Probability->GetBinContent(nt) - Probability->GetBinContent(InternalBin));
+      
+      double myP = m_SpRandGen->Uniform(0.9,1.1);
+
+      if (ProbRest <  myP)
 	{
 	  TimeToFirstPeriod = m_Tmax - InternalTime;
+	  ProbRest = myP - ProbRest;
 	}
-      else
+      else 
 	{
-	  TimeToFirstPeriod = 0.0;
-	  if(DEBUG)
-	    std::cout << "Next Photon comes within the same period " << std::endl;
+	  std::cout << " Next Photon within the same period " << std::endl;
 	}
-      
-      // If not, proceed to find the integer number of period required to have Prob = 1
-      if (TimeToFirstPeriod != 0.0)
-	{
-	  ProbRest = 1 - (Pnt - Probability->GetBinContent(Nv->GetXaxis()->FindBin(InternalTime)));
-	  //std::cout << "Computing Integer Periods , Now ProbRest is " << ProbRest << std::endl;
-	  IntNumPer = floor(ProbRest/Ptot);
-	  if (IntNumPer*m_Tmax > 3.15e8)
-	    {
-	      IntNumPer = -1.0;
-	      if (DEBUG)
-		{		
-		  std::cout << " Warning! No photons within the mission lifetime ! " << std::endl;
-		}
-	    }
 
-	    //std::cout << " Integer Number of Period is " << IntNumPer <<std::endl; 
-	}
       
-      // Then checks for the remnant part of the probability
-      if (IntNumPer > 0 )
+      //Step 2;
+      if (ProbRest/Ptot >= 1.0)
 	{
+ 		
+	  IntNumPer = floor(ProbRest/Ptot);	
 	  ProbRest = ProbRest - IntNumPer*Ptot;
-	  // std::cout << "Computing Residual time , Now ProbRest is " << ProbRest << std::endl;
-	  int tBinCurrent = 1;
-	  while ((Probability->GetBinContent(tBinCurrent) - Probability->GetBinContent(1)) < ProbRest ) 
-	    {
-	      tBinCurrent++;
-	    }	 
-	  TimeFromLastPeriod = Nv->GetXaxis()->GetBinCenter(tBinCurrent);
-	  ProbRest = ProbRest - (Probability->GetBinContent(tBinCurrent) - Probability->GetBinContent(1));
-	  TimeFromLastPeriod += m_SpRandGen->Uniform()*m_TimeBinWidth - m_TimeBinWidth/2 ;
-	  
 	}
-      
-      //std::cout << " At End ProbRest is (should be 0 ) " << ProbRest << std::endl;
-      
-      
-      
+
+      int tBinCurrent = 1;
+
+      while ((Probability->GetBinContent(tBinCurrent) - Probability->GetBinContent(1)) <  ProbRest )
+	{
+	  tBinCurrent++;
+	}	 
+      TimeFromLastPeriod = Nv->GetXaxis()->GetBinCenter(tBinCurrent);
       
       if(DEBUG)
-	{
-	  std::cout << " First Step " << t0 
-		    << " to " << t0 + TimeToFirstPeriod 
-		    << " (" << TimeToFirstPeriod << ")" << std::endl;  
+     	{
+	  std::cout << "\n\n First Step " << t0 
+ 		    << " to " << t0 + TimeToFirstPeriod 
+	 	    << " (" << TimeToFirstPeriod << ")" << std::endl;  
 	  std::cout << " Second Step " << t0 + TimeToFirstPeriod 
 		    << " to " << t0 + TimeToFirstPeriod + IntNumPer*m_Tmax 
 		    << " (" << IntNumPer*m_Tmax << "," << IntNumPer << " periods)" << std::endl;  
@@ -413,12 +413,14 @@ photon SpectObj::GetPhoton(double t0, double enph)
 		    << " to " << t0 + TimeToFirstPeriod + IntNumPer*m_Tmax + TimeFromLastPeriod 
 		    << " (" << TimeFromLastPeriod << ")" << std::endl;  
 	  
-	  //	    std::cout << "--> Time = " << ph.time << " s. , Energy = " << ph.energy << " keV" << std::endl; 
-	}
+
+	  }
       
       // Now evaluate the Spectrum Histogram
       
       ph.time   = t0 + TimeToFirstPeriod + IntNumPer*m_Tmax +TimeFromLastPeriod;
+      ph.energy = PeriodicSpectrum->GetRandom();
+
       if (IntNumPer == -1.0)
 	{
 	  if (DEBUG)
@@ -427,8 +429,6 @@ photon SpectObj::GetPhoton(double t0, double enph)
 	    }
 	  ph.time = t0 + 2.0e8;
 	}
-
-      ph.energy = PeriodicSpectrum->GetRandom();
             
     }
   
