@@ -12,6 +12,11 @@
 #include <sstream>
 #include <stdexcept>
 
+#include "CLHEP/Random/RandomEngine.h"
+#include "CLHEP/Random/JamesRandom.h"
+#include "CLHEP/Random/RandFlat.h"
+#include "CLHEP/Random/RandPoisson.h"
+
 #include "facilities/Util.h"
 
 #include "Util.h"
@@ -156,6 +161,16 @@ namespace genericSources {
       std::string message(eObj.what());
       return message.find_first_of(targetMessage.c_str()) 
          != std::string::npos;
+   }
+
+   double Util::drawFromPowerLaw(double emin, double emax, double gamma) {
+      double xi = RandFlat::shoot();
+      double one_m_gamma = 1. - gamma;
+      double arg = xi*(std::pow(emax, one_m_gamma) - 
+                       std::pow(emin, one_m_gamma)) 
+         + std::pow(emin, one_m_gamma);
+      double energy = std::pow(arg, 1./one_m_gamma);
+      return energy;
    }
 
 } // namespace genericSources

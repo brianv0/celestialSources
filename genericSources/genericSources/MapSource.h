@@ -33,7 +33,7 @@ public:
    /// "SpectrumClass" sources.
    MapSource(const std::string &params);
 
-   virtual ~MapSource(){}
+   virtual ~MapSource() {}
 
    /// @return Particle energy in MeV.
    /// @param xi Uniform random deviate on the unit interval.
@@ -66,7 +66,10 @@ public:
       return m_mapIntegral;
    }
 
-private:
+protected:
+
+   /// default constructor for subclasses;
+   MapSource() : m_gamma(0), m_emin(0), m_emax(0) {}
 
    double m_flux;
    double m_gamma;
@@ -85,10 +88,13 @@ private:
 
    double m_mapIntegral;
 
-   void samplePixel(unsigned int indx, double &lon, double &lat);
-   double mapValue(unsigned int i, unsigned int j);
-
+   void samplePixel(unsigned int indx, double &lon, double &lat) const;
    void readFitsFile(std::string fitsFile);
+   void makeIntegralDistribution(const std::vector<double> & pixelValues);
+
+private:
+
+   double mapValue(unsigned int i, unsigned int j);
 
 };
 

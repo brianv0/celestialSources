@@ -10,6 +10,7 @@
 #include <cstdlib>
 
 #include <algorithm>
+#include <stdexcept>
 
 #include "CLHEP/Random/RandomEngine.h"
 #include "CLHEP/Random/JamesRandom.h"
@@ -46,6 +47,7 @@ MapSource::MapSource(const std::string &paramString)
    if (params.size() > 4) m_emax = std::atof(params[4].c_str());
 
    readFitsFile(fitsFile);
+   makeIntegralDistribution(m_image);
 
 //    std::cerr << "Integral over the map: " 
 //              << m_mapIntegral << std::endl;
@@ -100,7 +102,8 @@ std::pair<double, double> MapSource::dir(double energy) {
    return std::make_pair(lon, lat);
 }
 
-void MapSource::samplePixel(unsigned int indx, double &lon, double &lat) {
+void MapSource::
+samplePixel(unsigned int indx, double &lon, double &lat) const {
 
    unsigned int i = indx % m_lon.size();
    unsigned int j = indx/m_lon.size();
@@ -138,20 +141,26 @@ void MapSource::readFitsFile(std::string fitsFile) {
 
    fitsImage.getSolidAngles(m_solidAngles);
    fitsImage.getImageData(m_image);
+}
 
-   int npix = m_solidAngles.size();
+void MapSource::
+makeIntegralDistribution(const std::vector<double> & pixelValues) {
+   unsigned int npix = m_solidAngles.size();
+   if (pixelValues.size() < npix) {
+      throw std::runtime_error("MapSource::makeIntegralDistribution:\n"
+                               + std::string("pixelValues vector has fewer ")
+                               + "elements than the number of image pixels");
+   }
    m_integralDist.resize(npix);
    m_integralDist[0] = 0;
    double totalSolidAngle(0);
-   for (int i = 1; i < npix; i++) {
-      m_integralDist[i] = m_integralDist[i-1] + m_solidAngles[i]*m_image[i];
+   for (unsigned int i = 1; i < npix; i++) {
+      m_integralDist[i] = m_integralDist[i-1] 
+         + m_solidAngles[i]*pixelValues[i];
       totalSolidAngle += m_solidAngles[i];
    }
-//    std::cerr << "total solid angle in map: " 
-//              << totalSolidAngle/M_PI << "*pi" 
-//              << std::endl;
    m_mapIntegral = m_integralDist[npix-1];
-   for (int i = 1; i < npix; i++) {
+   for (unsigned int i = 1; i < npix; i++) {
       m_integralDist[i] /= m_integralDist[npix-1];
    }
 //    std::cerr << "total solid angle in map: " 

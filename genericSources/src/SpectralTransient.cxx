@@ -144,20 +144,12 @@ double SpectralTransient::drawEnergy(const ModelInterval & interval) const {
    double xi = RandFlat::shoot();
    double energy;
    if (interval.drawBelowBreak(xi)) {
-      energy = drawFromPowerLaw(m_emin, interval.ebreak, interval.gamma1);
+      energy = genericSources::Util::drawFromPowerLaw(m_emin, interval.ebreak,
+                                                      interval.gamma1);
    } else {
-      energy = drawFromPowerLaw(interval.ebreak, m_emax, interval.gamma2);
+      energy = genericSources::Util::drawFromPowerLaw(interval.ebreak, m_emax,
+                                                      interval.gamma2);
    }
-   return energy;
-}
-
-double SpectralTransient::drawFromPowerLaw(double emin, double emax,
-                                           double gamma) const {
-   double xi = RandFlat::shoot();
-   double one_m_gamma = 1. - gamma;
-   double arg = xi*(std::pow(emax, one_m_gamma) - std::pow(emin, one_m_gamma)) 
-      + std::pow(emin, one_m_gamma);
-   double energy = std::pow(arg, 1./one_m_gamma);
    return energy;
 }
 

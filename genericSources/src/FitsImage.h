@@ -65,6 +65,12 @@ public:
    /// will be indexed by column then row, indx = i + j*NAXIS1.
    virtual void getSolidAngles(std::vector<double> &solidAngles);
 
+   /// @return The HDU number of the specified extension.
+   static int findHdu(const std::string & fitsFile,
+                      const std::string & extension);
+
+   static void fitsReportError(int status, std::string routine="");
+
 protected:
 
 /** 
@@ -102,6 +108,8 @@ protected:
 
    /// The FITS image data
    std::vector<double> m_image;
+
+   static std::string s_fitsRoutine;
 
 };
 

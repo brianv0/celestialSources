@@ -28,9 +28,9 @@ library genericSources -no_share $(source)
 
 application test_genericSources test/test.cxx
 
-#use SwigPolicy v*
-#
-#path_remove PYTHONPATH genericSources
-#path_append PYTHONPATH $(GENERICSOURCESROOT)/$(BINDIR)
-#
-#apply_pattern swig_module name="sources"
+use SwigPolicy v*
+
+path_remove PYTHONPATH genericSources
+path_append PYTHONPATH $(GENERICSOURCESROOT)/$(BINDIR)
+
+apply_pattern swig_module name="sources"

@@ -112,8 +112,6 @@ private:
 
    double drawEnergy(const ModelInterval & interval) const;
 
-   double drawFromPowerLaw(double emin, double emax, double gamma) const;
-
    static bool compareEventTime(const std::pair<double, double> & x,
                                 const std::pair<double, double> & y) {
       return x.first < y.first;

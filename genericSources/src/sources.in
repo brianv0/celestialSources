@@ -2,6 +2,7 @@
 %module sources
 %{
 #include "genericSources/SpectralTransient.h"
+#include "genericSources/MapCube.h"
 %}
 %include stl.i
 %exception {
@@ -15,4 +16,4 @@
 %template(DoublePair) std::pair<double, double>;
 %template(PairVector) std::vector<std::pair<double, double> >;
 %include $(GENERICSOURCESROOT)/genericSources/SpectralTransient.h
-
+%include $(GENERICSOURCESROOT)/genericSources/MapCube.h

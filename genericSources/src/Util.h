@@ -79,6 +79,8 @@ public:
    static bool expectedException(const std::exception & eObj,
                                  const std::string & targetMessage);
 
+   static double drawFromPowerLaw(double emin, double emax, double gamma);
+
 };
 
 } // namespace genericSources

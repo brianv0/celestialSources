@@ -7,7 +7,6 @@
  *
  */
 
-#include <cassert>
 #include <cmath>
 
 #include <iostream>
@@ -20,6 +19,8 @@
 namespace genericSources {
 
 #include "fitsio.h"
+
+std::string FitsImage::s_fitsRoutine("");
 
 FitsImage::FitsImage(const std::string &fitsfile) {
    m_filename = fitsfile;
@@ -106,24 +107,19 @@ AxisParams::computeAxisVector(std::vector<double> &axisVector) {
 void FitsImage::read_fits_image(std::string &filename, 
                                 std::vector<AxisParams> &axes,
                                 std::vector<double> &image) {
+   s_fitsRoutine = "read_fits_image";
    fitsfile * fptr = 0;
    char *file = const_cast<char *>(filename.c_str());
    int status = 0;
 
    fits_open_file(&fptr, file, READONLY, &status);
-   fits_report_error(stderr, status);
-   if (status != 0) {
-      throw std::runtime_error("FitsImage::read_fits_image: cfitsio error");
-   }
+   fitsReportError(status);
 
 // Get dimensions of the data cube
    long naxes;
    char comment[80];
    fits_read_key_lng(fptr, "NAXIS", &naxes, comment, &status);
-   fits_report_error(stderr, status);
-   if (status != 0) {
-      throw std::runtime_error("FitsImage::read_fits_image: cfitsio error");
-   }
+   fitsReportError(status);
 
 // Assume at least 1 image plane, but at most 3 dimensions...
    if (naxes != 2 && naxes != 3) {
@@ -154,11 +150,7 @@ void FitsImage::read_fits_image(std::string &filename,
    for (int i = 0; i < naxes; i++) {
 // axis size
       fits_read_key_lng(fptr, naxis[i], &ivalue, comment, &status);
-      fits_report_error(stderr, status);
-      if (status != 0) {
-         throw std::runtime_error
-            ("FitsImage::read_fits_image: cfitsio error");
-      }
+      fitsReportError(status);
       axes[i].size = ivalue;
 
 // Compute the number of pixels in the image.
@@ -175,38 +167,22 @@ void FitsImage::read_fits_image(std::string &filename,
    for (int i = 0; i < naxes; i++) {
 // reference values
       fits_read_key_dbl(fptr, crval[i], &value, comment, &status);
-      fits_report_error(stderr, status);
-      if (status != 0) {
-         throw std::runtime_error
-            ("FitsImage::read_fits_image: cfitsio error");
-      }
+      fitsReportError(status);
       axes[i].refVal = value;
 
 // step sizes
       fits_read_key_dbl(fptr, cdelt[i], &value, comment, &status);
-      fits_report_error(stderr, status);
-      if (status != 0) {
-         throw std::runtime_error
-            ("FitsImage::read_fits_image: cfitsio error");
-      }
+      fitsReportError(status);
       axes[i].step = value;
 
 // reference pixels
       fits_read_key_lng(fptr, crpix[i], &ivalue, comment, &status);
-      fits_report_error(stderr, status);
-      if (status != 0) {
-         throw std::runtime_error
-            ("FitsImage::read_fits_image: cfitsio error");
-      }
+      fitsReportError(status);
       axes[i].refPixel = ivalue;
 
 // axis types and commentary
       fits_read_key_str(fptr, ctype[i], svalue, comment, &status);
-      fits_report_error(stderr, status);
-      if (status != 0) {
-         throw std::runtime_error
-            ("FitsImage::read_fits_image: cfitsio error");
-      }
+      fitsReportError(status);
       axes[i].axisType = svalue;
       axes[i].comment = comment;
       
@@ -230,10 +206,7 @@ void FitsImage::read_fits_image(std::string &filename,
    tmpImage = new double[npixels];
    fits_read_img_dbl(fptr, group, fpixel, npixels, nullval, 
                      tmpImage, &anynull, &status);
-   fits_report_error(stderr, status);
-   if (status != 0) {
-      throw std::runtime_error("FitsImage::read_fits_image: cfitsio error");
-   }
+   fitsReportError(status);
 
    image.resize(npixels);
 
@@ -243,10 +216,65 @@ void FitsImage::read_fits_image(std::string &filename,
    delete [] tmpImage;
 
    fits_close_file(fptr, &status);
-   fits_report_error(stderr, status);
-   if (status != 0) {
-      throw std::runtime_error("FitsImage::read_fits_image: cfitsio error");
+   fitsReportError(status);
+}
+
+int FitsImage::findHdu(const std::string & fitsFile, 
+                       const std::string & extension) {
+   s_fitsRoutine = "findHdu";
+   
+   int status(0);
+   fitsfile * fptr = 0;
+
+   fits_open_file(&fptr, fitsFile.c_str(), READONLY, &status);
+   fitsReportError(status);
+   
+   int nhdus;
+   fits_get_num_hdus(fptr, &nhdus, &status);
+   fitsReportError(status);
+
+   int hdutype(0);
+   char extname[20];
+   char comment[72];
+   for (int hdu = 1; hdu < nhdus+1; hdu++) {
+      fits_movabs_hdu(fptr, hdu, &hdutype, &status);
+      fitsReportError(status);
+      
+      fits_read_key_str(fptr, "EXTNAME", extname, comment, &status);
+      if (status == 202) {
+         status = 0;
+         continue;
+      } else {
+         fitsReportError(status);
+      }
+      
+      if (extension == extname) {
+         fits_close_file(fptr, &status);
+         fitsReportError(status);
+         return hdu;
+      }
    }
+   fits_close_file(fptr, &status);
+   fitsReportError(status);
+
+   std::ostringstream message;
+   message << "FitsImage::findHdu: HDU number not found for file "
+           << fitsFile << " and extension " << extension;
+   throw std::runtime_error(message.str());
+   return -1;
+}
+
+void FitsImage::fitsReportError(int status, std::string routine) {
+   if (status == 0) {
+      return;
+   }
+   if (routine == "") {
+      routine = "FitsImage::" + s_fitsRoutine;
+   }
+   fits_report_error(stderr, status);
+   std::ostringstream message;
+   message << routine << ": CFITSIO error " << status;
+   throw std::runtime_error(message.str());
 }
 
 } // namespace genericSources
