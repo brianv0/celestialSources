@@ -11,6 +11,7 @@
 #include "astro/JulianDate.h"
 #include "astro/EarthOrbit.h"
 #include "astro/SolarSystem.h"
+#include "src/jplephem/bary.h" //local interface to the JPL ephemeris
 #include "astro/GPS.h"
 #include <cmath>
 #include <fstream>
@@ -176,14 +177,33 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
 
   PulsarLog.close();
 
-  astro::EarthOrbit m_earthOrbit();
-  astro::SolarSystem m_solSys();
+  astro::JulianDate JDStart(2007, 1, 1, 0.0);
+  // astro::JulianDate JDStart(2006, 12, 31, 12.0);
+
+   std::cout << std::setprecision(30) << JDStart << "MJD " << JDStart - JDminusMJD << std::endl;
+   astro::EarthOrbit m_earthOrbit();//JDStart);
+   astro::SolarSystem m_solSys();
+
+  //There id a strange difference of 0.5 days in astro package, so temporarly we use direct JPL ephem
+  //start ephem
+  s_ephemInitialized = false;
+  
+  if(!s_ephemInitialized) {
+    int ephnum = 405;
+    int denum;
+    double c, radsol, msol;
+    int j= initephem (ephnum, &denum, &c, &radsol, &msol);
+    if ( j !=0 ) {
+      std::cout << "ERROR in JPL Ephem reader in PulsarSpectrum: could not initilze JPL ephemeris" <<std::endl;
+    }
+  }
+    s_ephemInitialized = true;
+
+    //end ephem
 
 
   astro::SkyDir m_PulsarDir(m_RA,m_dec,astro::SkyDir::EQUATORIAL);
   m_PulsarVectDir = m_PulsarDir.dir();
-
-
   
   m_Pulsar    = new PulsarSim(m_PSRname, m_seed, m_flux, m_enphmin, m_enphmax, m_period, m_numpeaks);
 
@@ -260,13 +280,13 @@ double PulsarSpectrum::interval(double time)
 {  
   //std::cout << " pippo 1 " << std::endl;
   double timeTildeDecorr = time + (StartMissionDateMJD)*SecsOneDay; //Arrivat time decorrected
-  double timeTilde = timeTildeDecorr + getBaryCorr(timeTildeDecorr); //should be corrected before applying ephem de-corrections
-  if (DEBUG)
-    {
-      if ((int(timeTilde - (StartMissionDateMJD)*SecsOneDay) % 20000) < 1.5)
-	std::cout << "**  Time reached is: " << timeTilde-(StartMissionDateMJD)*SecsOneDay
+  double timeTilde = timeTildeDecorr;// + getBaryCorr(timeTildeDecorr); //should be corrected before applying ephem de-corrections
+  //  if (DEBUG)
+  //{
+  //  if ((int(timeTilde - (StartMissionDateMJD)*SecsOneDay) % 20000) < 1.5)
+	std::cout << "\n\n**  Time reached is: " << timeTilde-(StartMissionDateMJD)*SecsOneDay
 		  << " seconds from Mission Start  - pulsar " << m_PSRname << std::endl;
-    }
+	// }
 
   //First part: Ephemerides calculations...
   double initTurns = getTurns(timeTilde); //Turns made at this time 
@@ -277,11 +297,15 @@ double PulsarSpectrum::interval(double time)
   double inteTurns = inte/m_period; // conversion to # of turns
   double totTurns = initTurns + inteTurns; //Total turns at the nextTimeTilde
   double nextTimeTilde = retrieveNextTimeTilde(timeTilde, totTurns, (1e-6/m_period));
+  std::cout << "\nPPPP" << std::endl;
+
+  std::cout <<   getBaryCorr(timeTildeDecorr) << std::endl;
+  /*
   //Second part: baycentric decorrection
   //Use the bisection method to find the inverse of the de-corrected time, i.e. the time (in TT)
   //that after correction is equal to Time in TDB
 
-  double deltaMax = 510.0; //max deltat secs
+   double deltaMax = 510.0; //max deltat secs
   double err = 5e-5; //50 us
   double ttUp = nextTimeTilde + deltaMax;
   double ttDown = nextTimeTilde - deltaMax;
@@ -324,9 +348,12 @@ double PulsarSpectrum::interval(double time)
      std::cout << " corrected is " << nextTimeDecorr + getBaryCorr(nextTimeDecorr) - (StartMissionDateMJD)*SecsOneDay << std::endl;
      std::cout << " interval is " <<  nextTimeDecorr - timeTildeDecorr << std::endl;
   }
-  
-  return nextTimeDecorr - timeTildeDecorr; //interval between the de-corected times
-  //return nextTimeTilde-timeTilde;
+  */
+  // return nextTimeDecorr - timeTildeDecorr; //interval between the de-corected times
+  std::cout << " 999nextTimeTilde decorrected is" << nextTimeTilde - (StartMissionDateMJD)*SecsOneDay << "sec." << std::endl;
+  std::cout << " interval is " <<  nextTimeTilde - timeTilde << std::endl;
+  std::cout << " fine " << std::endl;
+   return nextTimeTilde-timeTilde;
 
 }
 
@@ -429,18 +456,19 @@ double PulsarSpectrum::retrieveNextTimeTilde( double tTilde, double totalTurns, 
 double PulsarSpectrum::getBaryCorr( double ttInput )
 {
   //Start Date;
+  //astro::JulianDate ttJD(2005, 7, 18, 0.0);
   astro::JulianDate ttJD(2007, 1, 1, 0.0);
-  if (DEBUG)
-    {
-      std::cout << std::setprecision(30) << "Barycentric Corrections for time " 
-		<< ttJD + (ttInput/SecsOneDay) << " (JD)" << std::endl;
-    }
-
-
   ttJD = ttJD+(ttInput - (StartMissionDateMJD)*SecsOneDay)/86400.;
 
-  //std::cout << std::setprecision(30) << " JD " << ttJD << std::endl;
+  //if (DEBUG)
+    //{
+      std::cout << std::setprecision(30) << "\nQQQBarycentric Corrections for time " 
+		<< ttJD + (ttInput - ((StartMissionDateMJD)*86400))/SecsOneDay << " (JD)" << std::endl;
+      //}
 
+
+      //  std::cout << std::setprecision(30) << " JD added " << ttJD << std::endl;
+      
   // Conversion TT to TDB, from JDMissionStart (that glbary uses as MJDref)
   double tdb_min_tt = m_earthOrbit.tdb_minus_tt(ttJD);
 
@@ -449,9 +477,50 @@ double PulsarSpectrum::getBaryCorr( double ttInput )
   // are compute for a time that is JD-05, so at this time we need to add 0.5 to the value
   // to be put into getSolarVector and getBarycenter
 
+ 
+  /*
+ //temporarly we read JPL ephem directly because of a problem of 0. days difference in astro
+  //start JPL ephem use for Geometrical and Shapiro correction
+  //TO BE REMOVED WHEN TOBY FIND THE SOLUTION TO 0.5 DIFFERENCE
+  
+  double jdt[2], *jdpointer;
+  jdt[0] = floor(ttJD+0.5);
+  jdt[1] = ttJD - jdt[0]; //ttJD - floor(ttJD);
+  jdpointer = &jdt[0];
+
+  std::cout << " ***astro-pulsarJPL jd0 = " << jdt[0] 
+	    << " jd1  " << jdt[1] << std::endl;
+  
+  const double *eposn =  dpleph(jdpointer, 3, 11);
+  double x = -eposn[0];
+no  double y = -eposn[1];
+  double z = -eposn[2];
+
+  Hep3Vector barycenter(x,y,z);
+
+  Hep3Vector GeomVect = (m_earthOrbit.position(ttJD));
+  std::cout << std::setprecision(30) << "Pulsar - SC pos x " << GeomVect.x() << " y " << GeomVect.y() 
+	    << " z " << GeomVect.z() << std::endl;
+
+
+  GeomVect = (m_earthOrbit.position(ttJD)/clight) - barycenter;
+  double GeomCorr = GeomVect.dot(m_PulsarVectDir);
+   
+  //SolarVector
+  x = -eposn[0] + eposn[3];
+  y = -eposn[1] + eposn[4];
+  z = -eposn[2] + eposn[5];
+   Hep3Vector sunV(x,y,z);
+
+  //end JPL ephem use. 
+
+
+  */
 
   //Correction due to geometric time delay of light propagation 
+  std::cout << " earthorbit.position da PuslaSpectrum " << std::endl;
   Hep3Vector GeomVect = (m_earthOrbit.position(ttJD)/clight) - m_solSys.getBarycenter(ttJD);
+  std::cout << " earthorbit.position da PuslaSpectrum1 " << std::endl;  
   double GeomCorr = GeomVect.dot(m_PulsarVectDir);
 
   //Correction due to Shapiro delay.
@@ -462,13 +531,13 @@ double PulsarSpectrum::getBaryCorr( double ttInput )
   double m = 4.9271e-6; // m = G * Msun / c^3
   double ShapiroCorr = 2.0 * m * log(1+costheta);
 
-  if (DEBUG)
-  {
+  // if (DEBUG)
+  //{
     std::cout << std::setprecision(15) << "** --> TDB-TT = " << tdb_min_tt << std::endl;
     std::cout << std::setprecision(15) << "** --> Geom. delay = " << GeomCorr << std::endl;
     std::cout << std::setprecision(15) << "** --> Shapiro delay = " << ShapiroCorr << std::endl;
     std::cout << std::setprecision(15) << "** ====> Total= " << tdb_min_tt + GeomCorr + ShapiroCorr  << std::endl;
-  }  
+    //}  
 
   return tdb_min_tt + GeomCorr + ShapiroCorr; //seconds
 

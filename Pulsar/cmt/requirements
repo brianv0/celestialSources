@@ -6,7 +6,7 @@ author Nicola Omodei<nicola.omodei@pi.infn.it>, Massimiliano Razzano <massimilia
 use flux       v8r*
 use ROOT       v*  IExternal
 use SpectObj   v* celestialSources
-use astro v*
+use astro v1r5
 
 
 macro_append ROOT_libs " -lHist -lGraf "\

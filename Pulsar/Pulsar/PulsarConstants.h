@@ -60,7 +60,7 @@ namespace cst
   const double EGRET3=3.0e7;                  
 
   //! Start Mission Date, expressed in MJD (July,18 2005, 00:00:00)
-  //  const double StartMissionDateMJD = 53569.0; 
+  //const double StartMissionDateMJD = 53569.0; 
   const double StartMissionDateMJD = 54101.0; 
 
 

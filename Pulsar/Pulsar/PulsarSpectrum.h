@@ -80,10 +80,11 @@ class PulsarSpectrum : public ISpectrum
   
   astro::EarthOrbit m_earthOrbit;
   astro::SolarSystem m_solSys;
+  bool s_ephemInitialized;
 
   astro::SkyDir m_PulsarDir;
   Hep3Vector m_PulsarVectDir;
-
+  
   const std::string& m_params; 
   
   std::string m_PSRname;
