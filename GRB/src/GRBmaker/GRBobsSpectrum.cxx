@@ -129,7 +129,7 @@ void GRBobsSpectrum::parseParamList(const std::string &input,
 
 double GRBobsSpectrum::flux(double time) const
 { 
-        std::cout << "Returning Flux: " << m_grb->globalData()->flux() << std::endl;
+ //       std::cout << "Returning Flux: " << m_grb->globalData()->flux() << std::endl;
     return m_grb->globalData()->flux();
 }
 
@@ -137,7 +137,7 @@ double GRBobsSpectrum::flux(double time) const
 
 float GRBobsSpectrum::fraction(float energy) 
 {
-        std::cout << "Returning Fraction: " << m_grb->globalData()->fraction() << std::endl;
+ //       std::cout << "Returning Fraction: " << m_grb->globalData()->fraction() << std::endl;
     return m_grb->globalData()->fraction();
 }
 
@@ -148,9 +148,19 @@ double GRBobsSpectrum::interval(double time)
         static const std::vector<TimeEnergy> &photonList = m_grb->photonlist();
         static int sz = photonList.size();
 
+// find the next photon in the list that comes after _time_ - recall that indx starts at -1
+// if the next guy in the list is greater than time, just increment indx for use here and in
+// energy and dir functions.
+
+		if (time > photonList[sz-1].time()) return INVTIME;
+
+		if (photonList[indx+1].time() < time){
+			while (photonList[++indx].time() < time) {};
+		}
+		else indx++;
 
         if (indx < sz)
-                return photonList[++indx].time() - time;
+                return photonList[indx].time() - time;
 
         else
                 return INVTIME;

@@ -493,7 +493,7 @@ std::ifstream &operator>>(std::ifstream &is, GRBurst &grb)
 	grb.m_photonlist[i].setDir(radec);
     }
     
-	std::cout << "Finished reading file...\n";
+	std::cout << "Finished reading file..." << std::endl;
     return is;
 }
 
