@@ -1,7 +1,7 @@
 #include "GRBobs/GRBobsPulse.h"
 #include <iostream>
 
-#define DEBUG 1  
+#define DEBUG 0  
 
 GRBobsPulse::GRBobsPulse(){;}
 

@@ -94,6 +94,7 @@ class GRBobsmanager : public ISpectrum
 
   double m_fluence;
   int    m_Npulses;
+  long   m_GRBnumber;
   double m_ExponentialTau;
   double m_MinPhotonEnergy;
   double m_startTime;

@@ -25,7 +25,6 @@ void GRBobsSim::GetUniqueName(const void *ptr, std::string & name)
   name = my_name.str();
   gDirectory->Delete(name.c_str());
 }
-
 TH2D* GRBobsSim::MakeGRB()
 {
   double *e = new double[Ebin +1];
@@ -46,10 +45,9 @@ TH2D* GRBobsSim::MakeGRB()
     }
   
   m_tbin = TMath::Max(10,int(m_tfinal/s_TimeBinWidth));
-  m_tbin = TMath::Min(1000,m_tbin);
+  m_tbin = TMath::Min(10000,m_tbin);
   s_TimeBinWidth = m_tfinal/m_tbin;
   //  double dt = m_tfinal/(m_tbin-1);
-  std::cout<<"Tfinal  = "<<m_tfinal<<" TBin = "<<m_tbin<<" "<<s_TimeBinWidth<<std::endl;
   gDirectory->Delete("Nv");
   m_Nv = new TH2D("Nv","Nv",m_tbin,0.,m_tfinal,Ebin, e);
   

@@ -1,6 +1,6 @@
 #include "GRBobs/GRBobsmanager.h"
 #include <iostream>
-
+#include <fstream>
 #include "flux/SpectrumFactory.h" 
 
 ISpectrumFactory &GRBobsmanagerFactory() 
@@ -24,7 +24,7 @@ GRBobsmanager::GRBobsmanager(const std::string& params)
   m_MinPhotonEnergy = parseParamList(params,5)*1.0e3; //MeV
   
   m_par = new GRBobsParameters();
-
+  m_GRBnumber = 65540+m_Npulses;
   m_par->SetGRBNumber(65540+m_Npulses);  
   m_par->SetNumberOfPulses(m_Npulses);
   m_par->SetAlphaBeta(alpha,beta);
@@ -37,8 +37,10 @@ GRBobsmanager::GRBobsmanager(const std::string& params)
   m_spectrum->SetAreaDetector(EventSource::totalArea());
   //////////////////////////////////////////////////
   m_endTime   = m_startTime + m_GRB->Tmax();
-  std::cout<<" GRB starting at time: "<<m_startTime<<" GRB ending at time: "<<m_endTime<<std::endl;
-  std::cout<<" EventSource::totalArea()= "<<EventSource::totalArea()<<std::endl;
+
+  std::ofstream os("grbobs_generated.txt",std::ios::app);
+  os<<m_GRBnumber<<" "<<m_startTime<<" "<<m_endTime<<" "<<m_fluence<<" "<<m_Npulses<<" "<<alpha<<" "<<beta<<std::endl;
+  std::cout<<" Generate GRB obs ("<<m_GRBnumber<<"), ts = "<<m_startTime<<" te ="<<m_endTime<<" F= "<<m_fluence<<" N = "<<m_Npulses<<" a= "<<alpha<<" b= "<<beta<<std::endl;
 }
 
 GRBobsmanager::~GRBobsmanager() 

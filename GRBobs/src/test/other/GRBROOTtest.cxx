@@ -27,7 +27,11 @@ int    TBIN, EBIN;
 
 double Band(double *var, double *par);
 void help();
-#define DEBUG=0
+void ScanParameters(int Ngrb);
+
+#define DEBUG 0
+
+#define GenerationArea 1.0 //1.21
 
 double Band(double *var, double *par)
 {
@@ -191,11 +195,7 @@ void PlotGRB(double enph = 0,char name[100]="grb_65540.root")
   
   //////////////////////////////////////////////////
   SpectObj *sp = new SpectObj(Nv,0);              //ph
-
-  std::pair<float,float> dir = std::make_pair((float)0.0,(float)0.0);
-  
-  //  sp->SaveParameters(0.0,dir);
-  
+  sp->SetAreaDetector(GenerationArea); //like observation sim
   //////////////////////////////////////////////////
   TCanvas *clc = new TCanvas("clc","clc",600,800);
   TCanvas *csp = new TCanvas("csp","csp");
@@ -487,6 +487,128 @@ void MakeGRB(int NGRB=1, double enph=0, bool gbm=false)
   
  }
 
+//////////////////////////////////////////////////
+void ScanParameters(int Ngrb)
+{
+  
+  std::string path = ::getenv("GRBOBSROOT");
+  std::string paramFile = path+"/src/test/GRBParam.txt";  
+  GRBobsParameters *params = new GRBobsParameters();  
+
+  //////////////////////////////////////////////////
+  // OUTPUT
+  double T90;
+  double fBATSE1,fBATSE2,fBATSE3,fBATSE4;
+  double fBATSE, fLAT,fGBM,fEXP,fTOT;
+  double nBATSE,nLAT,nGBM,nEXP,nTOT,Ep;
+  //////////////////////////////////////////////////
+  TTree *GRBTree = new TTree("GRBTree","GRBOBS Catalogue");
+  GRBTree->Branch("T90",&T90,"T90/D");
+  
+  GRBTree->Branch("LogfBATSE",&fBATSE,"fBATSE/D");  
+  GRBTree->Branch("Logf1BATSE",&fBATSE1,"fBATSE1/D");
+  GRBTree->Branch("Logf2BATSE",&fBATSE2,"fBATSE2/D");
+  GRBTree->Branch("Logf3BATSE",&fBATSE3,"fBATSE3/D");
+  GRBTree->Branch("Logf4BATSE",&fBATSE4,"fBATSE4/D");
+
+  GRBTree->Branch("LogfLAT",&fLAT,"LogfLAT/D");
+  GRBTree->Branch("LogfGBM",&fGBM,"LogfGBM/D");
+  GRBTree->Branch("LogfEXP",&fEXP,"LogfEXP/D");
+  GRBTree->Branch("LogfTOT",&fTOT,"LogfTOT/D");
+  
+  GRBTree->Branch("LognBATSE",&nBATSE,"LognBATSE/D");
+  GRBTree->Branch("LognLAT",&nLAT,"LognLAT/D");
+  GRBTree->Branch("LognGBM",&nGBM,"LognGBM/D");
+  GRBTree->Branch("LognEXP",&nEXP,"LognEXP/D");
+  GRBTree->Branch("LognTOT",&nTOT,"LognTOT/D");
+  GRBTree->Branch("LogEp",&Ep,"LogEp/D");
+  
+  
+  
+  for(long grbn=1;grbn<=Ngrb;grbn++)
+    {
+      std::cout<<" GRBOBS number : "<<grbn<<" / "<<Ngrb<<std::endl;
+      params->ReadParametersFromFile(paramFile,grbn);
+      params->PrintParameters();
+      GRBobsSim m_grb(params);
+      TH2D *Nv = m_grb.MakeGRB();
+      
+      TMIN = Nv->GetXaxis()->GetXmin();
+      TMAX = Nv->GetXaxis()->GetXmax();
+      EMIN = Nv->GetYaxis()->GetXmin();
+      EMAX = Nv->GetYaxis()->GetXmax();
+      EBIN = Nv->GetYaxis()->GetNbins();
+      
+      
+      // e2Ne = e * Ne * de: [keV/s/m^2]
+      gDirectory->Delete("e2Ne");
+      Nv->ProjectionY("e2Ne");
+      TH1D *e2Ne = (TH1D*) gDirectory->Get("e2Ne");
+      Ep=0.0;
+      for(int i=0; i < EBIN; i++)
+	{
+	  double ne = e2Ne->GetBinContent(i+1);
+	  double de = e2Ne->GetBinWidth(i+1);//GetBinCenter(i+1);
+	  double en = e2Ne->GetBinCenter(i+1);
+	  e2Ne->SetBinContent(i+1,en*en*ne);
+	  //if(en*de*ne > FEp && en < 1e4) Ep=e;
+	}
+      Ep = log10(e2Ne->GetBinCenter(e2Ne->GetMaximumBin()));
+      //////////////////////////////////////////////////
+      SpectObj *sp = new SpectObj(Nv,0);              //ph
+      sp->SetAreaDetector(GenerationArea); //like observation sim
+      //////////////////////////////////////////////////
+  
+      TH1D *Lct_TOT   = sp->Integral_E(EMIN,EMAX);  // ph
+      TH1D *Lct_BATSE = sp->Integral_E(BATSE1,BATSE5);  // ph
+      TH1D *Lct_GBM   = sp->Integral_E(GBM1,GBM2);  // ph
+      TH1D *Lct_LAT   = sp->Integral_E(LAT1,LAT2);  // ph
+      TH1D *Lct_EXT   = sp->Integral_E(enph,EMAX);  // ph
+      
+      T90    = log10(sp->GetT90());
+      fTOT   = log10(sp->GetFluence());
+      fBATSE = log10(sp->GetFluence(BATSE1,BATSE5));
+      fBATSE1 = log10(sp->GetFluence(BATSE1,BATSE2));
+      fBATSE2 = log10(sp->GetFluence(BATSE2,BATSE3));
+      fBATSE3 = log10(sp->GetFluence(BATSE3,BATSE4));
+      fBATSE4 =log10( sp->GetFluence(BATSE4,BATSE5));
+
+      fGBM   = log10(sp->GetFluence(GBM1,GBM2));
+      fLAT   = log10(sp->GetFluence(LAT1,LAT2));
+      fEXP   = log10(sp->GetFluence(enph,emax));
+      
+      nTOT   = log10(sp->Integral_T(Lct_TOT,0.0,TMAX));
+      nBATSE = log10(sp->Integral_T(Lct_BATSE,0.0,TMAX));
+      nGBM   = log10(sp->Integral_T(Lct_GBM,0.0,TMAX));
+      nLAT   = log10(sp->Integral_T(Lct_LAT,0.0,TMAX));
+      
+      std::cout<<"* Theoretical values:  *****************************"<<std::endl;
+      std::cout<<" T90 = "<<pow(10,T90)<<" Epeak = "<<pow(10,Ep)<<std::endl;
+      std::cout<<" log TOT   flux ("<< emin <<","<< emax <<") = "<<fTOT<<" erg/cm^2"<<std::endl;
+      std::cout<<" BASTE flux (ch1) ("<<BATSE1<<","<<BATSE2<<") = "<<pow(10,fBATSE1)<<" erg/cm^2"<<std::endl;
+      std::cout<<" BASTE flux (ch2) ("<<BATSE2<<","<<BATSE3<<") = "<<pow(10,fBATSE2)<<" erg/cm^2"<<std::endl;
+      std::cout<<" BASTE flux (ch3) ("<<BATSE3<<","<<BATSE4<<") = "<<pow(10,fBATSE3)<<" erg/cm^2"<<std::endl;
+      std::cout<<" BASTE flux (ch4) ("<<BATSE4<<","<<BATSE5<<") = "<<pow(10,fBATSE4)<<" erg/cm^2"<<std::endl;
+      std::cout<<" BASTE flux (tot) ("<<BATSE1<<","<<BATSE5<<") = "<<pow(10,fBATSE)<<" erg/cm^2"<<std::endl;
+      std::cout<<" GBM   flux ("<< GBM1 <<","<< GBM2 <<") = "<<fGBM<<" erg/cm^2"<<std::endl;
+      std::cout<<"  LAT   flux ("<< LAT1 <<","<< LAT2 <<") = "<<pow(10,fLAT)<<" erg/cm^2"<<std::endl;
+      std::cout<<"  Nph TOT    ("<<EMIN<<","<<EMAX<<")  = "<<pow(10,nTOT)<<std::endl;
+      std::cout<<"  Nph BATSE  ("<<BATSE1<<","<<BATSE5<<") = "<<pow(10,nBATSE)<<std::endl;
+      std::cout<<"  Nph GBM    ("<<GBM1<<","<<GBM2<<")  = "<<pow(10,nGBM)<<std::endl;
+      std::cout<<"  Nph LAT    ("<<LAT1<<","<<LAT2<<")  = "<<pow(10,nLAT)<<std::endl;
+      //	  if(output) delete sp;
+      GRBTree->Fill();
+      if(grbn%10==0)
+	{
+	  TFile aFile("GRBCatalogueFile.root","RECREATE");
+	  GRBTree->Write();
+	}
+      delete sp;
+    }
+  TFile aFile("GRBobsCatalogueFile.root","RECREATE");
+  GRBTree->Write();
+  delete params;
+}
 
 
 int main(int argc, char** argv)
@@ -496,6 +618,7 @@ int main(int argc, char** argv)
   int current_arg = 1;
   double enph=0.0;
   int ngrb=1;
+  int ngrbs=0;
   bool video_out=true;
   bool gbm = false;
   while(current_arg < argc)
@@ -514,13 +637,23 @@ int main(int argc, char** argv)
 	{
 	  gbm=true;
 	}
+      else if("-scan"==arg_name)
+	{
+	  ngrbs=atoi(argv[++current_arg]);
+	}
       current_arg++;
     }
   
-  TApplication theApp("App",0,0);
-
-  MakeGRB(ngrb,enph,gbm);
-  theApp.Run();
+  if(ngrbs>0)
+    {
+      ScanParameters(ngrbs);
+    }
+  else
+    {
+      TApplication theApp("App",0,0);
+      MakeGRB(ngrb,enph,gbm);
+      theApp.Run();
+    }
 }
 
 void help()

@@ -12,7 +12,6 @@ GRBobsengine::GRBobsengine(GRBobsParameters *params)
   : m_params(params)
 {
   m_dir = m_params->GetGalDir(); 
-  std::cout<<" Create new GRBobs (N= "<<m_params->GetGRBNumber()<<std::endl;//") at Position : l,b= "<<m_dir.first<<", "<<m_dir.second<<std::endl;
 }
 
 std::vector<GRBobsPulse*> GRBobsengine::CreatePulsesVector()
