@@ -1,0 +1,8 @@
+PROJECT_NAME           = "SpectObj package"
+#PROJECT_NUMBER         = "v1"
+FILE_PATTERNS          = *.cxx *.cpp *.h
+STRIP_CODE_COMMENTS    = NO
+EXAMPLE_PATH           = ".." "." 
+INPUT                  = ../src ../SpectObj
+#QUIET                  = YES
+GENERATE_TREEVIEW      = YES
