@@ -15,6 +15,7 @@
 #include <fstream>
 #include <iomanip>
 
+#define DEBUG 0
 
 using namespace cst;
 
@@ -112,24 +113,61 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
   m_f0 = 1.0/m_period;
   m_f1 = -m_pdot/(m_period*m_period);
   m_f2 = 2*pow((m_pdot/m_period),2.0)/m_period - m_p2dot/(m_period*m_period);
-  
- 
-  //Writes out Pulsar Info
-  std::cout << " \n********   PulsarSpectrum initialized !   ********" << std::endl;
-  std::cout << "**   Name : " << m_PSRname << std::endl;
-  std::cout << "**   Position : (RA,Dec)=(" << m_RA << "," << m_dec 
+  std::cout << " \n********   PulsarSpectrum initialized for Pulsar " << m_PSRname << std::endl;
+  if (DEBUG)
+    {
+      //Writes out Pulsar Info
+      std::cout << " \n********   PulsarSpectrum initialized !   ********" << std::endl;
+      std::cout << "**   Name : " << m_PSRname << std::endl;
+      std::cout << "**   Position : (RA,Dec)=(" << m_RA << "," << m_dec 
+		<< ") ; (l,b)=(" << m_l << "," << m_b << ")" << std::endl; 
+      std::cout << "**   Flux above 100 MeV : " << m_flux << " ph/cm2/s " << std::endl;
+      std::cout << "**   Number of peaks : " << m_numpeaks << std::endl;
+      std::cout << "**   Epoch (MJD) :  " << m_t0 << std::endl;
+      std::cout << "**   Phi0 (at Epoch t0) : " << m_phi0 << std::endl;
+      std::cout << "**   Period : " << m_period << " s. | f0: " << m_f0 << std::endl;
+      std::cout << "**   Pdot : " <<  m_pdot  << " | f1: " << m_f1 << std::endl; 
+      std::cout << "**   P2dot : " <<  m_p2dot  << " | f2: " << m_f2 << std::endl; 
+      std::cout << "**   Enphmin : " << m_enphmin << " keV | Enphmax: " << m_enphmax << " keV" << std::endl;
+      std::cout << "**   Mission started at (MJD) : " << StartMissionDateMJD << " (" 
+		<< std::setprecision(12) << (StartMissionDateMJD+JDminusMJD)*SecsOneDay << " sec.) - Jul,18 2005 00:00.00" << std::endl;
+      std::cout << "**************************************************" << std::endl;
+
+    }
+
+
+  //writes out an output  log file
+
+  char logLabel[40];
+
+  for (int i=0; i< m_PSRname.length()+1; i++)
+    {
+      logLabel[i] = m_PSRname[i];
+    }
+
+  sprintf(logLabel,"%sLog.txt",logLabel);
+  ofstream PulsarLog;
+  PulsarLog.open(logLabel);
+
+  PulsarLog << "\n********   PulsarSpectrum Log for pulsar" << m_PSRname << std::endl;
+  PulsarLog << "\n**   Name : " << m_PSRname << std::endl;
+  PulsarLog << "**   Position : (RA,Dec)=(" << m_RA << "," << m_dec 
 	    << ") ; (l,b)=(" << m_l << "," << m_b << ")" << std::endl; 
-  std::cout << "**   Flux above 100 MeV : " << m_flux << " ph/cm2/s " << std::endl;
-  std::cout << "**   Number of peaks : " << m_numpeaks << std::endl;
-  std::cout << "**   Epoch (MJD) :  " << m_t0 << std::endl;
-  std::cout << "**   Phi0 (at Epoch t0) : " << m_phi0 << std::endl;
-  std::cout << "**   Period : " << m_period << " s. | f0: " << m_f0 << std::endl;
-  std::cout << "**   Pdot : " <<  m_pdot  << " | f1: " << m_f1 << std::endl; 
-  std::cout << "**   P2dot : " <<  m_p2dot  << " | f2: " << m_f2 << std::endl; 
-  std::cout << "**   Enphmin : " << m_enphmin << " keV | Enphmax: " << m_enphmax << " keV" << std::endl;
-  std::cout << "**   Mission started at (MJD) : " << StartMissionDateMJD << " (" 
-	    << std::setprecision(12) << (StartMissionDateMJD+JDminusMJD)*SecsOneDay << " sec.) - Jul,18 2005 00:00.00" << std::endl;
-  std::cout << "**************************************************" << std::endl;
+  PulsarLog << "**   Flux above 100 MeV : " << m_flux << " ph/cm2/s " << std::endl;
+  PulsarLog << "**   Number of peaks : " << m_numpeaks << std::endl;
+  PulsarLog << "**   Epoch (MJD) :  " << m_t0 << std::endl;
+  PulsarLog << "**   Phi0 (at Epoch t0) : " << m_phi0 << std::endl;
+  PulsarLog << "**   Period : " << m_period << " s. | f0: " << m_f0 << std::endl;
+  PulsarLog << "**   Pdot : " <<  m_pdot  << " | f1: " << m_f1 << std::endl; 
+  PulsarLog << "**   P2dot : " <<  m_p2dot  << " | f2: " << m_f2 << std::endl; 
+  PulsarLog << "**   Enphmin : " << m_enphmin << " keV | Enphmax: " << m_enphmax << " keV" << std::endl;
+  PulsarLog << "**   Mission started at (MJD) : " << StartMissionDateMJD << " (" 
+		<< std::setprecision(12) << (StartMissionDateMJD+JDminusMJD)*SecsOneDay << " sec.) - Jul,18 2005 00:00.00" << std::endl;
+  PulsarLog << "**************************************************" << std::endl;
+   PulsarLog << "**   Model chosen : " << m_model << " --> Using Phenomenological Pulsar Model " << std::endl;  
+  // PulsarLog << "**  Effective Area set to : " << m_spectrum->GetAreaDetector() << " m2 " << std::endl; 
+
+  PulsarLog.close();
 
   astro::EarthOrbit m_earthOrbit();
   
@@ -137,16 +175,26 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
 
   if (m_model == 1)
     {
-      std::cout << "\n**   Model chosen : " << m_model << " --> Using Phenomenological Pulsar Model " << std::endl;  
+
+
       m_spectrum = new SpectObj(m_Pulsar->PSRPhenom(ppar1,ppar2,ppar3,ppar4),1);
       m_spectrum->SetAreaDetector(EventSource::totalArea());
-      std::cout << "**  Effective Area set to : " << m_spectrum->GetAreaDetector() << " m2 " << std::endl; 
+
+      if (DEBUG)
+	{
+	  std::cout << "**   Model chosen : " << m_model << " --> Using Phenomenological Pulsar Model " << std::endl;  
+	  std::cout << "**  Effective Area set to : " << m_spectrum->GetAreaDetector() << " m2 " << std::endl; 
+	}  
     }
   else 
     {
       std::cout << "ERROR!  Model choice not implemented " << std::endl;
       exit(1);
     }
+
+
+
+
   
   //Test for Baryc corrections..
   //ofstream file;
@@ -217,6 +265,7 @@ double PulsarSpectrum::interval(double time)
   //std::cout << std::setprecision(30) << "       diff " << fabs(modf(getTurns(nextTimeTilde),&intPart)-finPh) << std::endl;
 
 
+  /*
   //Second Part barycentric de-corrections
 
   astro::JulianDate JDStartMission(2005, 7, 18, 0.0);
@@ -241,8 +290,9 @@ double PulsarSpectrum::interval(double time)
  
   BaryOutFile << std::setprecision(30) << nextTimeTilde - (StartMissionDateMJD)*SecsOneDay << std::endl;
   BaryOutFile.close();
+  */
 
-   return nextTimeTilde - timeTilde;
+  return nextTimeTilde - timeTilde;
 }
 
 /////////////////////////////////////////////

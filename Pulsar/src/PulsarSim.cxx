@@ -12,6 +12,8 @@
 #include "TFile.h"
 #include "TF1.h"
 
+#define DEBUG 0
+
 using namespace cst;
 
 //////////////////////////////////////////////////
@@ -84,16 +86,7 @@ TH2D* PulsarSim::PSRPhenom(double par1, double par2, double par3, double par4)
   double E0 = par2;
   double b =  par4;
   double K1 = 138e-8; //This is the constant, will be overwritten by normalization
-
-  //Write out informations about the model parameters
-  std::cout << "\n******** Pulsar Phenomenological Model ********" << std::endl;
-  std::cout << "**  Random seed for the model : " << m_seed << std::endl;
-  std::cout << "**  Spectrum parameters: " << std::endl;
-  std::cout << "**           En = " << En  
-	    << " | E0 = " << E0 << std::endl;
-  std::cout << "**           G1 = " << G1 
-	    << " | b  = "  << b << std::endl;
-  std::cout << "**  enphmin " << m_enphmin << " enphmax " << m_enphmax << std::endl; 
+ 
 
   //Establish the lower and upper limits for the energy in ROOT histogram.Write out these infos
   double LowEnBound = TMath::Min(cst::EnNormMin,m_enphmin); 
@@ -101,15 +94,63 @@ TH2D* PulsarSim::PSRPhenom(double par1, double par2, double par3, double par4)
     m_enphmax = cst::EnNormMax;
   double HighEnBound = TMath::Max(cst::EnNormMax,m_enphmax); 
   
-  std::cout << "**           Normalisation between " << cst::EnNormMin << " keV and " 
-	    << cst::EnNormMax << " keV " << std::endl;
-  std::cout << "**           Photon extraction between " << m_enphmin << " keV and " 
-	    << m_enphmax << " keV " << std::endl;
-  std::cout << "**  Spectrum calculated between " << LowEnBound << " keV and " 
-	    << HighEnBound << " keV " << std::endl; 
+
+  if (DEBUG)
+    { 
+      //Write out informations about the model parameters
+      std::cout << "\n******** Pulsar Phenomenological Model ********" << std::endl;
+      std::cout << "**  Random seed for the model : " << m_seed << std::endl;
+      std::cout << "**  Spectrum parameters: " << std::endl;
+      std::cout << "**           En = " << En  
+		<< " | E0 = " << E0 << std::endl;
+      std::cout << "**           G1 = " << G1 
+		<< " | b  = "  << b << std::endl;
+      std::cout << "**  enphmin " << m_enphmin << " enphmax " << m_enphmax << std::endl; 
+      std::cout << "**           Normalisation between " << cst::EnNormMin << " keV and " 
+		<< cst::EnNormMax << " keV " << std::endl;
+      std::cout << "**           Photon extraction between " << m_enphmin << " keV and " 
+		<< m_enphmax << " keV " << std::endl;
+      std::cout << "**  Spectrum calculated between " << LowEnBound << " keV and " 
+		<< HighEnBound << " keV " << std::endl; 
+    }
+
+
+  //writes out an output  log file
+  
+  char logSimLabel[40];
+
+  for (int i=0; i< m_name.length()+1; i++)
+    {
+      logSimLabel[i] = m_name[i];
+    }
+
+  sprintf(logSimLabel,"%sLog.txt",logSimLabel);
+  ofstream PulsarLogSim;
+  PulsarLogSim.open(logSimLabel,std::ios::app);
+
+
+  //Write out informations about the model parameters on the file
+  PulsarLogSim << "******** Pulsar Phenomenological Model ********" << std::endl;
+  PulsarLogSim << "**  Random seed for the model : " << m_seed << std::endl;
+  PulsarLogSim << "**  Spectrum parameters: " << std::endl;
+  PulsarLogSim << "**           En = " << En  
+	       << " | E0 = " << E0 << std::endl;
+  PulsarLogSim << "**           G1 = " << G1 
+	       << " | b  = "  << b << std::endl;
+  PulsarLogSim << "**  enphmin " << m_enphmin << " enphmax " << m_enphmax << std::endl; 
+  PulsarLogSim << "**           Normalisation between " << cst::EnNormMin << " keV and " 
+	       << cst::EnNormMax << " keV " << std::endl;
+  PulsarLogSim << "**           Photon extraction between " << m_enphmin << " keV and " 
+	       << m_enphmax << " keV " << std::endl;
+  PulsarLogSim << "**  Spectrum calculated between " << LowEnBound << " keV and " 
+	        << HighEnBound << " keV " << std::endl; 
+
+   PulsarLogSim.close();
+
+  
 
   //Create the spetrum profile
-  double de = pow(HighEnBound/LowEnBound,1.0/Ebin);
+   double de = pow(HighEnBound/LowEnBound,1.0/Ebin);
  
   TF1 PulsarSpectralShape("PulsarSpectralShape", 
 			  "([0]*((x/[1])^[2])*exp(-1.0*((x/[3])^[4])))", LowEnBound, HighEnBound);
@@ -185,18 +226,30 @@ TH2D* PulsarSim::PSRPhenom(double par1, double par2, double par3, double par4)
     } 
 
   //writes out informations about hte lightcurves.
-  std::cout << std::setprecision(3) << "**\n**  Lightcurve parameters: (midist = " 
-	    << mindist  << " s.)" << std::endl;
+  if (DEBUG)
+    {
+
+      std::cout << std::setprecision(3) << "**\n**  Lightcurve parameters: (midist = " 
+		<< mindist  << " s.)" << std::endl;
+    }
+
   if (ampl1 !=0)
     {
-      std::cout << std::setprecision(3) << "**           Peak 1 t = " << peak1 << "(Ph.= " << peak1/m_period << " ) " 
-		<< " , FWHM " << fwhm1 << " ampl1 " << ampl1 << std::endl; 
+      if (DEBUG)
+	{
+	  std::cout << std::setprecision(3) << "**           Peak 1 t = " << peak1 << "(Ph.= " << peak1/m_period << " ) " 
+		    << " , FWHM " << fwhm1 << " ampl1 " << ampl1 << std::endl; 
+	}
+
     }
   if (ampl2 !=0)
     {
-      std::cout << std::setprecision(3) << "**           Peak 2 t = " << peak2 << "(Ph.= " << peak2/m_period << " ) " 
-		<< " , FWHM " << fwhm2 << " ampl2 " << ampl2 << std::endl; 
-      std::cout << "***********************************************" << std::endl;
+      if (DEBUG)
+	{
+	  std::cout << std::setprecision(3) << "**           Peak 2 t = " << peak2 << "(Ph.= " << peak2/m_period << " ) " 
+		    << " , FWHM " << fwhm2 << " ampl2 " << ampl2 << std::endl; 
+	  std::cout << "***********************************************" << std::endl;
+	}    
     }
   
 
@@ -214,6 +267,7 @@ TH2D* PulsarSim::PSRPhenom(double par1, double par2, double par3, double par4)
   for(int i = 0; i<=Ebin; i++)
     {
       e[i] = LowEnBound*pow(de,1.0*i); //KeV
+      //     std::cout << " i " << i << " ei " << e[i] << std::endl;
     }
 
   gDirectory->Delete("Nv");
@@ -231,7 +285,6 @@ TH2D* PulsarSim::PSRPhenom(double par1, double par2, double par3, double par4)
 	}
       for(int ei = 0; ei < Ebin; ei++)
 	{
-	  
 	  double nv = PulsarSpectralShape.Eval(e[ei]);
 	  m_Nv->SetBinContent(ti+1, ei+1, nt*nv);// [ph/(cm² s KeV)]
 	}

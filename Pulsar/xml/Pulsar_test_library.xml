@@ -20,7 +20,7 @@
    <source name=" Tst_PSRTEST3 " >
        <spectrum escale="MeV"> 
          <SpectrumClass name="PulsarSpectrum" params="PSRTEST3, 1, 1e+05, 3e+08, 9778, 3, 1e+06, 2.1e+07, -2.11, 1.72" /> 
-           <celestial_dir ra=" 296 " dec=" 29.4"/>
+           <celestial_dir ra=" 296 " dec=" 29.4"/> 
       </spectrum> 
    </source> 
    <source name=" Tst_PSRTEST4 " >

@@ -147,8 +147,8 @@ void PlotPulsar(double enph = 0,char name[100]="pulsar.root")
 
   //////////////////////////////////////////////////
   SpectObj *sp = new SpectObj(Nv,1);              //ph 
-  AreaDetector = EventSource::totalArea();
-  sp->SetAreaDetector(EventSource::totalArea());
+  AreaDetector = 1.21;//EventSource::totalArea();
+  sp->SetAreaDetector(1.21);//EventSource::totalArea());
   std::cout << "**  Effective Area set to : " << sp->GetAreaDetector() << " m2 " << std::endl; 
   //////////////////////////////////////////////////
   TCanvas *clc = new TCanvas("LightCurves","LightCurves",600,800);
