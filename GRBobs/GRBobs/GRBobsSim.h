@@ -51,7 +51,7 @@ class GRBobsSim
  private:
   
   //! Gathers all relevant constants for the simulation 
-  GRBobsParameters *m_params;
+  int m_GRBNumber;
   GRBobsengine  *m_GRBengine;
   double m_tfinal;
   double m_fluence;

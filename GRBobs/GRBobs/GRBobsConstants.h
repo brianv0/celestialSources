@@ -31,7 +31,7 @@ namespace ObsCst
   const double BATSE5=1000.0;                 // 1 MeV
   const double GBM1=10.0;                     // 10 keV 
   const double GBM2=30.0e3;                   // 25 MeV 
-  const double LAT1=50.0e3;                   // 50 MeV 
+  const double LAT1=30.0e3;                   // 50 MeV 
   const double LAT2=3.0e6;                    //300 GeV 
   //////////////////////////////////////////////////
 };

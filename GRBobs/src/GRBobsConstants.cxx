@@ -36,7 +36,15 @@ void GRBobsParameters::SetFluence(double fluence)
 
 void GRBobsParameters::SetNumberOfPulses(int NumberOfPulses)
 {
-  if(NumberOfPulses>0) m_numberOfPulses = NumberOfPulses;
+  if(NumberOfPulses>0) 
+    {
+      m_numberOfPulses = NumberOfPulses;
+    }
+  else 
+    {
+      double type = rnd->Uniform();
+      m_numberOfPulses = (type>0.3) ? (int) pow(10.0,rnd->Gaus(1.47,0.53)) : 1;
+    }
 }
 
 void GRBobsParameters::SetMinPhotonEnergy(double enph)
@@ -58,7 +66,7 @@ void GRBobsParameters::GenerateParameters()
 {
   m_Peakedness      = pow(10.0,rnd->Gaus(0.16,0.3));
   m_FWHM            = pow(10.0,rnd->Gaus(-0.1,0.5)); //FWHM @ 20keV 
-  m_pulseSeparation = pow(10.0,rnd->Gaus(0.12,0.4));
+  m_pulseSeparation = pow(10.0,rnd->Gaus(0.13,0.4));
   m_decayTime       = 0.75*pow(0.69,1./m_Peakedness)*m_FWHM;
   m_riseTime        = 0.33*m_decayTime;
   m_pulseHeight     = rnd->Uniform();

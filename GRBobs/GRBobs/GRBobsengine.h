@@ -23,7 +23,7 @@ class GRBobsengine
   GRBobsengine(GRBobsParameters *params);
   ~GRBobsengine()
     {
-      delete m_params;
+      //      delete m_params;
     }
     
   std::vector<GRBobsPulse*> CreatePulsesVector();

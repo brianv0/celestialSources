@@ -12,10 +12,10 @@
 using namespace ObsCst;
 //////////////////////////////////////////////////
 GRBobsSim::GRBobsSim(GRBobsParameters *params)
-  : m_params(params)
 {
   m_GRBengine = new GRBobsengine(params);
-  m_fluence = m_params->GetFluence();
+  m_fluence = params->GetFluence();
+  m_GRBNumber = (int) params->GetGRBNumber();
 }
 
 void GRBobsSim::GetUniqueName(const void *ptr, std::string & name)
@@ -141,7 +141,7 @@ void GRBobsSim::SaveNv()
   m_Nv->GetZaxis()->CenterTitle();
   
   char root_name[100];
-  sprintf(root_name,"grbobs_%d.root",(int)m_params->GetGRBNumber());
+  sprintf(root_name,"grbobs_%d.root",m_GRBNumber);
   std::cout<<" Saving "<<root_name<<std::endl;
   TFile mod(root_name,"RECREATE");
   std::string name = m_Nv->GetName();

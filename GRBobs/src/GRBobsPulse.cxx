@@ -34,8 +34,9 @@ void GRBobsPulse::Print()
 	   <<" Intensity= "<<m_Intensity
 	   <<" Peakedness= "<<m_Peakedness
 	   <<" Peak Energy= "<<m_Epeak
-	   <<" Low Energy idx= "<<m_LowEnergy
-	   <<" High Energy idx= "<<m_HighEnergy<<std::endl;
+	   <<" Low Energy idx= "<<m_LowEnergy-0.4
+	   <<" High Energy idx= "<<m_HighEnergy-0.4
+	   <<std::endl;
 }
 
 double GRBobsPulse::PulseShape(double t, double e)
