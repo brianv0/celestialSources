@@ -2,7 +2,8 @@
  * \class GRBShell 
  * \brief Describes a spherical shell produced by the blast of the GRB inner engine.
  *
- * The shells will be stacked in a vector.
+ * Different geometries can be used
+ *
  * \author Nicola Omodei       nicola.omodei@pi.infn.it 
  * \author Johann Cohen-Tanugi johann.cohen@pi.infn.it
  *
@@ -26,13 +27,13 @@ class GRBShell
    * \param E energy of the shell (in erg). In practice, all created shells share
    * the same fraction of the total energy released by the inner engine. 
    */
-  //  GRBShell(double /*energy*/);
-  GRBShell(double gamma, double mass, 
-	   double thickness, double radius);
-
+  GRBShell(double gamma, double mass,
+	   double thickness, double radius,double distance = 0.0,string type = "jet");
+  
   //! Destructor
   ~GRBShell() { }
-  
+  //! This operator compute the resulting shell after the collision between two shells.
+  GRBShell operator+(GRBShell Sh2);
   // Accessors to data member values:
   //! Returns the Mass
   inline double getMass()      {return m_mass;}
@@ -41,15 +42,22 @@ class GRBShell
   //! Returns the Thickness
   inline double getThickness() {return m_thickness;}
   //! Returns the Radius of the shell
-  inline double getRadius()    {return m_radius;} 
+  inline double getRadius()    {return m_radius;}  
+  //! Returns the Distance of the shell from the Burst
+  inline double getDistance()    {return m_distance;} 
   //! Returns the beta of the shell
   inline double getBeta()      {return beta(m_gamma);}
-  /*! \brief computes and returns the comoving volume (in \f$cm^3\f$).
-   *
+  //! Returns the internal energy
+  inline double getEint()      {return m_eint;}
+  /*! Returns the comoving volume (in \f$cm^3\f$).
    * The comoving volume is defined as 
-   *\f$\Large{4\pi\times{thickness}\times{radius}^2\times\Gamma}\f$
+   *\f$\Large{4\pi\times{thickness}\times{distance}^2}\f$ for isotropic shells,
+   *\f$\Large{\pi\times{thickness}\times{radius}^2}\f$ for jet shells.   
    */
-  inline double getVolCom()    {return 4.0*cst::pi*m_thickness*m_radius*m_radius*m_gamma;}
+  inline double getVolCom()    
+    {
+      return m_volume;
+    }
   
   //Set functions: Should be more protected!!
   //! Set the mass
@@ -60,9 +68,12 @@ class GRBShell
   inline void setThickness(double value) {m_thickness = value;}
   //! Set the Radius of the shell
   inline void setRadius(double value)    {m_radius = value;}
- 
+  //! Set the Distance of the shell from the burst
+  inline void setDistance(double value)  {m_distance = value;}
+  //! Set the internal energy
+  inline void setEint(double value)      {m_eint = value;}
+  
   //Higher  level functions:
-
 
   /*! 
    * \retval  beta = \f$\sqrt{1-{1\over\Gamma^2}}\f$
@@ -79,14 +90,16 @@ class GRBShell
    * \param time timestep of evolution
    */
   void      evolve(double time);
-  
-  
+    
  private:
   //Data Members:
   double m_mass;
   double m_gamma;
   double m_thickness;
   double m_radius;
+  double m_distance;
+  double m_volume;
+  double m_eint;
 };
 
 #endif

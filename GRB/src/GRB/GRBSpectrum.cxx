@@ -9,7 +9,7 @@
 
 GRBSpectrum::GRBSpectrum(const std::string& params) 
 {
-  m_grbsim = new GRBSim();
+  m_grbsim = new GRBSim(params);
   int flag=0;
   while(flag==0)
     {
@@ -26,16 +26,6 @@ GRBSpectrum::GRBSpectrum(const std::string& params)
     }
 }
 
-GRBSpectrum::~GRBSpectrum() 
-{
-  delete m_grbsim;
-}
-
-// Must be set to 1.0 for a point source.
-double GRBSpectrum::solidAngle() const
-{
-  return 1.0;
-}
 
 ///return flux, given a time
 double GRBSpectrum::flux(double time) const
@@ -46,59 +36,48 @@ double GRBSpectrum::flux(double time) const
   return m_grbsim->IRate(m_spectrum,m_grbsim->EnergyPh()); // in ph/(m^2 s) 
 }
 
-double GRBSpectrum::rate(double time) const
-{
-  //cout<<"RATE"<<endl;
-  //m_grbsim->ComputeFlux(time);
-  /// test to implement the right rate...
-  return m_grbsim->IRate(m_spectrum,m_grbsim->EnergyPh()); // in ph/(m^2 s) 
-}
-
 double GRBSpectrum::interval(double time)// const
 {
+  //  cout<<" Interval @ time "<<time<<endl;;
+  double inter;
   if(time<0) time=abs(time);
+  
   double tmax=m_grbsim->Tmax();
   /// test to implement the right rate...
   double sum=0.0;         // Initialize the integral=0
   double t1=time;         // t1 is the integration variable...
-  //  double temp=temp=m_grbsim->IRate(m_grbsim->ComputeFlux(time));
-  double temp=rate(time); // The m_spectrum is already computed from energySrc()
-  double dt=1.0e-2/6;       // .. and dt is its integration step.
+  double temp=flux(time); // The m_spectrum is already computed from energySrc()
+  double dt=1.0e-2;       // .. and dt is its integration step.
   while (sum<1.0){ // It compute the integral of the rate...
     // The idea is to compute t1 for which the 
     // integral between time and t1 of the rate(t) dt =1.
-  //  cout<<t1<<" "<<tmax<<endl;
     if(t1>=tmax)
-     {
-       t1=time+1;
-       break; // This exits the loop in the case af the burst is finished
-     } 
-      if (temp<=0.1) temp=0.1; // Minumum rate...
-//    if (temp>=1/cst::DeadTime) // If the rate is greater then 1/DeadTime...
-//      { 
-	// ... then the minimum time separation between two photons is the dead time...
-//	if(t1==time) return cst::DeadTime; 
-//	return t1-time; // it returns  t1-time;
-//      }
-//    else if (temp>=1.0/dt)  // the sum will be > 1, and I can stop the while loop...
-     if (temp>=1.0/dt)  // the sum will be > 1, and I can stop the while loop...
       {
-	return t1-time+1.0/temp;
+	inter = 1.0e+6;
+	break; // This exits the loop in the case af the burst is finished
+      } 
+    if (temp<=1/tmax) temp=1/tmax; // Minumum rate...
+    if (temp>=1.0/dt)  // the sum will be > 1, and I can stop the while loop...
+      {
+	inter = t1-time+1.0/temp;
+	break;
       }
     else
       {
 	sum+=temp*dt; //...integrate...
 	t1+=dt;       // ... and  incrase the time...
 	temp=m_grbsim->IRate(m_grbsim->ComputeFlux(t1),
-	m_grbsim->EnergyPh()); // is the rate at t1...
+			     m_grbsim->EnergyPh()); // is the rate at t1...
+	inter = t1-time;
       }
   }//end of while
-  return t1-time; // in Seconds 
+  //  if (inter <= 1.0e-8) inter = 1.0e-8;
+  return inter; // in Seconds 
 }
 
 double GRBSpectrum::energySrc(HepRandomEngine* engine, double time)
 {
-  // cout<<"energySrc @ time "<<time<<endl;
+  //  cout<<"energySrc @ time "<<time<<endl;
   //return the flux in photons/(m^2 sec)
   /// Use time to update the spectrum
   m_spectrum.clear();
@@ -111,9 +90,9 @@ double GRBSpectrum::energySrc(HepRandomEngine* engine, double time)
 
 float GRBSpectrum::operator() (float u) const
 {
- 
+  
   double energy = m_grbsim->DrawPhotonFromSpectrum(m_spectrum, 
-  	u,m_grbsim->EnergyPh());
+						   u,m_grbsim->EnergyPh());
   return (float) energy;
 }
 

@@ -1,4 +1,3 @@
-
 #ifndef GRBmanager_H
 #define GRBmanager_H
 
@@ -27,27 +26,29 @@ class GRBmanager : public ISpectrum
    */
   virtual  ~GRBmanager(); 
   
-  float operator() (float u) const;
-  
   double flux(double time)const; //{return m_GRB->flux(time);}
-  double rate(double time) const;//{return m_GRB->rate(time);}
   double interval(double time);//{return m_GRB->interval(time);}//const;
   double solidAngle() const;//{return m_GRB->solidAngle();}
   
   std::pair<float,float> dir(float energy) const;// {return m_GRB->dir(energy);}
   std::pair<double,double> dir(double energy, HepRandomEngine* engine){
     return dir(energy);} 
-  
-  double energySrc(HepRandomEngine*, double /*time*/ );//double energySrc(HepRandomEngine* engine, double time ) {return m_GRB->energySrc(engine,time);}
+
+
+  float operator() (float u) const;
+  double energySrc(HepRandomEngine*, double /*time*/ );
   //! inherited from Spectrum
   std::string title() const {return "GRBmanager";} 
   const char * particleName() const {return "gamma";}
   const char * nameOf() const {return "GRBmanager";}
-  
+  float parseParamList(std::string input, int index);  
  private:
-  const std::string& m_params;
+  
   GRBSpectrum* m_GRB;
-  double m_Time;
-  double m_timeToWait;
+  const std::string& m_params;
+  float m_FirstTime;
+  float m_initialTime;
+  float m_timeToWait;
+  float m_endTime;
 };
 #endif
