@@ -1,8 +1,12 @@
 #include <iostream>
 #include "Pulsar/PulsarSpectrum.h"
+#include "Pulsar/PulsarConstants.h"
 #include "SpectObj/SpectObj.h"
 #include "flux/SpectrumFactory.h"
 #include "astro/JulianDate.h"
+#include <cmath>
+
+using namespace cst;
 
 ISpectrumFactory &PulsarSpectrumFactory() 
  {
@@ -25,33 +29,26 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
   double ppar4 = parseParamList(params,8);
   m_enphmin = parseParamList(params,9);
   m_enphmax = parseParamList(params,10);
-  m_t0 = 0.0;
+  m_phi0 = 0.032;
+  m_t0 = 51900.0;
   m_f0 = 1.0/m_period;
-  m_f1 = 1.0/m_pdot;
-
-  std::cout << " \n*****\nPulsarSpectrum initialized ! " << std::endl;
-  std::cout << " **   Flux above 100 MeV " << m_flux << " ph/cm2/s " 
-	    << " | " << m_numpeaks << " peaks " << std::endl;
-  //std::cout << " **   Epoch  " << m_t0 << " , Period " << m_period << " f0 " << m_f0 << std::endl;
-  //std::cout << "                         Pdot " <<  m_pdot  << " f1 " << m_f1 << std::endl; 
-  std::cout << " **   Enphmin " << m_enphmin << " | Enphmax " << m_enphmax << std::endl;
-
-
+  m_f1 = -m_pdot/(m_period*m_period);
+  
+  std::cout << " \n********   PulsarSpectrum initialized !   ********" << std::endl;
+  std::cout << "**   Flux above 100 MeV : " << m_flux << " ph/cm2/s " << std::endl;
+  std::cout << "**   # of peaks : " << m_numpeaks << std::endl;
+  std::cout << "**   Epoch (MJD) :  " << m_t0 << std::endl;
+  std::cout << "**   Phi0 (at Epoch t0) : " << m_phi0 << std::endl;
+  std::cout << "**   Period : " << m_period << " s. | f0: " << m_f0 << std::endl;
+  std::cout << "**   Pdot : " <<  m_pdot  << " | f1: " << m_f1 << std::endl; 
+  std::cout << "**   Enphmin : " << m_enphmin << " keV | Enphmax: " << m_enphmax << " keV" << std::endl;
+  std::cout << "**   Mission started at (MJD) : " << StartMissionDateMJD << " (" 
+	    << (StartMissionDateMJD+JDminusMJD)*SecsOneDay << " sec.) - Jan,1 2001 00:00.00" << std::endl;
+  std::cout << "**************************************************" << std::endl;
 
   m_Pulsar   = new PulsarSim(m_flux, m_enphmin, m_enphmax, m_period, m_numpeaks);
   m_spectrum = new SpectObj(m_Pulsar->PSRPhenom(ppar1,ppar2,ppar3,ppar4),1);
-
-  JDStartMission = new astro::JulianDate(2001,1,1,0);
-  JDStartSimulation = new astro::JulianDate(2008, 2, 24, 6.5);
   m_JDCurrent = new astro::JulianDate(2008, 2, 24, 6.5);
-
-
-
-  std::cout << " Mission Started at " << JDStartMission->seconds() <<  " ( " 
-	    << JDStartMission->getGregorianDate() << " ) " << std::endl;
-  std::cout << " Simulation Started at " << JDStartSimulation->seconds() <<  " ( " 
-	    << JDStartSimulation->getGregorianDate() << " ) " << std::endl;
- 
 
   //////////////////////////////////////////////////
   
@@ -61,8 +58,6 @@ PulsarSpectrum::~PulsarSpectrum()
 {  
   delete m_Pulsar;
   delete m_spectrum;
-  delete JDStartMission;
-  delete JDStartSimulation;
   delete m_JDCurrent;
 }
 
@@ -76,26 +71,30 @@ double PulsarSpectrum::flux(double time) const
 
 double PulsarSpectrum::interval(double time)
 {  
-  double inte;  
-  // Variable with suffix tilde are reffered to dilated system
-  double timeTilde = time;
-  time = timeTilde - timeTilde*m_pdot;
-  //std::cout << " t0~ = " << timeTilde  << " --> t0 = " << time << std::endl;
-  inte = m_spectrum->interval(time,m_enphmin);
-  double nextTime = time + inte;
-  double nextTimeTilde = nextTime + m_pdot*nextTime;
-  //std::cout << " t1 = " << nextTime  << " --> t1~ = " << nextTimeTilde << std::endl;
-  inte = nextTimeTilde - timeTilde;
+  double timeTilde = time + (StartMissionDateMJD - m_t0)*SecsOneDay;
+  time = (m_period/m_pdot)*log(1+(m_pdot/m_period)*timeTilde) + m_phi0*m_period; 
+  double nextTime = time + m_spectrum->interval((time - m_period*int(time/m_period)),m_enphmin);
+  double nextTimeTilde = (m_period/m_pdot)*(exp((m_pdot/m_period)*(nextTime-m_phi0*m_period))-1);
 
 
-  /*
-  std::cout << "Next Photon at Mission Elapsed Time (sec.) " 
-	    << (inte + timeTilde + JDStartSimulation->seconds() 
-		- JDStartMission->seconds()) 
-	    << std::endl;
-  */
 
-  return inte;
+  std::cout << "\n****t0~ = " << timeTilde  << " (RefStart="
+	    << timeTilde - (StartMissionDateMJD - m_t0)*SecsOneDay  << ")" << std::endl;
+  std::cout << " -->t0  = " << time << " (Fract = " << (time - m_period*int(time/m_period)) << " ), phase " 
+	    <<  (time - m_period*int(time/m_period))/m_period << std::endl;
+  std::cout << " ----> Interval " << inte << std::endl;
+  std::cout << "\n****t1~ = " << nextTimeTilde  << " (RefStart="
+	    << nextTimeTilde - (StartMissionDateMJD - m_t0)*SecsOneDay  << ")" << std::endl;
+  std::cout << " -->t1  = " << nextTime << " (Fract = " << (nextTime - m_period*int(nextTime/m_period)) << " ), phase " 
+	    << (nextTime - m_period*int(nextTime/m_period))/m_period << std::endl;
+ 
+  double ph = ph = m_phi0 + m_f0*(timeTilde) +0.5*m_f1*(timeTilde)*(timeTilde);
+  double intph = 0;
+
+
+
+  std::cout << "\n\n *** theory : ph0 " << ph <<  " " << modf(ph,&intph) << std::endl;
+  return nextTimeTilde - timeTilde;
 }
 
 double PulsarSpectrum::energy(double time)

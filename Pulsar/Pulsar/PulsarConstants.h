@@ -8,42 +8,22 @@
  * The namespace cst contains all the constant needed to the simulation.
  *
  * \author Nicola Omodei       nicola.omodei@pi.infn.it 
- * \author Johann Cohen-Tanugi johann.cohen@pi.infn.it
+ * \author Massimiliano Razzano massimilia.razzano@pi.infn.it
  */
-//#include <iterator>
-//#include <iostream.h>
-//#include <fstream.h>
 
-/* #include <math.h> */
 #include <vector> 
 #include <string>
-/* #include <algorithm> */
-/* #include <cmath> */
-/* #include "stdio.h" */
-
-/* #include "TFile.h" */
-/* #include "TCanvas.h" */
-/* #include "TPad.h" */
-/* #include "TF1.h" */
-/* #include "TF2.h" */
-/* #include "TH1D.h" */
-/* #include "TH2D.h" e*/
 #include "TRandom.h"
 
 
 namespace cst
 {
-  // const double emin = 2e4;  // KeV (20 MeV)
-  //const double emax = 1.8e8;  // KeV (400 GeV)
-  //const double enph = 1e5;  // KeV (100 MeV) 
-
   const double EnNormMin = 1e5; // KeV (100 MeV) //Normalization Interval
   const double EnNormMax = 1e7; // KeV (10 GeV)
   
   const    int Ebin =  50 ; // Energy bins 
   const    int Tbin =  200; // Time bins 
-  // static const double de = pow(emax/emin,1.0/Ebin);
-  //  static const double dt   = tmax/(Tbin-1);
+
   const double erg2meV   = 624151.0;
 
 
@@ -54,6 +34,10 @@ namespace cst
   const double EGRET1=30.0e3;                 // 30 MeV
   const double EGRET2=100.0e3;                // 100MeV
   const double EGRET3=10.0e6;                 // 10 GeV
+
+  const double StartMissionDateMJD = 51910.0; //Start Date: 1 Jan 2001, 00:00.00
+  const double JDminusMJD = 2400000.5; //Difference between JD and MJD
+  const int SecsOneDay = 86400; //seconds in one day
 
   //////////////////////////////////////////////////
   

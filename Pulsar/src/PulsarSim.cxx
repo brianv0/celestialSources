@@ -59,8 +59,8 @@ TH2D* PulsarSim::PSRPhenom(double par1, double par2, double par3, double par4)
   
 
 
-  std::cout << "**  Normalisation between " << cst::EnNormMin << " and " << cst::EnNormMax << " keV " << std::endl;
-  std::cout << "**  Photon extraction between " << m_enphmin << " and " << m_enphmax << " keV " << std::endl;
+  std::cout << "**           Normalisation between " << cst::EnNormMin << " and " << cst::EnNormMax << " keV " << std::endl;
+  std::cout << "**           Photon extraction between " << m_enphmin << " and " << m_enphmax << " keV " << std::endl;
   std::cout << "**  Spectrum calculated between " << LowEnBound << " and " << HighEnBound << " keV " << std::endl; 
 
 
@@ -152,7 +152,7 @@ TH2D* PulsarSim::PSRPhenom(double par1, double par2, double par3, double par4)
     } 
 
 
-  std::cout << "**  Lightcurve parameters: (midist= " << mindist  << " s.)" << std::endl;
+  std::cout << "**\n**  Lightcurve parameters: (midist = " << mindist  << " s.)" << std::endl;
   if (ampl1 !=0)
     {
       std::cout << "**           Peak 1 t = " << peak1 << "(Ph.= " << peak1/m_period << " ) " 

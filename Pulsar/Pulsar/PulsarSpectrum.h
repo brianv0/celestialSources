@@ -75,6 +75,6 @@ class PulsarSpectrum : public ISpectrum
   double m_period, m_pdot, m_flux;
   double m_enphmin, m_enphmax;
   int m_numpeaks;
-  double m_t0, m_f0, m_f1;
+  double m_t0,m_phi0, m_f0, m_f1;
 };
 #endif
