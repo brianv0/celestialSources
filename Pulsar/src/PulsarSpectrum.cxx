@@ -15,7 +15,6 @@
 #include <cmath>
 #include <fstream>
 #include <iomanip>
-#include <time.h>
 
 #define DEBUG 0
 
@@ -259,37 +258,13 @@ double PulsarSpectrum::flux(double time) const
  */
 double PulsarSpectrum::interval(double time)
 {  
-  clock_t intStart,intEnd;;
-  intStart =  clock();
-
-  double timeTildeDecorr = time + (StartMissionDateMJD)*SecsOneDay;
-  double timeTilde = timeTildeDecorr + getBaryCorr(timeTildeDecorr);
-  /*
-//Timing the baryCorr 
-  clock_t barySt,baryEnd,bary1,bary2,bary3;
-  
-  barySt = clock();
-  for (int i=0; i < 2000; i++)
-    {
-
-      //double bc  = getBaryCorr(timeTildeDecorr);
-      double nextTimeTilde = retrieveNextTimeTilde(timeTilde, totTurns, (1e-6/m_period));
-      
-    }
-  baryEnd = clock();
-  std::cout << "\n\n\n\n\n\n\n\@@@@@@@@@@@@@222 @@@timing of Ephem Corr : " 
-	    << (baryEnd-barySt)/2000 << " cycles " <<  " s " << (baryEnd-barySt)/2e9 << std::endl;
-  */
-
-
-
-
-
-
+  double timeTildeDecorr = time + (StartMissionDateMJD)*SecsOneDay; //Arrivat time decorrected
+  double timeTilde = timeTildeDecorr + getBaryCorr(timeTildeDecorr); //should be corrected before applying ephem de-corrections
 
   if ((int(timeTilde - (StartMissionDateMJD)*SecsOneDay) % 20000) < 1.5)
     std::cout << "**  Time reached is: " << timeTilde-(StartMissionDateMJD)*SecsOneDay
 	      << " seconds from Mission Start  - pulsar " << m_PSRname << std::endl;
+
 
   //First part: Ephemerides calculations...
   double initTurns = getTurns(timeTilde); //Turns made at this time 
@@ -299,51 +274,22 @@ double PulsarSpectrum::interval(double time)
   double inte = m_spectrum->interval(tStart,m_enphmin); //deltaT (in system where Pdot = 0
   double inteTurns = inte/m_period; // conversion to # of turns
   double totTurns = initTurns + inteTurns; //Total turns at the nextTimeTilde
-  //double finPh =  modf(initTurns,&intPart);
-  //finPh = modf(finPh + inteTurns,&intPart); //finPh is the expected phase corresponding to the nextTimeTilde
-  //std::cout << "2" << std::endl;
   double nextTimeTilde = retrieveNextTimeTilde(timeTilde, totTurns, (1e-6/m_period));
-  //std::cout << "3" << std::endl;
-  // std::cout << " corr " << getBaryCorr(nextTimeTilde) << std::endl;  
 
 
+  //Second part: baycentric decorrection
+  //Use the bisection method to find the inverse of the de-corrected time, i.e. the time (in TT)
+  //that after correction is equal to Time in TDB
 
-//Timing the baryCorr 
-  clock_t barySt,baryEnd,bary1,bary2,bary3;
-  
-  barySt = clock();
-  for (int i=0; i < 2000; i++)
-    {
-
-      //double bc  = getBaryCorr(timeTildeDecorr);
-      double nextTimeTilde = retrieveNextTimeTilde(timeTilde, totTurns, (1e-6/m_period));
-    }
-  baryEnd = clock();
-  std::cout << "\n\n\n\n\n\n\n\@@@@@@@@@@@@@222 @@@timing of Ephem Correct : " 
-	    << (baryEnd-barySt)/2000 << " cycles " <<  " s " << (baryEnd-barySt)/2e9 << std::endl;
-
-
-
-
-
-
-
-
-
-
-
-
-  //Find the TT from TDB. Bisection method.
-  double deltaMax = 510.0; //secs
-  double err = 5e-5;
-
+  double deltaMax = 510.0; //max deltat secs
+  double err = 5e-5; //50 us
   double ttUp = nextTimeTilde + deltaMax;
   double ttDown = nextTimeTilde - deltaMax;
   double ttMid = (ttUp + ttDown)/2;
 
   int i = 0;
   
-  double hMid = 1e30;
+  double hMid = 1e30; //for the 1st iteration
   while (fabs(hMid)>err )
     {
       double hUp = (nextTimeTilde - (ttUp + getBaryCorr(ttUp)));
@@ -352,10 +298,9 @@ double PulsarSpectrum::interval(double time)
 
           
       // std::cout << std::setprecision(30) 
-	//	<< "\n" << i << "**ttUp " << ttUp << " ttDown " << ttDown << " mid " << ttMid << std::endl;
+      //	<< "\n" << i << "**ttUp " << ttUp << " ttDown " << ttDown << " mid " << ttMid << std::endl;
       //std::cout << "  hUp " << hUp << " hDown " << hDown << " hMid " << hMid << std::endl;
       
-
       if (fabs(hMid) < err) break;
       if ((hDown*hMid)>0)
 	{
@@ -370,16 +315,7 @@ double PulsarSpectrum::interval(double time)
        i++;
     }
 
-  /*
-   std::cout << i << " Diff is " << std::setprecision(30) << " TDB " << nextTimeTilde/SecsOneDay 
-	    << " TDB computed " << (ttMid + getBaryCorr(ttMid)/SecsOneDay)/SecsOneDay 
-	    << " corr " << getBaryCorr(ttMid) 
-	     << " -->Diff " << (nextTimeTilde-(ttMid + (getBaryCorr(ttMid)/SecsOneDay))) <<std::endl; 
-  */
-
-  //  std::cout << "3" << std::endl;
   double nextTimeDecorr = ttMid;
-  
 
   if (DEBUG)
     { 
@@ -391,16 +327,7 @@ double PulsarSpectrum::interval(double time)
      std::cout << " interval is " <<  nextTimeDecorr - timeTildeDecorr << std::endl;
   }
   
-   intEnd = clock();   
-   //   printf("^^^^^^^^^^^^^Interval -  CPU Time = %.i c\n",(intEnd-intStart));
-   //std::cout << "EEE" << (intEnd-intStart)/1e6 << std::endl;
-
-   //   std::cout << "\n\n OCCKIO " << std::endl;
-   //std::cout << getBaryCorr(timeTilde) << std::endl;
-   //std::cout << "\n\n OCCKIO " << std::endl;
-
-
-  return nextTimeDecorr - timeTildeDecorr; //+ getBaryDeCorr(nextTimeTilde)  - timeTilde;
+  return nextTimeDecorr - timeTildeDecorr; //interval between the de-corected times
   //return nextTimeTilde-timeTilde;
 
 }
