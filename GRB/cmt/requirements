@@ -1,6 +1,6 @@
 package GRB
-version v3
-author Johann Cohen-Tanugi <johann.cohen@pi.infn.it> Nicola Omodei<nicola.omodei@pi.infn.it> Sandhia Bansal <sandhiab@lheapop.gsfc.nasa.gov>
+version v3r1
+author Nicola Omodei<nicola.omodei@pi.infn.it> Johann Cohen-Tanugi <johann.cohen@pi.infn.it> Sandhia Bansal <sandhiab@lheapop.gsfc.nasa.gov>
 
 # $Id$
 
