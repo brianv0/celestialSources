@@ -124,6 +124,7 @@ void TestApp::setSources() {
         name != sourceNames.end(); ++name) {
       EventSource * source(0);
       if ((source = m_fluxMgr->source(*name))) {
+         std::cerr << "adding source " << *name << std::endl;
          m_compositeSource->addSource(source);
          nsrcs++;
       } else {

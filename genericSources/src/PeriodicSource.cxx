@@ -88,8 +88,16 @@ double PeriodicSource::interpolate(const std::vector<double> &x,
       = std::upper_bound(x.begin(), x.end(), xx) - 1;
    unsigned int indx = it - x.begin();
    double yy;
-   if (*(it+1) != *it) {
-      yy = (xx - *it)/(*(it+1) - *it)*(y[indx+1] - y[indx]) + y[indx];
+/// @bug Using iterators causes crash if there are zero value entries
+/// in the flux light curve.
+//    if (*(it+1) != *it) {
+//       yy = (xx - *it)/(*(it+1) - *it)*(y[indx+1] - y[indx]) + y[indx];
+//    } else {
+//       yy = (y[indx+1] + y[indx])/2.;
+//    }
+   if (x[indx+1] != x[indx]) {
+      yy = (xx - x[indx])/(x[indx+1] - x[indx])
+         *(y[indx+1] - y[indx]) + y[indx];
    } else {
       yy = (y[indx+1] + y[indx])/2.;
    }

@@ -31,8 +31,8 @@ public:
    
    virtual ~TransientTemplate() {}
 
-   static double drawTime(std::vector<double> tt,
-                          std::vector<double> integralDist);
+   static double drawTime(const std::vector<double> & tt,
+                          const std::vector<double> & integralDist);
 
 private:
 

@@ -19,8 +19,6 @@
 
 #include "facilities/Util.h"
 
-//#include "Likelihood/Util.h"
-
 #include "flux/SpectrumFactory.h"
 #include "flux/EventSource.h"
 
@@ -52,8 +50,6 @@ TransientTemplate::TransientTemplate(const std::string & paramString)
 void TransientTemplate::createEventTimes(std::string templateFile) {
    facilities::Util::expandEnvVar(&templateFile);
 
-//   Likelihood::Util::file_ok(templateFile);
-
    std::vector<double> light_curve;
    Pulsar::readLightCurve(templateFile, light_curve);
 
@@ -84,13 +80,18 @@ void TransientTemplate::createEventTimes(std::string templateFile) {
    std::stable_sort(m_eventTimes.begin(), m_eventTimes.end());
 }
 
-double TransientTemplate::drawTime(std::vector<double> tt,
-                                   std::vector<double> integralDist) {
+double TransientTemplate::drawTime(const std::vector<double> & tt,
+                                   const std::vector<double> & integralDist) {
    double xi = RandFlat::shoot();
    std::vector<double>::const_iterator it = 
       std::upper_bound(integralDist.begin(), integralDist.end(), xi);
    int indx = it - integralDist.begin() - 1;
-   double my_time = (xi - *it)/(*(it+1) - *it)*(tt[indx+1] - tt[indx])
+/// @bug Using iterators causes crash if there are zero value entries
+/// in the flux light curve.
+//    double my_time = (xi - *it)/(*(it+1) - *it)*(tt[indx+1] - tt[indx])
+//       + tt[indx];
+   double my_time = (xi - integralDist[indx])
+      /(integralDist[indx+1] - integralDist[indx])*(tt[indx+1] - tt[indx])
       + tt[indx];
    return my_time;
 }
