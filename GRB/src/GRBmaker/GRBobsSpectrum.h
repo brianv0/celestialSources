@@ -17,8 +17,6 @@
 
 #include "FluxSvc/ISpectrum.h"
 
-#include "CLHEP/Random/RandomEngine.h"
-
 class GRBurst;
 
 
@@ -72,7 +70,7 @@ public:
     std::pair<float,float> dir(float energy) const;
 
     //! \brief Calls std::pair<float,float> dir(float energy) const to return galactic direction
-    std::pair<double,double> dir(double energy, HepRandomEngine *engine);
+    std::pair<double,double> dir(double energy);
     
     /*! \brief returns the energy of a sampled photon.
      *
@@ -82,7 +80,7 @@ public:
      *  \param engine  random engine for uniform sampling;
      *  \param time    current time. 
      */
-    double energySrc(HepRandomEngine *engine, double time=0);
+    double energy(double time=0);
        
     /*! \brief Draws from the current spectrum the energy of a sampled photon. 
      *  \param randomNumber Uniform random number drawn in the method \c energySrc .  

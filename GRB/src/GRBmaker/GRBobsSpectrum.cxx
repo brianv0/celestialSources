@@ -161,7 +161,7 @@ double GRBobsSpectrum::nextEnergy() const
 
 
 // returns next available energy to the simulation
-double GRBobsSpectrum::energySrc(HepRandomEngine *engine, double time)
+double GRBobsSpectrum::energy(double time)
 {
     return nextEnergy();
 }
@@ -185,8 +185,7 @@ std::pair<float,float> GRBobsSpectrum::dir(float energy) const
 }
 
 
-std::pair<double,double> GRBobsSpectrum::dir(double energy, 
-                                             HepRandomEngine *engine)
+std::pair<double,double> GRBobsSpectrum::dir(double energy)
 {
     return dir(energy);
 }

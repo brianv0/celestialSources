@@ -74,10 +74,10 @@ double GRBmanager::interval(double time)
   return inte;
 }
 
-double GRBmanager::energySrc(HepRandomEngine* engine, double time)
+double GRBmanager::energy(double time)
 {
   if(time < m_initialTime) return 0;
-  return m_GRB->energySrc(engine,time - m_initialTime);
+  return m_GRB->energy(time - m_initialTime);
 }
 
 float GRBmanager::operator() (float u) const

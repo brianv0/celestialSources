@@ -74,17 +74,15 @@ double GRBSpectrum::interval(double time)// const
   return inter; // in Seconds 
 }
 
-double GRBSpectrum::energySrc(HepRandomEngine* engine, double time)
+double GRBSpectrum::energy(double time)
 {
-  //  std::cout<<"energySrc @ time "<<time<<std::endl;
   //return the flux in photons/(m^2 sec)
-  /// Use time to update the spectrum
+  ///Use time to update the spectrum
   m_spectrum.clear();
-  //  m_grbsim->ComputeFlux(time);
   m_spectrum = m_grbsim->ComputeFlux(time);//;m_grbsim->Spectrum();
   m_grbsim->setSpectrum( m_spectrum);
     /// Then returns a uniform random value, to be used by operator()
-  return (*this)(engine->flat());
+  return (*this)(RandFlat::shoot(1.0));
 }
 
 float GRBSpectrum::operator() (float u) const

@@ -18,7 +18,6 @@
 #include "FluxSvc/ISpectrum.h"
 #include "facilities/Observer.h"
 #include "src/GPS.h"
-#include "CLHEP/Random/RandomEngine.h"
 #include "GRBSpectrum.h"
 
 class ISpectrum;
@@ -59,12 +58,11 @@ class GRBmanager : public ISpectrum
   inline double solidAngle() const{return 1.0;}
   //! direction, taken from GRBSim
   inline std::pair<double,double> 
-    dir(double energy, HepRandomEngine* engine)
-    {return m_GRB->dir(energy, engine);} 
+    dir(double energy) {return m_GRB->dir(energy);} 
   //! calls GRBSpectrum::operator()
   float operator() (float u) const;
   //! calls GRBSpectrum::energySrc
-  double energySrc(HepRandomEngine*, double time);
+  double energy(double time);
   
   std::string title() const {return "GRBmanager";} 
   const char * particleName() const {return "gamma";}

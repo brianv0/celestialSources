@@ -8,7 +8,6 @@
 #include "FluxSvc/ISpectrum.h"
 #include "facilities/Observer.h"
 #include "src/GPS.h"
-#include "CLHEP/Random/RandomEngine.h"
 #include "GRBSim.h"
 
 /*!
@@ -64,8 +63,7 @@ class GRBSpectrum : public ISpectrum
   double interval(double time);
 
   //! Galactic direction 
-  inline std::pair<double,double> 
-    dir(double, HepRandomEngine*){return m_grbsim->GRBdir();} 
+  inline std::pair<double,double> dir(double){return m_grbsim->GRBdir();} 
 
   /*! \brief Draws from the current spectrum the energy of a sampled photon. 
    *  \param u uniform random number drawn in the method \c energySrc .  
@@ -79,7 +77,7 @@ class GRBSpectrum : public ISpectrum
    *  \param engine  random engine for uniform sampling;
    *  \param time    current time. 
    */
-  double energySrc(HepRandomEngine* engine, double time);
+  double energy(double time);
 
   std::string title() const {return "GRBSpectrum";}
 
