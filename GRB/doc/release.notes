@@ -1,12 +1,13 @@
 /*! \file release.notes
 *   Package GRB
-*
 *   Managers:  <a href="mailto:nicola.omodei@pi.infn.it">Nicola Omodei</a>,
 *              <a href="mailto:johann.cohen@pi.infn.it">Johann Cohen-Tanugi</a>,
 *              <a href="mailto:sandhiab@lheapop.gsfc.nasa.gov">Sandhia Bansal</a>
 *
-*   $Heading:$
+*   $Header$
+*@verbatim
 *
+*   v2r1p1 01-oct-2003 THB Disambiguate a few math args for vc7.1 
 *   v2r0 28-Jan-2003 big cleaning for the code review.
-*
+*@endverbatim
 */
