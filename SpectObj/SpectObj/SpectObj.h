@@ -43,6 +43,7 @@ class SpectObj
   TH1D *N(TH1D *EN);
   photon GetPhoton(double t0, double enph);
   
+  inline double SetAreaDetector(double AreaDetector=6.0){m_AreaDetector = AreaDetector;}
   double flux(double time, double enph);
   double interval(double time, double enph);
   double energy(double time, double enph);
@@ -59,6 +60,7 @@ class SpectObj
   TH1D *CloneTimes();
     
  private:
+  double  m_AreaDetector;
   TRandom *m_SpRandGen;
   TH2D* Nv;
   int ne,nt;
