@@ -1,9 +1,25 @@
-10	      	// Nshell
-1.0		// Redshift
-1.0e+54		// Etot
-1.0e+9		// Radius of the shells [cm]
-1.0e+9		// Thickness of the shells[cm]
-100		// Minumum Lorenz Factor
-1000		// Maximum Lorenz Factor
-2		// Duration of the Burst.
-1.0e+7          // Minimum Energy Extracted
+## Engine: Shell Generator
+1	      	// Nshell
+1.0e+1		// Initial distance of the shells[cm]
+## Engine: Shock Generator
+1	        // Nshock
+2.		// Duration of the Burst.
+0.1		// Rise  time of a shock
+1              // decay time of a shock
+2.             // Peak  energy
+## Shell: Spherical Shells
+## Shell: Jet Shells
+1.0e+15	  	// Radius of the jet [cm]
+0.0		// Angle of the jet  [degree]
+## Common
+1.0e+10		// Thickness of the shells[cm]
+1.0e+58		// Etot
+100.		// Minumum Lorenz Factor
+1000.		// Maximum Lorenz Factor
+1.		// Redshift
+3.0e+7          // Minimum Energy Extracted
+## Alternative:
+Duration ~ Vol/Etot/gammaf
+Tdecay   ~ Vol/gammaf
+Trise    ~ Thickness/gammaf
+Epeak    ~ sqrt(Etot)/Vol*gammaf/Nshock
