@@ -29,8 +29,9 @@ GRBmanager::GRBmanager(const std::string& params)
   m_spectrum = new  SpectObj(m_GRB->Fireball(),0);
   m_spectrum->SetAreaDetector(EventSource::totalArea());
   //////////////////////////////////////////////////
+  
   m_endTime   = m_startTime + m_GRB->Tmax();
-  m_nextBurst = m_endTime   + m_timeToWait;
+  m_nextBurst = m_endTime   + m_par->rnd->Exp(m_timeToWait);
   m_fluence   = m_GRB->GetFluence();
   m_GRBnumber = m_GRB->GetGRBNumber();
   m_GRBdir    =  m_GRB->GRBdir();
@@ -89,7 +90,7 @@ double GRBmanager::interval(double time)
       m_spectrum->SetAreaDetector(EventSource::totalArea());
       //////////////////////////////////////////////////
       m_endTime   = m_startTime + m_GRB->Tmax();
-      m_nextBurst = m_endTime   + m_timeToWait;      
+      m_nextBurst = m_endTime   + m_par->rnd->Exp(m_timeToWait);
       m_fluence   = m_GRB->GetFluence();
       m_GRBnumber = m_GRB->GetGRBNumber();
       m_GRBdir    =  m_GRB->GRBdir();

@@ -32,8 +32,8 @@ namespace cst
   const double emax = 1e9;  //keV
   const double enph = 3.0e+4;  //keV (30 MeV) 
   
-  const    int Ebin =  100; 
-  const    int Tbin =  500; 
+  const    int Ebin  =  50; 
+  const double MinDT =  0.016; 
   static const double de   = pow(emax/emin,1.0/Ebin);
   const double erg2meV   = 624151.0;
   
@@ -44,7 +44,7 @@ namespace cst
   const double BATSE5=1000.0;                 // 1 MeV
   const double GBM1=10.0;                     // 10 keV 
   const double GBM2=30.0e3;                   // 25 MeV 
-  const double LAT1=50.0e3;                   // 50 MeV 
+  const double LAT1=100.0e3;                   // 50 MeV 
   const double LAT2=3.0e6;                    //300 GeV 
   //////////////////////////////////////////////////
 };

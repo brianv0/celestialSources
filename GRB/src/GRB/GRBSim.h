@@ -72,6 +72,7 @@ class GRBSim
   GRBengine  *m_GRBengine;
   double m_tfinal;
   double m_fluence;
+  int Tbin;
   TH2D *m_Nv;
 };
 

@@ -83,9 +83,13 @@ TH2D* GRBSim::Fireball()
   //  int i=1;
   double shift =0.0;// Shocks.front()->GetTime() + 2.0*meanDuration;//3.*Shocks.front()->GetDuration();
   m_tfinal = Shocks.back()->GetTime() + meanDuration + shift + max_tqg;
-  double dt = m_tfinal/(Tbin-1);
+
+  Tbin     = TMath::Max(10,int(m_tfinal/MinDT));
+  Tbin     = TMath::Min(1000,Tbin);  
+
   gDirectory->Delete("Nv");
   m_Nv = new TH2D("Nv","Nv",Tbin,0.,m_tfinal,Ebin, e);
+  double dt = m_Nv->GetBinWidth(1);
   std::string name;
   GetUniqueName(m_Nv,name);
   m_Nv->SetName(name.c_str());

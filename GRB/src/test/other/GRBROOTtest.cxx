@@ -45,7 +45,7 @@ void ScanParameters(int Ngrb);
 
 #define DEBUG 0
 
-#define GenerationArea 1.21
+#define GenerationArea 1.0 //1.21
 
 
 double Band(double *var, double *par)
@@ -116,9 +116,6 @@ void PlotGRB(double enph = 0,char name[100]="grb_65540.root",TString name2="GRB_
 
   SpectObj *sp = new SpectObj(Nv,0);              //ph
   sp->SetAreaDetector(GenerationArea); //like observation sim
-  std::pair<float,float> dir = std::make_pair((float)0.0,(float)0.0);
-  //  sp->SaveParameters(0.0,dir);
-  
   //////////////////////////////////////////////////
   
   // Ne =  [ph/keV/s/m²]
@@ -602,10 +599,9 @@ void ScanParameters(int Ngrb)
 	  //if(en*de*ne > FEp && en < 1e4) Ep=e;
 	}
       Ep = log10(e2Ne->GetBinCenter(e2Ne->GetMaximumBin()));
-      std::cout<<"qui"<<std::endl;
-      SpectObj *sp = new SpectObj(Nv,0);              //ph
-      std::cout<<"qui"<<std::endl;
-      
+      SpectObj *sp = new SpectObj(Nv,0);              //p
+      sp->SetAreaDetector(GenerationArea); //like observation sim
+
       TH1D *Lct_TOT   = sp->Integral_E(EMIN,EMAX);  // ph
       TH1D *Lct_BATSE = sp->Integral_E(BATSE1,BATSE5);  // ph
       TH1D *Lct_GBM   = sp->Integral_E(GBM1,GBM2);  // ph
@@ -630,19 +626,19 @@ void ScanParameters(int Ngrb)
       nLAT   = log10(sp->Integral_T(Lct_LAT,0.0,TMAX));
       
       std::cout<<"* Theoretical values:  *****************************"<<std::endl;
-      std::cout<<" log T90 = "<<T90<<" Epeak = "<<Ep<<std::endl;
+      std::cout<<" T90 = "<<pow(10,T90)<<" Epeak = "<<pow(10,Ep)<<std::endl;
       std::cout<<" log TOT   flux ("<< emin <<","<< emax <<") = "<<fTOT<<" erg/cm^2"<<std::endl;
       std::cout<<" BASTE flux (ch1) ("<<BATSE1<<","<<BATSE2<<") = "<<pow(10,fBATSE1)<<" erg/cm^2"<<std::endl;
       std::cout<<" BASTE flux (ch2) ("<<BATSE2<<","<<BATSE3<<") = "<<pow(10,fBATSE2)<<" erg/cm^2"<<std::endl;
       std::cout<<" BASTE flux (ch3) ("<<BATSE3<<","<<BATSE4<<") = "<<pow(10,fBATSE3)<<" erg/cm^2"<<std::endl;
       std::cout<<" BASTE flux (ch4) ("<<BATSE4<<","<<BATSE5<<") = "<<pow(10,fBATSE4)<<" erg/cm^2"<<std::endl;
       std::cout<<" BASTE flux (tot) ("<<BATSE1<<","<<BATSE5<<") = "<<pow(10,fBATSE)<<" erg/cm^2"<<std::endl;
-      std::cout<<" log GBM   flux ("<< GBM1 <<","<< GBM2 <<") = "<<fGBM<<" erg/cm^2"<<std::endl;
-      std::cout<<" log LAT   flux ("<< LAT1 <<","<< LAT2 <<") = "<<fLAT<<" erg/cm^2"<<std::endl;
-      std::cout<<" log Nph TOT    ("<<EMIN<<","<<EMAX<<")  = "<<nTOT<<std::endl;
-      std::cout<<" log Nph BATSE  ("<<BATSE1<<","<<BATSE5<<") = "<<nBATSE<<std::endl;
-      std::cout<<" log Nph GBM    ("<<GBM1<<","<<GBM2<<")  = "<<nGBM<<std::endl;
-      std::cout<<" log Nph LAT    ("<<LAT1<<","<<LAT2<<")  = "<<nLAT<<std::endl;
+      std::cout<<" GBM   flux ("<< GBM1 <<","<< GBM2 <<") = "<<fGBM<<" erg/cm^2"<<std::endl;
+      std::cout<<"  LAT   flux ("<< LAT1 <<","<< LAT2 <<") = "<<pow(10,fLAT)<<" erg/cm^2"<<std::endl;
+      std::cout<<"  Nph TOT    ("<<EMIN<<","<<EMAX<<")  = "<<pow(10,nTOT)<<std::endl;
+      std::cout<<"  Nph BATSE  ("<<BATSE1<<","<<BATSE5<<") = "<<pow(10,nBATSE)<<std::endl;
+      std::cout<<"  Nph GBM    ("<<GBM1<<","<<GBM2<<")  = "<<pow(10,nGBM)<<std::endl;
+      std::cout<<"  Nph LAT    ("<<LAT1<<","<<LAT2<<")  = "<<pow(10,nLAT)<<std::endl;
       //	  if(output) delete sp;
       GRBTree->Fill();
       if(grbn%10==0)
@@ -670,8 +666,6 @@ void MakeGRB(int NGRB=1, UInt_t seed=1, double enph=0, bool gbm = false)
   //////////////////////////////////////////////////
   params->ComputeParametersFromFile(paramFile,NGRB);
   params->PrintParameters();
-  std::cout<<params->GetGRBNumber()<<std::endl;
-
   GRBSim* m_grb = new GRBSim(params);
   TH2D *matrix = m_grb->Fireball();
   m_grb->SaveNv();

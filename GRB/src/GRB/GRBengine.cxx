@@ -186,7 +186,7 @@ double GRBengine::GetDistance()
   double Wm = 0.3;
   double Wl = W-Wm;
   double qo = (W/2. - Wl);
-  double dL = (cst::c/Hubble) * z + pow(z,2.0)/2.*(1.0-qo);
+  double dL = 2.0*cst::c/(Hubble*sqrt(Wm))*(1.-pow(1.+z,-1./2.));
   return dL;
 }
 
