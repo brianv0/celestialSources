@@ -78,7 +78,7 @@ class PulsarSpectrum : public ISpectrum
   PulsarSim *m_Pulsar;
   SpectObj  *m_spectrum;
   
-  astro::EarthOrbit m_earthOrbit;
+  astro::EarthOrbit *m_earthOrbit;
   astro::SolarSystem m_solSys;
   bool s_ephemInitialized;
 
@@ -97,6 +97,6 @@ class PulsarSpectrum : public ISpectrum
   int m_model;
   double m_flux, m_enphmin, m_enphmax;
   int m_seed;
-  
+
 };
 #endif

@@ -11,7 +11,6 @@
 #include "astro/JulianDate.h"
 #include "astro/EarthOrbit.h"
 #include "astro/SolarSystem.h"
-#include "src/jplephem/bary.h" //local interface to the JPL ephemeris
 #include "astro/GPS.h"
 #include <cmath>
 #include <fstream>
@@ -33,19 +32,19 @@ ISpectrumFactory &PulsarSpectrumFactory()
  * \param params string containing the XML parameters
  *
  * This method takes from the XML file the name of the pulsar to be simulated, the model
- * to be used and the parameter specific for the model choosen. Then extract from the
- * txt DataList file the characteristics of the pulsar choosen (period, flux, period derivatives
+ * to be used and the parameters specific for the choosen model. Then extract from the
+ * TXT DataList file the characteristics of the choosen pulsar (e.g. period, flux, period derivatives
  * ,ephemerides, flux, etc...)
  * Then it calls the PulsarSim class in order to have the TH2D histogram.
  * For more informations and fot a brief tutorial about the use of PulsarSpectrum  please see:
  * <br>
- * <a href="#dejager02">http://www.pi.infn.it/~razzano/Pulsar/PulsarSpectrumTutorial/PsrSpectrumTut.html </a>
+ * <a href="#dejager02">http://www.pi.infn.it/~razzano/Pulsar/PulsarSpTutor/PulsarSpTutor.htm </a>
  */
 PulsarSpectrum::PulsarSpectrum(const std::string& params)
   : m_params(params)
 {
 
-  // Set to 0 all variables;
+  // Reset all variables;
   m_RA = 0.0;
   m_dec = 0.0;
   m_l = 0.0;
@@ -64,21 +63,21 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
   std::ifstream PulsarDataTXT;
 
   //Read from XML file
-  m_PSRname    = parseParamList(params,0).c_str();
-  m_model      = std::atoi(parseParamList(params,1).c_str());
+  m_PSRname    = parseParamList(params,0).c_str();            // Pulsar name
+  m_model      = std::atoi(parseParamList(params,1).c_str()); // choosen model
 
-  m_enphmin    = std::atof(parseParamList(params,2).c_str());
-  m_enphmax    = std::atof(parseParamList(params,3).c_str());
+  m_enphmin    = std::atof(parseParamList(params,2).c_str()); // minimum energy of extracted photons
+  m_enphmax    = std::atof(parseParamList(params,3).c_str()); // minimum energy of extracted photons
 
   m_seed       = std::atoi(parseParamList(params,4).c_str()); //Seed for random
   m_numpeaks   = std::atoi(parseParamList(params,5).c_str()); //Number of peaks
 
-  double ppar1 = std::atof(parseParamList(params,6).c_str());
+  double ppar1 = std::atof(parseParamList(params,6).c_str()); // model parameters
   double ppar2 = std::atof(parseParamList(params,7).c_str());
   double ppar3 = std::atof(parseParamList(params,8).c_str());
   double ppar4 = std::atof(parseParamList(params,9).c_str());
 
-  //Read from PulsarDataList.txt
+  //Read from PulsarDataList.txt and find the data correspondind go choosen pulsar
   sprintf(sourceFileName,"%s/data/PulsarDataList.txt",pulsar_root);  
   if (DEBUG)
     {
@@ -101,8 +100,6 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
   while ((std::string(tempName) != m_PSRname) && ( PulsarDataTXT.eof() != 1))
     {
       PulsarDataTXT >> tempName >> m_RA >> m_dec >> m_l >> m_b >> m_flux >> m_period >> m_pdot >> m_p2dot >> m_t0 >> m_phi0;
-      //  std::cout << tempName  << m_RA << m_dec << m_l << m_b << m_flux 
-      //  << m_period << m_pdot << m_t0 << m_phi0 << std::endl;  
     } 
   
   if (std::string(tempName) == m_PSRname)
@@ -138,7 +135,8 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
       std::cout << "**   P2dot : " <<  m_p2dot  << " | f2: " << m_f2 << std::endl; 
       std::cout << "**   Enphmin : " << m_enphmin << " keV | Enphmax: " << m_enphmax << " keV" << std::endl;
       std::cout << "**   Mission started at (MJD) : " << StartMissionDateMJD << " (" 
-		<< std::setprecision(12) << (StartMissionDateMJD+JDminusMJD)*SecsOneDay << " sec.) - Jul,18 2005 00:00.00" << std::endl;
+		<< std::setprecision(12) << (StartMissionDateMJD+JDminusMJD)*SecsOneDay 
+		<< " sec.) - Jan,1 2007 00:00.00 (TT)" << std::endl;
       std::cout << "**************************************************" << std::endl;
 
     }
@@ -170,58 +168,30 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
   PulsarLog << "**   P2dot : " <<  m_p2dot  << " | f2: " << m_f2 << std::endl; 
   PulsarLog << "**   Enphmin : " << m_enphmin << " keV | Enphmax: " << m_enphmax << " keV" << std::endl;
   PulsarLog << "**   Mission started at (MJD) : " << StartMissionDateMJD << " (" 
-		<< std::setprecision(12) << (StartMissionDateMJD+JDminusMJD)*SecsOneDay << " sec.) - Jul,18 2005 00:00.00" << std::endl;
+	    << std::setprecision(12) << (StartMissionDateMJD+JDminusMJD)*SecsOneDay 
+	    << " sec.) - Jan,1 2007 00:00.00 (TT)" << std::endl;
   PulsarLog << "**************************************************" << std::endl;
-   PulsarLog << "**   Model chosen : " << m_model << " --> Using Phenomenological Pulsar Model " << std::endl;  
-  // PulsarLog << "**  Effective Area set to : " << m_spectrum->GetAreaDetector() << " m2 " << std::endl; 
+  PulsarLog << "**   Model chosen : " << m_model << " --> Using Phenomenological Pulsar Model " << std::endl;  
 
-  PulsarLog.close();
+
+
+  //Init SolarSystem stuffs useful for barycentri decorrections
 
   astro::JulianDate JDStart(2007, 1, 1, 0.0);
-  //  astro::JulianDate JDStart(2007, 1, 1, 0.0);
-
-  // astro::JulianDate JDStart(2006, 12, 31, 23.99888);
-  
-  std::cout << std::setprecision(30) << " start is " << JDStart <<
-    " in MJD " << JDStart - JDminusMJD << " ole'!" << std::endl;
-
-
-  // astro::JulianDate JDStart(2006, 12, 31, 12.0);
-
-   std::cout << std::setprecision(30) << JDStart << "MJD " << JDStart - JDminusMJD << std::endl;
-   astro::EarthOrbit m_earthOrbit(JDStart);
-   astro::SolarSystem m_solSys();
-
-  //There id a strange difference of 0.5 days in astro package, so temporarly we use direct JPL ephem
-  //start ephem
-  s_ephemInitialized = false;
-  
-  if(!s_ephemInitialized) {
-    int ephnum = 405;
-    int denum;
-    double c, radsol, msol;
-    int j= initephem (ephnum, &denum, &c, &radsol, &msol);
-    if ( j !=0 ) {
-      std::cout << "ERROR in JPL Ephem reader in PulsarSpectrum: could not initilze JPL ephemeris" <<std::endl;
-    }
-  }
-    s_ephemInitialized = true;
-
-    //end ephem
-
-
+  m_earthOrbit = new astro::EarthOrbit(JDStart);
+  astro::SolarSystem m_solSys();
   astro::SkyDir m_PulsarDir(m_RA,m_dec,astro::SkyDir::EQUATORIAL);
   m_PulsarVectDir = m_PulsarDir.dir();
   
+  //Instantiate an object of PulsarSim class
   m_Pulsar    = new PulsarSim(m_PSRname, m_seed, m_flux, m_enphmin, m_enphmax, m_period, m_numpeaks);
 
+  //Instantiate an object of SpectObj class
   if (m_model == 1)
     {
-
-
       m_spectrum = new SpectObj(m_Pulsar->PSRPhenom(ppar1,ppar2,ppar3,ppar4),1);
       m_spectrum->SetAreaDetector(EventSource::totalArea());
-
+      PulsarLog << "**   Effective Area set to : " << m_spectrum->GetAreaDetector() << " m2 " << std::endl; 
       if (DEBUG)
 	{
 	  std::cout << "**   Model chosen : " << m_model << " --> Using Phenomenological Pulsar Model " << std::endl;  
@@ -234,21 +204,7 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
       exit(1);
     }
 
-
-
-
-  
-  //Test for Baryc corrections..
-  //ofstream file;
-  //file.open ("example.bin", ios::out | ios::app | ios::binary);
-
-  //  ofstream BaryOutFile;
-  
-  //BaryOutFile.open("BaryDeCorr.txt",std::ios::app);
-
-  //  BaryOutFile << "TestFile for barycentric decorrections " << std::endl;
-  //  std::cout  << "TestFile for barycentric decorrections " << std::endl;
-  //..to be removed...
+  PulsarLog.close();
 
 }
 
@@ -257,7 +213,7 @@ PulsarSpectrum::~PulsarSpectrum()
 {  
   delete m_Pulsar;
   delete m_spectrum;
-  //  BaryOutFile.close();
+  delete m_earthOrbit;
 }
 
 /////////////////////////////////////////////////
@@ -273,8 +229,9 @@ double PulsarSpectrum::flux(double time) const
 /*!
  * \param time time to start the computing of the next photon
  *
- * This method find the time when the next photon will come. The decorrections for the ephemerides
- * are taken into account. The parameters used for this computation are:
+ * This method find the time when the next photon will come. It takes into account decorrections due to
+ * ephemerides and period derivativers and barycentric decorrections.
+ * For the ephemerides decorrections the parameters used are:
  * <ul>
  * <li> <i>Epoch</i>, espressed in MJD;</li>
  * <li> <i>Initial Phase Phi0</i>;</li>
@@ -282,13 +239,14 @@ double PulsarSpectrum::flux(double time) const
  * <li> <i>Second Period derivative</i>;</li>
  * </ul>
  * <br>
- * The interval method is taken from SpectObj. 
+ * The barycentric decorrections takes into account conversion TDB->TT, Geometrical and Shapiro delays.
+ * This method also calls the interval method in SpectObj class to determine the next photon in a rest-frame without 
+ * ephemerides effects
  */
 double PulsarSpectrum::interval(double time)
 {  
-  //std::cout << " pippo 1 " << std::endl;
   double timeTildeDecorr = time + (StartMissionDateMJD)*SecsOneDay; //Arrivat time decorrected
-  double timeTilde = timeTildeDecorr;// + getBaryCorr(timeTildeDecorr); //should be corrected before applying ephem de-corrections
+  double timeTilde = timeTildeDecorr+ getBaryCorr(timeTildeDecorr); //should be corrected before applying ephem de-corrections
   //  if (DEBUG)
   //{
   //  if ((int(timeTilde - (StartMissionDateMJD)*SecsOneDay) % 20000) < 1.5)
@@ -304,24 +262,20 @@ double PulsarSpectrum::interval(double time)
   double inte = m_spectrum->interval(tStart,m_enphmin); //deltaT (in system where Pdot = 0
   double inteTurns = inte/m_period; // conversion to # of turns
   double totTurns = initTurns + inteTurns; //Total turns at the nextTimeTilde
-  double nextTimeTilde = retrieveNextTimeTilde(timeTilde, totTurns, (1e-6/m_period));
-  std::cout << "\nPPPP" << std::endl;
-
-  std::cout <<   getBaryCorr(timeTildeDecorr) << std::endl;
-  /*
+  double nextTimeTilde = retrieveNextTimeTilde(timeTilde, totTurns, (ephemCorrTol/m_period));
+  
   //Second part: baycentric decorrection
   //Use the bisection method to find the inverse of the de-corrected time, i.e. the time (in TT)
   //that after correction is equal to Time in TDB
 
-   double deltaMax = 510.0; //max deltat secs
-  double err = 5e-5; //50 us
+  double deltaMax = 510.0; //max deltat (s)
   double ttUp = nextTimeTilde + deltaMax;
   double ttDown = nextTimeTilde - deltaMax;
   double ttMid = (ttUp + ttDown)/2;
 
   int i = 0;
   double hMid = 1e30; //for the 1st iteration
-  while (fabs(hMid)>err )
+  while (fabs(hMid)>baryCorrTol )
     {
       double hUp = (nextTimeTilde - (ttUp + getBaryCorr(ttUp)));
       double hDown = (nextTimeTilde - (ttDown + getBaryCorr(ttDown)));
@@ -331,7 +285,7 @@ double PulsarSpectrum::interval(double time)
       //	<< "\n" << i << "**ttUp " << ttUp << " ttDown " << ttDown << " mid " << ttMid << std::endl;
       //std::cout << "  hUp " << hUp << " hDown " << hDown << " hMid " << hMid << std::endl;
       
-      if (fabs(hMid) < err) break;
+      if (fabs(hMid) < baryCorrTol) break;
       if ((hDown*hMid)>0)
 	{
 	  ttDown = ttMid;
@@ -349,19 +303,16 @@ double PulsarSpectrum::interval(double time)
 
   if (DEBUG)
     { 
-     std::cout << "\nTimeTildeDEcorr in TDB is" << timeTildeDecorr - (StartMissionDateMJD)*SecsOneDay << "sec." << std::endl;
-     std::cout << "TimeTilde in TDB is" << timeTilde - (StartMissionDateMJD)*SecsOneDay << "sec." << std::endl;
-     std::cout << "nextTimeTilde in TDB is" << nextTimeTilde - (StartMissionDateMJD)*SecsOneDay << "sec." << std::endl;
-     std::cout << " nextTimeTilde decorrected is" << nextTimeDecorr - (StartMissionDateMJD)*SecsOneDay << "sec." << std::endl;
+     std::cout << "\nTimeTildeDecorr at Spacecraft (TT) is: " 
+	       << timeTildeDecorr - (StartMissionDateMJD)*SecsOneDay << "sec." << std::endl;
+     std::cout << "TimeTilde at SSB (in TDB) is: " << timeTilde - (StartMissionDateMJD)*SecsOneDay << "sec." << std::endl;
+     std::cout << "nextTimeTilde at SSB (in TDB) is:" << nextTimeTilde - (StartMissionDateMJD)*SecsOneDay << "sec." << std::endl;
+     std::cout << " nextTimeTilde decorrected (TT)is" << nextTimeDecorr - (StartMissionDateMJD)*SecsOneDay << "sec." << std::endl;
      std::cout << " corrected is " << nextTimeDecorr + getBaryCorr(nextTimeDecorr) - (StartMissionDateMJD)*SecsOneDay << std::endl;
      std::cout << " interval is " <<  nextTimeDecorr - timeTildeDecorr << std::endl;
   }
-  */
-  // return nextTimeDecorr - timeTildeDecorr; //interval between the de-corected times
-  std::cout << " 999nextTimeTilde decorrected is" << nextTimeTilde - (StartMissionDateMJD)*SecsOneDay << "sec." << std::endl;
-  std::cout << " interval is " <<  nextTimeTilde - timeTilde << std::endl;
-  std::cout << " fine " << std::endl;
-   return nextTimeTilde-timeTilde;
+  
+  return nextTimeDecorr - timeTildeDecorr; //interval between the de-corected times
 
 }
 
@@ -451,9 +402,10 @@ double PulsarSpectrum::retrieveNextTimeTilde( double tTilde, double totalTurns, 
 
 /////////////////////////////////////////////
 /*!
- * \param ttInput Photon arrival time Terrestrial Time (expressed in MJD converted in seconds)
+ * \param ttInput Photon arrival time at spacecraft in Terrestrial Time (expressed in MJD converted in seconds)
  *
- * <br>This method computes the barycentric corrections for the photon arrival time at spacecraft and returns 
+ * <br>
+ * This method computes the barycentric corrections for the photon arrival time at spacecraft and returns 
  * the time in Solar System Barycentric Time. The corrections implemented at the moment are:
  * <ul>
  *  <li> Conversion from TT to TDB;
@@ -464,72 +416,19 @@ double PulsarSpectrum::retrieveNextTimeTilde( double tTilde, double totalTurns, 
 double PulsarSpectrum::getBaryCorr( double ttInput )
 {
   //Start Date;
-  //astro::JulianDate ttJD(2005, 7, 18, 0.0);
   astro::JulianDate ttJD(2007, 1, 1, 0.0);
-  //astro::JulianDate ttJD(2006, 12, 31, 23.99888);
-  ttJD = ttJD+(ttInput - (StartMissionDateMJD)*SecsOneDay)/86400.;
+  ttJD = ttJD+(ttInput - (StartMissionDateMJD)*SecsOneDay)/SecsOneDay;
 
-  //if (DEBUG)
-    //{
-      std::cout << std::setprecision(30) << "\nQQQBarycentric Corrections for time " 
-		<< ttJD + (ttInput - ((StartMissionDateMJD)*86400))/SecsOneDay << " (JD)" << std::endl;
-      //}
+  if (DEBUG)
+    {
+      std::cout << std::setprecision(30) << "\nBarycentric Corrections for time " << ttJD << " (JD)" << std::endl;
+    }
 
-
-      //  std::cout << std::setprecision(30) << " JD added " << ttJD << std::endl;
-      
   // Conversion TT to TDB, from JDMissionStart (that glbary uses as MJDref)
-  double tdb_min_tt = m_earthOrbit.tdb_minus_tt(ttJD);
-
-  //ATTENTION!!!!
-  // the Current version of astro probably has a strange behaviour and the ephemeris 
-  // are compute for a time that is JD-05, so at this time we need to add 0.5 to the value
-  // to be put into getSolarVector and getBarycenter
-
- 
-  /*
- //temporarly we read JPL ephem directly because of a problem of 0. days difference in astro
-  //start JPL ephem use for Geometrical and Shapiro correction
-  //TO BE REMOVED WHEN TOBY FIND THE SOLUTION TO 0.5 DIFFERENCE
-  
-  double jdt[2], *jdpointer;
-  jdt[0] = floor(ttJD+0.5);
-  jdt[1] = ttJD - jdt[0]; //ttJD - floor(ttJD);
-  jdpointer = &jdt[0];
-
-  std::cout << " ***astro-pulsarJPL jd0 = " << jdt[0] 
-	    << " jd1  " << jdt[1] << std::endl;
-  
-  const double *eposn =  dpleph(jdpointer, 3, 11);
-  double x = -eposn[0];
-no  double y = -eposn[1];
-  double z = -eposn[2];
-
-  Hep3Vector barycenter(x,y,z);
-
-  Hep3Vector GeomVect = (m_earthOrbit.position(ttJD));
-  std::cout << std::setprecision(30) << "Pulsar - SC pos x " << GeomVect.x() << " y " << GeomVect.y() 
-	    << " z " << GeomVect.z() << std::endl;
-
-
-  GeomVect = (m_earthOrbit.position(ttJD)/clight) - barycenter;
-  double GeomCorr = GeomVect.dot(m_PulsarVectDir);
-   
-  //SolarVector
-  x = -eposn[0] + eposn[3];
-  y = -eposn[1] + eposn[4];
-  z = -eposn[2] + eposn[5];
-   Hep3Vector sunV(x,y,z);
-
-  //end JPL ephem use. 
-
-
-  */
+  double tdb_min_tt = m_earthOrbit->tdb_minus_tt(ttJD);
 
   //Correction due to geometric time delay of light propagation 
-  std::cout << " earthorbit.position da PuslaSpectrum " << std::endl;
-  Hep3Vector GeomVect = (m_earthOrbit.position(ttJD)/clight) - m_solSys.getBarycenter(ttJD);
-  std::cout << " earthorbit.position da PuslaSpectrum1 " << std::endl;  
+  Hep3Vector GeomVect = (m_earthOrbit->position(ttJD)/clight) - m_solSys.getBarycenter(ttJD);
   double GeomCorr = GeomVect.dot(m_PulsarVectDir);
 
   //Correction due to Shapiro delay.
@@ -540,13 +439,13 @@ no  double y = -eposn[1];
   double m = 4.9271e-6; // m = G * Msun / c^3
   double ShapiroCorr = 2.0 * m * log(1+costheta);
 
-  // if (DEBUG)
-  //{
-    std::cout << std::setprecision(15) << "** --> TDB-TT = " << tdb_min_tt << std::endl;
-    std::cout << std::setprecision(15) << "** --> Geom. delay = " << GeomCorr << std::endl;
-    std::cout << std::setprecision(15) << "** --> Shapiro delay = " << ShapiroCorr << std::endl;
-    std::cout << std::setprecision(15) << "** ====> Total= " << tdb_min_tt + GeomCorr + ShapiroCorr  << std::endl;
-    //}  
+  if (DEBUG)
+    {
+      std::cout << std::setprecision(20) << "** --> TDB-TT = " << tdb_min_tt << std::endl;
+      std::cout << std::setprecision(20) << "** --> Geom. delay = " << GeomCorr << std::endl;
+      std::cout << std::setprecision(20) << "** --> Shapiro delay = " << ShapiroCorr << std::endl;
+      std::cout << std::setprecision(20) << "** ====> Total= " << tdb_min_tt + GeomCorr + ShapiroCorr  << " s." <<std::endl;
+    }  
 
   return tdb_min_tt + GeomCorr + ShapiroCorr; //seconds
 

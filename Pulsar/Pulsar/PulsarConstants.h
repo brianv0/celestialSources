@@ -59,12 +59,14 @@ namespace cst
   //! Upper energy of EGRET band, expressed in keV (30GeV)
   const double EGRET3=3.0e7;                  
 
-  //! Start Mission Date, expressed in MJD (July,18 2005, 00:00:00)
-  //const double StartMissionDateMJD = 53569.0; 
+  //! Start Mission Date, expressed in MJD (corresponding to TT January 1st, 2007, at 00:00:00)
   const double StartMissionDateMJD = 54101.0; 
-  //const double StartMissionDateMJD = 54100.999953333288; 
+  
+  //! Tolerance for the ephemerides decorrection (in us.)
+  const double ephemCorrTol = 1e-6;
 
-
+  //! Tolerance for the barycentri decorrection (in us.)
+  const double baryCorrTol = 5e-5;
 
   //! Difference between JD and MJD
   const double JDminusMJD = 2400000.5; 
