@@ -475,6 +475,7 @@ void MakeGRB(int NGRB=1, UInt_t seed=1, double enph=0, bool gbm = false)
   if (seed > 1) params->SetGRBNumber(seed);
   //////////////////////////////////////////////////
   params->ComputeParametersFromFile(paramFile,NGRB);
+  params->PrintParameters();
   GRBSim* m_grb = new GRBSim(params);
   TH2D *matrix = m_grb->Fireball();
   m_grb->SaveNv();
@@ -596,6 +597,7 @@ void ScanParameters(int Ngrb)
       
       //      params->SetGRBNumber(grbn);
       params->ComputeParametersFromFile(paramFile,grbn);
+      params->PrintParameters();
       GRBN    = params->GetGRBNumber();
       GRBSim m_grb(params);
       TH2D *Nv = m_grb.Fireball();

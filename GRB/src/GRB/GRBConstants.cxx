@@ -166,7 +166,7 @@ void Parameters::ComputeParametersFromFile(std::string paramFile, int NGRB)
   double gmax_gmin,tv,ep;
 
   char buf[200];
-  f1.getline(buf,200);
+  f1.getline(buf,100);
   
   int i=1;
   while(i<=NGRB && f1.getline(buf,100))
@@ -176,25 +176,25 @@ void Parameters::ComputeParametersFromFile(std::string paramFile, int NGRB)
       i++;
     } 
   i--;
-  
+  f1.close();
+	
   if(i<NGRB)
     {
-      f1.close();
-      f1.open(paramFile.c_str());
-      f1.getline(buf,100);
+      std::ifstream f2(paramFile.c_str());
+      f2.getline(buf,100);
 
       for(int j = 1; j<=(NGRB %i);j++)
 	{
-	  f1.getline(buf,100);
+	  f2.getline(buf,100);
 	  sscanf(buf,"%d %lf %lf %lf %d %lf %lf %lf %lf %lf ",
 		 &seed,&l0,&b0,&fluence,&nshell,&tv,&gmax_gmin,&ep,&ic);
-
+	  
 	}
       seed=NGRB;
+      f2.close();
     }
-  f1.close();
   if(gmax_gmin<1.5) gmax_gmin=1.5;
-  if(gmax_gmin>1.5) gmax_gmin=1.5;
+  //  if(gmax_gmin>1.5) gmax_gmin=1.5;
   SetGRBNumber(65540+ (long) seed);  
   
   SetGalDir(l0,b0);
