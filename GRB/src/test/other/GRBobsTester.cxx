@@ -63,13 +63,18 @@
 //int main(int argn, char * argc[]) {
 int main()
 {
-	GRBmaker grbMaker1;
-	
-	GRBmaker grbMaker2(36.804426, 18, 9.843296, 0.199746, 2.850374, 1);
+  GRBmaker grbMaker1(36.804426, 18, 9.843296, 0.199746, 2.850374, 1);
+  
+  std::vector<std::string> fileList;
+  std::string fname1="./";
+  fileList.push_back(fname1);  
+  GRBmaker grbMaker2(fileList); // creates the list of GRBs
+  std::string fname2="GRB_000.lis";
+  fileList.push_back(fname2);
+  GRBmaker grbMaker3(fileList); // reads the first GRB
 
-	std::string fname="GRB_000.lis";
-	GRBmaker grbMaker3(fname);
-    return 0;
+
+  return 0;
 }
 
 void WARNING (const char * text ){  std::cerr << "WARNING: " << text << '\n';}
