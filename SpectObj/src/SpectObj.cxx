@@ -337,11 +337,11 @@ photon SpectObj::GetPhoton(double t0, double enph)
       if (!PeriodicSpectrumIsComputed)
 	{
 	  std::string name;
-	  PeriodicSpectrum = new TH1D("PeriodicSpectrum","PeriodicSpectrum",nt,m_Tmin,m_Tmax);
+	  //	  PeriodicSpectrum = new TH1D("PeriodicSpectrum","PeriodicSpectrum",nt,m_Tmin,m_Tmax);
+	  PeriodicSpectrum = Integral_T(1,nt,ei);
 	  GetUniqueName(PeriodicSpectrum,name);
 	  gDirectory->Delete(name.c_str());
 	  PeriodicSpectrum->SetName(name.c_str());
-	  PeriodicSpectrum = Integral_T(1,nt,ei);
 	  PeriodicSpectrumIsComputed = true;
 	}
 
