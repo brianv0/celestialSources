@@ -1,4 +1,5 @@
 // FILE: BackgroundMixer.cxx
+// This class reads GRB and background photons lists and mixes them together.
 
 
 #include "BackgroundMixer.h"
@@ -12,6 +13,24 @@
 
 
 
+
+// Constructor  BackgroundMixer()
+// Read GRB and background photon lists, mix and write the mixed list to an output file.
+//
+// Input:
+//      grbFile                    :   file containing GRB photon list
+//      backgroundFile             :   file containing background photon list
+//      mixedFile                  :   name of the output file
+//      grbOffsetTime              :   offset for GRB photon times
+//
+// Output:
+//		BackgroundMixer object
+//
+// Calls:
+//      readGRB                     :   reads GRB photon list
+//      readBackground              :   reads background photon list
+//      mix                         :   uses time ordering to mix GRB with background photons
+//      writeMixedData              :   writes mixed photon list to an output file
 
 BackgroundMixer::BackgroundMixer(const std::string &grbFile, const std::string &backgroundFile, const std::string &mixedFile, 
 								 const double grbOffsetTime)
@@ -30,6 +49,18 @@ BackgroundMixer::BackgroundMixer(const std::string &grbFile, const std::string &
 
 
 
+// Constructor  BackgroundMixer()
+// Reads an already mixed photon list.
+//
+// Input:
+//      mixedFile                  :   file containing GRB photon list
+//
+// Output:
+//		BackgroundMixer object
+//
+// Calls:
+//      readMixedData               :   reads mixed photon list
+
 BackgroundMixer::BackgroundMixer(const std::string &mixedFile)
 	:m_mixedFile(mixedFile),
 	 m_photonData()
@@ -38,6 +69,18 @@ BackgroundMixer::BackgroundMixer(const std::string &mixedFile)
 }
 
 
+
+// readGRB()
+// Reads a file containing GRB photon list.
+//
+// Input:
+//      m_grbFile                   :   file containing GRB photon list
+//
+// Output:
+//		m_photonData                :   GRB photon list (time, energy, theta, phi, signal)
+//
+// Calls:
+//      facilities::Util::expandEnvVar
 
 void BackgroundMixer::readGRB()
 {
@@ -77,6 +120,18 @@ void BackgroundMixer::readGRB()
 }
 
 
+
+// readBackground()
+// Reads a file containing background photon list.
+//
+// Input:
+//      m_backgroundFile            :   file containing background photon list
+//
+// Output:
+//		m_photonData                :   GRB photon list (time, energy, theta, phi, signal)
+//
+// Calls:
+//      facilities::Util::expandEnvVar
 
 // for now assume that background file has same structure as the GRB file
 void BackgroundMixer::readBackground()
@@ -119,12 +174,37 @@ void BackgroundMixer::readBackground()
 
 
 
+// mix()
+// Reads a file containing mixed photon list.
+//
+// Input:
+//		m_photonData                :   photon list (GRBs followed by background)
+//
+// Output:
+//		m_photonData                :   mixed photon list
+//
+// Calls:
+//      ---
+
 void BackgroundMixer::mix()
 {
 	std::sort(m_photonData.begin(), m_photonData.end(), timeCmp());
 }
 
 
+
+// writeMixedData()
+// Writes mixed photon list to an output file
+//
+// Input:
+//		m_mixedFile                 :   name of the output file
+//		m_photonData                :   mixed photon list
+//
+// Output:
+//		---
+//
+// Calls:
+//      facilities::Util::expandEnvVar
 
 void BackgroundMixer::writeMixedData()
 {
@@ -143,6 +223,20 @@ void BackgroundMixer::writeMixedData()
 }
 
 
+
+// readMixedData()
+// Reads mixed photon list from a file
+//
+// Input:
+//		m_mixedFile                 :   name of the input file containing mixed photon list
+//
+// Output:
+//		m_nGrb                      :   number of signals
+//      m_nBck                      :   number of background photons
+//      m_photonData                :   photon list (time, energy, theta, phi, signal)
+//
+// Calls:
+//      facilities::Util::expandEnvVar
 
 void BackgroundMixer::readMixedData()
 {

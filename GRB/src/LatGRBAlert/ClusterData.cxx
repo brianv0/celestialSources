@@ -16,6 +16,8 @@ using namespace lattrigtypes;
 static std::ofstream os2("likeinfo.lis");
 
 
+// Default constructor  ClusterData()
+
 ClusterData::ClusterData()
 	: m_photonData(),
 	  m_useDist(),
@@ -26,6 +28,18 @@ ClusterData::ClusterData()
 }
 
 
+
+// cosDistance()
+// 
+//
+// Input:
+//      index1, index2              :   indices pointing to two photons in the list
+// 
+// Output:
+//		distance between two photons
+//
+// Calls:
+//      ---
 
 const double ClusterData::cosDistance(const long index1, const long index2) const
 {
@@ -39,6 +53,22 @@ const double ClusterData::cosDistance(const long index1, const long index2) cons
 }
 
 
+
+// fillUseDistance(const long index)
+// form N*(N-1) distances (on sphere between nrange photons).  Use spherical trig:
+// pole=zenith.  For each photon, there are (N-1) distances.  Per "photonl" sort these
+// distances. we will keep the smallest "cluster" -- that distance set with the smallest
+// average distance for photons within 95% containment for 30MeV photon (using PSF for layers 12-15).  
+// This distance = ~2.3*sigma68=2.3*13.6 ~= 34 degrees.
+//
+// Input:
+//      index                       :   pointer to the first photon to be considered
+// 
+// Output:
+//		distances between photons
+//
+// Calls:
+//      ---
 
 void ClusterData::fillUseDistance(const long index)
 {
@@ -61,6 +91,24 @@ void ClusterData::fillUseDistance(const long index)
 }
 
 
+
+// calcUseDistance()
+// calls fillUseDistance to form N*(N-1) distances (on sphere between nrange photons).  
+// we are moving forward in "nmove" chunks, so it is only the first time that all distances need to be calculated;
+// after that only following elements need to be recalculated:
+//      - "nmove" elements of the first (nragne-nmove) rows
+//      - last nmove rows
+//
+// Input:
+//      lattrigcst::nrange            :   number of photons in this cluster
+//      lattrigcst::nmove             :   number of photons in a chunk to move along nrange photons
+//      m_useDist                     :   distances between nrange photons; empty for the first time
+// 
+// Output:
+//      m_useDist                     :   distances between nrange photons
+//
+// Calls:
+//      ---
 
 void ClusterData::calcUseDistance()
 {
@@ -93,6 +141,20 @@ void ClusterData::calcUseDistance()
 
 
 
+// calcAvgDistance()
+// find most compact cluster, considering photons within 2 sigma of 30 MeV photon radius.
+//
+// Input:
+//      lattrigcst::nrange            :   number of photons in this cluster
+//      lattrigcst::twosigdist        :   
+//      m_useDist                     :   distances between nrange photons
+// 
+// Output:
+//      m_avgDist                     :   average distances between nrange photons
+//
+// Calls:
+//      ---
+
 void ClusterData::calcAvgDistance()
 {
 	m_avgDist.clear();
@@ -120,12 +182,38 @@ void ClusterData::calcAvgDistance()
 
 
 
+// greater_equal()
+// return true if distance associated with current record is >= some specified value.
+//
+// Input:
+//      x                             :   current cluster record
+//      m_value                       :   user supplied value
+// 
+// Output:
+//      true if x.dist >= m_value
+//
+// Calls:
+//      ---
+
 const bool ClusterData::greater_equal::operator () (ClusterInfo &x) const
 {
 	return x.dist() >= m_value;
 }
 
 
+
+// less()
+// return true if distance associated with current record is < some specified value.
+//
+// Input:
+//      x                             :   current cluster record
+//      m_value                       :   user supplied value
+// 
+// Output:
+//      true if x.dist < m_value
+//
+// Calls:
+//      ---
 
 const bool ClusterData::less::operator () (ClusterInfo &x) const
 {
@@ -134,12 +222,37 @@ const bool ClusterData::less::operator () (ClusterInfo &x) const
 
 
 
+// pdistValue(const double distance)
+//
+// Input:
+//      distance                      :   input value
+// 
+// Output:
+//      distance/(2*M_PI)
+//
+// Calls:
+//      ---
+
 const double ClusterData::pdistValue(const double distance) const
 {
 	return distance / (2 * M_PI);
 }
 
 
+
+// pdtValue(const double deltaTime)
+// see JPN thesis, page 101: Prob of nu counts in interval <=dt:
+// 1-exp(-x)*(1+x), where x=R*dt, and R=expected background rate=4.07 Hz (avg)
+//
+// Input:
+//      lattrigcst::ratebck           :   average background rate
+//      deltaTime                     :   input value
+// 
+// Output:
+//      double
+//
+// Calls:
+//      ---
 
 const double ClusterData::pdtValue(const double deltaTime) const
 {
@@ -151,12 +264,37 @@ const double ClusterData::pdtValue(const double deltaTime) const
 
 
 
+// psfValue(const double energy, const double denom)
+// energy weighting is proportional to the PSF (photon).  For now, since we didn't log fst_x_lyr values, use JTB's
+// parameterization for layers 12-15: alp1=0.93 & C1=0.52 & C2=0.063.
+//
+// Input:
+//      energy                        :   input value
+//      denom                         :   input value
+// 
+// Output:
+//      double
+//
+// Calls:
+//      ---
+
 const double ClusterData::psfValue(const double energy, const double denom) const
 {
 	return (0.52 * pow(energy, -0.93) + 0.063) / denom;
 }
 
 
+
+// likelihood(const double dist, const double dt, const double psf)
+//
+// Input:
+//      dist, dt, psf                      :   double
+// 
+// Output:
+//      likelihood                         :   trigger likelihood
+//
+// Calls:
+//      ---
 
 const double ClusterData::likelihood(const double dist, const double dt, const double psf) const
 {
@@ -165,6 +303,19 @@ const double ClusterData::likelihood(const double dist, const double dt, const d
 }
 
 
+
+// extractClusterData(const long chosenphot)
+// re-extract cluster (N-1) distances, and associated photon parameters.  Fast approach appears to be: recompute
+// distances from "chosen" photon with tightest cluster.
+//
+// Input:
+//      chosenphot                         :   index to the photon with tightest cluster
+// 
+// Output:
+//      m_extractedClusterData             :   extracted cluster data
+//
+// Calls:
+//      greater_equal
 
 void ClusterData::extractClusterData(const long chosenphot)
 {
@@ -203,6 +354,19 @@ void ClusterData::extractClusterData(const long chosenphot)
 
 
 
+// jointLikelihood()
+// calculate trigger likelihood.
+//
+// Input:
+//      ---
+// 
+// Output:
+//      likelihood                         :   trigger likelihood
+//
+// Calls:
+//      likelihood
+//      psfValue
+
 const double ClusterData::jointLikelihood() const
 {
 	std::vector<ClusterData>::size_type sz = m_extractedClusterData.size();
@@ -213,6 +377,9 @@ const double ClusterData::jointLikelihood() const
 		clusterTimes.push_back((*it).time());
 
 	std::sort(clusterTimes.begin(), clusterTimes.end());
+
+	// compute relative probability of chance occurrence.
+	// joint probability is product of : P(dts), P(dists), P(Energies)
 
 	double pdist = 0;
 	double pdt   = 0;
@@ -234,6 +401,21 @@ const double ClusterData::jointLikelihood() const
 }
 
 
+
+// triggerLikelihood()
+// calculate trigger likelihood.
+//
+// Input:
+//      ---
+// 
+// Output:
+//      likelihood                         :   trigger likelihood
+//
+// Calls:
+//      calcUseDistance
+//      calcUseDistance
+//      extractClusterData
+//      jointLikelihood
 
 const double ClusterData::triggerLikelihood(const std::vector<PhotonInfo> &photonData)
 {
