@@ -16,63 +16,108 @@
 #include "CLHEP/Random/RandomEngine.h"
 
 /*!
-  Namespace contaning all the constants
+  \brief Namespace contaning all the constants
+  
+  In this namespace are stored all the constants needed by the GRB Physical 
+  simulator.
+  The constants contained here usually should not be changed by a general user.
+  
 */
 namespace cst
 {
   // Universal constants :
-  // Electron Rest Mass (MeV)
+  //! Proton Rest Mass (MeV)
   const double mpc2      = 938.2; 
-  const double erg2MeV   = 624151.0;
-  const double mpc2cm    = 3.0857e+24;
-
-  const double G2MeV     = 815.78;
-  const double st        = 6.65225e-25;
+  //! Electron Rest Mass (MeV)
   const double mec2      = 0.510999;       //MeV
-  const double mu0       = 4.0*M_PI*1.0e-7; //N A^-2
-  const double   BQ        = 4.413e+13; // Gauss
-  // light speed in cm/sec.
+  //! Conversion fron \e erg to \e MeV
+  const double erg2MeV   = 624151.0;
+  //! Conversion fron \e Mpc to \e cm
+  const double mpc2cm    = 3.0857e+24;
+  // Conversion fron \e Gauss to \e MeV
+  //  const double G2MeV     = 815.78;
+  
+  //! Thompson cross section (\f$ cm^2 \f$)
+  const double st        = 6.65225e-25;
+  //! Magnetic permeability in \f$ N A^{-2}\f$
+  const double mu0       = 4.0*M_PI*1.0e-7; 
+  //! Reference value for the magnetic field \e Gauss. 
+  const double   BQ        = 4.413e+13; 
+  //! Speed of light in \f$ cm/sec\f$
   const double c         = 2.98e+10;
+  //! Square of the speed of light
   const double c2        = c*c;
-  // Planck constant in eV*sec.
+  //! Planck constant in eV*sec.
   const double hplanck   = 4.13567e-15;
+  //! \f$\pi\f$
   const double pi        = 3.1415926535897932385;
+  //! Hobble`s constant in \f$km/(s Mpc)\f$
   const double Hubble    = 6.5e+1; 
+  //! w Zeldovich
   const double wzel      = 0.0;
-
-  const double csi       = 1.0; //csi = 1, more efficient IC
+  //! Scale factor, indicates the ratio of accelerated electrons
+  const double csi       = 1.0; 
+  //! Part of the internal energies that goes in electrons
   const double alphae    = .5;
-  const double alphab    = .1; //smaller is alphab greater is the IC efficiency
+  //! Part of the internal energies that goes in magnetic fiels
+  const double alphab    = .1;
+  //! The shock accelerate electron with a power low energy disptribution:
+  //! \f$N(E)dE\propto E^{-p}dE\f$ 
   const double p         = 2.5;
+  //! Viscosity of the circum burst material
   const double viscosity = 0.0;
-  // Internal Parameters
-  const int    nstep        = 500; // Number of time step
-  const int    enstep       =  50; // Number of energy step
+  //! Number of time steps
+  const int    nstep        = 500; 
+  //! Number of energy steps
+  const int    enstep       =  50;
+  //! Minimum energy at which the simulator will compute the flux 
   const double enmin     = 1.0e+3;
+  //! Maximum energy at which the simulator will compute the flux 
   const double enmax     =1.0e+12;
   // Minimal Temporal separation between 2 photons
-  const double DeadTime  = 1.0e-5; //sec
-  // flag =[0,1], if ==0, No inverse compton;
+  // const double DeadTime  = 1.0e-5; //sec
+  
+  /*! Compton Scattering calculation
+
+    This constant give an estimation of how Compton scattering will 
+    partecipate to the spectrum. flagIC has to be in the interval [0,1],
+    if ==0, no inverse compton will be calculated. If == 1 the IC effect is
+    calculated tacking into account the optical depht of the shell.
+    \sa GRBSynchrotron, GRBICompton, GRBSim
+  */
   const float flagIC     = 1;
-  // Flag to compute the Quantum Gravity Effect
-  const bool  flagQG     = false;
-  // If true it save into an output file 
-  const bool savef=false;
-  // Name of the output file
-  const std::string paramFile= "GRBdata.txt";
-  /* Different pulse shape are considered.
-   * The pulse shape depends on how the particle are accelerated in a shock 
-   * as function of time.
-   * - sgauss = Simmetric pulse shape. It is a double exponential with 
-   * the two characteristic time equal to the cooling time of the radiative
-   *  process. No intrinsic delay (or 'lag' has been considered between 
-   * different energies.
-   * - agauss = asimmetric exponential function, the rise time and the decay
-   * time are different. The peak time depend on the energy, 
-   * and this give up a delay between high energies and low energies. 
-   * -else . any other choiche set up a default function expressed by a FRED
-   *  like function. A Fast Rise pulse followed by an Exponential Decay.
+  /*! \brief Flag to compute the Quantum Gravity Effect
+     
+     Quantum gravity, if present, will calculate the dispersion low 
+     on the arrival time for the photons depending on thei energies.
+     \sa RadiationProcess::timeShiftForDispersion()
+     
    */
+  const bool  flagQG     = false;
+  /*!Flag for saving in output file
+    
+    If true it save into an output file. It is needed by 
+    <a href="../../src/test/other/GRBROOTtest.cxx"> GRBROOTtest.cxx</a>
+  */
+  const bool savef=false;
+  //! Name of the output file
+  const std::string paramFile= "GRBdata.txt";
+  /*! Indicates the pulse shape
+
+    Different pulse shape are considered.
+    The pulse shape depends on how the particle are accelerated in a shock 
+    as function of time.
+    - sgauss = Simmetric pulse shape. It is a double exponential with 
+    the two characteristic time equal to the cooling time of the radiative
+     process. No intrinsic delay (or 'lag' has been considered between 
+    different energies.
+    - agauss = asimmetric exponential function, the rise time and the decay
+    time are different. The peak time depend on the energy, 
+    and this give up a delay between high energies and low energies. 
+    -else . any other choiche set up a default function expressed by a FRED
+     like function. A Fast Rise pulse followed by an Exponential Decay.
+  \sa RadiationProcess::electronNumber
+  */
   const std::string pulse_shape="agauss"; 
 }
 

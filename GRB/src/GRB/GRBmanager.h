@@ -1,3 +1,13 @@
+/*!\class  GRBmanager
+  
+  \brief Spectrum class for many GRBs inheriting from GRBSpectrum.
+  This class concatenates several GRBSpectrum one after the other 
+  for simulating a series of several GRBs.
+  
+  \author Nicola Omodei       nicola.omodei@pi.infn.it 
+  \author Johann Cohen-Tanugi johann.cohen@pi.infn.it
+*/
+
 #ifndef GRBmanager_H
 #define GRBmanager_H
 
@@ -13,18 +23,9 @@
 
 class ISpectrum;
 
-/*!\class  GRBmanager
-  
-  \brief Spectrum class for many GRBs inheriting from GRBSpectrum.
-  This class concatenates several GRBSpectrum one after the other 
-  for simulating a series of several GRBs.
-  
-  \author Nicola Omodei       nicola.omodei@pi.infn.it 
-  \author Johann Cohen-Tanugi johann.cohen@pi.infn.it
-*/
 class GRBmanager : public ISpectrum
 {
-
+  
  public:
   /*! This initializes the simulation parsing the parameters.
     
@@ -45,23 +46,24 @@ class GRBmanager : public ISpectrum
   GRBmanager(const std::string& params);
   
   virtual  ~GRBmanager(); 
-  /*! If a burst is shining it returns the \e GRBSpectrum::flux(time) method 
+  /*! If a burst is shining it returns the GRBSpectrum::flux method 
    */
   double flux(double time)const;
-  /* \brief Returns the time interval
+  /*! \brief Returns the time interval
    *
-   * If a burst is shining it returns the GRBSpectrum::interval(time) method.
+   * If a burst is shining it returns the GRBSpectrum::interval method.
    * If not it returns the time to whait for the first photon of the next burst.
    */
   double interval(double time);
-  //! \retval 1
+  //! return the default value 1
   inline double solidAngle() const{return 1.0;}
   //! direction, taken from GRBSim
   inline std::pair<double,double> 
     dir(double energy, HepRandomEngine* engine)
     {return m_GRB->dir(energy, engine);} 
-  
+  //! calls GRBSpectrum::operator()
   float operator() (float u) const;
+  //! calls GRBSpectrum::energySrc
   double energySrc(HepRandomEngine*, double time);
   
   std::string title() const {return "GRBmanager";} 

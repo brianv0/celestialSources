@@ -25,14 +25,18 @@ class GRBSynchrotron : virtual public RadiationProcess
   GRBSynchrotron(SpectObj spectrumObj);
   
   ~GRBSynchrotron(){;}
-  /*! Given a Shock compute the spectrum at a certain /param time.
-   *  /param angle is needed to compute the observed spectrum.
-   */
+  /*! Given a Shock compute the spectrum at a certain time
+    
+    /param *Shock contains all the information to compute the emission
+    /param time is the rtime to compute the spectrum
+    /param angle is needed to compute the observed spectrum
+    /param distance_to_source is the distance of the source (in cm)
+  */
   void load(const GRBShock *Shock,
 	    const double time  = 0.0,
 	    const double angle = 0.0,
 	    const double distance_to_source = 0.0);
-  /*! General Interface for computing the synchrotron spectrum at a certain /param time.
+  /*! General Interface for computing the synchrotron spectrum
    */
   void load(const double time      = 0.0,
 	    const double angle     = 0.0,
@@ -46,12 +50,15 @@ class GRBSynchrotron : virtual public RadiationProcess
 	    const double dr        = 1.0e+10); 
 
   /*! \brief Synchrotron Function
-   *
-   * This Function represents the approximated version of the Synchrotron 
-   * function (eq. [6.31c] in Rybiki & Lightman 1979) and is the normalized 
-   * emission of an electron with gyrofrequency \e esyn in function of the 
-   * photon \e energy.
-   */
+   
+    This Function represents the approximated version of the Synchrotron 
+    function (eq. [6.31c] in Rybiki & Lightman 1979) and is the normalized 
+    emission of an electron with gyrofrequency \e esyn in function of the 
+    photon \e energy.
+    
+    \param esyn is the gyrofrequency of the electron
+    \param energy is the energy of the photon
+  */
   double SynchrotronFunction(double esyn, double energy);
  private:
 };

@@ -75,11 +75,11 @@ class GRBSpectrum : public ISpectrum
    *
    *  Method called by \c FluxSource::event(). 
    *  It returns the energy of a sampled photon, by calling 
-   *  the \c operator() method. 
+   *  the operator() method. 
    *  \param engine  random engine for uniform sampling;
    *  \param time    current time. 
    */
-  double energySrc(HepRandomEngine*, double time);
+  double energySrc(HepRandomEngine* engine, double time);
 
   std::string title() const {return "GRBSpectrum";}
 

@@ -1,32 +1,37 @@
-// Description:
-//    GRBROOTTest is a test program for GRB simulation studies.
-//    This executable uses ROOT to display several histograms at run time.
-//    It is just an interface to GRBSim, which actually does all the job.
-//
-// Usage:
-//    test_GRBROOT.exe [options] [option_args]
-//
-// Options:
-//    -help or -h print all the options
-//    -time <time in sec> fix the maximum time
-//    -save Save the parameters for the model and the output in a file ("GRBdata.txt").
-//    -root Save the histograms in a in a root file ("histos.root")
-//    -seed <seed> set the seed for the random engine
-//    -mute It turns off the graphical output
-//    -nomovie It turn off the visualization of the evolution of the flux
-//    -cycle <N> it runs the program N times
-//    -gif  It save the moovie of the evolving flux in a gif file.
-//
-// Graphical output:
-//    After a period of initialization, a canvas pops up showing the 
-//    complete evolution of the burst in function of the time. 
-//    At the end, 4 new canvas pops up, showing several summary 
-//    histograms.
-//
-// Authors
-//    Nicola Omodei
-//    Johann Cohen-Tanugi
-//
+/* Test program for the GRB physical simulator using ROOT 
+ 
+  GRBROOTTest is a test program for GRB simulation studies.
+  This executable uses ROOT to display several histograms at run time.
+  It is just an interface to GRBSim, which actually does all the job.
+  
+  - Usage:
+  \verbatim
+  test_GRBROOT.exe [options] [option_args]
+  \endverbatim
+  
+  - Options:
+  \verbatim
+    -help or -h print all the options
+    -time <time in sec> fix the maximum time
+    -save Save the parameters for the model and the output in a file ("GRBdata.txt").
+    -root Save the histograms in a in a root file ("histos.root")
+    -seed <seed> set the seed for the random engine
+    -mute It turns off the graphical output
+    -nomovie It turn off the visualization of the evolution of the flux
+    -cycle <N> it runs the program N times
+    -gif  It save the moovie of the evolving flux in a gif file.
+    \endverbatim
+    
+ - Graphical output:
+ After a period of initialization, a canvas pops up showing the 
+ complete evolution of the burst in function of the time. 
+ At the end, 4 new canvas pops up, showing several summary 
+ histograms.
+ 
+ 
+ \autor  Nicola Omodei
+*/
+
 // [Header File]
 #include <iterator>
 #include <iostream>
@@ -127,38 +132,39 @@ void Burst(int argc, char** argv)
   
   while(current_arg < argc)
     {
-      arg_name = argv[current_arg]; 
+      arg_name = argv[current_arg];
       if ("-help"==arg_name || "-h"==arg_name)
 	{
   	  std::cout<<" ** HELP for test_GRBROOT.exe **"<<std::endl;
 	  std::cout<<" Description:"<<std::endl;
-	  std::cout<<"    GRBROOTTest is a test program for GRB simulation 
-studies."<<std::endl;
-	  std::cout<<"    This executable uses ROOT to display several 
-histograms at run time."<<std::endl;
-	  std::cout<<"    It is just an interface to GRBSim, which actually 
-does all the job."<<std::endl;
+	  std::cout<<"    GRBROOTTest is a test program for GRB" <<std::endl;
+	  std::cout<<"    simulation studies."<<std::endl;
+	  std::cout<<"    This executable uses ROOT to display" <<std::endl;
+	  std::cout<<"    several histograms at run time."<<std::endl;
+	  std::cout<<"    It is just an interface to GRBSim, which"<<std::endl;
+	  std::cout<<"    actually does all the job."<<std::endl;
 	  std::cout<<" "<<std::endl;
-	  std::cout<<" Usage:                                      "<<std::endl;
-	  std::cout<<"    test_GRBROOT.exe [options] [option_args] "<<std::endl;
+	  std::cout<<" Usage: "<<std::endl;
+	  std::cout<<"   test_GRBROOT.exe [options] [option_args] "<<std::endl;
 	  std::cout<<" "<<std::endl;
-	  std::cout<<" Options:                                    "<<std::endl;
-	  std::cout<<"    -help or -h print this help         "<<std::endl;
-	  std::cout<<"    -time <time in sec> fix the maximum time "<<std::endl;
-	  std::cout<<"    -save Save the parameters for the model and 
-\t\t the output in a file (GRBdata.txt)."<<std::endl;
-	  std::cout<<"    -root Save the histograms in a in a root file 
-\t\t (\'histos.root\')"<<std::endl;
-	  std::cout<<"    -seed <seed> set the seed for the random engine"
-		   <<std::endl;
-	  std::cout<<"    -mute It turns off the graphical output (fastest)"
-		   <<std::endl;
-	  std::cout<<"    -nomovie It turn off the visualization of the 
-\t\t evolution of the flux (faster)"<<std::endl;
-	  std::cout<<"    -cycle <N> it runs the program N times 
-(with mute option) "<<std::endl;
-	  std::cout<<"    -gif  It save the moovie of the evolving flux 
-\t\t in a gif file."<<std::endl;
+	  std::cout<<" Options:                                   "<<std::endl;
+	  std::cout<<"   -help or -h print this help         "<<std::endl;
+	  std::cout<<"   -time <time in sec> fix the maximum time "<<std::endl;
+	  std::cout<<"   -save Save the parameters for the model"<<std::endl;
+          std::cout<<"          in the file (GRBdata.txt)."<<std::endl;
+	  std::cout<<"    -root Save the histograms in a in a root"<<std::endl;
+	  std::cout<<"          file (histos.root)"<<std::endl;
+	  std::cout<<"    -seed <seed> set the seed for the random"<<std::endl;
+	  std::cout<<"          engine."<<std::endl;
+	  std::cout<<"    -mute It turns off the graphical output"<<std::endl;
+	  std::cout<<"          (fastest)"<<std::endl;
+	  std::cout<<"    -nomovie It turn off the visualization "<<std::endl;
+	  std::cout<<"          of the evolution of the flux"<<std::endl;
+	  std::cout<<"          (faster)"<<std::endl;
+	  std::cout<<"    -cycle <N> it runs the program N times "<<std::endl;
+	  std::cout<<"          (with mute option) "<<std::endl;
+	  std::cout<<"    -gif  It save the moovie of the evolving"<<std::endl;
+	  std::cout<<"          flux in a gif file."<<std::endl;
 	  std::cout<<" Author:         Nicola Omodei "<<std::endl;
 	  exit(0);
 	}

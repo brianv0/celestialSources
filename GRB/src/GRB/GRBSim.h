@@ -81,7 +81,7 @@ class GRBSim
   //! Return the \e en energy bin.
   inline double                 Energy(int en) {return m_energy[en];}
   
-  /*! \brief Return the integrated flux (\f$eV/(m^2 s)\f$ for energy greather than \en enmin.
+  /*! \brief Return the integrated flux (\f$eV/(m^2 s)\f$ for energy greather than \e en.
    *
    * It calculates the following integral:
    * \f[ \int_{enmin}^{enmax} spctrmVec(E) E dE\f]
@@ -115,10 +115,10 @@ class GRBSim
    * This is essentially a copycat from the ROOT TH1::GetRandom() method.
    * \param spctrmVec the current spectrum vector \c m_spectrum.
    * \param u uniform random number.
-   * \param emin minimal energy below which no photon energy is drawn. This 
+   * \param enmin minimal energy below which no photon energy is drawn. This 
    * is to avoid generation of low energy photons without interest to GLAST.
    */
-  double 		DrawPhotonFromSpectrum(std::vector<double>, 
+  double 		DrawPhotonFromSpectrum(std::vector<double> spctrmVec, 
 					       float u=0.0, 
 					       double enmin=cst::enmin);
   /*! Return the minimum energy for the photon drawn */

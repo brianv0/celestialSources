@@ -17,7 +17,7 @@ the internal shocks configuration.
  
  \section physics Very short introduction to the physical model
 <br>
-We adopted a physical model based on the \em fireball model of Gamma Ray 
+We adopted a physical model based on the \e fireball model of Gamma Ray 
 Burst, because it is able to well reproduce the fast time variability 
 observed in the GRB signal: a series of shells is injected in the circum 
 burst medium with different Lorentz factors. 
@@ -30,6 +30,10 @@ thanks to the Lorentz factor of the emitting material.
 The higher energy part of a GRB spectrum can be obtained keeping into account 
 the possibility of Compton scattering of the synchrotron photons against the 
 electron accelerated by the shock (Inverse Compton Scattering).
+
+A short list of articles regarding the physics of GRB, 
+observations and theories can be found <a href="http://www.pi.infn.it/~omodei/biblio.html"> here</a>. 
+
 <br>
 
 \subsection parameters Parameters for the GRB physical model
@@ -71,16 +75,18 @@ energy are extracted from the flux and stent to FluxSvc
 The GRB simulator can be use with several test program:
 
 - test_GRB.exe
-This executable tests the GRB algorithm. It initializes the GRB simulation,
+This executable tests the GRBTestAlg. It initializes the GRB simulation,
 and extracts photons according to the computed spectrum. 
 To launch it type "test_GRB.exe". All the options are contained in the 
 joboptions.txt file.
 
 - test_GRBROOT.exe
-This test program makes use of the \em ROOT graphical environment to display some plots regarding the simulated GRB. It shows the evolution of the flux with respect to time, and plots the integrated spectrum and the light curves.
+This test program makes use of the \e ROOT graphical environment to display some plots regarding the simulated GRB. It shows the evolution of the flux with respect to time, and plots the integrated spectrum and the light curves.
 to execute it type "test_GRBROOT.exe".
 Type "test_GRBROOT.exe -help" to have a list of the available execution 
 options.
+See <a href="../../src/test/other/GRBROOTtest.cxx"> GRBROOTtest.cxx</a> 
+the test code.
 <br>
 
 \section Howto How-to use the GRB spectrum in Gleam
@@ -128,7 +134,7 @@ This file is used to choose (by picking up/commenting out '\c #include' statemen
 - <a href="../../src/test/GRBtestAlgOptions.txt"> GRBtestAlgOptions.txt</a>:
 \param GRBTestAlg.source_name
 passes the name of the GRB source, to be chosen among the ones defined in 
-<a href="../../xml/GRB_user_library.xml>GRB_user_library.xml</a>
+<a href="../../xml/GRB_user_library.xml"> GRB_user_library.xml</a>
 \param GRBTestAlg.background_name
 passes the name of the background source, to be added on top of the GRB signal. 
 It can be any spectrum defined in FluxSvc xml files.
@@ -138,12 +144,12 @@ Maximum number of photon generated. Default is 100000
 "root" saves data in ROOT format, "ascii" in ASCII text file. 
 Saving in both is also possible
 
-- <a href="../../src/test/TDSreadFluxOptions.txt>TDSreadFluxOptions.txt</a>:
+- <a href="../../src/test/TDSreadFluxOptions.txt"> TDSreadFluxOptions.txt</a>:
 \param TDSreadFluxAlg.savefile
 "root" saves data in ROOT format, "ascii" in ASCII text file. 
 Saving in both is also possible
 
-- <a href="../../src/test/LatGRBAlertOptions.txt>LatGRBAlertOptions.txt</a>:
+- <a href="../../src/test/LatGRBAlertOptions.txt"> LatGRBAlertOptions.txt</a>:
 \param LatGRBAlertAlg.nbckoff
 Region threshold; determines when to start testing for false triggers. Default is 5.
 \param LatGRBAlertAlg.mix

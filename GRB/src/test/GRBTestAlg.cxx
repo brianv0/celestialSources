@@ -1,15 +1,3 @@
-/*!\class GRBTestAlg
-  \brief Test the GRB Gaudi algorithm.
-  
-  It contains the structure of a general algorithm of Gaudi.
-  All the option available are declered in the joboptions file.
-  To test the algorithm, run: 
-  \verbatim
-  test_GRB.exe ../src/test/GRBtestAlgOptions.txt
-  \endverbatim
-  
-*/
-
 // Include files
 #include "FluxSvc/IFluxSvc.h"
 #include "FluxSvc/IFlux.h"
@@ -46,14 +34,38 @@
 
 using namespace std;
 
+/*!\class GRBTestAlg
+  \brief Test the GRB Gaudi algorithm.
+  
+  It contains the structure of a general algorithm of Gaudi.
+  All the option available are declered in the joboptions file.
+  To test the algorithm, run: 
+  \verbatim
+  test_GRB.exe ../src/test/GRBtestAlgOptions.txt
+  \endverbatim
+  
+*/
 class GRBTestAlg : public Algorithm {
   
 public:
-  //! Constructor of this form must be provided 
+  /*! \brief Constructor of this form must be provided
+
+    In the constructor the algorithm declares its properties
+   */ 
   GRBTestAlg(const std::string& name, ISvcLocator* pSvcLocator);   
   
+  /*! \brief Initializes the algorithm.
+    
+    It uses the Job options service to set the Algorithm's parameters, 
+    and points to flux service 
+  */
+
   StatusCode initialize();
+  
+  //! Executes the algorithm, calling GRBTest.
   StatusCode execute();
+  
+  //!Finalizes the algorithm.
   StatusCode finalize();
   
 private:
@@ -65,7 +77,7 @@ private:
   int m_events;
 
   std::string m_source_name;
-  //std::string  m_background_name;
+  
   std::vector<std::string> m_background_name;
   std::vector<std::string> m_save_file;
   double m_observation_time;
@@ -91,11 +103,6 @@ GRBTestAlg::GRBTestAlg(const std::string& name, ISvcLocator* pSvcLocator) :
 }
 
 //------------------------------------------------------------------------------
-/*! \brief Initialize the algorithm.
-  
-  It use the Job options service to set the Algorithm's parameters, 
-  and points to flux service 
-*/
 StatusCode GRBTestAlg::initialize() {
   
   
@@ -127,9 +134,6 @@ StatusCode GRBTestAlg::initialize() {
 
 
 //------------------------------------------------------------------------------
-/*! 
- * \brief Execute the algorithm, calling GRBTest.
- */
 StatusCode GRBTestAlg::execute() {
   m_loop++;
   cout<<m_loop<<endl;
@@ -194,9 +198,6 @@ StatusCode GRBTestAlg::execute() {
 
 
 //------------------------------------------------------------------------------
-/*!
- * Finalize the algorithm.
- */
 StatusCode GRBTestAlg::finalize() {
     
     return StatusCode::SUCCESS;

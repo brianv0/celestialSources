@@ -346,8 +346,8 @@ WARN_LOGFILE           =
 # with spaces.
 
 INPUT                  = ../src \
-                         ../src/test/GRBTestAlg.cxx \
                          ../src/test/other/GRBTest.cxx \
+                         ../src/test/GRBTestAlg.cxx \
                          ../src/TDSReadFluxAlg.cxx
 
 # If the value of the INPUT tag contains directories, you can use the 
@@ -388,6 +388,7 @@ EXCLUDE_PATTERNS       =
 # the \include command).
 
 EXAMPLE_PATH           = ../src/test \
+EXAMPLE_PATH           = ../src/test/other \
                          ../cmt \
                          ../doc
 

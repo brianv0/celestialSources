@@ -41,23 +41,23 @@ class SpectObj
 
   ~SpectObj(){;}
   
-  /*! compute \f$\sum E_i p(E_i) B_i\f$, where \f$p(E_i)\f$ is 
+  /*!Computes \f$\sum E_i p(E_i) B_i\f$, where \f$p(E_i)\f$ is 
    * the spectrum value at energy \f$E_i\f$ and \f$B_i\f$ is the bin size of 
    * the bin starting at \f$i\f$
-   * \param emin minimal energy \f$E_i\f$
-   * \param emin maximal energy \f$E_i\f$
+   * \param enmin minimal energy \f$E_i\f$
+   * \param enmax maximal energy \f$E_i\f$
    * \retval eV/s
    */
-  double integrated_E_Flux(double emin, double emax);
+  double integrated_E_Flux(double enmin, double enmax);
   
-  /*! compute \f$\sum p(E_i)B_i\f$, where \f$p(E_i)\f$ is 
+  /*! computes \f$\sum p(E_i)B_i\f$, where \f$p(E_i)\f$ is 
    * the spectrum value at energy \f$E_i\f$ and \f$B_i\f$ is the bin size of 
    * the bin starting at \f$i\f$
-   * \param emin minimal energy \f$E_i\f$
-   * \param emin maximal energy \f$E_i\f$
+   * \param enmin minimal energy \f$E_i\f$
+   * \param enmax maximal energy \f$E_i\f$
    * \retval ph/s
    */
-  double integrated_Flux(double emin, double emax);
+  double integrated_Flux(double enmin, double enmax);
   
   /*! returns the size value of the bin starting at it
    * \param it const iterator pointing to the min energy of the bin 
@@ -68,7 +68,7 @@ class SpectObj
   /*! returns the size of the map, aka the number of values points on the spectrum
    */
   inline double size()  { return m_spectrum.size(); }
-  /*! It empty the values of the spectrum, not the energy vector!
+  /*! It empties the values of the spectrum, not the energy vector!
    */
   inline void   clear() { m_spectrum.clear();       }
    
@@ -140,13 +140,13 @@ class SpectObj
   SpectObj extractSub(std::map<double,double>::const_iterator start,
 		      std::map<double,double>::const_iterator end);
   
-  /*! Change one spectral value
+  /*! Changes one spectral value
    * \param energy position of value to be changed
-   * \param new value
+   * \param spectrum new value
    */
   SpectObj SetSpectrum(double energy, double spectrum);
   
-  /*! Load this SpectObj instance with energy and spectrum vectors
+  /*! Loads this SpectObj instance with energy and spectrum vectors
    * \param energy vector of energy values
    * \param spectrum vector of spectral values
    */

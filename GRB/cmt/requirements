@@ -30,16 +30,13 @@ library GRB_lib -no_share 	*.cxx GRB/*.cxx \
 			  	GRBmaker/*.cxx  LatGRBAlert/*.cxx \
 				${GRB_headers}
 
-macro libs ""   WIN32   "$(GRBDir)/GRB_lib.lib"
+macro libs ""   WIN32 " $(GRBDir)/GRB_lib.lib "
 
 macro GRB_linkopts "-L $(GRBDir) -lGRB_lib" \
                        WIN32 ""
 
 macro_append ROOT_linkopts " -lHist  -lMatrix -lGraf -lGraf3d -lGpad " \
-       WIN32 " 	$(ROOT_PATH)/lib/libHist.lib $(ROOT_PATH)/lib/libMatrix.lib \
-	       	$(ROOT_PATH)/lib/libGraf.lib $(ROOT_PATH)/lib/libGraf3d.lib \
-		$(ROOT_PATH)/lib/libGpad.lib "
-
+       WIN32 " $(ROOT_PATH)/lib/libHist.lib $(ROOT_PATH)/lib/libMatrix.lib $(ROOT_PATH)/lib/libGraf.lib $(ROOT_PATH)/lib/libGraf3d.lib $(ROOT_PATH)/lib/libGpad.lib "
 
 library GRB  Dll/*.cxx $(libs)
 

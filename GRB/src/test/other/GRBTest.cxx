@@ -21,8 +21,6 @@
 #include <list>
 #include <string>
 #include <vector>
-//#include "GaudiKernel/ParticleProperty.h"
-
 
 // GRB includes
 #include "../GRB/GRBConstants.h"
@@ -32,22 +30,29 @@
 #include "TObjArray.h"
 #include "TFile.h"
 /*! 
- */
+  \brief namespace containing some constant relative to GRBTest
+*/
 namespace channel
 {
-  // BATSE 1 Channel (MeV):
+  //! BATSE Channel 1 Low edge (MeV):
   const double ch1L      = 50.0e-3;
+  //! BATSE Channel 1 High edge (MeV):
   const double ch1H      = 100.0e-3;
-  // BATSE 2 Channel
+  //! BATSE Channel 2 Low edge (MeV):
   const double ch2L      = 100.0e-3;
+  //! BATSE Channel 2 High edge (MeV):
   const double ch2H      = 300.0e-3;
-  // GBM Energy Range:
+  //! GBM Channel 1 Low edge (MeV):
   const double ch3L      = 25.0e-3;
+  //! GBM Channel 1 High edge (MeV):
   const double ch3H      = 10.0;
-  // LAT Energy Range
+  //! LAT Channel 1 Low edge (MeV):
   const double ch4L      = 20.0;
+  //! LAT Channel 1 High edge (MeV):
   const double ch4H      = 1.0e+3;
+  //! LAT Channel 2 Low edge (MeV):
   const double ch5L      = 1.0e+3;
+  //! LAT Channel 2 High edge (MeV):
   const double ch5H      = 300.0e+3;
   //////////////////////////////////////////////////
 }
@@ -63,8 +68,7 @@ using namespace channel;
  
  \author Nicola Omodei       
  \author Johann Cohen-Tanugi 
- \aoutor Franceso Longo
-
+ 
 */
 
 class DataOut{
@@ -73,15 +77,15 @@ public:
   ~DataOut(){}  
   //! Stores the time 
   inline void setTime(double value)   {m_time=value;}
-  //! Store the energy 
+  //! Stores the energy 
   inline void setEnergy(double value) {m_energy=value;}
-  //! Store Phi 
+  //! Stores Phi 
   inline void setPhi(double value)    {m_phi=value;}
-  //! Store the Theta
+  //! Stores the Theta
   inline void setTheta(double value)  {m_theta=value;}
-  //! Store the Galactic \e l direction 
+  //! Stores the Galactic \e l direction 
   inline void setGal_l(double value)  {m_l=value;}
-  //! Store the Galactic \e b direction 
+  //! Stores the Galactic \e b direction 
   inline void setGal_b(double value)  {m_b=value;}
 
   //! Returns the time stored in DataOut 
@@ -109,7 +113,7 @@ public:
     sources and background.
   */
   inline void setSourceType(int value)    {m_source_type=value;}
-  //! return the source type.
+  //! Returns the source type.
   inline int   SourceType() {return m_source_type;}
 private:
   double m_time;
@@ -153,24 +157,23 @@ public:
  * It calls the GRBSim class as kernel of the simulation.
  * Some quantities are also calculated to help people understanding 
  * GRB physics.
- *
  */
 class GRBTest{
     
 public:
   GRBTest();
   ~GRBTest(){}
-  //! Set a pointer to flux service
+  //! Sets a pointer to flux service
   inline void setService(IFluxSvc* ptr){m_fsvc = ptr;}
-  //! Calculate the fluence in the energy band between e1 and e2.
+  //! Calculates the fluence in the energy band between e1 and e2.
   double CalculateFluence(double ee/* MeV */,
 			  double e1=cst::enmin*1e-6/* MeV */,
 			  double e2=cst::enmax*1e-6/* MeV */);
   /*!
-    \brief Generate a GRB
+    \brief Generates a GRB
 
-    This method  initialize the Simulation. It parse the parameters and generates 
-    events (calling Flux::generate() method).
+    This method  initializes the Simulation. It parses the parameters and 
+    generates events (calling IFlux::generate method).
     \param argv is the vector containing all the available options. It 
     is parsed by this method.
   */
@@ -182,20 +185,22 @@ public:
     It prints on the screen all the available options.
   */
   void help();
-  //! List all the sources available
+  //! Lists all the sources available
   void listSources(const std::list<std::string>& source_list );
-  //! List of loaded spectrum objects
+  //! Lists of loaded spectrum objects
   void listSpectra();
   
 private:  
-  IFlux* m_flux;    // pointer the a flux object
-  IFluxSvc* m_fsvc; // pointer to the flux Service  
+  //! points to IFlux object
+  IFlux* m_flux;
+  //! pointer to the FluxSvc    
+  IFluxSvc* m_fsvc; 
   int m_loop;
   bool savef_root;
   bool savef_ascii;
   double TIME;
   int EVENTS;
-  const char * default_arg;//="GRBSpectrum";
+  const char * default_arg;
   std::vector<DataOut> theData;  
 };
 
