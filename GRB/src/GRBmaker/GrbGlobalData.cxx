@@ -252,7 +252,7 @@ const std::vector<int> &histpl, const double factor, std::vector<double> &vect)
     // Code for NEW LAT/GBM
     std::vector<int>::size_type sz = histpl.size();
     std::vector<double> loEdges(sz+1);
-    for (int i=0; i<=sz; ++i)
+    for (std::vector<int>::size_type i=0; i<=sz; ++i)
         loEdges[i] = factor - i*0.1;
     
     for (long isim=0; isim<grbcst::nbsim; ++isim)

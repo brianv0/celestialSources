@@ -187,5 +187,6 @@ std::pair<float,float> GRBobsSpectrum::dir(float energy) const
 
 std::pair<double,double> GRBobsSpectrum::dir(double energy)
 {
-    return dir(energy);
+	//return m_grb->dir();
+    return dir(float(energy));
 }
