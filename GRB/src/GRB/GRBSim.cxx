@@ -76,7 +76,7 @@ void GRBSim::MakeGRB(double time_offset)
     }
   catch (char * )
     {
-      std::std::cout<< "Failure initializing the GRB constants \n";
+      std::cout<< "Failure initializing the GRB constants \n";
       exit(1);
     }
   

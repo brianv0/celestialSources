@@ -31,7 +31,7 @@ class SpectObj
   inline double getBinValue(double index) 
     {
       std::map<double,double>::const_iterator it = m_spectrum.begin();
-      advance(it,index);
+      std::advance(it,index);
       return it->first;
     }
   void clearSpectrumVector();

@@ -8,7 +8,7 @@
 GRBengine::GRBengine(GRBConstants *myParam)
 {
   int engine_type   = 3;
-  string shell_type = "jet";
+  std::string shell_type = "jet";
   switch(engine_type)
     {
     case 1: // jet, no shell evolution
