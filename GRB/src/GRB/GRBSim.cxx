@@ -111,10 +111,7 @@ TH2D* GRBSim::Fireball()
 	  // [ph/(cm² s keV)]
 	}
     }
-  // Conersion 1/cm² -> 1/m²
-  //  m_Nv->Scale(1.0e+4); // [ph/(m² s keV)]
-  // double fluence = 1.0e-6; //erg/cm²
-  // nph = nv * dE * TimeBinWidth
+
   TH2D *nph = Nph(m_Nv); //ph/cm²
   
   int ei1 = nph->GetYaxis()->FindBin(BATSE1);
@@ -168,7 +165,7 @@ TH2D *GRBSim::Nph(const TH2D *Nv)
       for(int ti = 0; ti<Tbin; ti++)
 	{
 	  Nph->SetBinContent(ti+1, ei+1, 
-			     Nph->GetBinContent(ti+1, ei+1)*dei*deltat); //[ph]
+			     Nph->GetBinContent(ti+1, ei+1)*dei*deltat); // [ph/(cm²)]  
 	}   
     }
   return Nph;

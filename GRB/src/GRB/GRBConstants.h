@@ -29,7 +29,7 @@ namespace cst
   const double ae = 0.3; 
 
   const double emin =  10.0; //keV
-  const double emax = 1e9;  //keV
+  const double emax =  1e9;  //keV
   const double enph = 3.0e+4;  //keV (30 MeV) 
   
   const    int Ebin  =  50; 
@@ -44,8 +44,8 @@ namespace cst
   const double BATSE5=1000.0;                 // 1 MeV
   const double GBM1=10.0;                     // 10 keV 
   const double GBM2=30.0e3;                   // 25 MeV 
-  const double LAT1=100.0e3;                   // 50 MeV 
-  const double LAT2=3.0e6;                    //300 GeV 
+  const double LAT1=30.0e3;                   // 50 MeV 
+  const double LAT2=3.0e8;                    //300 GeV 
   //////////////////////////////////////////////////
 };
 
