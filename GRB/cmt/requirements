@@ -8,8 +8,7 @@ author Nicola Omodei<nicola.omodei@pi.infn.it> Johann Cohen-Tanugi <johann.cohen
 use flux       v8r*
 use ROOT       v2r*  IExternal
 
-
-macro_prepend includes "-I $(GRBROOT)/src/ "
+macro_prepend includes " -I$(GRBROOT)/src/ "
 
 macro GRB_linkopts "-L $(GRB_root)/$(BINDIR) -lGRBLib" \
                        WIN32 ""
