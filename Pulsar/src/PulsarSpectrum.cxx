@@ -36,25 +36,27 @@ PulsarSpectrum::~PulsarSpectrum()
 //return flux, given a time
 double PulsarSpectrum::flux(double time) const
 {
-  double InternalTime = TMath::ASin(sin(2*TMath::Pi()*time/m_period))/(2*TMath::Pi());
+  //  double InternalTime = TMath::ASin(sin(2*TMath::Pi()*time/m_period))/(2*TMath::Pi());
   double flux;	  
-  flux = m_spectrum->flux(InternalTime,cst::enph);
+  //  flux = m_spectrum->flux(InternalTime,cst::enph);
+  flux = m_spectrum->flux(time,cst::enph);
   return flux;
 }
 
 double PulsarSpectrum::interval(double time)
 {  
   double inte;  
-  double InternalTime = TMath::ASin(sin(2*TMath::Pi()*time/m_period))/(2*TMath::Pi());
-  
-  inte = m_spectrum->interval(InternalTime,cst::enph);
+  //  double InternalTime = TMath::ASin(sin(2*TMath::Pi()*time/m_period))/(2*TMath::Pi());
+  //inte = m_spectrum->interval(InternalTime,cst::enph);
+  inte = m_spectrum->interval(time,cst::enph);
   return inte;
 }
 
 double PulsarSpectrum::energy(double time)
 {
-  double InternalTime = TMath::ASin(sin(2*TMath::Pi()*time/m_period))/(2*TMath::Pi());
-  return m_spectrum->energy(InternalTime,cst::enph)*1.0e-3; //MeV
+  //double InternalTime = TMath::ASin(sin(2*TMath::Pi()*time/m_period))/(2*TMath::Pi());
+  //return m_spectrum->energy(InternalTime,cst::enph)*1.0e-3; //MeV
+  return m_spectrum->energy(time,cst::enph)*1.0e-3; //MeV
 }
 
 double PulsarSpectrum::parseParamList(std::string input, int index)
