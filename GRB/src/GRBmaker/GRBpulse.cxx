@@ -14,24 +14,14 @@ using namespace grbobstypes;
 
 // Default constructor  GRBpulse()
 // Initializes the member data.
-//
-// Input:
-//		--
-//
-// Output:
-//		GRBpulse object
-//
-// Calls:
-//		--
-
 GRBpulse::GRBpulse()
-:m_amplitude(),
-m_tdiff(),
-m_tmax(),
-m_sigma(),
-m_pulse(),
-m_nphotpul(),
-m_univFWHM(0.0)
+        : m_amplitude(),
+          m_tdiff(),
+          m_tmax(),
+          m_sigma(),
+          m_pulse(),
+          m_nphotpul(),
+          m_univFWHM(0.0)
 {
 }
 
@@ -49,25 +39,11 @@ GRBpulse::~GRBpulse()
 // getAmplitude(HepRandomEngine *engine, const int npuls)
 //		Generates pulse amplitudes and sorts them in ascending order.
 //		Scramples amplitudes of {1st,2nd} l halves of pulses, separately (leaves whole time profile asymmetric)
-//
-// Input:
-//		engine						:	pointer to a HepRandomEngine object
-//		npuls				 		:	number of pulses in this burst
-//
-// Output:
-//		m_amplitude					:	pulse peak amplitude
-//
-// Calls:
-//		GRBobsUtilities::sortVector
-//		GRBobsUtilities::randGen
-//
-// Caller:
-//		data
-
 void GRBpulse::getAmplitude(HepRandomEngine *engine, const int npuls)
 {
     m_amplitude.resize(npuls);
-    std::transform(m_amplitude.begin(), m_amplitude.end(), m_amplitude.begin(), GRBobsUtilities::randGen(engine));
+    std::transform(m_amplitude.begin(), m_amplitude.end(), m_amplitude.begin(), 
+        GRBobsUtilities::randGen(engine));
     std::sort(m_amplitude.begin(), m_amplitude.end(), std::greater<double>());
     
     if (npuls > 3)
@@ -78,14 +54,16 @@ void GRBpulse::getAmplitude(HepRandomEngine *engine, const int npuls)
             ++n1st;
         
         std::vector<double> index1st(n1st);
-        std::transform(index1st.begin(), index1st.end(), index1st.begin(), GRBobsUtilities::randGen(engine));
+        std::transform(index1st.begin(), index1st.end(), index1st.begin(), 
+            GRBobsUtilities::randGen(engine));
         
         std::vector<double> sorted(index1st);
         std::sort(sorted.begin(), sorted.end());
         GRBobsUtilities::sortVector(0, index1st, sorted, m_amplitude);
         
         index1st.resize(n2nd);
-        std::transform(index1st.begin(), index1st.end(), index1st.begin(), GRBobsUtilities::randGen(engine));
+        std::transform(index1st.begin(), index1st.end(), index1st.begin(), 
+            GRBobsUtilities::randGen(engine));
         
         sorted = index1st;
         std::sort(sorted.begin(), sorted.end());
@@ -98,19 +76,6 @@ void GRBpulse::getAmplitude(HepRandomEngine *engine, const int npuls)
 
 // getAlpha(const double value)
 //		Gets a power-law index from one of the three portions of the pulse width distribution
-//
-// Input:
-//		value						:	input value
-//
-// Output:
-//		value						:	output value
-//
-// Calls:
-//		---
-//
-// Caller:
-//		universalWidth
-
 double GRBpulse::getAlpha(const double value) const
 {
     if (value >= 0.01 && value <= 0.10)
@@ -133,19 +98,6 @@ double GRBpulse::getAlpha(const double value) const
 
 // fillVector(std::vector<long> &ngtwid)
 //		Fills up a vector with the hard coded values for the integral pulse width distribution.
-//
-// Input:
-//		---
-//
-// Output:
-//		ngtwid						:	filled vector
-//
-// Calls:
-//		---
-//
-// Caller:
-//		pickWidth
-
 void GRBpulse::fillVector(std::vector<long> &ngtwid) const
 {
     // Keep it in sorted order for index method to work
@@ -164,23 +116,8 @@ void GRBpulse::fillVector(std::vector<long> &ngtwid) const
 
 // index(HepRandomEngine *engine, const long diff, const long minval, const std::vector<long> &in)
 // returns the index i to the last element of "in" vector such that in[i] >= some random value.
-//
-// Input:
-//		engine						:	pointer to a HepRandomEngine object
-//		in							:	vector to be scanned for some specified value - SORTED IN ASCENDING ORDER
-//		diff						:	difference between maximum and minimum elements of vector "in"
-//		minval						:	minimum element of vector "in"
-//
-// Output:
-//		index						:	index such that in[index] >= some random value
-//
-// Calls:
-//		engine->flat
-//
-// Caller:
-//		universalWidth
-
-long GRBpulse::index(HepRandomEngine *engine, const long diff, const long minval, const std::vector<long> &in) const
+long GRBpulse::index(HepRandomEngine *engine, const long diff, const long minval, 
+                     const std::vector<long> &in) const
 {
     bool found=0;
     long i;
@@ -213,28 +150,10 @@ long GRBpulse::index(HepRandomEngine *engine, const long diff, const long minval
 //		pulse widths ~ 1/10-1/20 that of long GRBs -- multiply pulse widths for one
 //		quarter of the GRBs by compression factor of 1/10.  Then using Width ~ E^(-0.333)
 //		relationship, scale chosen width (at 100 keV) to width at Ethres.
-//
-// Input:
-//		grbcst::ethres				:	double
-//		engine						:	pointer to a HepRandomEngine object
-//		duration					:	current burst duration
-//		v							:	hi and lo values picked from vector "v" are interpolated to get the return value
-//		in							:	vector to aid in picking values from the "v" vector
-//		diff						:	difference between maximum and minimum elements of vector "in"
-//		minval						:	minimum element of vector "in"
-//
-// Output:
-//		ngtwid						:	filled vector
-//
-// Calls:
-//		index
-//		GRBobsUtilities::result
-//
-// Caller:
-//		pickWidth
-
-void GRBpulse::universalWidth(HepRandomEngine *engine, const double ethres, const double duration, const long diff, 
-                              const long minval, const std::vector<long> &in, const std::vector<double> &v) 
+void GRBpulse::universalWidth(HepRandomEngine *engine, const double ethres, 
+                              const double duration, const long diff, 
+                              const long minval, const std::vector<long> &in, 
+                              const std::vector<double> &v) 
 {
     // find index loIndex such that in[loIndex] < some random number
     long loIndex = index(engine, diff, minval, in);
@@ -257,24 +176,8 @@ void GRBpulse::universalWidth(HepRandomEngine *engine, const double ethres, cons
 
 // pickWidth(HepRandomEngine *engine, const double ethres, const double duration)
 // Chooses a universal width for the pulses within a given burst.
-//
-// Input:
-//		grbcst::nbins				:	long
-//		grbcst::logfac0				:	double
-//		engine						:	pointer to a HepRandomEngine object
-//		duration					:	current burst duration
-//
-// Output:
-//		m_univFWHM					:	universal width for the pulses within current burst
-//
-// Calls:
-//		fillVector
-//		universalWidth
-//
-// Caller:
-//		data
-
-void GRBpulse::pickWidth(HepRandomEngine *engine, const double ethres, const double duration)
+void GRBpulse::pickWidth(HepRandomEngine *engine, const double ethres, 
+                         const double duration)
 {
     static std::vector<double> logwidth;
     static std::vector<long> ngtwid;
@@ -319,28 +222,6 @@ void GRBpulse::pickWidth(HepRandomEngine *engine, const double ethres, const dou
 //		scale the pulse width for energy dependence, as E^-0.333.  make the peak shift
 //		1/2 as large as width adjustment, ~ as observed at BATSE energies.
 //		theses dependences are crude estimates of what we shall measure with GLAST.
-
-//
-// Creates the two vectors sigma and tdiff needed in the calculation of GRB times.
-//
-// Input:
-//		grbcst::nu					:	long
-//		grbcst::frackeep			:	double
-//		grbcst::timres				:	double
-//		engine						:	pointer to a HepRandomEngine object
-//		m_univFWHM					:	universal width for the pulses within the current burst
-//
-// Output:
-//		deltbinsleft				:	value used in the calculations of GRB times
-//		m_sigma						:	vector containing values equal to sigrise and sigdecay
-//		m_tdiff						:	
-//
-// Calls:
-//		engine->flat
-//
-// Caller:
-//		data
-
 long GRBpulse::createSigmaTdiff(HepRandomEngine *engine)
 {
     double riseHWHM  = (0.4 + 0.1 * engine->flat()) * m_univFWHM;
@@ -377,21 +258,6 @@ long GRBpulse::createSigmaTdiff(HepRandomEngine *engine)
 
 // getNphotpul(const long nphoton, const int npuls)
 // Computes number of photons in each pulse for the given burst.
-//
-// Input:
-//		nphoton						:	number of photons in the current burst
-//		npuls						:	number of pulses in the current burst
-//		m_amplitude					:	peak flux amplitude
-//
-// Output:
-//		m_nphotpul					:	vector containing number of photons in each pulse
-//
-// Calls:
-//		GRBobsUtilities::getSorter
-//
-// Caller:
-//		data
-
 void GRBpulse::getNphotpul(const long nphoton, const int npuls)
 {
     long v;
@@ -430,28 +296,15 @@ void GRBpulse::getNphotpul(const long nphoton, const int npuls)
 // getTmax(HepRandomEngine *engine, const int npuls, const double duration)
 // Returns a vector of random numbers multiplied by the duration sorted in ascending order.  
 // Random numbers are in the range [0,1).  This vector is used in the calculations of GRB times.
-//
-// Input:
-//		engine						:	pointer to a HepRandomEngine object
-//		npuls						:	number of pulses in the current burst
-//		duration					:	current burst duration
-//
-// Output:
-//		m_tmax						:	vector of (randomNumber * duration) sorted in ascending order
-//
-// Calls:
-//		GRBobsUtilities::randGen
-//		GRBobsUtilities::multiplier
-//
-// Caller:
-//		data
-
-void GRBpulse::getTmax(HepRandomEngine *engine, const int npuls, const double duration)
+void GRBpulse::getTmax(HepRandomEngine *engine, const int npuls, 
+                       const double duration)
 {
     m_tmax.resize(npuls);
-    std::transform(m_tmax.begin(), m_tmax.end(), m_tmax.begin(), GRBobsUtilities::randGen(engine));
+    std::transform(m_tmax.begin(), m_tmax.end(), m_tmax.begin(), 
+        GRBobsUtilities::randGen(engine));
     
-    std::transform(m_tmax.begin(), m_tmax.end(), m_tmax.begin(), GRBobsUtilities::multiplier(duration));
+    std::transform(m_tmax.begin(), m_tmax.end(), m_tmax.begin(), 
+        GRBobsUtilities::multiplier(duration));
     
     std::sort(m_tmax.begin(), m_tmax.end());
 }
@@ -461,22 +314,6 @@ void GRBpulse::getTmax(HepRandomEngine *engine, const int npuls, const double du
 
 // getPulse(const int npuls)
 // Returns a vector needed in the calculations of GRB times.
-//
-// Input:
-//		grbcst::nu					:	long
-//		npuls						:	number of pulses in the current burst
-//		m_tdiff						:	vector returned by createSigmaTdiff method
-//		m_sigma						:	vector returned by createSigmaTdiff method
-//
-// Output:
-//		m_pulse						:	output vector
-//
-// Calls:
-//		GRBobsUtilities::multiplier
-//
-// Caller:
-//		data
-
 void GRBpulse::getPulse(const int npuls)
 {
     DoubleSize sz = m_tdiff.size();
@@ -489,7 +326,8 @@ void GRBpulse::getPulse(const int npuls)
     m_pulse.reserve(npuls);
     for (int ipuls=0; ipuls<npuls; ++ipuls)
     {
-        std::transform(temp.begin(), temp.end(), temp.begin(), GRBobsUtilities::multiplier(m_amplitude[ipuls]));
+        std::transform(temp.begin(), temp.end(), temp.begin(), 
+            GRBobsUtilities::multiplier(m_amplitude[ipuls]));
         m_pulse.push_back(temp);
     }
 }
@@ -499,33 +337,8 @@ void GRBpulse::getPulse(const int npuls)
 
 // data(HepRandomEngine *engine, const double ethres, const long nphoton, const int npuls, const double duration)
 // Returns pulse data needed in the
-//
-// Input:
-//		engine						:	pointer to a HepRandomEngine object
-//		nphoton						:	number of photons in the current burst
-//		npuls						:	number of pulses in the current burst
-//		duration					:	current burst duration
-//
-// Output:
-//		deltbinsleft				:	value used in the calculations of GRB times
-//		m_tmax						:	vector of (randomNumber * duration) sorted in ascending order
-//		m_pulse						:	
-//		m_nphotpul					:	vector containing number of photons in each pulse
-//		m_sigma						:	vector containing values equal to sigrise and sigdecay
-//		m_tdiff						:	
-//
-// Calls:
-//		getAmplitude
-//		getTmax
-//		pickWidth
-//		createSigmaTdiff
-//		getPulse
-//		getNphotpul
-//
-// Caller:
-//		GRBmaker::makeTimes
-
-long GRBpulse::data(HepRandomEngine *engine, const double ethres, const long nphoton, const int npuls, const double duration)
+long GRBpulse::data(HepRandomEngine *engine, const double ethres, 
+                    const long nphoton, const int npuls, const double duration)
 {
     getAmplitude(engine, npuls);
     getTmax(engine, npuls, duration);

@@ -1,5 +1,14 @@
-//
-// File: GRBobsConstants.h
+/*! 
+ * \class GRBobsConstants
+ * \brief Class instantiated to access general parameters and constants.
+ *  
+ * The namespace grbcst contains all the constant needed by the simulation.
+ * The namespace grbobstypes contains typedef definitions used by the program.
+ *
+ * \author Jay Norris             jnorris@lheapop.gsfc.nasa.gov
+ * \author Sandhia Bansal         sandhiab@lheapop.gsfc.nasa.gov
+ */
+
 
 #ifndef GRB_OBS_CONSTANTS_H
 #define GRB_OBS_CONSTANTS_H 

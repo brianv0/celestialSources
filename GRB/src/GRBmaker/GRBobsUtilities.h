@@ -1,7 +1,13 @@
-// File: GRBobsUtilities.h
-//
-// This class offers some utility functions to the GRBmaker and GRBpulse classes.
-//
+/*!
+* \class GRBobsUtilities
+*
+* \brief This class provides some utilities for the this program.
+* \author Jay Norris        jnorris@lheapop.gsfc.nasa.gov
+* \author Sandhia Bansal    sandhiab@lheapop.gsfc.nasa.gov
+*
+*/
+
+
 #ifndef GRB_OBS_UTILITIES_H
 #define GRB_OBS_UTILITIES_H
 
@@ -16,21 +22,26 @@ using namespace grbobstypes;
 
 class HepRandomEngine;
 
+
+
 class GRBobsUtilities
 {
 public:
+    /*!
+     * \breif Return interpolated value from hi and lo.
+     */
+    static double result(HepRandomEngine *engine, const double lo, 
+        const double hi, const double p);
     
-    // utility functions
-    
-    // returns the interpolated value from hi and lo
-    static double result(HepRandomEngine *engine, const double lo, const double hi, const double p);
-    
-    static void sortVector(const long index, const std::vector<double> &in, const std::vector<double> &sorted, 
-        std::vector<double> &out);
-    
-    
-    
-    // used to fill a vector with the product of its values with m_value
+    /*!
+     * \brief Use ordering of "sorted" to sort "out" vector.
+     */
+    static void sortVector(const long index, const std::vector<double> &in, 
+        const std::vector<double> &sorted, std::vector<double> &out);
+     
+    /*!
+     * \brief Used to fill a vector with the product of its values with m_value.
+     */
     struct multiplier : public std::unary_function<double, double>
     {
         multiplier(double value) : m_value(value) {}
@@ -40,7 +51,9 @@ public:
     };
     
     
-    // used to fill a vector with random numbers in the range [0,1)
+    /*!
+     * =brief Used to fill a vector with random numbers in the range [0,1).
+     */
     struct randGen : public std::unary_function<double, double>
     {
         randGen(HepRandomEngine *engine) : m_engine(engine) {}
@@ -50,10 +63,12 @@ public:
     };
     
     
-    
-    // returns the ordering of vector "in"
+    /*!
+     * \breif Return the ordering of vector "in".
+     */
     template<class T>
-        static void getSorter(const std::vector<T> &in, std::vector<long> &sorter)
+        static void getSorter(const std::vector<T> &in, 
+        std::vector<long> &sorter)
     {
         std::vector<T> sorted(in);
         std::sort(sorted.begin(), sorted.end());
@@ -77,10 +92,9 @@ public:
     }
     
     
-    
-    
-    // Templated functions:
-    // Create cumulative sum of the input vector "in"
+    /*! 
+     * \brief Create cumulative sum of the input vector "in".
+     */
     template<class S, class T>
         static void cumulativeSum(const std::vector<S> &in, std::vector<T> &out)
     {

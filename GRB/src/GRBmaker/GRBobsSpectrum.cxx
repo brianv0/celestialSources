@@ -5,7 +5,7 @@
 
 
 #include "GRBmaker.h"
-#include "GRB.h"
+#include "GRBurst.h"
 #include "GRBobsSpectrum.h"
 #include "GRBobsConstants.h"
 #include "src/GPS.h"
@@ -20,36 +20,40 @@ static std::ofstream os("gleam.lis");
 // Constructors
 
 GRBobsSpectrum::GRBobsSpectrum(const std::string &params)
-    :ISpectrum(),
-     m_title("GRBobsSpectrum"),
-     m_particleName("gamma")
+              : ISpectrum(),
+                m_title("GRBobsSpectrum"),
+                m_particleName("gamma")
 {
     std::vector<std::string> paramVector;
     parseParamList(params, paramVector);
     
     std::auto_ptr<GRBmaker> grbMaker(new GRBmaker);
-    std::auto_ptr<GRB> p(grbMaker->create(paramVector));
+    std::auto_ptr<GRBurst> p(grbMaker->create(paramVector));
     m_grb = p.release();
 }
 
 
-GRBobsSpectrum::GRBobsSpectrum(const double duration, const int npuls, const double flux, const double fraction, 
-                               const double alpha, const double beta, const double epeak, const double specnorm, const bool flag)
-                               :ISpectrum(),
-                               m_title("GRBobsSpectrum"),
-                               m_particleName("gamma")
+GRBobsSpectrum::GRBobsSpectrum(const double duration, const int npuls, 
+                               const double flux, const double fraction, 
+                               const double alpha, const double beta, 
+                               const double epeak, const double specnorm, 
+                               const bool flag)
+              :ISpectrum(),
+               m_title("GRBobsSpectrum"),
+               m_particleName("gamma")
 {
     std::auto_ptr<GRBmaker> grbMaker(new GRBmaker);
-    std::auto_ptr<GRB> p(grbMaker->create(duration, npuls, flux, fraction, alpha, beta, epeak, specnorm, flag));
+    std::auto_ptr<GRBurst> p(grbMaker->create(duration, npuls, flux, fraction, alpha,
+        beta, epeak, specnorm, flag));
     m_grb = p.release();
 }
 
 
 // Copy Constructor
 GRBobsSpectrum::GRBobsSpectrum(const GRBobsSpectrum &right)
-    :ISpectrum(),
-     m_title(right.m_title),
-     m_particleName(right.m_particleName)
+:ISpectrum(),
+m_title(right.m_title),
+m_particleName(right.m_particleName)
 {
     if (right.m_grb)
         m_grb = right.m_grb->clone();
@@ -83,7 +87,8 @@ GRBobsSpectrum &GRBobsSpectrum::operator=(const GRBobsSpectrum &right)
 
 
 // Parse input parameter list obtained from the xml file
-void GRBobsSpectrum::parseParamList(const std::string &input, std::vector<std::string>& output) const
+void GRBobsSpectrum::parseParamList(const std::string &input, 
+                                    std::vector<std::string>& output) const
 { 
     std::string::size_type i = input.find_last_of("/");
     
@@ -180,7 +185,8 @@ std::pair<float,float> GRBobsSpectrum::dir(float energy) const
 }
 
 
-std::pair<double,double> GRBobsSpectrum::dir(double energy, HepRandomEngine *engine)
+std::pair<double,double> GRBobsSpectrum::dir(double energy, 
+                                             HepRandomEngine *engine)
 {
     return dir(energy);
 }
