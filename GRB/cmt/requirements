@@ -25,7 +25,9 @@ macro source "*.cxx" WIN32 "*.cxx *.h"
 
 library GRB -no_share \
      -s=../src      $(source) \
-     -s=GRB         $(source)
+     -s=GRB         $(source) \     
+     -s=GRBmaker    $(source) 
+
 
 
 application test_GRB      test/testMgr.cxx 

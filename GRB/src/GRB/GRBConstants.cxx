@@ -19,7 +19,8 @@ void Parameters::SetGRBNumber(UInt_t GRBnumber)
 {
   m_GRBnumber = GRBnumber;
   rnd->SetSeed(m_GRBnumber);
-  double tmp = rnd->Uniform();
+  double tmp;
+  tmp = rnd->Uniform();
 }
 
 //////////////////////////////////////////////////
@@ -76,7 +77,8 @@ void Parameters::SetFluence(double fluence)
   else
     {
       m_Fluence = fluence;
-      double tmp = rnd->Uniform();//THB: this needed parentheses
+      double tmp;
+      tmp = rnd->Uniform();//THB: this needed parentheses
     }
 }
 

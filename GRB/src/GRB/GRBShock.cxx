@@ -27,7 +27,7 @@ GRBShock::GRBShock(GRBShell *FS, GRBShell *BS, double tshock, double p)
   double g1 = FS->GetGamma();
   double g2 = BS->GetGamma();
   
-  double e1 = FS->GetEnergy();
+  //  double e1 = FS->GetEnergy();
   double r2 = BS->GetRadius();
 
   double dr1 = FS->GetThickness();
