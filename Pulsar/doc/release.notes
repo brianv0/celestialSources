@@ -15,5 +15,7 @@
 *   v1r0p4 09-Mar-2005 THB  Barycentric Decorrections included;
 			    Specific user-defined TimeProfiles;	
 	                    Increased speed
+*   v1r0p5 30-Mar-2005 THB  Continuous phase inserted;
+
 *@endverbatim
 */

@@ -322,7 +322,7 @@ TH2D* PulsarSim::PSRPhenom(double par1, double par2, double par3, double par4)
 	}
 
       TH1D TempProfile("TempProfile","TempProfile",timeCounts.size()-1,0,m_period);
- 
+      
       for (unsigned int i =0; i < timeCounts.size()-1; i++)
 	{
 	  TempProfile.SetBinContent(i,timeCounts[i]);

@@ -13,5 +13,5 @@ The source code for PulsarSpectrum is included in the celestialSources package u
 
 * A brief tutorial on the use of PulsarSpectrum can be found at:
 * <br>
-* <a href="#dejager02">http://www.pi.infn.it/~razzano/Pulsar/PulsarSpectrumTutorial/PsrSpectrumTut.html </a>
+* <a href="#dejager02">http://www.pi.infn.it/~razzano/Pulsar/PulsarSpTutor/PulsarSpTutor.htm </a>
 */
