@@ -43,7 +43,7 @@ GRBmanager::~GRBmanager()
 double GRBmanager::flux(double time) const
 {
   double flux;	  
-  if(time < m_startTime || (time > m_endTime)) flux = 0.0;
+  if(time <= m_startTime || (time > m_endTime)) flux = 0.0;
   else flux = m_spectrum->flux(time-m_startTime,cst::enph);
   return flux;
 }
