@@ -1,3 +1,0 @@
-Seed l     b     Fluence Nshell  Tv  Eco(GeV)  Ep(keV)  IC/Syn
-1  -500.0 -500.0  0.0e-5 0	 0.0  0.       0.	0 //L+S
-1  -500.0 -500.0  0.0e-5 0	 0.0  0.       0.	1 //L+S
