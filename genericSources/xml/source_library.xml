@@ -174,7 +174,7 @@
      emax = 2e5 (MeV, default)
      lc # (in FITS file) = 0 (default)
      z (redshift) = 0 (default)
---!>
+-->
           <SpectrumClass name="SpectralTransient"
           params="1e-1, 0., 1e4, $(GENERICSOURCESROOT)/data/testTemplate.dat,20,2e5,0,0"/>
           <celestial_dir ra="193.4" dec="-5.82"/>
