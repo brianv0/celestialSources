@@ -1,88 +1,74 @@
 <source_library title="GRB_user_library">
-
+	
 <!-- Type of GRB spectrums : -->
-<!-- 1) GRBSpectrum: the physical model for simulating GRBs based on the fireball model.-->
-<!-- The reference frame is galactic. -->
-
-    <source name=" GRBspectrum_Gal">
-    <spectrum  escale="GeV"> <SpectrumClass name="GRBSpectrum" params="temp.txt"/>
-    <!--This will live the direction free-->
-    <use_spectrum frame="galaxy"/>
+<!--1) GRBmanager: several GRB are concatenated using the physical model simulator. -->
+<!-- The direction are random in the sky-->
+<!-- - The first parameter is the starting time of the first BURST -->
+<!-- - The second parameter is the time to wait for the next burst (1hour = 3600 seconds., 1day = 86400 seconds.) -->     
+    <source name=" GRB ">
+        <spectrum escale="MeV"> <SpectrumClass name="GRBmanager" params="3600,86400"/>
+	<use_spectrum frame="galaxy"/> 
     </spectrum> </source>
 
-<!-- 2) GRBobsSpectrum: the phenomenological model of GRB. The high energy part is extrapolated from the BATSE data. The reference frame is galactic. -->
+<!-- 2) GRBobsSpectrum: the phenomenological model of GRB. -->
+<!-- The high energy part is extrapolated from the BATSE data. The reference frame is galactic. -->
 
-    <source name=" GRBobsSpectrum_Gal" >
-<!--        <spectrum escale="GeV"> <SpectrumClass name="GRBobsSpectrum" params="$(GRBROOT)/GRBmakerOutput/GRB_001.lis"/>     -->
-        <spectrum  escale="GeV"> <SpectrumClass name="GRBobsSpectrum" params="$(GRBROOT)/GRBmakerOutput/"  />    
-<!--        <spectrum escale="GeV"> <SpectrumClass name="GRBobsSpectrum"/>  -->
-    <!--This will live the direction free-->
-    <use_spectrum frame="galaxy"/>
-    </spectrum> </source>
-
-
-<!-- 2a) GRBobsSpectrum: the phenomenological model of GRB. The high energy part is extrapolated from the BATSE data. The reference frame is galactic. -->
-
-    <source name=" GRBobsSpectrum" >
-        <spectrum escale="GeV"> <SpectrumClass name="GRBobsSpectrum" params="$(GRBROOT)/GRBmakerOutput/GRB_018.lis"  />     
-<!--        <spectrum escale="GeV"> <SpectrumClass name="GRBobsSpectrum" params="$(GRBROOT)/GRBmakerOutput/"/>  -->  
-<!--        <spectrum escale="GeV"> <SpectrumClass name="GRBobsSpectrum"/>  -->
-    <!--Have spectrum code return the direction (costheta, phi) -->
-    <use_spectrum/>
-    </spectrum> </source>
-
-
-
-<!--3) GRBmanager: several GRB are concatenated. When a GRB ends the next is created in a different position. --> 
-
-    <source name=" GRBmanager_Gal">
-    <spectrum escale="GeV"> <SpectrumClass name="GRBmanager" params="50 100"/>
-    <use_spectrum frame="galaxy"/> 
-    </spectrum> </source>
+     <source name=" GRBobsSpectrum_Gal" >
+          <!-- <spectrum escale="GeV"> <SpectrumClass name="GRBobsSpectrum" params="$(GRBROOT)/GRBmakerOutput/GRB_001.lis"/>     -->
+	  <spectrum escale="GeV"> <SpectrumClass name="GRBobsSpectrum" params="$(GRBROOT)/GRBmakerOutput/"  />    
+	  <!--  <spectrum escale="GeV"> <SpectrumClass name="GRBobsSpectrum"/>  -->
+	  <use_spectrum frame="galaxy"/>
+     </spectrum> </source>
 
 <!--                  TEST SPECTRUMS                      -->
 <!-- The reference frame is galactic and a fixed direction is given to avoid the occlusion by the Earth. -->
 
-        <source name=" GRBspectrum_Test" >
-	<spectrum escale="GeV"> <SpectrumClass name="GRBSpectrum"  /> 
-	<!--This will fix the direction -->
-	 <direction theta="0" phi="0" />
-	</spectrum> </source>
+      <source name=" One_GRB_each_Hour ">
+          <spectrum escale="MeV"> <SpectrumClass name="GRBmanager" params="5,3600"/>
+          <use_spectrum frame="galaxy"/> 
+     </spectrum> </source>
+     
+     <source name=" GRB_0_0 ">
+          <spectrum escale="MeV"> <SpectrumClass name="GRBmanager" params="5,3600"/>
+          <galactic_dir l="0" b="0"/>
+     </spectrum> </source>
 
-	<source name=" GRBobsSpectrum_Test" >
+     <source name=" GRB_120_50 ">
+	<spectrum escale="MeV"> <SpectrumClass name="GRBmanager" params="5,3600"/>
+	<galactic_dir l="120" b="50"/>
+     </spectrum> </source>
+
+     <source name=" GRB_GLAST_0_0 ">
+	<spectrum escale="MeV"> <SpectrumClass name="GRBmanager" params="5,3600"/>
+	<direction theta="0" phi="0" />
+     </spectrum> </source>
+
+     <source name=" GRBobsSpectrum_Test" >
 	<spectrum escale="GeV"> <SpectrumClass name="GRBobsSpectrum"  />
 	<!--This will fix the direction -->
 	<galactic_dir l="120" b="-50"/>
-        </spectrum>
-	</source>
+     </spectrum> </source>
 	
-	<source name=" GRBmanager_Test" >
-	<spectrum escale="GeV"> <SpectrumClass name="GRBmanager"  />
-	<galactic_dir l="120" b="-50"/>
-	</spectrum> </source>
-
-<!--     GRBs and BACKGROUND MIXTURES    -->	
-	<!-- Only background mixture, defined in FluxSvc
-	<source name="backgndmix" >
+<!--	 GRBs and BACKGROUND MIXTURES    -->	
+<!-- Only background mixture, defined in FluxSvc 
+     <source name="backgndmix" >
         <nestedSource sourceRef="chimeavg"/>
-        <nestedSource sourceRef="albedo_proton_avg"/>
+	<nestedSource sourceRef="albedo_proton_avg"/>
         <nestedSource sourceRef="albedo_gamma"/>
-        <nestedSource sourceRef="electronavg"/>
-	</source>
+	<nestedSource sourceRef="electronavg"/>
+     </source>
+	-->
+<!--GRB spectrum + diffuse -->
+     <source name="GRB_DIFFUSE" >
+	<nestedSource sourceRef="One_GRB_each_Hour"/>
+	<nestedSource sourceRef="diffuse"/>
+     </source>
 
-        -->
-	<!--GRB spectrum + diffuse -->
-	<source name="GRBbckmix" >
-        <nestedSource sourceRef="GRBspectrum_Gal"/>
-        <nestedSource sourceRef="diffuse"/>
-	</source>
-	
+<!-- GRB obs spectrum + diffuse -->
 
-	<!-- GRB obs spectrum + diffuse -->
-	<source name="GRBobsbckmix" >
-        <nestedSource sourceRef="GRBobsSpectrum_Gal"/> 
-        <nestedSource sourceRef="diffuse"/>
-	</source>
-
+     <source name="GRB_OBS_DIFFUSE" >
+	<nestedSource sourceRef="GRBobsSpectrum_Gal"/> 
+	<nestedSource sourceRef="diffuse"/>
+     </source>
 </source_library>
 

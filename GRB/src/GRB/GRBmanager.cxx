@@ -2,100 +2,90 @@
 #include <iostream>
 
 GRBmanager::GRBmanager(const std::string& params)
-: m_params(params)
+  : m_params(params)
 {
-  m_FirstTime   = parseParamList(params,0);
-  m_timeToWait  = parseParamList(params,1);
-  m_initialTime = m_FirstTime;
-  m_GRB = new GRBSpectrum("temp.txt");
-  m_endTime = m_FirstTime+m_GRB->m_grbsim->Tmax();
+  paramFile = "$(GRBROOT)/src/test/GRBParam.txt";
+  facilities::Util::expandEnvVar(&paramFile);
+ 
+  m_timeToWait  = TMath::Max(0.,parseParamList(params,1));
+  m_par = new Parameters();
+  //////////////////////////////////////////////////
+  m_par->ReadParametersFromFile(paramFile);
+  m_par->PrintParameters();
+  m_GRB = new GRBSim(m_par);
+  m_spectrum = new  SpectObj(m_GRB->Fireball());
+  //////////////////////////////////////////////////
+  m_startTime = TMath::Max(0.,parseParamList(params,0));
+  m_endTime   = m_startTime + m_GRB->Tmax();
+  m_nextBurst = m_endTime   + m_timeToWait;
+
 }
 
 GRBmanager::~GRBmanager() 
 {  
   std::cout<<"**************************************************"<<std::endl;
   delete m_GRB;
+  delete m_spectrum;
+
 }
-/*
-  double GRBmanager::solidAngle() const
-  {
-  return 1.0;
-  }
-*/
 
 //return flux, given a time
 double GRBmanager::flux(double time) const
 {
   double flux;	  
-  if(time < m_initialTime || (time > m_endTime)) flux = 1.;
- 
-  else flux = m_GRB->flux(time - m_initialTime);  
+  if(time < m_startTime || (time > m_endTime)) flux = 0.0;
+  else flux = m_spectrum->flux(time-m_startTime,cst::enph);
   return flux;
 }
 
 double GRBmanager::interval(double time)
 {  
- 
-  double inte;
-  	
-  if(time < m_initialTime) inte = m_initialTime - time;
+  double inte;  
+
+  if(time < m_startTime) inte = m_startTime - time; //+ m_spectrum->interval(0.0,cst::enph);
   else if (time<m_endTime)
-	{
-	  inte = m_GRB->interval(time - m_initialTime);
-	}
-  else if (time < m_endTime + m_timeToWait)
-	{
-	  delete m_GRB;
-	  std::cout<<" NEW GRB "<<std::endl;
-	  inte = m_timeToWait -(time - m_endTime);
-	  m_GRB = new GRBSpectrum("temp.txt");
-	  m_initialTime=time+inte;
-	  m_endTime=m_initialTime+m_GRB->m_grbsim->Tmax();
-//	  inte =  m_GRB->interval(0.0);
-	}
-  else
-  	{
-	 delete m_GRB;
-	 std::cout<<" WARNING UNEXPECTED NEW GRB "<<std::endl;
-	 inte = 0.0;
-	 m_GRB = new GRBSpectrum("temp.txt");
-	 m_initialTime=time+inte;
-	 m_endTime=m_initialTime+m_GRB->m_grbsim->Tmax();
-	} 	
-  /*
-    std::cout<<"-----------------------------------"<<std::endl;
-    std::cout<<" Interval @ int time "<<time - m_initialTime<<std::endl;
-    std::cout<<" 		time = "<<time<<std::endl;
-    std::cout<<"		Initial Time = "<<m_initialTime<<std::endl;
-    std::cout<<"		End Time = "<<m_endTime<<std::endl;
-    std::cout<<" INTERVAL = "<<inte<<std::endl;
-    std::cout<<"-----------------------------------"<<std::endl;
-  */
+    {
+      inte = m_spectrum->interval(time - m_startTime,cst::enph);
+    }
+  else 
+    {
+      delete m_GRB;
+      delete m_spectrum;
+      
+      m_startTime = m_nextBurst;
+      std::cout<<" NEW GRB : TIME "<<m_startTime<<std::endl;
+      //////////////////////////////////////////////////
+      m_par->ReadParametersFromFile(paramFile);
+      m_par->PrintParameters();
+      m_GRB = new GRBSim(m_par);
+      m_spectrum = new  SpectObj(m_GRB->Fireball());
+      //////////////////////////////////////////////////m_par->PrintParameters();
+      m_endTime   = m_startTime + m_GRB->Tmax();
+      m_nextBurst = m_endTime   + m_timeToWait;
+      
+      inte = m_startTime-time;
+    }
+  //double t1 = TMath::Max(m_GRB->Tmax(),m_timeToWait);
+  inte = TMath::Min(inte,m_nextBurst-time);
   return inte;
 }
 
 double GRBmanager::energy(double time)
 {
-  if(time < m_initialTime) return 0;
-  return m_GRB->energy(time - m_initialTime);
+  return m_spectrum->energy(time-m_startTime,cst::enph)*1.0e-3; //MeV
 }
 
-float GRBmanager::operator() (float u) const
+double GRBmanager::parseParamList(std::string input, int index)
 {
-  return (*m_GRB)(u);
-}
-
-
-float GRBmanager::parseParamList(std::string input, int index)
-{
-  std::vector<float> output;
+  std::vector<double> output;
   unsigned int i=0;
   for(;!input.empty() && i!=std::string::npos;){
-    float f = ::atof( input.c_str() );
+    double f = ::atof( input.c_str() );
     output.push_back(f);
     i=input.find_first_of(",");
     input= input.substr(i+1);
   } 
+  if(index>=output.size()) return 0.0;
   return output[index];
 }
 

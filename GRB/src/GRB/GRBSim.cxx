@@ -1,162 +1,117 @@
-#include <iterator>
-#include <iostream>
-#include <algorithm>
-#include <vector>
-#include <cmath>
-#include <cassert>
-#include <string>
-
+#include "GRBConstants.h"
+#include "GRBShell.h"
+#include "GRBShock.h"
+#include "GRBengine.h"
 #include "GRBSim.h"
 
-/*------------------------------------------------------*/
 using namespace cst;
-using namespace std;
-/*------------------------------------------------------*/
 
-GRBSim::GRBSim(long seed)
+//////////////////////////////////////////////////
+GRBSim::GRBSim(Parameters *params)
+  : m_params(params)
 {
-  std::cout<<"******Staring The GRB Simulation******"<<std::endl;
-  m_seed = seed;
-  //  std::cout<<"--------INT SEED = "<<m_seed<<std::endl;
-  //////////////////////////////////////////////////
-  m_spectobj = SpectObj(cst::enmin,cst::enmax,cst::enstep);
-  //////////////////////////////////////////////////
-  //m_energy.clear();	
-  //m_de.clear();  
-  //m_energy = m_spectobj.getEnergyVector();
-  //m_de     = m_spectobj.getBinVector();
-  //////////////////////////////////////////////////
-  m_synchrotron = GRBSynchrotron(m_spectobj);
-  
-  //////////////////////////////////////////////////
-}	
-
-GRBSim::GRBSim(const std::string& params)
-{
-  std::cout<<"******Staring The GRB Simulation******"<<std::endl;
-  std::ifstream is (params.c_str());
-  is>>m_seed;
-  is.close();
-  m_seed++;
-  std::ofstream os (params.c_str());
-  os<<m_seed;
-  os.close();
-  //  std::cout<<"------PARAMS  SEED = "<<m_seed<<std::endl;
-  //////////////////////////////////////////////////
-  m_spectobj = SpectObj(cst::enmin,cst::enmax,cst::enstep);
-  //////////////////////////////////////////////////
-  //m_energy.clear();	
-  //m_de.clear();  
-  //m_energy = m_spectobj.getEnergyVector();
-  //m_de     = m_spectobj.getBinVector();
-  //////////////////////////////////////////////////
-  m_synchrotron = GRBSynchrotron(m_spectobj);
-  
-  //////////////////////////////////////////////////
-}	
-
-/*------------------------------------------------------*/
-GRBSim::~GRBSim()
-{
-  //  delete m_engine;
-  delete myParam;
-  std::cout<<"*******Exiting The GRB Simulation ******"<<std::endl;
-}
-/*------------------------------------------------------*/
-
-void GRBSim::MakeGRB(double time_offset)
-{
-  //////////////////////////////////////////////////
-  m_duration=0.0;
-  //////////////////////////////////////////////////
-  theShocks.clear();
-  try
-    {
-      myParam=new GRBConstants(); //<- Read the Param
-    }
-  catch (char * )
-    {
-      std::cout<< "Failure initializing the GRB constants \n";
-      exit(1);
-    }
-  
-  m_enph=myParam->EnergyPh();
-  // This initialize the Random Engine in GRBSim...
-  //m_engine = GRBConstants::GetTheRandomEngine(m_seed);
-  //  GRBengine * m_CentralEngine = GRBengine(myParam);
-  GRBengine *m_CentralEngine = new GRBengine(myParam);
-  theShocks   = m_CentralEngine->getShocksVector();
-  m_duration  = m_CentralEngine->getDuration();
-  m_distance  = m_CentralEngine->getDistance();
-  m_direction = m_CentralEngine->getDirection();
-  m_area      = (4.*M_PI)*pow(m_distance,2.)*1.0e-4; // [m^2]
-  m_jetangle  = myParam->JetAngle();
-  delete m_CentralEngine;
- 
-  //////////////////////////////////////////////////
-  // All is ok
-  ////////////////////////////////////////////////// 
-  
-  myParam->Print();
-  //myParam->Save(cst::savef);
-
-  
-  //////////////////////////////////////////////////
-  std::cout<<" Dist  of the source   = "<<m_distance<<" cm "<<std::endl;
-  std::cout<<" Galactic Direction = [l= "<<m_direction.first<<" ,b = "<<m_direction.second<<"]"<<std::endl;
-  std::cout<<" Number of Shocks      = " <<theShocks.size()<< std::endl;
-  std::cout<<" Duration of the Burst = "<<m_duration-time_offset<<std::endl;
-  //std::cout<<" Total Energy Radiated = "<<0<<std::endl;
-  //////////////////////////////////////////////////
-  //  std::cout<<m_energy.size()<<" "<<m_de.size()<<std::endl;
-  if (m_duration-time_offset<2.)
-    {std::cout<<"The burst is Short "<<std::endl;}
-  else
-    {std::cout<<"The burst is Long "<<std::endl;}
-  //ouble dt=(m_duration-time_offset)/nstep;
-  
-  std::vector<GRBShock>::iterator itr;
-  for(itr=theShocks.begin();itr != theShocks.end();++itr)
-    {
-      (*itr).Write();
-    }
+  m_GRB = new GRBengine(params);
 }
 
-/*------------------------------------------------------*/
-SpectObj GRBSim::ComputeFlux(const double time)
+TH2D* GRBSim::Fireball()
 {
-  m_spectobj *= 0.0 ;
-  if (time<0) return m_spectobj;
-  std::vector<GRBShock>::iterator itr=theShocks.begin();
-  while(itr != theShocks.end())
+  int    Nshell            = m_params->m_nshell;
+  double BATSE_fluence     = m_params->m_fluence;
+  double Etot              = m_params->m_etot;
+  double InitialSeparation = m_params->m_initialSeparation;
+  double InitialThickness  = m_params->m_initialThickness;
+  
+  double *e = new double[Ebin +1];
+  for(int i = 0; i<=Ebin; i++)
     {
-      
-      m_synchrotron.load(&(*itr),time,m_jetangle,m_distance);
-      m_spectobj+=m_synchrotron.getSpectrumObj();
-      
-      if (cst::flagIC!=0.0)
+      e[i] = emin*pow(de,1.0*i); //keV
+    }
+  
+  //////////////////////////////////////////////////  
+  
+  std::vector<GRBShock*> Shocks = 
+    m_GRB->CreateShocksVector(Nshell,InitialSeparation,InitialThickness,Etot);
+  int nshocks = (int) Shocks.size();
+  //  if(nshocks==0) return;
+  
+  m_tfinal = 1.5 * Shocks[nshocks-1]->GetTime();
+  double dt = m_tfinal/(Tbin-1);
+  gDirectory->Delete("Nv");
+  m_Nv = new TH2D("Nv","Nv",Tbin,0.,m_tfinal,Ebin, e);
+  
+  double t = 0.0;
+  for(int ti = 0; ti<Tbin; ti++)
+    {
+      t = ti*dt;
+      for(int ei = 0; ei < Ebin; ei++)
 	{
-	  m_icompton = GRBICompton(m_synchrotron.getSpectrumObj());
-	  m_icompton.load(&(*itr),time,m_jetangle,m_distance);
-	  m_spectobj+=m_icompton.getSpectrumObj();
+	  double nv = m_Nv->GetBinContent(ti+1, ei+1);
+	  for (int i = 0; i< nshocks; i++)
+	    {
+	      GRBShock *ashock = Shocks[i];
+	      nv += ashock->ComputeFlux(t,e[ei]);
+	    }
+	  m_Nv->SetBinContent(ti+1, ei+1, nv);
+	  // [ph/(cm² s keV)]
 	}
-      
-      itr++;
     }
-  m_spectobj/=m_area;  // is in ph/s/MeV/m^2
-  return m_spectobj;  
+  // Conersion 1/cm² -> 1/m²
+  m_Nv->Scale(1.0e+4); // [ph/(m² s keV)]
+  // double fluence = 1.0e-6; //erg/cm²
+  BATSE_fluence *= 1.0e+4;        //erg/m²
+  // nph = nv * dE * dt
+  TH2D *nph = Nph(m_Nv); //ph/m²
+  
+  int ei1 = nph->GetYaxis()->FindBin(BATSE1);
+  int ei2 = nph->GetYaxis()->FindBin(BATSE2);
+  double norm = nph->Integral(0,Tbin,ei1,ei2,"width")*(1.0e-3)/(dt*erg2meV); //erg/m²
+  
+  // IMPORTANT m_Nv has to  be in [ph/(m² s keV)]
+  m_Nv->Scale(BATSE_fluence/norm);  
+  /*
+    nph = Nph(m_Nv); //ph/m²
+    cout<<nph->Integral(0,Tbin,ei1,ei2,"width")*(1.0e-7)/(dt*erg2meV)<<endl; //erg/cm²
+  */    
+  delete nph;
+  SaveNv();
+  return m_Nv;
+}
+//////////////////////////////////////////////////
+TH2D *GRBSim::Nph(const TH2D *Nv)
+{
+  TH2D *Nph = (TH2D*) Nv->Clone(); // 1/kev/s
+  Nph->SetName("Nph");
+  double dei;
+  double deltat = Nv->GetXaxis()->GetBinWidth(0);
+
+  for (int ei = 0; ei<Ebin; ei++)
+    {
+      dei   = Nv->GetYaxis()->GetBinWidth(ei+1);
+      for(int ti = 0; ti<Tbin; ti++)
+	{
+	  Nph->SetBinContent(ti+1, ei+1, 
+			     Nph->GetBinContent(ti+1, ei+1)*dei*deltat); //[1]
+	}   
+    }
+  return Nph;
 }
 
-/*------------------------------------------------------*/
-long GRBSim::parseParamList(std::string input, int index)
+//////////////////////////////////////////////////
+void GRBSim::SaveNv()
 {
-  std::vector<long> output;
-  unsigned int i=0;
-  for(;!input.empty() && i!=std::string::npos;){
-    float f = ::atoi( input.c_str() );
-    output.push_back(f);
-    i=input.find_first_of(",");
-    input= input.substr(i+1);
-  } 
-  return output[index];
-}
+  
+  m_Nv->SetXTitle("Time [s]");
+  m_Nv->SetYTitle("Energy [keV]");
+  m_Nv->SetZTitle("N_{v} [ph/m^2/s/keV]");
+  m_Nv->GetXaxis()->SetTitleOffset(1.5);
+  m_Nv->GetYaxis()->SetTitleOffset(1.5);
+  m_Nv->GetZaxis()->SetTitleOffset(1.2);
+  m_Nv->GetXaxis()->CenterTitle();
+  m_Nv->GetYaxis()->CenterTitle();
+  m_Nv->GetZaxis()->CenterTitle();
+  
+  TFile *mod = new TFile("grb.root","RECREATE");
+  m_Nv->Write();
+  mod->Close();
+};
+

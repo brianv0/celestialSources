@@ -1,41 +1,124 @@
-
 //##############################################################
 //
-// Job options file for TDSReadFluxalg test program
-//
-//==================================================
+// basic Job options file for a Gleam execution
+// $Header$
 
-ApplicationMgr.DLLs +=    {"RootIo","GlastSvc"};
-ApplicationMgr.TopAlg +=  {"FluxAlg"};
-ApplicationMgr.ExtSvc = {"GlastEventSelector/EventSelector","EventCnvSvc"};
-    
+// primary DLLs, including auditor 
+
+ApplicationMgr.DLLs+= { "GaudiAlg", "GaudiAud"};
+ApplicationMgr.ExtSvc += {"ChronoStatSvc"};
+AuditorSvc.Auditors = {"ChronoAuditor"};
+
+// ----------------------------
+// setup basic event loop stuff
+//
+ApplicationMgr.ExtSvc = { 
+    "GlastEventSelector/EventSelector" 
+    , "EventCnvSvc"
+    };
+
 EventPersistencySvc.CnvServices = {"EventCnvSvc"};
 EventSelector.Input = "NONE";
 
+
+// ----------------------------
+//  a structure for the topalg, using sequencer steps
+
+ApplicationMgr.TopAlg = {
+      "Sequencer/Top" };
+
+//the top sequence loop
+Top.Members={
+    "Sequencer/Generator"
+    ,"Sequencer/Digitization"
+};
+
+// ----------------------------
+//  Geometry definition
+//
+ApplicationMgr.DLLs += {"GlastSvc"};
+ApplicationMgr.ExtSvc += { "GlastDetSvc"};
+// select one of the following 
+GlastDetSvc.topVolume="LAT"; 
+//GlastDetSvc.topVolume="CsIElement";  // to look at a single full crystal
+//GlastDetSvc.topVolume="CALLayer";
+//GlastDetSvc.topVolume="CALLayers";
+//GlastDetSvc.topVolume="oneTower";
+//GlastDetSvc.topVolume="trayReg";
+//GlastDetSvc.topVolume="trayBot";
+
+
+GlastDetSvc.xmlfile="$(XMLGEODBSROOT)/xml/flight/flightSegVols.xml";
+GlastDetSvc.visitorMode="recon";
+
+// ----------------------------
+//  Randoms definition
+//
+ApplicationMgr.ExtSvc += { "GlastRandomSvc"};
+
+// ----------------------------
+//  Generation or input
+
+ApplicationMgr.DLLs +={ "G4Generator","G4Propagator"};
+ApplicationMgr.ExtSvc += {"G4GeometrySvc"};
+Generator.Members = {"FluxAlg"};
 #include "$FLUXSVCROOT/src/defaultOptions.txt"
 
-// ----->  Basic Options <----
+Generator.Members += {"G4Generator"};
+G4Generator.defaultCutValue=0.7; // instead of 0.1 default
+
 ApplicationMgr.DLLs +={ "GRB"};
-FluxSvc.source_lib += {"$(GRBROOT)/xml/GRB_user_library.xml"};
 ApplicationMgr.TopAlg +=  {"TDSReadFluxAlg"};
+
+// Append (or replace) the list of source library documents
+FluxSvc.source_lib += {"$(G4GENERATORROOT)/src/test/test_sources.xml"};
+FluxSvc.source_lib += {"$(GRBROOT)/xml/GRB_user_library.xml"};
 
 // -----> To set the source <-----
 // From here we can select the model for GRB ... 
+
+//FluxAlg.source_name="GRBROOT_Gal"; 
+
 //FluxAlg.source_name="GRBspectrum_Gal";  
-FluxAlg.source_name="GRBspectrum_Test"; // with fixed direcion
+//FluxAlg.source_name="GRBspectrum_Test"; // with fixed direcion
 
 //FluxAlg.source_name="GRBobsspectrum_Gal";
 //FluxAlg.source_name="GRBobsspectrum_Test"; // with fixed direcion
 
 //FluxAlg.source_name="GRBmanager_Gal";
 
+// ----------------------------
+//  Digitization
+//
+ApplicationMgr.DLLs +={ "TkrDigi", "CalDigi", "AcdDigi"  };
+Digitization.Members = { 
+    "TkrSimpleDigiAlg", 
+    "CalDigiAlg", 
+    "AcdDigiAlg"};
+
+//ApplicationMgr.ExtSvc += { "GlastPropagatorSvc" };
+
+ApplicationMgr.DLLs +={ 
+    "CalibSvc",
+    "CalRecon", "CalUtil", "TkrUtil",
+    "TkrRecon"
+    };
+
+//          tracker
+// -------------------------------------------
+ApplicationMgr.ExtSvc   += { "TkrGeometrySvc"};
+ApplicationMgr.ExtSvc   += { "TkrInitSvc"};
+
 // ---------------------- Save options: -----------------------
-TDSReadFluxAlg.savefile={"ascii"};
+//TDSReadFluxAlg.savefile={"ascii"};
 TDSReadFluxAlg.savefile+={"root"};
 // ------------------------------------------------------------
+// Set output level threshold (2=DEBUG, 3=INFO, 4=WARNING, 5=ERROR, 6=FATAL )
+ToolSvc.OutputLevel=3;    // too verbose in debug
+MessageSvc.OutputLevel=3;
 
-MessageSvc.OutputLevel=2;
-ApplicationMgr.EvtMax = 100000;
+// Max Number of events
+ApplicationMgr.EvtMax = 100;
 
 //==============================================================
 //

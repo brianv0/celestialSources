@@ -1,3 +1,6 @@
+#include "astro/SkyDir.h"
+#include "flux/GPS.h"
+
 #include "GaudiKernel/MsgStream.h"
 #include "GaudiKernel/AlgFactory.h"
 #include "GaudiKernel/IDataProviderSvc.h"
@@ -9,91 +12,61 @@
 #include "Event/MonteCarlo/McParticle.h"
 #include "Event/MonteCarlo/McIntegratingHit.h"
 #include "Event/MonteCarlo/McPositionHit.h"
-#include "Event/Recon/TkrRecon/TkrVertex.h"
-#include "Event/Recon/CalRecon/CalCluster.h"
 
-#include "Event/Digi/CalDigi.h"
-#include "idents/CalXtalId.h"
+#include "Event/Recon/TkrRecon/TkrFitTrack.h" //aggiunto 
+#include "Event/Recon/TkrRecon/TkrKalFitTrack.h"
+#include "Event/Recon/TkrRecon/TkrVertex.h"
+#include "Event/Recon/TkrRecon/TkrClusterCol.h" //max
+#include "Event/Recon/TkrRecon/TkrCluster.h" //max
+
+#include "Event/Recon/CalRecon/CalCluster.h"
 //include files for ROOT...
 #include "TTree.h"
-#include "TBranch.h"
+#include "TH1D.h"
 #include "TObjArray.h"
 #include "TFile.h"
-// Include files
+#include "TMath.h"
+
+//#include "TkrRecon/Cluster/TkrMakeClusters.h" //max
+#include "GaudiKernel/DataSvc.h" //max
 #include "FluxSvc/IFluxSvc.h"
 //#include <map>
 #include <vector>
 #include <fstream>
+#include <sstream>
 #include "CLHEP/Vector/Rotation.h"
-/*! @class TDSReadFluxAlg
-  @brief Takes the data relatives to the incoming particle from the TDS
-  and write the output in files.
- 
-  This method accesses to the transient data store to retrive information
-  about the incoming particles (mother particles) and about their trigger 
-  status and their reconstruction.  
-  From the TDS:
-  - The time (from EventHeader)
-  - The "real" energy (from McParticleCol)
-  - The reconstructed energy (from CalClusterCol)
-  - The "real" direction (from McParticleCol)
-  - The reconstructed direction (from TkrVertexCol)
-  Then it compute the galactic direction (using 
-  FluxSvc::transformGlastToGalactic(double) )
-  Finally this algorithm save the "real" data and the "recon" data in 
-  output files.
-  From the jobOptions file it is possible to select the format: ROOT tree, 
-  ascii file, or both. 
-  To test the algorithm, run: 
-  \verbatim
-  test_GRB.exe ../src/test/TDSreadFluxOptions.txt
-  \endverbatim
-  
-  @author Nicola Omodei nicola.omodei@pi.infn.it
-  @author Francesco Longo francesco.longo@ts.infn.it
-  @author Sandhia Bansal sandhiab@lheapop.gsfc.nasa.gov
-*/
 
-const double deg = 180.0 / M_PI;
+#include "LatGRBAlert/PhotonInfo.h"
+#include "LatGRBAlert/ClusterData.h"
+#include "LatGRBAlert/LatGRBAlertConstants.h"
 
-/*! @struct Data 
-  \brief This structure stores the data
-  
-  The data that we read from the TDS and we whant to store are:
-  \param time the time at which the particle arrives to the satellite
-  \param energy is the energy of the particle
-  \param theta relative to Glast
-  \param phi relative to glast
-  
-  @author Nicola Omodei nicola.omodei@pi.infn.it
-  @author Francesco Longo francesco.longo@ts.infn.it
-  @author Sandhia Bansal sandhiab@lheapop.gsfc.nasa.gov
-*/
-struct Data
-{
-	float  time;
-	float  energy;
-	float  theta;
-	float  phi;
+bool SaveFullRecon   = true;
+int GRBAlertFlag     = 0; //0 = none, 1 = FR, 2 = MC
+
+struct myEvent
+{  
+  double time;
+  double energy;
+  double Theta;
+  double Phi;
+  double l;
+  double b;
 };
 
-std::pair<double,double> GalDir(HepVector3D GalDirVec)
+struct GRBAlertData
+{ 
+  double tstart;
+  double tend;
+  double like;
+};
+
+const double deg   =  180.0 / M_PI;
+
+astro::SkyDir GalacticDirection(Hep3Vector GlastDirection, double time)
 {
-	double x_g=GalDirVec.x();
-	double y_g=GalDirVec.y();
-	double z_g=GalDirVec.z();
-
-	if(pow(x_g,2)<=1.e-15) x_g=0.0;
-	if(pow(y_g,2)<=1.e-15) y_g=0.0;
-	if(pow(z_g,2)<=1.e-15) z_g=0.0;
-
-	double b = 360./M_2PI*asin(y_g);
-	double l = 360./M_2PI*atan2(x_g,z_g);
-	if(pow(b,2)<1.0e-15) b=0.;
-	if(pow(l,2)<1.0e-15) l=0.;
-
-	return std::make_pair(l,b);
-
+  HepRotation GlastToGalactic = GPS::instance()->transformCelToGlast(time).inverse();
+  astro::SkyDir GalDir(GlastToGalactic * GlastDirection);
+  return GalDir;
 }
 
 class TDSReadFluxAlg : public Algorithm
@@ -107,62 +80,40 @@ public:
     It sets the correct pointers and builds a root tree for saving the data
   */
   StatusCode initialize();
-  /*! \brief This method reads the data from the Transient Data Store
-    
-    After having retrived the data from the TDS this method flags the 
-    events following a trigger mask:
-    \verbatim
-    ////////////////////////////////////////////////////////////////////////
-    //          		RECONSTRUCTED DATA                        //
-    // Trigger fag	|   triggered	|    energy>0 	| #track > 0      // 
-    // 		0    	|	0	|	0	|	0         //
-    //		1	|	1	|	0	|	0         //
-    //		3	|	1	|	1	|	0         //
-    //		5	|	1	|	0	|	1         //
-    //		7	|	1	|	1	|	1         //
-    ////////////////////////////////////////////////////////////////////////
-    \endverbatim
-
-    The data relative to the incoming particles will be stored in a 
-    ROOT Tree named "events.root" Their Trigger flag will be 0
-    The data realtive to the reconstructed particles together with 
-    the trigger flag, will be stored in a ROOT Tree named in 
-    "events_recon.root"
-  */
   StatusCode execute();
-  /*! Save all the outoput data and close the files.
-    
-    The data relative to the incoming particles will be saved in "Events.root"
-    The data realtive to the reconstructed particles together with 
-    the trigger flag, will be saved in "Events_recon.root"
-  */
   StatusCode finalize();   
   
 private:
-  IFluxSvc* m_fsvc; // pointer to the flux Service
-  /*! This is the rotation matrix to compute the direction in Galactic 
-    coordinates
-  */
   HepRotation Glast2Gal;  
-  HepVector3D dir,GalDirVec;
+  Hep3Vector dir,GalDirVec;
+    
+  StatusCode readMCEvent();
+  StatusCode readEvent();
+  StatusCode GRBAlert(myEvent);
+  myEvent MCEvent,FREvent;  
 
-  StatusCode readTDSData();
+  int NumReconTracks;
   
-  double energy,time,cos_theta,phi,l,b;
-  double energy_recon,time_recon;
-  double cos_theta_recon,phi_recon;
-  double l_recon,b_recon,rate_recon;
-  int trigger_flag;
-  std::vector<Data> m_data;
+
+  std::vector<int> Hits;
+  TTree *FRevents,*MCevents;
+
+  //  IFluxSvc* m_fsvc; // pointer to the flux Service
   
-  TTree *events;
-  TTree *events_recon;
-  
-  TFile *f;
-  TFile *f_recon;
-  int counts;
+  //  TH1D *hitmap[numPlanes];//,*hitmap0y,*hitmap1x,*hitmap1y,*hitmap2x,*hitmap2y;
+  int numPlanes,numTowers;
+  bool triggerFlag;
   std::vector<std::string> m_save_file;
-  //  std::string m_save_opt;
+  //  std::string m_nameoutfile;
+  //std::string m_save_opt; 
+  
+  PhotonInfo a_photon;
+  std::vector<PhotonInfo> PhotonsData;
+  std::vector<GRBAlertData> JointLike;
+  int count_buff;
+  //////////////////////////////////////////////////
+  ClusterData *clusterData;
+  //////////////////////////////////////////////////
 };
 
 
@@ -175,234 +126,265 @@ TDSReadFluxAlg::TDSReadFluxAlg(const std::string& name,
   Algorithm(name, pSvcLocator)
 {
   declareProperty("savefile", m_save_file);
-  //	declareProperty("saveoption", m_save_opt);
-  
-}
+  //  declareProperty("nameoutput", m_nameoutfile);
+ }
 
 StatusCode TDSReadFluxAlg::initialize()
 {
+   
   StatusCode sc = StatusCode::SUCCESS;
   MsgStream log(msgSvc(), name());
   
   setProperties();
+  //////////////////////////////////////////////////
+  /*
+    IService*   iService = 0; // questa parte serve per i cluster...
+    sc        = serviceLocator()->getService("TkrGeometrySvc", iService, true);  
+    sc        = serviceLocator()->getService("EventDataSvc", iService);
+    m_dataSvc = dynamic_cast<DataSvc*>(iService);  
+    //Geometria del TKR..
+    sc = service("TkrGeometrySvc", m_TkrGeo, true);
+    if (sc.isFailure()) 
+    {
+    log << MSG::ERROR << "TkrGeometrySvc is required for this algorithm." 
+    << endreq;
+    return sc;
+    }
+    
+    m_Alignment = m_TkrGeo->getTkrAlignmentSvc();
+    numTowers = m_TkrGeo->numXTowers()*m_TkrGeo->numYTowers();
+    numPlanes =  2*m_TkrGeo->numPlanes()*numTowers;
+  */
+  MCevents = new TTree("MCEvents","MCEvents");  
   
-  sc = service("FluxSvc",m_fsvc);
+  MCevents->Branch("MCevents",&MCEvent,
+		   "time/D:energy:Theta:Phi:l:b");
   
-  // Open the file and set up the tree:
-  
-  events = new TTree("Events","Events");
-  
-  events->Branch("energy",&energy,"energy/D");
-  events->Branch("time",&time,"time/D");
-  events->Branch("trigger_flag",&trigger_flag,"trigger_flag/I");
-  events->Branch("cos_theta",&cos_theta,"cos_theta/D");
-  events->Branch("phi",&phi,"phi/D");
-  events->Branch("l",&l,"l/D");
-  events->Branch("b",&b,"b/D");
-  counts=0;
-  
-  events_recon = new TTree("Events_recon","Events_recon");
-  events_recon->Branch("energy",&energy_recon,"energy/D");
-  events_recon->Branch("time",&time,"time/D");
-  events_recon->Branch("trigger_flag",&trigger_flag,"trigger_flag/I");
-  events_recon->Branch("cos_theta",&cos_theta_recon,"cos_theta/D");
-  events_recon->Branch("phi",&phi_recon,"phi/D");
-  events_recon->Branch("l",&l_recon,"l/D");
-  events_recon->Branch("b",&b_recon,"b/D");
-  
+  FRevents = new TTree("FREvents","FREvents");  
+  FRevents->Branch("FRevents",&FREvent,
+		   "time/D:energy:Theta:Phi:l:b");
+
+  if(GRBAlertFlag>0) clusterData = new ClusterData;
+  //////////////////////////////////////////////////
   return sc;
-  
 }
 
 StatusCode TDSReadFluxAlg::execute()
 {
-  
   MsgStream log(msgSvc(), name());
   StatusCode sc = StatusCode::SUCCESS;
-  
-  sc = readTDSData();
+  sc = readMCEvent();
+  sc = readEvent();
   return sc;
 }
 
-StatusCode TDSReadFluxAlg::readTDSData() {
-  // Purpose and Method: Retrieve Monte Carlo data from the TDS.
+StatusCode TDSReadFluxAlg::readMCEvent()
+{
+  StatusCode sc = StatusCode::SUCCESS;
+
   MsgStream log(msgSvc(), name());
-  
-  static Data record;
+  // ---> MC PARTICLES
   SmartDataPtr<Event::EventHeader> evt(eventSvc(), EventModel::EventHeader);
-  
-  if(!evt) return StatusCode::SUCCESS;
+  if(!evt) return sc;
   //Get the time
-  time=(double)evt->time();
-  record.time   = time;
-  record.energy = 0.0;
-  record.theta  = 0.0;
-  record.phi    = 0.0;
+  double time = (double) evt->time();
+  MCEvent.time= time;
   
   SmartDataPtr<Event::McParticleCol> 
     particles(eventSvc(), EventModel::MC::McParticleCol);
-  if (particles) {
-    if(counts % 1000==0) f = new TFile("Events.root","RECREATE"); 
-    // It save the data every 1000 events... 
-    log << MSG::INFO << "Retrieved McParticles from the TDS at Time = " 
-	<< time <<" s "<< endreq;
-    
-    Event::McParticleCol::const_iterator p;
-    p = particles->begin(); // This is the mother...
-    
-    energy=(*p)->finalFourMomentum().e();
-    dir=(*p)->finalFourMomentum().vect().unit();
-    cos_theta=-(*p)->finalFourMomentum().cosTheta(); // note the (-)
-    phi=(*p)->finalFourMomentum().phi();
-    if(phi < 0) phi += 2*M_PI;
-    phi*= deg; //degrees
-    
-    
-    trigger_flag=0; // see later...
-    
-    Glast2Gal=m_fsvc->transformGlastToGalactic(time);
-    GalDirVec=Glast2Gal*dir;
-    l = GalDir(GalDirVec).first;
-    b = GalDir(GalDirVec).second;
-    //	std::cout<<" ---- Time (sec) "<<time<<std::endl;
-    //	std::cout<<"      Energy     = "<<energy<<" (MeV)"<<std::endl;	
-    //  std::cout<<"      Direction: Cos(theta) = "<<cos_theta<<std::endl;	
-    //	std::cout<<"                        phi = "<<phi<<std::endl;
-    //	std::cout<<"-------------------------------------------"<<std::endl;	
-    if(energy>0) events->Fill();
-    if(counts % 1000==0) events->Write();
-    counts++;
-  }
-  //////////////////////////////////////////////////////////////////////////
-  //          		RECONSTRUCTED DATA                                //
-  // Trigger fag	|   triggered	|    energy>0 	| #track > 0      // 
-  // 		0    	|	0	|	0	|	0         //
-  //		1	|	1	|	0	|	0         //
-  //		3	|	1	|	1	|	0         //
-  //		5	|	1	|	0	|	1         //
-  //		7	|	1	|	1	|	1         //
-  //////////////////////////////////////////////////////////////////////////
-  energy_recon=0.;
-  cos_theta_recon=1.;
-  phi_recon=0.;
-  l_recon=0.;
-  b_recon=0.; 
   
-  trigger_flag=0;
+
+  if (particles) 
+    {
+      Event::McParticleCol::const_iterator p;
+      p = particles->begin(); // This is the mother...
+      
+      MCEvent.energy = (*p)->finalFourMomentum().e();
+      dir= -1*(*p)->finalFourMomentum().vect().unit();
+      
+      MCEvent.Theta     =  acos(dir.cosTheta())*deg; // note the (-)
+      MCEvent.Phi       =  dir.phi()*deg; //conversione in phi-Xml
+      
+      MCEvent.l = GalacticDirection(dir,time).l();
+      MCEvent.b = GalacticDirection(dir,time).b();
+      
+      //////////////////////////////////////////////////
+      log << MSG::INFO << "Retrieved McParticles from the TDS at time = " << MCEvent.time <<" s "<< endreq;
+      log << MSG::INFO <<" MC energy           = "<<MCEvent.energy<<" (MeV)"<< endreq;
+      log << MSG::INFO <<" MC Direction: Theta = "<<MCEvent.Theta<<" Phi = "<<MCEvent.Phi<< endreq;
+      log << MSG::INFO <<" MC Direction: l     = "<<MCEvent.l<<" b = "<<MCEvent.b<< endreq;
+      if(GRBAlertFlag == 2) sc = GRBAlert(MCEvent);      
+      if(MCEvent.energy>0) MCevents->Fill();
+    }  
+  return  StatusCode::SUCCESS;
+}
+
   
+StatusCode TDSReadFluxAlg::readEvent()
+{
+  MsgStream log(msgSvc(), name());
+  StatusCode sc = StatusCode::SUCCESS;
+  // ---> FULL RECONSTRUCTION
+  // ---> 1) Calorimeter:
   SmartDataPtr<Event::CalClusterCol> 
-    clusters(eventSvc(),  EventModel::CalRecon::CalClusterCol);
+    calClusters(eventSvc(),  EventModel::CalRecon::CalClusterCol);
+  
+  if(calClusters) // look at the recon energy
+    {
+      FREvent.time = MCEvent.time; 
+      FREvent.energy = calClusters->getCluster(0)->getEnergyCorrected(); 
+      log << MSG::INFO <<" FR Energy           = "<<FREvent.energy<<" (MeV)"<< endreq;
+    }
+  
+  // ---> 2) Tracker:
+  
+  SmartDataPtr<Event::TkrClusterCol> 
+    tkrClusters(eventSvc(),  EventModel::TkrRecon::TkrClusterCol);
+  
   SmartDataPtr<Event::TkrVertexCol>  
     tracks(eventSvc(),EventModel::TkrRecon::TkrVertexCol);
   
-  if(clusters)	
-    {	
-      trigger_flag+=1; // Triggered
-      energy_recon = clusters->getCluster(0)->getEnergySum();
-      log << MSG::INFO << "Reconstructed Energy = " 
-	  << energy_recon <<" (MeV) "<< endreq;
-      if (energy_recon>0) trigger_flag+=2; //Triggered + e>0
-      
+  
+  if(tkrClusters)	
+    {
       if (tracks->size() != 0)
 	{
-	  trigger_flag+=4;
-	  
 	  const Event::TkrVertex *track = (tracks->front());
 	  
-	  dir = track->getDirection();
+	  dir = -1*track->getDirection();
 	  
-	  cos_theta_recon = -dir.z(); // note the (-)
-	  phi_recon   = atan2(dir.y(),dir.x());
-	  if(phi_recon < 0) phi_recon += 2*M_PI;
-	  phi_recon   *= deg; 
-	  GalDirVec=Glast2Gal*dir;
-	  l_recon = GalDir(GalDirVec).first;
-	  b_recon = GalDir(GalDirVec).second;	
-	  log << MSG::INFO << "Reconstructed Direction : Cos Theta = " 
-	      << cos_theta_recon <<" phi = "<< phi_recon<<endreq;
-	  log << MSG::INFO << " Galactic Coordinates : l = " 
-	      << l_recon <<" b = "<< b_recon << endreq;
+	  FREvent.Theta = acos(dir.cosTheta())*deg; // note the (-)
+	  FREvent.Phi   = dir.phi()*deg; //conversione in Phi-Xml
+	  FREvent.l = GalacticDirection(dir,FREvent.time).l();
+	  FREvent.b = GalacticDirection(dir,FREvent.time).b();
 	  
+	  log << MSG::INFO <<" FR Direction: Theta = "<<FREvent.Theta<<" Phi = "<<FREvent.Phi<< endreq;
+	  log << MSG::INFO <<" FR Direction: l     = "<<FREvent.l<<" b = "<<FREvent.b<< endreq;
+	  
+	  if(GRBAlertFlag == 1)  sc = GRBAlert(FREvent);
+	  NumReconTracks++;
+	  cout<<" Number of reconstructed tracks = "<<NumReconTracks<<endl;
+	  FRevents->Fill(); 
 	}
-      // The root tree is filled with all the triggered events. 
-      // The trigger flag will help to separate them.
-      events_recon->Fill(); 
     }
-  // In the ascii file only the events with energy > 0 and # tracks > 0 
-  // will be saved. 
-  std::string m_save_opt="energy && track";
   
-  bool save=false;
-  // This are other options that can be saved
-  if(m_save_opt == "energy" && energy_recon>0) 
-    save=true;
-  else if(m_save_opt == "track" && tracks->size()>0) 
-    save=true;
-  else if(m_save_opt == "triggered" && (clusters || tracks))
-    save=true;
-  else if(m_save_opt == "energy || track" && 
-	  (energy_recon>0 || tracks->size()>0)) 
-    save=true;
-  else if(m_save_opt == "energy && track" && 
-	  (energy_recon>0 &&  tracks->size()>0)) 
-    save=true;
+  if(triggerFlag) FRevents->Fill();       
+  // FINE FULL RECON
+  //  OBrecon *myOB = new OBrecon();
   
-  
-  if (save)
-    {
-      record.energy = energy_recon*1e-3; //Convert to GeV
-      record.theta  = acos(cos_theta_recon)*deg;
-      record.phi    = phi_recon;
-      m_data.push_back(record);
-    }
-  return  StatusCode::SUCCESS;
+  return sc;
 }
 
 
 StatusCode TDSReadFluxAlg::finalize()
 {
+  cout<<"--------------------------------------------------"<<endl;
+  cout<<" Number of reconstructed tracks = "<<NumReconTracks<<endl;
+  cout<<"--------------------------------------------------"<<endl;
+
+  if(JointLike.size()>0)
+    {
+      std::ofstream os("trigger_Likelihood.lis");
+      for (std::vector<GRBAlertData>::iterator it = JointLike.begin(); 
+	   it!=JointLike.end(); ++it)
+	{
+	  os << it->tstart<<"  "<<it->tend<<"  "<<it->like<<std::endl; 
+	  std::cout<<it->tstart<<"  "<<it->tend<<"  "<<it->like<<std::endl; 
+	}
+    }
+  
   if(m_save_file.empty()) return StatusCode::SUCCESS;
   std::vector<std::string>::iterator itr;
   for(itr=m_save_file.begin();itr != m_save_file.end();++itr)
     {
       if((*itr)=="root") 
 	{
-	  f = new TFile("Events.root","RECREATE");
-	  events->Write();
+	  TFile *f = new TFile("Events.root","RECREATE"); //real events
+	  MCevents->Write();  
+	  FRevents->Write();
 	  f->Close();
-	  
-	  f_recon = new TFile("Events_recon.root","RECREATE");
-	  events_recon->Write();
-	  f_recon->Close();
+	  std::cout<<"Events.root Saved !"<<std::endl;
 	}
       // Write the ascii file
-      if((*itr)=="ascii") 
+      /*
+	if((*itr)=="ascii") 
 	{
-	  long sz = m_data.size();
-	  if (sz > 0)   
-	    {
-	      std::ofstream os("grb_detected.lis");
-	      os << "nEvents: " << sz << std::endl;
-#ifdef WIN32
-	      for (std::vector<Data>::iterator it=m_data.begin(); 
-		   it!=m_data.end(); ++it)
-		os << std::setw(12) <<
-		  std::fixed << 
-		  it->time << "  " << 
-		  it->energy << "  " <<
-		  it->theta << "  " << 
-		  it->phi << std::endl;
-#else
-	      for (std::vector<Data>::iterator it=m_data.begin(); 
-		   it!=m_data.end(); ++it)
-		os << std::setw(12) << 
-		  it->time << "  " << 
-		  it->energy << "  " << 
-		  it->theta << "  " << 
-		  it->phi << std::endl;
-#endif
-	    }
+	long sz = m_data.size();
+	if (sz > 0)   
+	{
+	std::ofstream os("grb_detected.lis");
+	os << "nEvents: " << sz << std::endl;
+	#ifdef WIN32
+	for (std::vector<Data>::iterator it=m_data.begin(); 
+	it!=m_data.end(); ++it)
+	os << std::setw(12) <<
+	std::fixed << 
+	it->time << "  " << 
+	it->energy << "  " <<
+	it->theta << "  " << 
+	it->phi << std::endl;
+	#else
+	for (std::vector<Data>::iterator it=m_data.begin(); 
+	it!=m_data.end(); ++it)
+	os << std::setw(12) << 
+	it->time << "  " << 
+	it->energy << "  " << 
+	it->theta << "  " << 
+	it->phi << std::endl;
+	#endif
 	}
+	}
+      */
     }
+  return StatusCode::SUCCESS;
+}
+
+StatusCode TDSReadFluxAlg::GRBAlert(myEvent Evt)
+{
+  //////////////////////////////////////////////////
+  ///           LAT GRB ALERT
+  //////////////////////////////////////////////////
+  PhotonInfo myPhoton;
+ 
+  cout<<Evt.time<<" "<<Evt.energy<<endl;
+
+  myPhoton.setTime(Evt.time);
+  myPhoton.setEnergy(Evt.energy);
+  myPhoton.setTheta(Evt.l);
+  myPhoton.setPhi(Evt.b);
+  
+  PhotonsData.push_back(myPhoton);    
+  GRBAlertData AlertData;
+  
+  cout<<PhotonsData[0].time()<<" "<<PhotonsData.back().time()<<endl;
+
+  if((int) PhotonsData.size() == lattrigcst::nrange)
+    {
+      double tstart = PhotonsData[0].time();
+      double tend   = PhotonsData.back().time();
+      double like   = clusterData->triggerLikelihood(PhotonsData);
+      cout<<tstart<<" "<<tend<<" "<<like<<endl;
+      if(like>100)
+	{
+	  std::cout << " *********************************************** " << std::endl;
+	  std::cout << " ********** GRB TRIGGER ON  ("<<like
+		    <<" ) TIME = "<<tstart<<" ********** " << std::endl;
+	  std::cout << "************************************************ " << std::endl;
+	}
+      
+      AlertData.tstart = tstart;
+      AlertData.tend   = tend;
+      AlertData.like   = like;
+
+      JointLike.push_back(AlertData);
+
+      std::cout << " --> Likelihood  ("<<tstart<<","<<tend<<") = " <<like << std::endl;
+      std::copy(&PhotonsData[lattrigcst::nmove], 
+		&PhotonsData[lattrigcst::nmove+lattrigcst::nrange], PhotonsData.begin());
+      PhotonsData.resize(lattrigcst::nrange-lattrigcst::nmove);
+    }
+  std::cout << " Trigger buffer = " << PhotonsData.size()<<" / "<<lattrigcst::nrange
+	    << std::endl;
+  
   return StatusCode::SUCCESS;
 }

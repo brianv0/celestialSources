@@ -1,7 +1,7 @@
 /*!\class  GRBmanager
   
-  \brief Spectrum class for many GRBs inheriting from GRBSpectrum.
-  This class concatenates several GRBSpectrum one after the other 
+  \brief Spectrum class for many GRBs 
+  This class concatenates several GRB one after the other 
   for simulating a series of several GRBs.
   
   \author Nicola Omodei       nicola.omodei@pi.infn.it 
@@ -10,6 +10,7 @@
 
 #ifndef GRBmanager_H
 #define GRBmanager_H
+#include "GRBConstants.h"
 
 #include <vector>
 #include <string>
@@ -17,11 +18,12 @@
 #include <cmath>
 #include "flux/ISpectrum.h"
 #include "facilities/Observer.h"
-#include "flux/GPS.h"
-#include "CLHEP/Random/RandomEngine.h"
-#include "GRBSpectrum.h"
+#include "GRBSim.h"
+#include "SpectObj.h"
 
-class ISpectrum;
+#include "facilities/Util.h"
+
+//class ISpectrum;
 
 class GRBmanager : public ISpectrum
 {
@@ -33,7 +35,7 @@ class GRBmanager : public ISpectrum
     They are: 
     - The time of the first burst
     - The time to wait before the next burst
-
+    
     An example the xml source declaration for this spectrum should appears:
     \verbatim
     <source name=" GRBmanager_Gal">
@@ -45,7 +47,8 @@ class GRBmanager : public ISpectrum
   
   GRBmanager(const std::string& params);
   
-  virtual  ~GRBmanager(); 
+  virtual  ~GRBmanager();
+   
   /*! If a burst is shining it returns the GRBSpectrum::flux method 
    */
   double flux(double time)const;
@@ -55,13 +58,14 @@ class GRBmanager : public ISpectrum
    * If not it returns the time to whait for the first photon of the next burst.
    */
   double interval(double time);
-  //! return the default value 1
-  inline double solidAngle() const{return 1.0;}
+  
   //! direction, taken from GRBSim
   inline std::pair<double,double> 
-    dir(double energy) {return m_GRB->dir(energy);} 
-  //! calls GRBSpectrum::operator()
-  float operator() (float u) const;
+    dir(double energy) 
+    {
+      cout<<"dir"<<endl;
+      return m_GRB->GRBdir();
+    } 
   //! calls GRBSpectrum::energySrc
   double energy(double time);
   
@@ -75,15 +79,20 @@ class GRBmanager : public ISpectrum
     \param index if the position of the parameter in the input list. 
     \retval output is the value of the parameter as float number.
   */  
-  float parseParamList(std::string input, int index);  
+  double parseParamList(std::string input, int index);  
   
  private:
-  
-  GRBSpectrum* m_GRB;
+
+  GRBSim*            m_GRB;
+  SpectObj *m_spectrum;
   const std::string& m_params;
-  float m_FirstTime;
-  float m_initialTime;
-  float m_timeToWait;
-  float m_endTime;
+  std::string paramFile;
+
+  double m_timeToWait;
+
+  double m_startTime;
+  double m_endTime;
+  double m_nextBurst;
+  Parameters *m_par;
 };
 #endif

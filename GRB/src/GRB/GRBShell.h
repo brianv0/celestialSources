@@ -9,99 +9,30 @@
  *
  */
 
+#ifndef GRBSHELL_HH
+#define GRBSHELL_HH 1
 #include "GRBConstants.h"
-
-#ifndef GRBSHELL_H
-#define GRBSHELL_H 1
-
-class GRBShell 
-{  
+//////////////////////////////////////////////////
+class GRBShell
+{
  public:
-
-  /*!
-   * \brief Creation of a new shell.
-   *
-   * \param gamma is the The Lorentz factor of the shell.
-   * \param mass is the mass of the shell is computed as: 
-   * \f$\displaystyle{E\over \Gamma c^2}\f$. 
-   * \param thickness is in cm.
-   * \param radius of the jet. In cm.
-   * \param distance of the Shell to the central engine. In cm.
-   * \param type indicates the type of geometry. 
-   * If "jet" the emission of shells from the central engine is beamed.
-   * Else is isotropic.  
-   */
-  GRBShell(double gamma, double mass,
-	   double thickness, double radius,double distance = 0.0,std::string type = "jet");
+  GRBShell(double g, double r, double d, double e);
+  GRBShell(double g, double r, double d, double e, double m);
+  ~GRBShell(){;}
   
-  ~GRBShell() { }
-  //! This operator compute the resulting shell after the collision between two shells.
-  GRBShell operator+(GRBShell Sh2);
-  // Accessors to data member values:
-  inline double getMass()      {return m_mass;}
-
-  inline double getGamma()     {return m_gamma;}
-
-  inline double getThickness() {return m_thickness;}
-
-  inline double getRadius()    {return m_radius;}  
-
-  inline double getDistance()    {return m_distance;} 
-
-  inline double getBeta()      {return beta(m_gamma);}
-
-  inline double getEint()      {return m_eint;}
-  /*! Returns the comoving volume (in \f$cm^3\f$).
-   * The comoving volume is defined as 
-   *\f$4\pi\times{thickness}\times{distance}^2\f$ for isotropic shells,
-   *\f$\pi\times{thickness}\times{radius}^2\f$ for jet shells.   
-   */
-  inline double getVolCom()    
-    {
-      return m_volume;
-    }
-  
-  //Set functions: Should be more protected!!
-
-  inline void setMass(double value)      {m_mass = value;}
-
-  inline void setGamma(double value)     {m_gamma = value;}
-
-  inline void setThickness(double value) {m_thickness = value;}
-
-  inline void setRadius(double value)    {m_radius = value;}
-
-  inline void setDistance(double value)  {m_distance = value;}
-
-  inline void setEint(double value)      {m_eint = value;}
-  
-  //Higher  level functions:
-
-  /*! 
-   * \retval  beta = \f$\sqrt{1-{1\over gamma^2}}\f$
-   */
-  double    beta(const double gamma);
-
-  /*!
-   * \brief Time evolution of the shell.
-   *
-   * This method can be used by GRBengine to evolve the shells prior to checking
-   * for new shocks.
-   * Radius of the shell is moved forward by \f$\beta\times c\times time\f$
-   * \param time timestep of evolution
-   */
-  void      evolve(double time);
-    
+  void Evolve(double dt);
+  double GetBeta()  {return sqrt(1.0 - 1.0/(m_g*m_g));}
+  double GetRadius(){return m_r;}
+  double GetGamma(){return m_g;}
+  double GetThickness(){return m_dr;}
+  double GetMass(){return m_m;} //
+  double GetEnergy(){return m_e;}
+  double GetVolume(){return 4./3.*cst::pi*(pow(m_r+m_dr,3.)-pow(m_r,3.));}  // cm^3
+  double GetComovingVolume(){return GetVolume()*m_g;} // cm^3
+  double GetComPartDens() {return m_m*cst::c2*cst::erg2meV/(cst::mpc2*GetComovingVolume());} //1/cm^3
  private:
-  //Data Members:
-  double m_gamma;
-  double m_mass;
-  double m_thickness;
-  double m_radius;
-  double m_distance;
-  double m_volume;
-  double m_eint;
+  double m_g, m_r,m_dr,m_e, m_m;
+
 };
-
+//////////////////////////////////////////////////
 #endif
-

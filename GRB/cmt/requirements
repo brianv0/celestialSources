@@ -1,5 +1,5 @@
 package GRB
-version v2r1p2
+version v3
 author Johann Cohen-Tanugi <johann.cohen@pi.infn.it> Nicola Omodei<nicola.omodei@pi.infn.it> Sandhia Bansal <sandhiab@lheapop.gsfc.nasa.gov>
 
 # $Id$
@@ -53,18 +53,14 @@ library GRB  Dll/*.cxx $(libs)
 macro GRB_extrastamps "$(GRBDir)/GRB_lib.stamp"
 
 #
-#	Executables:
+#	Executables:	
 #
 
 # this executable provides visualization with ROOT at runtime
 #
-application test_GRBROOT  test/other/GRBROOTtest.cxx $(libs)
-public set JOBOPTIONS ${GRBROOT}/src/test/jobOptions.txt
+#application test_GRBROOT  test/other/GRBROOTtest.cxx $(libs)
+#public set JOBOPTIONS ${GRBROOT}/src/test/jobOptions.txt
 
-
-# builds batch job (no ROOT visualization) for nightly builds, 
-# and sets its jobOptions file
-#
-apply_pattern package_test
+apply_pattern dummy_test
 set TESTJOBOPTIONS ${GRBROOT}/src/test/test_jobOptions.txt
 

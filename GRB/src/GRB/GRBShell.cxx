@@ -4,83 +4,30 @@
 //
 
 #include "GRBShell.h"
-#include <iostream>
-#include <cmath>
-#include <stdlib.h>
 
-using namespace std;
+using namespace cst;
 
-GRBShell::GRBShell(double gamma, double mass,
-		   double thickness, double radius, double distance,string type) 
-  : m_gamma(gamma), m_mass(mass),m_thickness(thickness),m_radius(radius),m_distance(distance)
-{ 
-  if(type =="jet")
-    {
-      m_volume = cst::pi*pow(m_radius,2.)*m_thickness;
-    }
-  else if (type =="iso")
-    {
-      m_volume = 4.*cst::pi*pow(m_distance,2.)*m_thickness;
-    }
-  else 
-    {
-      std::cout<<" Option for shell type, not recognized !! "<<std::endl;
-      std::cout<<" Please eneter 0 for isotropic fireballs "<<std::endl; 
-      std::cout<<" or 1 for beamed fireballs in the GRBParam.txt file!! "<<std::endl;
-    }
-}
-
-
-
-double GRBShell::beta(const double gamma) 
+GRBShell::GRBShell(double g, double r, double dr, double e)
 {
-  if(gamma<1.0)
-    {
-      return 0;
-    }
-  else 
-    {
-      return sqrt(1. - 1./(gamma*gamma));  
-    }
+  m_g  = g;
+  m_r  = r;
+  m_dr = dr;
+  m_e  = e;
+  m_m  = e/(g*c2);
 }
 
-
-void GRBShell::evolve(double dt) 
+GRBShell::GRBShell(double g, double r, double dr, double e, double m)
 {
-  //Interaction with the Inter Stellar Medium: 
-  if(m_distance>1.0e+19)
-    {
-      m_gamma=cst::viscosity+m_gamma*(1.0-cst::viscosity);
-    }
-  if(m_gamma<1.0) m_gamma=1.0;
-  m_distance += beta(m_gamma)*cst::c*dt;
-  // Expanding sells...
-  //  m_thickness=m_distance/pow(m_gamma,2)>m_thickness?m_distance/pow(m_gamma,2):m_thickness;
-  
+  m_g  = g;
+  m_r  = r;
+  m_dr = dr;
+  m_e  = e; 
+  m_m  = m;
 }
 
-
-GRBShell GRBShell::operator+(GRBShell Sh) 
-{ 
-  m_distance = Sh.getDistance();
-  //Kinematics:  
-  double m1 = m_mass;
-  double m2 = Sh.getMass();
-  double g1 = m_gamma;
-  double g2 = Sh.getGamma();
-  double dr1= m_thickness;
-  double dr2= Sh.getThickness();
-  
-  // Gamma of the resulting shell: 
-  m_gamma=sqrt((m1*g1+m2*g2)/(m1/g1+m2/g2));
-  m_gamma=((m_gamma<=1.) ? 1.+1.0e-6 : m_gamma);
-  // See Piran 1999
-  // Internal Energy:
-  //Updating Shell Info. after shock:
-  setMass(m1+m2);
-  setGamma(m_gamma);
-  setThickness((dr1+dr2)/2.);
-  setEint(m1*cst::c2*(g1-m_gamma)+m2*cst::c2*(g2-m_gamma));
-  return (*this);
+void GRBShell::Evolve(double t)
+{
+  m_r  += c * GetBeta() * t;
+  //  m_dr += c * GetBeta() * t;
 }
-
+//////////////////////////////////////////////////
