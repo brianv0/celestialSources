@@ -8,11 +8,12 @@ This package is also developed to study the physics of bursts and the
 capability of Glast in the observation of rapid 
 transient signals. It is interfaced to ROOT for possible visualization.
  
- This package contains three parts related to Gamma-Ray Bursts:
+ This package contains four parts related to Gamma-Ray Bursts:
  -# The full physical simulator of GRB, based on the fireball model in 
 the internal shocks configuration.
  -# The phenomenological simulator of GRB signal. 
  -# The algorithm describing the LAT alert.
+ -# The Transient Data Store reading utility.
 
  
  \section physics Very short introduction to the physical model

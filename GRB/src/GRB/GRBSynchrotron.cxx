@@ -39,18 +39,21 @@ void GRBSynchrotron::load(const double time,
 			  const double dr)
   
 {
-  if (time<=0.) {
-    m_spectrumObj *= 0.0; 
-    /*
-      cout<<"   SYNCRO      "<<endl;
-      cout<<"   Rise Time  = "<<(dr/cst::c)/GAMMAF<<endl;
-      cout<<"   Decay Time = "<<gamma_min*cst::mec2/
-      (4./3.* Umag(B)*cst::erg2MeV*cst::c*cst::st*
-      (pow(gamma_min,2.)-1.))/GAMMAF<<endl;
-      cout<<" Gamma_min    = "<<gamma_min<<endl;
-    */
-    return;}
-  
+  if (time<=0.) 
+    {
+      m_spectrumObj *= 0.0; 
+      /*
+	cout<<"   SYNCRO      "<<endl;
+	cout<<"   Rise Time  = "<<(dr/cst::c)/GAMMAF<<endl;
+	cout<<"   Decay Time = "<<gamma_min*cst::mec2/
+	(4./3.* Umag(B)*cst::erg2MeV*cst::c*cst::st*
+	(pow(gamma_min,2.)-1.))/GAMMAF<<endl;
+	cout<<" Gamma_min    = "<<gamma_min<<endl;
+      */
+      return;
+    }
+  const int type=0; // Power Law
+  //  const int type=1; // Complete integration;
   double ComovingTime; 
   const double EnergyTransformation = 
     1.e+6 * cst::mec2 *
@@ -79,8 +82,6 @@ void GRBSynchrotron::load(const double time,
   std::vector<double>::iterator its = fsyn.begin();
   double   dgamma     = pow((gamma_max/gamma_min),1./cst::enstep);
   
-
-  
   while(x1!=x.end()) 
     {
       ComovingTime = comovingTime(time,GAMMAF,EnergyTransformation*(*x1),
@@ -91,22 +92,49 @@ void GRBSynchrotron::load(const double time,
       
       // Here the integral beween the population of electron and 
       // the syncrotron emission from each of those electrons.
-      for (int j = 0; j < cst::enstep;)
+      
+      if(type == 0) //Power Law approx...
 	{
-	  double gi      = gamma_min*pow(dgamma,j);
+	  double gc = cst::mec2/(Psyn_0*ComovingTime); 
+	  gc = (gc <= 1. ? 1.+1.e-6 : gc);
+	  double em = 4./3.*esyn_0*(pow(gamma_min,2.)-1.)/cst::mec2;
+	  // The SYN energy that conrespond to gc 
+	  double ec = 4./3.*esyn_0*(pow(gc,2.)-1.)/cst::mec2;
+	  double gi      = 2.*gamma_min; 
 	  double gi2     = pow(gi,2.);
-	  double esyn    = esyn_0*(gi2-1.)/cst::mec2; // In mec2 units
-	  
-	  double tsyn    = (gi*cst::mec2)/(Psyn_0*(gi2-1.)); 
+	  double tsyn    = (gi*cst::mec2)/(Psyn_0*(gi2-1.));  
 	  double tau = tau_0;
 	  tau *= (tsyn<tcross)? tsyn: tcross;
 	  if(tau>1.) tau = 1.;
-	  double N_e     = (1.-tau)*electronNumber(gi, gamma_min, gamma_max,
+	  double N_e = (1.-tau)*electronNumber(gi, gamma_min, gamma_max,
 						   dr, ComovingTime, tsyn, N0);
-	  (*its) += SynchrotronFunction(esyn,(*x1))*N_e
-	    *gamma_min*(pow(dgamma,j+5)-pow(dgamma,j)); //adim
-	  //cout<<" SYN = "<<(*its)<<endl;
-	  j+=5; // This is for speed up the simulation
+	  
+	  //	  if(*x1<gc) //ekn == gc
+	    (*its) = processFlux(*x1,ec,em);
+	    //  else 
+	    //  (*its) = 0.0;
+	  
+	  (*its) *= N_e*gi*(dgamma-1.); // adim
+	}
+      else // Complete integration
+	{
+	  for (int j = 0; j < cst::enstep;)
+	    {
+	      double gi      = gamma_min*pow(dgamma,j);
+	      double gi2     = pow(gi,2.);
+	      double esyn    = esyn_0*(gi2-1.)/cst::mec2; // In mec2 units
+	      
+	      double tsyn    = (gi*cst::mec2)/(Psyn_0*(gi2-1.)); 
+	      double tau = tau_0;
+	      tau *= (tsyn<tcross)? tsyn: tcross;
+	      if(tau>1.) tau = 1.;
+	      double N_e     = (1.-tau)*electronNumber(gi, gamma_min, gamma_max,
+						       dr, ComovingTime, tsyn, N0);
+	      (*its) += SynchrotronFunction(esyn,(*x1))*N_e
+		*gamma_min*(pow(dgamma,j+2)-pow(dgamma,j)); //adim
+	      //cout<<" SYN = "<<(*its)<<endl;
+	      j+=2; // This is for speed up the simulation
+	    }
 	}
       its++;
       x1++;

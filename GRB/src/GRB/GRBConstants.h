@@ -67,7 +67,7 @@ namespace cst
   //! Viscosity of the circum burst material
   const double viscosity = 0.0;
   //! Number of time steps
-  const int    nstep        = 500; 
+  const int    nstep        = 300; 
   //! Number of energy steps
   const int    enstep       =  50;
   //! Minimum energy at which the simulator will compute the flux 

@@ -43,10 +43,10 @@ void GRBICompton::load(const double time,
 {
 
   if (time <= 0.){m_spectrumObj *= 0.; return;}
-  //int type = 0; // 0 -> Power Law, from Sari and Esin, astro-ph/0005253
+  int type = 0; // 0 -> Power Law, from Sari and Esin, astro-ph/0005253
   //int type = 1; // 0 -> Power Law, the electron have gamma_min, Low IC
   //int type = 2; // 0 -> Power Law, The electron have gc, High IC
-  int type = 3; // 0 -> Integration, Slow computation but all the 
+  //int type = 3; // 0 -> Integration, Slow computation but all the 
   //                                 electrons are considered
   
   double ComovingTime; 
@@ -108,9 +108,6 @@ void GRBICompton::load(const double time,
 	  double em = 4./3.*pow(gamma_min,2.) *esyn_0*(pow(gamma_min,2.)-1.)/cst::mec2;
 	  // The IC energy that conrespond to gc is (ec_syn*gc^2)
 	  double ec = 4./3.*pow(gc,2.)        *esyn_0*(pow(gc,2.)-1.)/cst::mec2;
-	  // The KN limit is when the electron give all its energy to the photon:
-	  double ekn= gc; 
-	  
 	  // the gamma of the original syn electron is:
 	  double gi      = gamma_min; //sqrt(1. + (3.*(*x1)*cst::mec2)/(4.*pow(gamma_min,2.)*esyn_0));
 	  double gi2     = pow(gi,2.);
@@ -124,7 +121,7 @@ void GRBICompton::load(const double time,
 	  double N_e = N0/Vol*(tau)*electronNumber(gi, gamma_min, gamma_max,
 					    dr, ComovingTime, tic, N0);
 	  
-	  if(*x1<ekn)
+	  if(*x1<gc) //Ekn == gc
 	    (*its) = processFlux(*x1,ec,em);
 	  else 
 	    (*its) = 0.0;
@@ -151,7 +148,6 @@ void GRBICompton::load(const double time,
 	  
 	  double em = 4./3.*pow(gamma_min,2.) *esyn_0 *(pow(gamma_min,2.)-1.)/cst::mec2;
 	  double ec = 4./3.*pow(gamma_min,2.) *esyn_0 *(pow(gc,2.)-1.)/cst::mec2;
-	  double ekn= gamma_min;
 	  // gamma of the seed electron
 	  double gi      = gamma_min; //sqrt(1. + (3.*(*x1)*cst::mec2)/(4.*pow(gamma_min,2.)*esyn_0));
 	  double gi2     = pow(gi,2.);
@@ -164,7 +160,7 @@ void GRBICompton::load(const double time,
 	  
 	  double N_e = N0/Vol*(tau)*electronNumber(gi, gamma_min, gamma_max,
 					    dr, ComovingTime, tic, N0);
-	  if(*x1<ekn)
+	  if(*x1<gamma_min) //Ekn = gamma_min
 	    (*its) = processFlux(*x1,ec,em);
 	  else 
 	    (*its) = 0.0;
@@ -193,7 +189,6 @@ void GRBICompton::load(const double time,
 	  
 	  double em = 4./3.*pow(gc,2.) *esyn_0 *(pow(gamma_min,2.)-1.)/cst::mec2;
 	  double ec = 4./3.*pow(gc,2.) *esyn_0 *(pow(gc,2.)-1.)/cst::mec2;
-	  double ekn= gc;
 	  double gi      = gc;//sqrt(1. + (3.*(*x1)*cst::mec2)/(4.*pow(gc,2.)*esyn_0));
 	  double gi2     = pow(gi,2.);
 	  double tic    = (gi*cst::mec2)/(Pic_0*(gi2-1.));  
@@ -205,7 +200,7 @@ void GRBICompton::load(const double time,
 	  double N_e = N0/Vol*(tau)*electronNumber(gc, gamma_min, gamma_max,
 					    dr, ComovingTime, tic, N0);
 	  
-	  if(*x1<ekn)
+	  if(*x1<gc) //Ekn == gc
 	    (*its) = processFlux(*x1,ec,em);
 	  else 
 	    (*its) = 0.0;
