@@ -4,3 +4,5 @@ sun4x_*
 i386_linux*
 setup.*
 *.mak*
+rh*
+Linux*
