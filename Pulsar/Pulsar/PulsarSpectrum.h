@@ -49,8 +49,11 @@ class PulsarSpectrum : public ISpectrum
   //! Returns the number of turns made at a specified time
   double getTurns(double time);
 
-  //Retrieve the nextTime from the number of turns to be completed
+  //!Retrieve the nextTime from the number of turns to be completed
   double retrieveNextTimeTilde( double tTilde, double totalTurns, double err );
+
+  //!Apply the barycentric decorrections and returns arrival time in tt
+  double getBaryDeCorr( double tdbInput ); 
   
   //! direction, taken from PulsarSim
   inline std::pair<double,double>
@@ -74,11 +77,8 @@ class PulsarSpectrum : public ISpectrum
   PulsarSim *m_Pulsar;
   SpectObj  *m_spectrum;
   
-  // astro::JulianDate JDStartMission; 
-  // astro::JulianDate *JDStartSimulation; 
-  //astro::JulianDate m_JDCurrent; 
-
   astro::EarthOrbit m_earthOrbit;
+
 
   ofstream BaryOutFile;
 

@@ -175,6 +175,7 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
 
   PulsarLog.close();
 
+
   astro::EarthOrbit m_earthOrbit();
   
   m_Pulsar    = new PulsarSim(m_PSRname, m_seed, m_flux, m_enphmin, m_enphmax, m_period, m_numpeaks);
@@ -266,50 +267,10 @@ double PulsarSpectrum::interval(double time)
   double finPh =  modf(initTurns,&intPart);
   finPh = modf(finPh + inteTurns,&intPart); //finPh is the expected phase corresponding to the nextTimeTilde
   double nextTimeTilde = retrieveNextTimeTilde(timeTilde, totTurns, (1e-6/m_period));
-  
-  
-  //Second Part barycentric de-corrections
-
-  //  astro::JulianDate JDStartMission(2005, 7, 18, 0.0);
-  astro::JulianDate JDStartMission(2007, 1, 1, 0.0);
-
-  astro::SkyDir PsrDir(m_RA,m_dec,astro::SkyDir::EQUATORIAL);
-
-
-  //Conversion TT to TDB, from JDMissionStart (that glbary uses as MJDref)
-  double tdb_min_tt = m_earthOrbit.tdb_minus_tt(JDStartMission+(nextTimeTilde - (StartMissionDateMJD)*SecsOneDay)/86400.);//jd
-
-
-
-
-
-
-
-  //Correction due to geometric time delay of light propagation 
-  //  double GeomCorr = m_earthOrbit.calcTravelTime(JDStartMission+tdb_min_tt, PsrDir); // seconds
-  double GeomCorr = m_earthOrbit.calcTravelTime(JDStartMission+(nextTimeTilde - (StartMissionDateMJD)*SecsOneDay)/86400., PsrDir); // seconds
-
-  //Shapiro Correction
-  //  double ShapiroCorr = m_earthOrbit.calcShapiroDelay(JDStartMission+
-  //(nextTimeTilde - (StartMissionDateMJD)*SecsOneDay)/86400., PsrDir); //seconds
-  double ShapiroCorr = m_earthOrbit.calcShapiroDelay(JDStartMission+tdb_min_tt,PsrDir);
-
-  BaryOutFile.open("BaryDeCorr.txt",std::ios::app);
-  BaryOutFile << std::setprecision(20) << "****  BaryCentric Correction : Start " << JDStartMission 
-	    << " PSR position : RA " << PsrDir.ra() << " dec " << PsrDir.dec() << std::endl;
-  BaryOutFile << std::setprecision(30) << nextTimeTilde - (StartMissionDateMJD)*SecsOneDay 
-	    << "\t" << PsrDir.ra() << "\t" << PsrDir.dec() 
-	      << "\t" << std::setprecision(10) << tdb_min_tt << "\t" << GeomCorr << "\t" << ShapiroCorr << "\t";
-
-  std::cout << std::setprecision(30) << " Bef " << nextTimeTilde  << std::endl;
-  // nextTimeTilde = nextTimeTilde - tdb_min_tt - GeomCorr + ShapiroCorr;
-  //std::cout << std::setprecision(30) << "    --> " << nextTimeTilde - (StartMissionDateMJD)*SecsOneDay << std::endl;
-  BaryOutFile << std::setprecision(30) << nextTimeTilde - (StartMissionDateMJD)*SecsOneDay << std::endl;
-  BaryOutFile.close();
-
-  
-
-  return nextTimeTilde - timeTilde;
+    
+  //  double tt = getBaryDeCorr(nextTimeTilde);
+ 
+   return nextTimeTilde + getBaryDeCorr(nextTimeTilde)  - timeTilde;
 }
 
 /////////////////////////////////////////////
@@ -393,7 +354,7 @@ double PulsarSpectrum::retrieveNextTimeTilde( double tTilde, double totalTurns, 
 	{
 	  //	  	  std::cout << std::setprecision(30) << " Warning!! Amplifying tolerance for convergence at time " 
 	  //		    << tTilde - (StartMissionDateMJD)*SecsOneDay << std::endl;
-	  //	  std::cout <<  std::setprecision(30) << " Low is " << tTildeLow << " High is " << tTildeHigh 
+ 	  //	  std::cout <<  std::setprecision(30) << " Low is " << tTildeLow << " High is " << tTildeHigh 
 	  //    << " -->turns " << tempTurns << "(total " << totalTurns << " ) " << std::endl;
 	  //std::cout << "    diff " << fabs(tempTurns-totalTurns) << " , err " << err << std::endl;
 	  //std::cout << " Error from " << err ; 
@@ -405,6 +366,70 @@ double PulsarSpectrum::retrieveNextTimeTilde( double tTilde, double totalTurns, 
 
   return tTilde;
 }
+
+/////////////////////////////////////////////
+/*!
+ * \param tdbInput Arrival Time in Solar System Barycentric Time
+ *
+ * <br>This method performs the barycentric decorrections and returns the time in Terrestrial Time. The corrections 
+ * now taken into account are:
+ * <ul>
+ *  <li> Conversion from TDB to TT;
+ *  <li> Geometric Time Delay due to light propagation;
+ *  <li> Relativistic Shapiro delay;
+ * </ul>   
+ */
+double PulsarSpectrum::getBaryDeCorr( double tdbInput )
+{
+
+  
+  //JD of clock start time 
+  astro::JulianDate JDStartClockMission(2007, 1, 1, 0.0);
+  astro::JulianDate tdbJD= JDStartClockMission+(tdbInput - (StartMissionDateMJD)*SecsOneDay)/86400.;
+
+  std::cout << "\n\n#######\n** Performing barycentric de-corrections for JD  " <<std::setprecision(20) << tdbJD << std::endl;
+
+  //Position of source in sky
+  astro::SkyDir PsrDir(m_RA,m_dec,astro::SkyDir::EQUATORIAL);
+
+
+  //Conversion TT to TDB, from JDMissionStart (that glbary uses as MJDref)
+  double tdb_min_tt = m_earthOrbit.tdb_minus_tt(tdbJD);
+  // std::cout << std::setprecision(15) << "** --> TDB-TT = " << tdb_min_tt << std::endl;
+
+  //Correction due to geometric time delay of light propagation 
+  double GeomCorr = m_earthOrbit.calcTravelTime(tdbJD, PsrDir); // seconds
+  //std::cout << std::setprecision(15) << "** --> Geom. delay = " << GeomCorr << std::endl;
+
+  //Correction due to Shapiro delay
+  double ShapiroCorr = m_earthOrbit.calcShapiroDelay(tdbJD,PsrDir);
+  //std::cout << std::setprecision(15) << "** --> Shapiro delay = " << ShapiroCorr << std::endl;
+  //std::cout << std::setprecision(15) << "** ====> Total= " << tdb_min_tt + GeomCorr + ShapiroCorr  << std::endl;
+
+  std::cout << "----------------- And now the decorrections...!"<<std::endl;
+
+
+
+  double tdb_min_tt_d = m_earthOrbit.tdb_minus_tt(tdbJD);
+  std::cout << std::setprecision(15) << "\n\n** --> TDB-TT = " << tdb_min_tt << std::endl;
+
+  //Correction due to geometric time delay of light propagation 
+  double GeomCorr_d = m_earthOrbit.calcTravelTime(tdbJD-tdb_min_tt_d, PsrDir); // seconds
+  std::cout << std::setprecision(15) << "** --> Geom. delay = " << GeomCorr << std::endl;
+
+  //Correction due to Shapiro delay
+  double ShapiroCorr_d = m_earthOrbit.calcShapiroDelay(tdbJD-tdb_min_tt_d,PsrDir);
+  std::cout << std::setprecision(15) << "** --> Shapiro delay = " << ShapiroCorr_d << std::endl;
+  std::cout << std::setprecision(15) << "** ====> Total= " << tdb_min_tt_d + GeomCorr_d + ShapiroCorr_d  << std::endl;
+
+  double total_d = tdb_min_tt_d + GeomCorr_d + ShapiroCorr_d;
+  double total = tdb_min_tt + GeomCorr + ShapiroCorr;
+  std::cout << " Diff " << std::setprecision(20) << total-total_d << std::endl;
+
+  return total_d;
+
+}
+
 
 /////////////////////////////////////////////
 double PulsarSpectrum::energy(double time)
