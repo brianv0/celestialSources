@@ -40,7 +40,7 @@ class SpectObj
   double flux(double time, double enph);
   double interval(double time, double enph);
   double energy(double time, double enph);
-  void SaveParameters(double tstart, std::pair<float,float> direction);
+  void SaveParameters(double tstart, std::pair<double,double> direction);
   //////////////////////////////////////////////////
   void ScaleAtBATSE(double fluence);
   double GetFluence(double BL=0.0, double BH=0.0);

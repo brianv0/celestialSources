@@ -10,6 +10,11 @@
 	<use_spectrum frame="galaxy"/> 
     </spectrum> </source>
 
+    <source name=" GRB_DC1 ">
+        <spectrum escale="MeV"> <SpectrumClass name="GRBmanager" params="3000,4000"/>
+	<use_spectrum frame="galaxy"/> 
+    </spectrum> </source>
+
 <!-- 2) GRBobsSpectrum: the phenomenological model of GRB. -->
 <!-- The high energy part is extrapolated from the BATSE data. The reference frame is galactic. -->
 
@@ -30,46 +35,33 @@
 
       <source name=" One_GRB_each_10Minutes ">
           <spectrum escale="MeV"> <SpectrumClass name="GRBmanager" params="60,600"/>
-	<!--direction theta="0" phi="0" /-->
           <use_spectrum frame="galaxy"/> 
      </spectrum> </source>
 
       <source name=" One_GRB_each_Hour ">
-          <spectrum escale="MeV"> <SpectrumClass name="GRBmanager" params="0,3600"/>
+          <spectrum escale="MeV"> <SpectrumClass name="GRBmanager" params="60,3600"/>
           <use_spectrum frame="galaxy"/> 
      </spectrum> </source>
      
      <source name=" GRB_0_0 ">
-          <spectrum escale="MeV"> <SpectrumClass name="GRBmanager" params="60,3600"/>
+          <spectrum escale="MeV"> <SpectrumClass name="GRBmanager" params="1800,3600"/>
           <galactic_dir l="0" b="0"/>
      </spectrum> </source>
 
      <source name=" GRB_120_10 ">
-	<spectrum escale="MeV"> <SpectrumClass name="GRBmanager" params="60,3600"/>
-	<galactic_dir l="120" b="-10"/>
+        <spectrum escale="MeV"> <SpectrumClass name="GRBmanager" params="3600,7200"/>
+	<galactic_dir l="120" b="10"/>
      </spectrum> </source>
 
      <source name=" GRB_GLAST_0_0 ">
-	<spectrum escale="MeV"> <SpectrumClass name="GRBmanager" params="0,3600"/>
+	<spectrum escale="MeV"> <SpectrumClass name="GRBmanager" params="3600,7200"/>
 	<direction theta="0" phi="0" />
      </spectrum> </source>
 
-     <source name=" GRBobsSpectrum_Test" >
-	<spectrum escale="GeV"> <SpectrumClass name="GRBobsSpectrum"  />
-	<!--This will fix the direction -->
-	<galactic_dir l="120" b="-50"/>
-     </spectrum> </source>
 	
 <!--GRB spectrum + diffuse -->
      <source name="GRB_DIFFUSE" >
 	<nestedSource sourceRef="One_GRB_each_Minute"/>
-	<nestedSource sourceRef="diffuse"/>
-     </source>
-
-<!-- GRB obs spectrum + diffuse -->
-
-     <source name="GRB_OBS_DIFFUSE" >
-	<nestedSource sourceRef="GRBobsSpectrum_Gal"/> 
 	<nestedSource sourceRef="diffuse"/>
      </source>
 

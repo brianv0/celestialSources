@@ -26,7 +26,7 @@ class GRBengine
   //double getDistance();
   inline std::pair<double,double> GetDirection(){return m_dir;}
  private:
-  std::pair<float,float> m_dir;
+  std::pair<double,double> m_dir;
   Parameters *m_params;
 };
 

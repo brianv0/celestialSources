@@ -80,7 +80,7 @@ TH1D *SpectObj::Integral_E(double e1, double e2)
 
 TH1D *SpectObj::Integral_E(int ei1, int ei2)
 {
-  //  gDirectory->Delete("ts");
+  gDirectory->Delete("ts");
   TH1D *ts = (TH1D*) times->Clone();
   ts->SetName("ts");  
   
@@ -167,7 +167,7 @@ TH1D *SpectObj::ComputeProbability(double enph)
     {
       P->SetBinContent(ti,Integral_T(pt,0,ti)); //ph/m²
     }
-  delete pt;
+  //delete pt;
   return P; //ph/m²
 }
 
@@ -195,17 +195,16 @@ photon SpectObj::GetPhoton(double t0, double enph)
     } 
   double dp = P->GetBinContent(t2) - P->GetBinContent(t1);
   double dt = Nv->GetXaxis()->GetBinCenter(t2) - Nv->GetXaxis()->GetBinCenter(t1);
-  TH1* Sp;
+  
   if(t2 <= nt) // the burst has finished  dp < 1 or dp >=1
     {
-      Sp = Integral_T(t1,t2,ei); //ph/m²
+      TH1D* Sp = Integral_T(t1,t2,ei); //ph/m²
       time    = dt/dp + t0;       
       energy  = Sp->GetRandom();
     }
   ph.time   = time;
   ph.energy = energy;
-  delete P;
-  delete Sp;
+  //  delete P;
   return ph;
 }
 
@@ -270,7 +269,7 @@ double SpectObj::flux(double time, double enph)
 
   TH1D* fl = GetSpectrum(time);    //ph/m²
   double integral = Integral_E(fl,enph,emax)/deltat; //ph/m²/s
-  delete fl;
+  //delete fl;
   return integral;//ph/m²/s
 }
 
@@ -286,7 +285,7 @@ double SpectObj::energy(double time, double enph)
 }
 
 //////////////////////////////////////////////////
-void SpectObj::SaveParameters(double tstart, std::pair<float,float> direction)
+void SpectObj::SaveParameters(double tstart, std::pair<double,double> direction)
 {
   
   double BATSEL = 20.0;

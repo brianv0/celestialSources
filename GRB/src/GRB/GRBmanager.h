@@ -61,7 +61,7 @@ class GRBmanager : public ISpectrum
   double interval(double time);
   
   //! direction, taken from GRBSim
-  inline std::pair<double,double> 
+  inline std::pair<double,double>
     dir(double energy) 
     {
       return m_GRB->GRBdir();

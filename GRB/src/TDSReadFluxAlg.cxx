@@ -132,7 +132,7 @@ TDSReadFluxAlg::TDSReadFluxAlg(const std::string& name,
 
 StatusCode TDSReadFluxAlg::initialize()
 {
-   
+  NumReconTracks=0;
   StatusCode sc = StatusCode::SUCCESS;
   MsgStream log(msgSvc(), name());
   setProperties();
