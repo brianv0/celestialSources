@@ -5,7 +5,7 @@
 
 #include "GRBConstants.h"
 
-#define DEBUG  0
+#define DEBUG  1
 
 Parameters::Parameters()
 {
@@ -30,34 +30,45 @@ double Parameters::GetBATSEFluence()
     return pow(10.0,(double)rnd->Gaus(-6.3,0.57)); //erg/cm^2 (Short Bursts)
   return pow(10.0,(double)rnd->Gaus(-5.4,0.62)); //erg/cm^2 (Long Burst)
 }
+//////////////////////////////////////////////////
+
+double Parameters::GetBATSEDuration()
+{
+  using std::pow;
+  if (m_Type==1)
+    return pow(10.0,(double)rnd->Gaus(-0.2,0.55)); //erg/cm^2 (Short Bursts)
+  return pow(10.0,(double)rnd->Gaus(1.46,0.49)); //erg/cm^2 (Long Burst)
+}
+
 
 //////////////////////////////////////////////////
+
 void Parameters::SetGalDir(double l, double b)
 {
   double ll,bb;
   
   ll = (l<=180.0 && l>=-180.0) ? l : rnd->Uniform(-180.0,180.0);
   bb = (b<=90.0 && b>=-90.0)   ? b : rnd->Uniform(-90.0,90.0);
-  
   m_GalDir=std::make_pair(ll,bb);
 }
 
-void Parameters::SetNshell(int nshell)
-{
+/*
+  void Parameters::SetNshell(int nshell)
+  {
   if(nshell>1 && nshell<4)
-    m_Type=1;
+  m_Type=1;
   else if(nshell>4)
-    m_Type=2;
+  m_Type=2;
   
   if (nshell<1)
-    if (m_Type==1)    
-      m_Nshell = int(2+rnd->Integer(2));
-    else
-      m_Nshell = int(10+rnd->Integer(100));
+  if (m_Type==1)    
+  m_Nshell = int(2+rnd->Integer(2));
   else
-    m_Nshell = nshell;
-}
-
+  m_Nshell = int(10+rnd->Integer(100));
+  else
+  m_Nshell = nshell;
+  }
+*/
 void Parameters::SetFluence(double fluence)
 {
   if(fluence == 0)  
@@ -101,19 +112,20 @@ void Parameters::SetInverseCompton(double ic)
 
 //..................................................
 
-void Parameters::ReadParametersFromFile(std::string paramFile, int NGRB)
-{
+/*
+  void Parameters::ReadParametersFromFile(std::string paramFile, int NGRB)
+  {
   
   std::ifstream f1(paramFile.c_str());
   if (!f1.is_open()) 
-    {
-      std::cout<<"GRBConstants: Error Opening paramFile!! \n";
-      exit(1);
-    }
-  int    nshell=0;
+  {
+  std::cout<<"GRBConstants: Error Opening paramFile!! \n";
+  exit(1);
+  }
+  //  int    nshell=0;
   double fluence,etot,r0,dr0;
   double gmin,gmax,ic;
-
+  
   
   char buf[200];
   f1.getline(buf,200);
@@ -121,38 +133,38 @@ void Parameters::ReadParametersFromFile(std::string paramFile, int NGRB)
   int i=1;
   
   while(i<=NGRB && f1.getline(buf,200))
-    {
-      if(sscanf(buf,"%lf %d %lf %lf %lf %lf %lf %lf",&fluence,&nshell,&etot,&r0,&dr0,&gmin,&gmax,&ic)<=0) break;
-      i++;
-    }
+  {
+  if(sscanf(buf,"%lf %d %lf %lf %lf %lf %lf %lf",&fluence,&nshell,&etot,&r0,&dr0,&gmin,&gmax,&ic)<=0) break;
+  i++;
+  }
   i--;
   f1.close();
-
+  
   if(i<NGRB)
-    {    
+  {    
       std::ifstream f2(paramFile.c_str());
       f2.getline(buf,200);
       int nb;
       if((NGRB % i)==0) nb=3;
       else nb=(NGRB % i);
       for(int j = 1; j<=nb;j++)
-	{
-	  f2.getline(buf,200);
-	  sscanf(buf,"%lf %d %lf %lf %lf %lf %lf %lf",&fluence,&nshell,&etot,&r0,&dr0,&gmin,&gmax,&ic);
-	}
+      {
+      f2.getline(buf,200);
+      sscanf(buf,"%lf %d %lf %lf %lf %lf %lf %lf",&fluence,&nshell,&etot,&r0,&dr0,&gmin,&gmax,&ic);
+      }
       f2.close();
-    }
-  SetParameters(fluence,nshell,etot,r0,dr0,gmin,gmax,ic);
-}
+      }
+      SetParameters(fluence,nshell,etot,r0,dr0,gmin,gmax,ic);
+      }
+*/
 
-void Parameters::SetParameters(double fluence, int nshell, double etot, double r0, double dr0, double gmin, double gmax, double ic)
+void Parameters::SetParameters(double fluence, double etot, double r0, double dr0, double gmin, double gmax, double ic)
 {
   SetGalDir(-200,-200);
   SetEtot(etot);
   SetFluence(fluence);
   SetInitialSeparation(r0);
   SetInitialThickness(dr0);		
-  SetNshell(nshell);
   SetGammaMin(gmin);
   SetGammaMax(gmax);
   SetInverseCompton(ic);
@@ -160,17 +172,17 @@ void Parameters::SetParameters(double fluence, int nshell, double etot, double r
 
 void Parameters::ComputeParametersFromFile(std::string paramFile, int NGRB)
 {
-  using std::pow;
+  using std::fabs; using std::pow;
   std::ifstream f1(paramFile.c_str());
   if (!f1.is_open()) 
     {
       std::cout<<"GRBConstants: Error Opening paramFile\n";
       exit(1);
     }
-  int    nshell=0;
+  //  int    nshell=0;
   double fluence,r0,dr0;
   double gmin,gmax,etot,ic;
-  double tv,ep,Eco;
+  double ep,Eco;
   char type;
   
   int GBM;
@@ -203,7 +215,7 @@ void Parameters::ComputeParametersFromFile(std::string paramFile, int NGRB)
   //  ep/=2.0;
   if (GBM>0) 
     SetGBMOutput(true);
-    
+  
   SetGRBNumber(UInt_t(65540+NGRB));  
   if(type=='S' || type =='s')
     m_Type=1;
@@ -212,119 +224,83 @@ void Parameters::ComputeParametersFromFile(std::string paramFile, int NGRB)
   else
     m_Type=((rnd->Uniform()<0.3) ? 1 : 2);
   
-  
-  
-  /*
-    if(tv<=0.0)
-    {
-    if(nshell>1 && nshell<4)
-    tv= -2;
-    else if(nshell>4)
-    tv= -1;
-    }
-    
-    if(tv==0)   // both
-    {
-    tv=((rnd->Uniform()<0.3) ? -2 : -1);
-    }
-    
-    if(tv==-2)
-    {
-    m_Type=1;
-    }
-    else if(tv==-1)
-    {
-    m_Type=2;
-    }
-  
-  */
-  
-  double gmax_gmin=2;  
+  m_Duration = GetBATSEDuration();
+
+  double gmax_gmin=2.0;  
   double E52   = 1.0;
-  double Ep100 = TMath::Max(1.0,ep/100.0);
+  double Ep100 = ep/100.0;
   double ae3   = cst::ae * 3.;
   double ab3   = cst::ab * 3.;
   double g100=0;
   double r10=0;
   double G=0.0;
-  double d7=0;
-  bool EcoFlag = (Eco<=2.0) ? true : false;
-  
-  while(G<80.0 || d7 <= 0.01 || Ep100 < 1.0) 
+  double d7=0.0;
+  double tv=0.0;
+
+  if (Eco<=2.0) Eco = rnd->Uniform(3.0,10.0);
+  if(m_Type==1) 
     {
-      Ep100 = TMath::Max(1.0,ep/100.0);
-      if(m_Type==1)
-	{
-	  tv     = pow(10.0,rnd->Gaus(-1.,0.5)); // short bursts
-	  if(Ep100==0) Ep100 = 7.0;
-	}
-      else
-	{
-	  tv   = pow(10.0,rnd->Gaus(1.5,0.5)); //long burts
-	  if(Ep100==0) Ep100 = 3.0;
-	}
-      r0    =  2.0 * cst::c * tv;
-      r10   =   r0 * 1.0e-10;
-
-      if(EcoFlag) Eco = rnd->Uniform(2.0,10.0);
-      
-      G   =  40.5 * Eco;
-      d7  =  13.6 * E52 * ab3 * pow(ae3,4.0)/(pow(Eco,4.0)*pow(Ep100*tv,2.0));
-      dr0 =   1e7 * d7;
-      g100=G/100.0;  
-
-      Ep100 = 3.63*sqrt(E52*ab3/d7)*pow(ae3,2.)/(r10*pow(g100,2));    
-      if(DEBUG) std::cout<<G<<" "<<d7<<" "<<Ep100<<" "<<Eco<<std::endl;
-           
+      tv  = m_Duration;
+      if(ep==0) ep = pow(10.,log10(235.0)+log10(1.75) * rnd->Gaus());
     }
-  ep = 100.0*Ep100;
-
+  else          
+    {
+      //tv = rnd->Uniform(GetDuration()/50.0,GetDuration()/2.0);
+      tv  = TMath::Max(m_Duration/50.0,pow(10.0,rnd->Gaus(0.0,0.5))); ///FWHM @ 20ke
+      if(ep==0) ep = 0.5 * pow(10.,log10(235.0)+log10(1.75) * rnd->Gaus());
+    }
+  
+  //  if(ep==0) ep = pow(10.,log10(235.0)+log10(1.75) * rnd->Gaus());
+  //////////////////////////////////////////////////
+  G   =  40.5 * Eco;
+  g100=G/100.0;
+  
+  Ep100 = ep/100.0;
+  d7  =  13.6 * E52 * ab3 * pow(ae3,4.0)/(pow(Eco,4.0)*pow(Ep100*tv,2.0)*pow(cst::csi,4.0));
+  dr0 =   1e7 * d7;
+  
+  r0    =  2.0 * cst::c * tv;
+  r10   =   r0 * 1.0e-10;
+  
+  //////////////////////////////////////////////////
   /*
-    if(Ep100==0)
-    {
-    if(Eco==0)
-    {
-    g100 = rnd->Uniform(1.0,2.0);
-    d7   = rnd->Uniform(0.0,1.0);
-    G=100.0*g100;
-    dr0=1e7*d7;
-    }
-    else
-    {
-    G = 40.5 * Eco;
-    g100=G/100.0;
-    d7   = rnd->Uniform(0.0,1.0);
-    dr0=1e7*d7;
-    }
-    }
-    else
-    {
-    if(Eco==0)
-    {
-    d7   = rnd->Uniform(0.0,1.0);
-    dr0=1e7*d7;
+    bool EcoFlag = (Eco<=2.0) ? true : false;
     
-    G = 77.8 * pow(E52*ab3/d7,1./4.)*ae3/sqrt(Ep100*tv);
-    g100=G/100.0;
+    double Ep100 = ep/100.0;
+    
+    while(G<80.0 || d7 <= 0.1 || Ep100 < 1.0) 
+    {
+    double Ep100 = ep/100.0;
+    tv     = pow(10.0,rnd->Gaus(-1.0,0.5)); ///FWHM @ 20keV 
+    //      ep     = log10(235.0)+log10(1.75) * rnd->Gaus();
+    if(Ep100==0) Ep100 = 2.35; //short
+
+    if(m_Type==1)
+    {
+    if(Ep100==0) Ep100 = 2.35; //short
     }
     else
     {
-    G = 40.5 * Eco;
-    d7=13.6*E52*ab3*pow(ae3,4.0)/(pow(Eco,4.0)*pow(Ep100*tv,2.0));
-    dr0=1e7*d7;
-    g100=G/100.0;
+    if(Ep100==0) Ep100 = 3.0; // long
     }
+    
+    
+    r0    =  2.0 * cst::c * tv;
+    r10   =   r0 * 1.0e-10;
+    
+    if(EcoFlag) Eco = rnd->Uniform(2.0,10.0);
+    
+    G   =  40.5 * Eco;
+    d7  =  13.6 * E52 * ab3 * pow(ae3,4.0)/(pow(Eco,4.0)*pow(Ep100*tv,2.0));
+    dr0 =   1e7 * d7;
+    g100=G/100.0;  
+    
+    
+    Ep100 = 3.63*sqrt(E52*ab3/d7)*pow(ae3,2.)/(r10*pow(g100,2));    
+    
     }
-  G = 40.5 * Eco;
-  d7=13.6*E52*ab3*pow(ae3,4.0)/(pow(Eco,4.0)*pow(Ep100*tv,2.0));
-  dr0=1e7*d7;
-  g100=G/100.0;  
-  
-  Ep100=3.63*sqrt(E52*ab3/d7)*pow(ae3,2.)/(r10*pow(g100,2));
+  */
   ep = 100.0*Ep100;
-
-  */  
-  
   
   if(DEBUG) 
     std::cout<<"Expected Ep= "<<ep<<" Gamma = "<<G<<" Ecut-off : "<<G/40.5<<" GeV, Rsh = "<<r0*G*G<<" tv "<<tv<<std::endl;
@@ -341,7 +317,7 @@ void Parameters::ComputeParametersFromFile(std::string paramFile, int NGRB)
   //  SetInitialThickness(dr0);
   //  SetNshell(nshell);
   //  SetInverseCompton(ic);
-  SetParameters(fluence,nshell,etot,r0,dr0,gmin,gmax,ic);
+  SetParameters(fluence,etot,r0,dr0,gmin,gmax,ic);
 
 }
 
@@ -349,11 +325,11 @@ void Parameters::PrintParameters()
 {
   std::cout<<"--------------------------------------------------"<<std::endl;
   std::cout<<"-GRB NUMBER :  ---------------> "<<m_GRBnumber<<std::endl;
-  std::cout<<" Nshell                      = "<<m_Nshell<<std::endl;
+  std::cout<<" Duaration (T90)             = "<<m_Duration<<" s "<<std::endl;
   std::cout<<" Etot                        = "<<m_Etot<<" Erg "<<std::endl;
-  std::cout<<" Fluence in the Batse Range  = "<<m_Fluence<<std::endl;
-  std::cout<<" Initial Separation          = "<<m_InitialSeparation<<std::endl;
-  std::cout<<" Initial Thickness           = "<<m_InitialThickness<<std::endl;
+  std::cout<<" Fluence in the Batse Range  = "<<m_Fluence<<" erg/cm^2/s"<<std::endl;
+  std::cout<<" Initial Separation          = "<<m_InitialSeparation<<" cm"<<std::endl;
+  std::cout<<" Initial Thickness           = "<<m_InitialThickness<<" cm"<<std::endl;
   std::cout<<" Minimum Lorentsz Factor     = "<<m_Gmin<<std::endl;
   std::cout<<" Maximum Lorentsz Factor     = "<<m_Gmax<<std::endl;
   std::cout<<" Inverse Compton Parameter   = "<<m_InverseCompton<<std::endl;

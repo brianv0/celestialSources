@@ -7,25 +7,25 @@
 
 using namespace cst;
 
-GRBShell::GRBShell(double g, double r, double dr, double e, double t)
+GRBShell::GRBShell(double g, double r, double dr, double e)
 {
   m_g  = g;
   m_r  = r;
   m_dr = dr;
   m_e  = e;
   m_m  = e/(g*c2);
-  m_t  = t;
+  //  m_t  = t;
   m_b=sqrt(1.0 - 1.0/(m_g*m_g));
 }
 
-GRBShell::GRBShell(double g, double r, double dr, double e, double m, double t)
+GRBShell::GRBShell(double g, double r, double dr, double e, double m)
 {
   m_g  = g;
   m_r  = r;
   m_dr = dr;
   m_e  = e; 
   m_m  = m;
-  m_t  = t;
+  //  m_t  = t;
   m_b=sqrt(1.0 - 1.0/(m_g*m_g));
 }
 
@@ -35,13 +35,12 @@ void GRBShell::Evolve(double t)
   //  m_dr += c * GetBeta() * t;
 }
 //////////////////////////////////////////////////
-double GRBShell::GetVolume(double time)
+double GRBShell::GetVolume()
 {
-  double r = GetRadius(time);
-  return 4.*cst::pi*r*r*m_dr;
+  return 4.*cst::pi * m_r * m_r * m_dr;
 }  
 
-double GRBShell::GetComPartDens(double time) 
+double GRBShell::GetComPartDens() 
 {
-  return (m_e * cst::erg2meV)/(m_g*cst::mpc2)/GetComovingVolume(time); //1/cm^3
+  return (m_e * cst::erg2meV)/(m_g*cst::mpc2)/GetComovingVolume(); //1/cm^3
 }

@@ -81,13 +81,13 @@ TH2D* GRBSim::Fireball()
     }
 
   //  int i=1;
-  double shift =0.0;// Shocks.front()->GetTime() + 2.0*meanDuration;//3.*Shocks.front()->GetDuration();
+  static const double shift =0.0;// Shocks.front()->GetTime() + 2.0*meanDuration;//3.*Shocks.front()->GetDuration();
   m_tfinal = Shocks.back()->GetTime() + meanDuration + shift + max_tqg;
 
-  Tbin     = TMath::Max(10,int(m_tfinal/MinDT));
+  Tbin     = TMath::Max(100,int(m_tfinal/MinDT));
   if(!m_params->GenerateGBM())
     {
-      Tbin     = TMath::Max(10,int(50*m_tfinal));
+      Tbin     = TMath::Max(100,int(m_tfinal/MinDT));
       Tbin     = TMath::Min(5000,Tbin);  
     }
   if(DEBUG)  
@@ -100,17 +100,23 @@ TH2D* GRBSim::Fireball()
   m_Nv->SetName(name.c_str());
   
   double t = 0.0;
+  double energy,tqg;
+  
   for(int ti = 0; ti<Tbin; ti++)
     {
       t = ti*dt;
       for(int ei = 0; ei < Ebin; ei++)
 	{
 	  double nv = m_Nv->GetBinContent(ti+1, ei+1);
+	  energy = m_params->rnd->Uniform(e[ei],e[ei+1]);
+	  tqg    = t-shift-energy*dtqg;
+	  
 	  for (int i = 0; i< nshocks; i++)
 	    {
 	      GRBShock *ashock = Shocks[i];
-	      double energy = m_params->rnd->Uniform(e[ei],e[ei+1]);
-	      nv += ashock->ComputeFlux(t-shift-energy* dtqg,energy);
+	      //energy = m_params->rnd->Uniform(e[ei],e[ei+1]);
+	      //tqg = t-shift-energy*dtqg
+	      nv += ashock->ComputeFlux(tqg,energy);
 	    }
 	  m_Nv->SetBinContent(ti+1, ei+1, nv);
 	  // [ph/(cm² s keV)]
@@ -132,15 +138,6 @@ TH2D* GRBSim::Fireball()
 	}  
     }
   double norm = F*1.0e-3/(erg2meV); //erg/cm²  
-  /*
-    if (norm<1e-20) 
-    {
-    m_fluence =  m_params->GetBATSEFluence();
-    m_params->SetFluence(m_fluence);
-    delete[] e;
-    return Fireball();
-    }
-  */
   /////////////////////////////////////////////////////////////
   //         IMPORTANT m_Nv has to  be in [ph/(m² s keV)]    //
   //////////////////////////////////////////////////

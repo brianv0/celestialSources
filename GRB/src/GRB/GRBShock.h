@@ -69,8 +69,8 @@ class GRBShock
   double tsh;
   double eff;
   double gf,ei,ef,mf, eint_o,eint_c,rf,drf;
-  double nsh,gsh,B;
-  double ta,tc;
+  double nsh,esh,gsh,B;
+  double ta,tar,tc;
   double Es0,ts0;
   double gem,gec,geM;
   double m_p;

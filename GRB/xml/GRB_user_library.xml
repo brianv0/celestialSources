@@ -10,7 +10,7 @@
     <!-- - The Third parameter is the minimum energy for sampled photons (MeV) -->     
     <source name="GRB">
       <spectrum escale="MeV"> 
-        <SpectrumClass name="GRBmanager" params="10,86400,30.0"/>
+        <SpectrumClass name="GRBmanager" params="1000,86400,30.0"/>
         <use_spectrum frame="galaxy"/> 
       </spectrum> 
     </source>
@@ -21,7 +21,7 @@
     </spectrum> </source>
 
     <source name=" GRB_DC2 ">
-        <spectrum escale="MeV"> <SpectrumClass name="GRBmanager" params="1000, 1000, 30"/>
+        <spectrum escale="MeV"> <SpectrumClass name="GRBmanager" params="100000, 259200, 30"/>
         <use_spectrum frame="galaxy"/> 
     </spectrum> </source>
 

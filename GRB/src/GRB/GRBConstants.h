@@ -25,8 +25,10 @@ namespace cst
   static const Double_t mec2  = 0.510999;       //MeV
   static const double st      = 6.65225e-25;
   
-  const double ab = 0.3;
-  const double ae = 0.3; 
+  const double ab  = 0.3;
+  const double ae  = 0.3; 
+
+  const double csi = 0.1; 
 
   const double emin =  10.0; //keV
   const double emax =  1e9;  //keV
@@ -54,19 +56,19 @@ class Parameters
  public:
   Parameters();
   ~Parameters(){ delete rnd;}
-  int    GetNshell() {return m_Nshell;}
-  double GetFluence(){return m_Fluence;}
-  double GetEtot()   {return m_Etot;}
-  double GetInitialSeparation(){return m_InitialSeparation;}
-  double GetInitialThickness() {return m_InitialThickness;}
-  double GetGammaMin(){return m_Gmin;}
-  double GetGammaMax(){return m_Gmax;}
-  double GetInverseCompton() {return m_InverseCompton;}
-
+  inline double GetFluence(){return m_Fluence;}
+  inline double GetDuration(){return m_Duration;}
+  inline double GetEtot()   {return m_Etot;}
+  inline double GetInitialSeparation(){return m_InitialSeparation;}
+  inline double GetInitialThickness() {return m_InitialThickness;}
+  inline double GetGammaMin(){return m_Gmin;}
+  inline double GetGammaMax(){return m_Gmax;}
+  inline double GetInverseCompton() {return m_InverseCompton;}
+  
   double GetBATSEFluence();
+  double GetBATSEDuration();
   
   void SetGalDir(double l, double b);
-  void SetNshell(int nshell);
   void SetFluence(double fluence);
   void SetEtot(double etot);
   void SetInitialSeparation(double initialSeparation);
@@ -77,7 +79,6 @@ class Parameters
   void ReadParametersFromFile(std::string paramFile, int NGRB=1);
   void ComputeParametersFromFile(std::string paramFile, int NGRB=1);
   void SetParameters(double fluence, 
-		     int nshell, 
 		     double etot, 
 		     double r0, 
 		     double dr0, 
@@ -97,9 +98,7 @@ class Parameters
       return rnd->Uniform(gmin,gmax);
     }
   void SetGRBNumber(UInt_t GRBnumber);
-  //  double GetNextPeak();
-  //  inline   double GetTau(){return m_Tau;}
-
+  
   TRandom *rnd; 
 
  private:
@@ -107,7 +106,7 @@ class Parameters
   bool m_GBM;
   UInt_t m_GRBnumber;
   int m_Type;
-  int    m_Nshell;
+  double m_Duration;
   double m_Gmin;
   double m_Gmax ;
   double m_Fluence;

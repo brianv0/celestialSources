@@ -519,7 +519,6 @@ void ScanParameters(int Ngrb)
   //////////////////////////////////////////////////
   // INPUT:
   UInt_t GRBN;
-  int    Nshell;
   double Fluence,Etot,r0,dr0,gmin,gmax, ic;
   // OUTPUT
   double T90;
@@ -530,7 +529,7 @@ void ScanParameters(int Ngrb)
   TTree *GRBTree = new TTree("GRBTree","GRB Catalogue");
   GRBTree->Branch("GRBN",&GRBN,"/i");
   GRBTree->Branch("LogFluence",&Fluence,"LogFluence/D");
-  GRBTree->Branch("Nshell",&Nshell,"Nshell/I");
+  //  GRBTree->Branch("Nshell",&Nshell,"Nshell/I");
   GRBTree->Branch("LogEtot",&Etot,"LogEtot/D");
   GRBTree->Branch("LogR0",&r0,"LogR0/D");
   GRBTree->Branch("LogDr0",&dr0,"LogDr0/D");
@@ -569,7 +568,7 @@ void ScanParameters(int Ngrb)
       GRBSim m_grb(params);
       TH2D *Nv = m_grb.Fireball();
       
-      Nshell  = params->GetNshell();
+      //Nshell  = params->GetNshell();
       Fluence = log10(params->GetFluence());
       Etot    = log10(params->GetEtot());
       r0      = log10(params->GetInitialSeparation());
@@ -760,7 +759,7 @@ void help()
   std::cout<<"  -grb [N] processes the N grb in the $GRBROOT/src/test/GRBParam.txt file "<<std::endl;
   std::cout<<"  -scan [N] process N GRBs, starting from the first. No video out. "<<std::endl;
   std::cout<<"            It save a root file named GRBCatalog.root"<<std::endl;
-  std::cout<<"  -gbm      Fit the GBM spectrum with as Band function, as afunction of the time"<<std::endl;
+  std::cout<<"  -band     Fit the GBM spectrum with as Band function, as afunction of the time"<<std::endl;
   std::cout<<"--------------------------------------------------"<<std::endl;
 
 }

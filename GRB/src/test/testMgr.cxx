@@ -10,7 +10,7 @@
 #include <algorithm>
 
 ISpectrumFactory & GRBmanagerFactory();
-ISpectrumFactory & GRBobsFactory();
+//ISpectrumFactory & GRBobsFactory();
 
 static int default_count = 10 ;
 //Testing
@@ -51,7 +51,7 @@ void listSpectra() {
 void flux_load() 
 {
   GRBmanagerFactory();
-  GRBobsFactory();
+  //  GRBobsFactory();
 }
 
 void galacticTest(FluxMgr* fm, std::string sourceName,double count){
