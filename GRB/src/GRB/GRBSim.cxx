@@ -28,7 +28,7 @@ TH2D* GRBSim::Fireball()
     m_GRBengine->CreateShocksVector();
   int nshocks = (int) Shocks.size();
   int i=1;
-  while(Shocks[nshocks-i]->GetEfficiency()<1e-5)
+  while(Shocks[nshocks-i]->GetEfficiency()<1e-4)
     { 
       i++;
     }
@@ -81,10 +81,10 @@ TH2D* GRBSim::Fireball()
     cout<<nph->Integral(0,Tbin,ei1,ei2,"width")*(1.0e-7)/(dt*erg2meV)<<endl; //erg/cm²
   */    
   
-  
-  for(int i =0; i<(int) Shocks.size();i++)
+  /*
+    for(int i =0; i<(int) Shocks.size();i++)
     delete Shocks[i]; 
-  
+  */
   
   delete nph;
   SaveNv(m_Nv);

@@ -96,7 +96,7 @@ class Parameters
   double GetLESI();
   double GetHESI();
   
-
+  void SetGalDir(double l, double b);
   void SetNshell(int nshell);
   void SetFluence(double fluence);
   void SetEtot(double etot);
@@ -105,9 +105,13 @@ class Parameters
   void SetGammaMin(double gmin);
   void SetGammaMax(double gmax);
   void SetInverseCompton(double ic);
-  void ReadParametersFromFile(std::string paramFile);
+  //  void ReadParametersFromFile(std::string paramFile);
+  int ReadParametersFromFile(std::string paramFile, int NGRB=1);
+
   void PrintParameters();
   inline long GetGRBNumber(){return m_GRBnumber;}
+  inline std::pair<double,double> GetGalDir(){return m_GalDir;}
+
   inline void SetGRBNumber(long GRBnumber)
     {
       m_GRBnumber = GRBnumber;
@@ -125,8 +129,7 @@ class Parameters
   double m_InitialThickness ;
   double m_InverseCompton ;
   long   m_GRBnumber;
-
-  
+  std::pair<double,double> m_GalDir;
 };
 
 #endif

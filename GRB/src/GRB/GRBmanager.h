@@ -93,6 +93,7 @@ class GRBmanager : public ISpectrum
   double m_startTime;
   double m_endTime;
   double m_nextBurst;
+  int    m_Nbursts;
   Parameters *m_par;
 };
 #endif

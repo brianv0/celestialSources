@@ -4,13 +4,15 @@
 GRBmanager::GRBmanager(const std::string& params)
   : m_params(params)
 {
+  m_Nbursts=1;
   paramFile = "$(GRBROOT)/src/test/GRBParam.txt";
   facilities::Util::expandEnvVar(&paramFile);
  
   m_timeToWait  = TMath::Max(0.,parseParamList(params,1));
   m_par = new Parameters();
   //////////////////////////////////////////////////
-  m_par->ReadParametersFromFile(paramFile);
+  m_par->ReadParametersFromFile(paramFile,1);
+  
   m_par->PrintParameters();
   m_GRB      = new  GRBSim(m_par);
   m_spectrum = new  SpectObj(m_GRB->Fireball());
@@ -56,7 +58,8 @@ double GRBmanager::interval(double time)
       m_startTime = m_nextBurst;
       std::cout<<" NEW GRB : TIME "<<m_startTime<<std::endl;
       //////////////////////////////////////////////////
-      m_par->ReadParametersFromFile(paramFile);
+      m_Nbursts++;
+      m_par->ReadParametersFromFile(paramFile,m_Nbursts);
       m_par->PrintParameters();
       m_GRB      = new  GRBSim(m_par);
       m_spectrum = new  SpectObj(m_GRB->Fireball());

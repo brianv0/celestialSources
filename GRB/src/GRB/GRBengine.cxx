@@ -12,15 +12,11 @@ double Beta(double gamma)
 GRBengine::GRBengine(Parameters *params)
   : m_params(params)
 {
-  
-  double l = m_params->rnd->Uniform(180.0,-180.0);
-  double b = m_params->rnd->Uniform(90.0,-90.0);
-  
-  m_dir = std::make_pair(l,b);
+  m_dir = m_params->GetGalDir();
   
   std::cout<<" Create new GRB : "<<std::endl;
   std::cout<<" Seed           = "<<m_params->GetGRBNumber()<<std::endl;
-  std::cout<<" Position    : l="<<l<<", b = "<<b<<std::endl;
+  std::cout<<" Position    : l="<<m_dir.first<<", b = "<<m_dir.second<<std::endl;
   
 }
 
@@ -98,10 +94,10 @@ std::vector<GRBShock*> GRBengine::CreateShocksVector()
       //std::cout<<"Nshock = "<<Nshock<<" Nshell "<<N<<std::endl;
     }
   
-  /*
-    for(int i =0; i<(int) theShells.size();i++)
+  
+  for(int i =0; i<(int) theShells.size();i++)
     delete theShells[i];
-  */
+  
   
   std::sort(theShocks.begin(), theShocks.end(), ShockCmp());
   double T0 = theShocks[0]->GetTime();
