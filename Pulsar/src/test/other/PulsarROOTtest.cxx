@@ -74,9 +74,6 @@ void PlotPulsar(double enph = 0,char name[100]="pulsar.root")
   
   TH2D *Nv = Load(name); //Nv = ph/m2/s/keV
 
-  int ei2 = Nv->GetYaxis()->FindBin(EGRET2);
-  int ei3 = Nv->GetYaxis()->FindBin(EGRET3);
-
   // Ne =  [ph/m²/s/keV]
   gDirectory->Delete("Ne");
   Nv->ProjectionY("Ne");
@@ -152,7 +149,7 @@ void PlotPulsar(double enph = 0,char name[100]="pulsar.root")
   Lct_LAT->Scale((1e-4)/(DT*AreaDetector)); //ph/cm2/s
   //Extracted photons band
   TH1D *Lct_EXT = sp->Integral_E(enph,EMAX);  // ph
-  //Lct_EXT->Scale((1e-4)/(DT*AreaDetector)); //ph/cm2/s
+  
 
 
 
@@ -224,14 +221,15 @@ void PlotPulsar(double enph = 0,char name[100]="pulsar.root")
 	  
 	  Counts->Fill(energy); // ph
 	  Lc->Fill( time - (TMAX*int(time/TMAX)));       // ph
-	 
+	
+	  time+=Interval;
 	  std::cout<<" Time (s)  = "<<time
 		   << " within period = " << time - (TMAX*int(time/TMAX))
 		   <<" Flux (ph/s/m^2)  = "<<flux
 		   <<" energy (keV) = "<<energy
 		   <<" Interval (s) = "<<Interval<<std::endl;
 	 
-	  time+=Interval;
+	
 	  i++;
 	} 
       
@@ -283,6 +281,8 @@ void PlotPulsar(double enph = 0,char name[100]="pulsar.root")
       Lct_EXT->Scale(nLoops);
       Lct_EXT->Draw("same");
       Lc->Draw("elpsame");  
+      std::cout << " Photon expecteed : " << Lct_EXT->Integral(0,TBIN) << " ph " << std::endl;  
+
     } 
   else
     {
@@ -304,6 +304,9 @@ void PlotPulsar(double enph = 0,char name[100]="pulsar.root")
   std::cout << "       LAT band (" << LAT1 <<","<<LAT2<<")  = " 
 	    << Lct_LAT->Integral(0,TBIN)/TBIN << " ph/cm2/s" << std::endl;
   std::cout << "****-------------------------------------------------" <<std::endl;
+
+
+
 
 
   //  if(ExtractPhotons) std::cout<<" Flux[ erg/cm^2] EXT ("<<enph<<","<<EMAX<<")  = "<<Fv->Integral(iEXP,EBIN,"width")*1.0e-7/erg2meV<<" erg/cm^2"<<std::endl;
@@ -333,7 +336,7 @@ int main(int argc, char** argv)
 
   
 
-
+  
   double Period  = 0.089; // s
   double flux = 9e-6; // ph/cm2/s
   int npeaks = 2;
@@ -341,7 +344,8 @@ int main(int argc, char** argv)
   double ppar2 = 8e6;
   double ppar3 = -1.62;
   double ppar4 = 1.7;
-    
+  
+
   //Crab Polar Cap vs Outer Gap
   /*
   double Period  = 0.033; // s
@@ -351,7 +355,7 @@ int main(int argc, char** argv)
   double ppar2 = 30e6;
   double ppar3 = -1.9;
   double ppar4 = 0.29; // 1.0 for outer
-  */
+  /*
 
   /*
   //Vela Polar Cap vs Outer 

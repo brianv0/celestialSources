@@ -62,7 +62,7 @@ TH2D* PulsarSim::PSRPhenom(double par1, double par2, double par3, double par4)
   //Set the Random engine.
 
   TRandom engine;
-  //engine->SetSeed(time(NULL));
+  //engine.SetSeed(time(NULL));
   engine.SetSeed(43242);
   
   // LightCurve generation:
@@ -70,35 +70,41 @@ TH2D* PulsarSim::PSRPhenom(double par1, double par2, double par3, double par4)
 
   ampl1 = engine.Uniform();
   while (ampl1 < 0.1)  ampl1 = engine.Uniform();
+  
   ampl2 = engine.Uniform();
   while (ampl2 < 0.1)  ampl2 = engine.Uniform();
+  
 
   peak1 = engine.Uniform()*m_period; 
   fwhm1 = engine.Uniform()*m_period;
+
   while ((peak1 > 0.5*m_period)
-	 || (peak1 < (fwhm1*2))
-	 || (fwhm1 < (0.005*ampl1)))
+	 || (peak1 < (fwhm1*2)))
     {
       peak1 = engine.Uniform()*m_period; 
       fwhm1 = engine.Uniform()*m_period;
     }    
 
-
-
+  
   peak2 = engine.Uniform()*m_period; 
   fwhm2 = engine.Uniform()*m_period;
 
   while ((peak2 > (m_period-2*fwhm2))
-	 || (peak2 <(peak1+mindist))
-	 || (fwhm2 < (0.005*ampl2)))
+	 || (peak2 <(peak1+mindist)))
     {
       peak2 = engine.Uniform()*m_period; 
       fwhm2 = engine.Uniform()*m_period;
     }
-  
+
+  if (fwhm1 < (0.01*m_period))
+    fwhm1 = 0.01*m_period;
+
+  if (fwhm2 < (0.01*m_period))
+    fwhm2 = 0.01*m_period;
 
 
   
+    
   //Remove first or second peak.
   if ((m_numpeaks == 1) || (m_numpeaks == 3))
     {
