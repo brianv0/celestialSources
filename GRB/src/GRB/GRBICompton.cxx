@@ -43,13 +43,13 @@ void GRBICompton::load(const double time,
 {
   if (time <= 0.){m_spectrumObj *= 0.; return;}
   
-  int type = 0; // 0 -> Power Law Approximation
-
+  int type = 2; // 0 -> Power Law Approximation
+  
   double ComovingTime; 
-
+  
   const double EnergyTransformation = (1.e+6*cst::mec2)*
     ( GAMMAF + sqrt(GAMMAF*GAMMAF+1.)*cos(angle) );
-    
+  
   //////////////////////////////////////////////////
   // Gamma e+-
   //////////////////////////////////////////////////
@@ -57,19 +57,19 @@ void GRBICompton::load(const double time,
   std::vector<double>   x  = m_spectrumObj.getEnergyVector(1./(EnergyTransformation));
   std::vector<double>   dx = m_spectrumObj.getBinVector(1./(EnergyTransformation));
   std::vector<double> fsyn(cst::enstep+1, 0.0);
- 
+  
   const double Psyn_0    = 4./3.*Umag(B)*cst::erg2MeV*cst::c*cst::st; //MeV/s      
   const double esyn_0    = (3.*cst::pi/8.)*(B/cst::BQ)*cst::mec2; //MeV
   const double Psyn_esyn = Psyn_0/esyn_0; //1/sec
   const double tau_0     = (cst::flagIC == 1.) ? cst::c*cst::st*N0/Vol : cst::flagIC; //1/s
   
-  if (type==0)
+  if (type==0) //Power law from Sari and Esin, astro-ph/0005253
     {
       std::vector<double>::iterator x1 = x.begin();
       std::vector<double>::iterator its = fsyn.begin();
       while(x1!=x.end()) 
 	{
-	  ComovingTime = comovingTime(time,GAMMAF,(*x1),distance_to_source);
+	  ComovingTime = comovingTime(time,GAMMAF,EnergyTransformation*(*x1),distance_to_source);
 	  //comoving time <0 means that dispersive effect delayed 
 	  //to much the photon at this energy bin
 	  if(ComovingTime<0){its++; x1++; continue;}
@@ -77,34 +77,115 @@ void GRBICompton::load(const double time,
 	  //em and ec are specific: the compton scattering is with the gamma_min electron only...
 	  double gc = cst::mec2/(Psyn_0*ComovingTime);
 	  gc = (gc <= 1. ? 1.+1.e-6 : gc);
-	  double em = 2.*pow(gamma_min,2.) *esyn_0*(pow(gamma_min,2.)-1.)/cst::mec2;
-	  double ec = 2.*pow(gc,2.)*esyn_0 *(pow(gc,2.)-1.)/cst::mec2;
-      
-	  double gKN     = sqrt((cst::mec2/esyn_0)/(2.*gamma_min)+1.);	  
-	  double gi      = sqrt(1. + (*x1/(2.*pow(gamma_min,2.)))*cst::mec2/esyn_0);
+	  double em = 4./3.*pow(gamma_min,2.) *esyn_0*(pow(gamma_min,2.)-1.)/cst::mec2;
+	  double ec = 4./3.*pow(gc,2.)*esyn_0 *(pow(gc,2.)-1.)/cst::mec2;
+	  double ekn= gc;
 	  
+	  //double gKN     = sqrt((cst::mec2/esyn_0)/(2.*gamma_min)+1.);	  
+	  // the gamma of the original electron is:
+	  double gi      = sqrt(1. + (3.*(*x1)*cst::mec2)/(4.*pow(gamma_min,2.)*esyn_0));
 	  double gi2     = pow(gi,2.);
 	  double Psyn    = Psyn_0*(gi2-1.); //MeV/s
+	  // The syn cooling time of the original electron is:
 	  double tsyn    = ((gi)*cst::mec2)/Psyn;
-	  double tsyn0    = (gamma_min*cst::mec2)/Psyn;
+	  
 	  double tcross  = dr/cst::c;
 	  double tau = tau_0;
 	  tau *= (tsyn<tcross)? tsyn: tcross;
 	  if(tau>1.) tau = 1.;
 	  
-	  double N_e;
-	  if (gi > gKN)  
-	    N_e = 0.0;
-	  else
-	    N_e = tau*N0;
+	  double N_e = (tau)*electronNumber(2.*gamma_min, gamma_min, gamma_max,
+					    dr, ComovingTime, Psyn_0, N0);
+	  
+	  if(*x1<ekn)
+	    (*its) = processFlux(*x1,ec,em);
+	  else 
+	    (*its) = 0.0;
+	  
+	  (*its++) *= N_e; // adim
+	  
+	  (x1++);
+	}
+    }
+  else if (type==1) // The electron have gamma_min, Low IC
+    {
+      std::vector<double>::iterator x1 = x.begin();
+      std::vector<double>::iterator its = fsyn.begin();
+      while(x1!=x.end()) 
+	{
+	  ComovingTime = comovingTime(time,GAMMAF,EnergyTransformation*(*x1),distance_to_source);
+	  //comoving time <0 means that dispersive effect delayed 
+	  //to much the photon at this energy bin
+	  if(ComovingTime<0){its++; x1++; continue;}
+	  
+	  //em and ec are specific: the compton scattering is with the gamma_min electron only...
+	  double gc = cst::mec2/(Psyn_0*ComovingTime);
+	  gc = (gc <= 1. ? 1.+1.e-6 : gc);
+	  
+	  
+	  double em = 4./3.*pow(gamma_min,2.) *esyn_0 *(pow(gamma_min,2.)-1.)/cst::mec2;
+	  double ec = 4./3.*pow(gamma_min,2.) *esyn_0 *(pow(gc,2.)-1.)/cst::mec2;
+	  double ekn= gamma_min;
+	  // gamma of the seed electron
+	  double gi      = sqrt(1. + (3.*(*x1)*cst::mec2)/(4.*pow(gamma_min,2.)*esyn_0));
+	  double gi2     = pow(gi,2.);
+	  double Psyn    = Psyn_0*(gi2-1.); //MeV/s
+	  double tsyn    = ((gi)*cst::mec2)/Psyn;
+	  double tcross  = dr/cst::c;
+	  double tau = tau_0;
+	  tau *= (tsyn<tcross)? tsyn: tcross;
+	  if(tau>1.) tau = 1.;
+	  
+	  
+	  double N_e = (tau)*electronNumber(2.*gamma_min, gamma_min, gamma_max,
+					    dr, ComovingTime, Psyn_0, N0);
+	  if(*x1<ekn)
+	    (*its) = processFlux(*x1,ec,em);
+	  else 
+	    (*its) = 0.0;
 
+	  (*its++) *= N_e; // adim
 	  
-	  (*its) = processFlux(*x1,ec,em);
+	  (x1++);
+	}
+    }
+  else if (type==2) // The electron have gc, High IC
+    {
+      std::vector<double>::iterator x1 = x.begin();
+      std::vector<double>::iterator its = fsyn.begin();
+      while(x1!=x.end()) 
+	{
+	  ComovingTime = comovingTime(time,GAMMAF,EnergyTransformation*(*x1),distance_to_source);
+	  //comoving time <0 means that dispersive effect delayed 
+	  //to much the photon at this energy bin
+	  if(ComovingTime<0){its++; x1++; continue;}
 	  
-	  if(ComovingTime <= tcross)
-	    N_e *= tsyn0/tcross*(1.-exp(-ComovingTime/tsyn0));
-	  else
-	    N_e *= tsyn0/tcross*(1.-exp(-tcross/tsyn0))*exp((tcross-ComovingTime)/tsyn0);
+	  //em and ec are specific: the compton scattering is with the gamma_min electron only...
+	  double gc = cst::mec2/(Psyn_0*ComovingTime);
+	  gc = (gc <= 1. ? 1.+1.e-6 : gc);
+	  
+	  
+	  double em = 4./3.*pow(gc,2.) *esyn_0 *(pow(gamma_min,2.)-1.)/cst::mec2;
+	  double ec = 4./3.*pow(gc,2.) *esyn_0 *(pow(gc,2.)-1.)/cst::mec2;
+	  double ekn= gc;
+	  double gi      = sqrt(1. + (3.*(*x1)*cst::mec2)/(4.*pow(gc,2.)*esyn_0));
+	  double gi2     = pow(gi,2.);
+	  double Psyn    = Psyn_0*(gi2-1.); //MeV/s
+	  double tsyn    = ((gi)*cst::mec2)/Psyn;
+	  double tcross  = dr/cst::c;
+	  double tau = tau_0;
+	  tau *= (tsyn<tcross)? tsyn: tcross;
+	  if(tau>1.) tau = 1.;
+	  
+
+	  double N_e = (tau)*electronNumber(2.*gamma_min, gamma_min, gamma_max,
+					    dr, ComovingTime, Psyn_0, N0);
+	  
+	  if(*x1<ekn)
+	    (*its) = processFlux(*x1,ec,em);
+	  else 
+	    (*its) = 0.0;
+	  
 	  (*its++) *= N_e; // adim
 	  
 	  (x1++);

@@ -35,16 +35,18 @@ double GRBSpectrum::flux(double time) const
 
 double GRBSpectrum::interval(double time)// const
 {
-  //  std::cout<<" Interval @ time "<<time<<std::endl;;
   double inter;
-  if(time<0) time=abs(time);
-  
   double tmax=m_grbsim->Tmax();
-  /// test to implement the right rate...
   double sum=0.0;         // Initialize the integral=0
+  double temp;
+  
+  if(time<=1.0e-9) time=1.0e-9;
+  temp=flux(time); // The m_spectrum is already computed from energySrc()
+  //std::cout<<" Interval @ time "<<time<<" Rate = "<<temp<<std::endl;
+  
+    /// test to implement the right rate...
   double t1=time;         // t1 is the integration variable...
-  double temp=flux(time); // The m_spectrum is already computed from energySrc()
-  double dt=1.0e-2;       // .. and dt is its integration step.
+  double dt=1.0e-3*tmax;       // .. and dt is its integration step.
   while (sum<1.0){ // It compute the integral of the rate...
     // The idea is to compute t1 for which the 
     // integral between time and t1 of the rate(t) dt =1.
@@ -56,11 +58,11 @@ double GRBSpectrum::interval(double time)// const
     if (temp<=1/tmax) temp=1/tmax; // Minumum rate...
     if (temp>=1.0/dt)  // the sum will be > 1, and I can stop the while loop...
       {
-	inter = t1-time+1.0/temp;
+  	inter = t1-time+1.0/temp;
 	break;
       }
     else
-      {
+      { 
 	sum+=temp*dt; //...integrate...
 	t1+=dt;       // ... and  incrase the time...
 	temp=m_grbsim->IRate(m_grbsim->ComputeFlux(t1),

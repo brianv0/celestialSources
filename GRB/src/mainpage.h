@@ -1,9 +1,9 @@
- // $Header$
- // Mainpage for doxygen
-
  /*! \mainpage GRB Package: simulating a transient source
    
- This package contains the full simulation code for simulating a GRB and for using the output radiation as source for the Glast simulation.
+ This package contains three programs related to Gamma-Ray Bursts. The full physical simulator of GRB, based on the fireball model in the internal shocks configuration.
+
+The phenomenological simulator of GRB signal. And the algorithm describing the LAT alert.
+
  GRB is now defined as a Gaudi algorithm, and it can be dynamically loaded within FluxSvc. GRBSpectrum is an example of rapid transient flux, and can be used for studyng the capability of Glast in the observation of rapid transient signals.
  
  \section physics Very short introduction to the physical model

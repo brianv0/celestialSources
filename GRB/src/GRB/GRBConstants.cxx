@@ -2,10 +2,8 @@
 #include <stdio.h>
 #include <string>
 
-//#include <time.h>
 #include <ctime>
 
-//#include "src/FluxException.h" // defines FATAL_MACRO
 #include "GRBConstants.h"
 #include "facilities/Util.h"
 #include "CLHEP/Random/RandFlat.h"
@@ -19,7 +17,8 @@ GRBConstants::GRBConstants()
   ReadParam();
 }
 
-
+// To initialize the random number generator with a different seed each run, we use the clock time.
+// The seed can be also initialized to a given number.
 void GRBConstants::InitializeRandom(long seed)
 {
   HepRandom::setTheEngine(new RanluxEngine);
@@ -43,8 +42,8 @@ HepRandomEngine* GRBConstants::GetTheRandomEngine(long seed)
   InitializeRandom(seed);
   return HepRandom::getTheEngine();
 }
-
-int GRBConstants::ReadParam(){    
+// This method read tyhe parameter file, and sets all the private data members.
+int GRBConstants::ReadParam(){   
   char buf[100];
   std::string paramFile = "$(GRBROOT)/src/test/GRBParam.txt";
   facilities::Util::expandEnvVar(&paramFile);

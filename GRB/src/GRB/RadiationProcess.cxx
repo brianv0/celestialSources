@@ -56,12 +56,22 @@ double RadiationProcess::electronNumber(double gi,
   double gi2     = pow(gi,2.);
   double Psyn    = Psyn_0*(gi2-1.); //MeV/s
   double tsyn    = (gi*cst::mec2)/(Psyn);
-  double tcross  = (dr/cst::c)*(gamma_min/gi);
-  
-  if(ComovingTime < tcross)
-    N_e *= tsyn/tcross*(1.-exp(-ComovingTime/tsyn));
+  double tcross  = (dr/cst::c);//*(gamma_min/gi);
+  double tpeak   = tcross;
+  // Jay norris pulse shape:
+  //cout<<gi<<" "<<ComovingTime<<" "<<tpeak<<" "<<tcross<<" "<<tsyn<<endl;
+  if (ComovingTime > 2.*tpeak)
+    N_e=0.;
+  else if(ComovingTime < tpeak)
+    N_e *= (exp(-abs(ComovingTime-tpeak)/tsyn)-exp(-tpeak/tsyn))/(1.-exp(-tpeak/tsyn));
   else
-    N_e *= tsyn/tcross*(1.-exp(-tcross/tsyn))*exp((tcross-ComovingTime)/tsyn);
+    N_e *= (exp(-abs(ComovingTime-tpeak)/tsyn)-exp(-tpeak/tsyn))/(1.-exp(-tpeak/tsyn));
+  
+  // my pulse shape
+  //  if(ComovingTime < tcross)
+//      N_e *= tsyn/tcross*(1.-exp(-ComovingTime/tsyn));
+//    else
+//      N_e *= tsyn/tcross*(1.-exp(-tcross/tsyn))*exp((tcross-ComovingTime)/tsyn);
   
   return N_e;
 } 
@@ -69,10 +79,10 @@ double RadiationProcess::electronNumber(double gi,
 double RadiationProcess::timeShiftForDispersion(const double time, const double E, 
 						const double distance_to_source)
 {
-  const double E_QG = 1.e+19*1.e+3 / cst::mec2; //GeV->MeV->mc2 units
-  const double ksi = +1;
+  // R in eV; converted in GeV
+  const double E_QG = 1.e+28; //eV
+  const double ksi = 1.;
   double dispersion_factor = ksi * E/ E_QG;
-  
   double shifted_time = time - (distance_to_source / cst::c) * dispersion_factor;
   return shifted_time;
 }
@@ -82,8 +92,8 @@ double RadiationProcess::comovingTime(const double time,
 				      const double gamma, 
 				      const double E, const double D)
 {
-  bool disperse = false;
-  if(disperse)
+  //  bool disperse = false;
+  if(cst::flagQG)
     return gamma * timeShiftForDispersion(time,E,D);
   else 
     return gamma * time;
