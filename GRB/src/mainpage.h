@@ -121,20 +121,18 @@ Saving in both is also possible
 \param same as above, replacing \c GRBTestAlg with \c FluxAlg.
 - <a href="../../src/test/LatGRBAlertOptions.txt>LatGRBAlertOptions.txt</a>:
 \param same as above, with \c LatGRBAlertAlg as the driving algorithm, plus
-\param LatGRBAlertAlg.OutputLevel
-Sandhia. Default is 2.
 \param LatGRBAlertAlg.nbckoff
-Sandhia. Default is 5.
+Region threshold; determines when to start testing for false triggers. Default is 5.
 \param LatGRBAlertAlg.mix
-Sandhia. Default is 0.
+A value of 0 indicates that background mix has already been generated in file named by mixedFile field. Default is 0.
 \param LatGRBAlertAlg.grbFile
-Sandhia
+Name of file listing events data.
 \param LatGRBAlertAlg.backgroundFile
-Sandhia
+Name of file containing background data.
 \param LatGRBAlertAlg.grbOffsetTime
-Sandhia. Default is 0.
+Value to be used to offset events times. Default is 0.
 \param LatGRBAlertAlg.mixedFile
-Sadhia
+Name of file containing background mixed data.
 
 <hr>
 \section requirements CMT requirements
