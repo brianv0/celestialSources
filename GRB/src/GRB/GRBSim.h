@@ -21,7 +21,7 @@
 #include "GRBShock.h"
 #include "GRBConstants.h"
 #include "GRBengine.h"
-#include "SpectObj.h"
+#include "TH2D.h"
 #include <vector>
 
 #ifndef GRBSIM_H

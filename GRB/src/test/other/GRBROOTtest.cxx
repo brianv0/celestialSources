@@ -13,7 +13,7 @@
 #include "TGaxis.h"
 
 
-#include "../../GRB/SpectObj.h"
+#include "SpectObj/SpectObj.h"
 #include "../../GRB/GRBSim.h"
 #include "../../GRB/GRBConstants.h"
 
@@ -173,7 +173,7 @@ void PlotGRB(double enph = 0,char name[100]="grb_65540.root")
   else if (enph<EMIN)  enph = EMIN;
   
   //////////////////////////////////////////////////
-  SpectObj *sp = new SpectObj(Nv);              //ph/m² 
+  SpectObj *sp = new SpectObj(Nv,0);              //ph/m² 
   
   std::pair<float,float> dir = std::make_pair((float)0.0,(float)0.0);
   

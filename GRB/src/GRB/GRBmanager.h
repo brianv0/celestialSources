@@ -20,7 +20,7 @@
 #include "flux/ISpectrum.h"
 //#include "facilities/Observer.h"
 #include "GRBSim.h"
-#include "SpectObj.h"
+#include "SpectObj/SpectObj.h"
 
 #include "facilities/Util.h"
 
