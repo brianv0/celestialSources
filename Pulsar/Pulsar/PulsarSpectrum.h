@@ -38,6 +38,8 @@ class PulsarSpectrum : public ISpectrum
    * If not it returns the time to whait for the first photon of the next burst.
    */
   double interval(double time);
+  double getTurns(double time);
+  double retrieveNextTimeTilde( double tTilde, double totalTurns, double err );
   
   //! direction, taken from PulsarSim
   inline std::pair<double,double>
@@ -76,7 +78,7 @@ class PulsarSpectrum : public ISpectrum
   
   std::string m_PSRname;
   double m_RA, m_dec, m_l, m_b;  
-  double m_period, m_pdot, m_t0, m_phi0, m_f0, m_f1;
+  double m_period, m_pdot, m_p2dot, m_t0, m_phi0, m_f0, m_f1, m_f2;
   int m_numpeaks;
   int m_model;
   double m_flux, m_enphmin, m_enphmax;

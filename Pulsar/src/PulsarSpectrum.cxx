@@ -29,6 +29,7 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
   m_flux = 0.0;
   m_period = 0.0;
   m_pdot = 0.0;
+  m_p2dot = 3.0e-18;
   m_t0 = 0.0;
   m_phi0 = 0.0;
   m_model = 0;
@@ -90,6 +91,7 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
   
   m_f0 = 1.0/m_period;
   m_f1 = -m_pdot/(m_period*m_period);
+  m_f2 = 2*pow((m_pdot/m_period),2.0)/m_period - m_p2dot/(m_period*m_period);
   
  
   //Writing out Pulsar Info
@@ -146,34 +148,59 @@ double PulsarSpectrum::flux(double time) const
 
 double PulsarSpectrum::interval(double time)
 {  
-  double timeTilde = time + (StartMissionDateMJD - m_t0)*SecsOneDay;
-  if ((int(timeTilde) % 10000) < 3.0)
-    std::cout << "**  Time reached is: " << timeTilde << " seconds from Start " << std::endl;
+  double timeTilde = time + (StartMissionDateMJD)*SecsOneDay;
+  if ((int(timeTilde - (StartMissionDateMJD)*SecsOneDay) % 20000) < 2.0)
+    std::cout << "**  Time reached is: " << timeTilde-(StartMissionDateMJD)*SecsOneDay
+	      << " seconds from Mission Start " << std::endl;
   
-  if (m_pdot != 0.0) 
+  double initTurns = getTurns(timeTilde); //Turns made at this time 
+  double intPart; //Integer part
+  double tStart = modf(initTurns,&intPart)*m_period; // Start time for interval
+  double inte = m_spectrum->interval(tStart,m_enphmin); //deltaT (in system where Pdot = 0
+  double inteTurns = inte/m_period; // conversion to # of turns
+  double totTurns = initTurns + inteTurns; //Total turns at the nextTimeTilde
+  //std::cout <<  std::setprecision(30) << "**  Inte " << inte 
+  //    << " initTurns " << initTurns << " totTurns " << totTurns << std::endl;
+
+
+  double finPh =  modf(initTurns,&intPart);
+  finPh = modf(finPh + inteTurns,&intPart); //finPh is the expected phase corresponding to the nextTimeTilde
+  double nextTimeTilde = retrieveNextTimeTilde(timeTilde, totTurns, 1e-4);
+  //std::cout << std::setprecision(30) << "phCalc " << modf(getTurns(nextTimeTilde),&intPart) << " exp " << finPh << std::endl;
+  //std::cout << std::setprecision(30) << "       diff " << fabs(modf(getTurns(nextTimeTilde),&intPart)-finPh) << std::endl;
+
+
+  /* ///Cut the old code...
+
+   if (m_pdot != 0.0) 
     {
       // The exact formula is:
       //     time = (m_period/m_pdot)*log(1.0+(m_pdot/m_period)*(timeTilde)) + m_phi0*m_period;
       // but we use an approximation in order to avoid errors due to finite precision in log (1+e)
       // where e is of order of 10^-12. double has around 20 decimal positions.We use instead the 
       // expansion of log(1+x)
-      time = m_phi0*m_period;
-      for (int n=1; n<10; n++)
+       time = m_phi0*m_period;
+       for (int n=1; n<4; n++)
 	{
 	  time = time + ((m_period/m_pdot)*pow(-1,n+1)*pow(((m_pdot/m_period)*timeTilde),n))/n;
 	}
+      std::cout << std::setprecision(20) << "time with series " << time << std::endl;
+      double time1 = timeTilde -(m_pdot/(2*m_period))*timeTilde*timeTilde + (m_pdot*m_pdot)/(3*m_period*m_period)*(timeTilde*timeTilde*timeTilde);
+       time = time1;
+       std::cout << std::setprecision(20) << "time with 2 order " << time1 << std::endl;
+      std::cout << std::setprecision(20) << "diff " << time1-time << std::endl;
+
+
     } 
   else // Case of exact periodic pulsar (pdot = 0)
     {
       time = timeTilde + m_phi0*m_period;
     }
-
-
   //Get interval in the reference system where pdot = 0;
-  double nextTime = time + m_spectrum->interval((time - m_period*int(time/m_period)),m_enphmin);
+   double nextTime = time + m_spectrum->interval((time - m_period*int(time/m_period)),m_enphmin);
   double nextTimeTilde = 0.0;
 
-  if (m_pdot != 0.0) //Case of periodic pulsar
+   if (m_pdot != 0.0) //Case of periodic pulsar
     {
       // The exact formula is:
       //     nextTimeTilde = (m_period/m_pdot)*(exp((m_pdot/m_period)*(nextTime-m_phi0*m_period))-1.0);
@@ -182,7 +209,7 @@ double PulsarSpectrum::interval(double time)
       // expansion of exp(x)
  
       
-      for (int n=1; n<10;n++)
+      for (int n=1; n<3;n++)
 	{
 	  double fact = 1.0;
 	  for (int i = 0; i <n; i++) //compute factorial
@@ -202,16 +229,16 @@ double PulsarSpectrum::interval(double time)
   
   //This is the formula for the phase computation in the Pulsar Analysys tool. Here for comparison.
   double ph0 =  m_phi0 + m_f0*(timeTilde) +0.5*m_f1*(timeTilde)*(timeTilde);
-  double ph1 =  m_phi0 + m_f0*(nextTimeTilde) +0.5*m_f1*(nextTimeTilde)*(nextTimeTilde);
+   double ph1 =  m_phi0 + m_f0*(nextTimeTilde) +0.5*m_f1*(nextTimeTilde)*(nextTimeTilde);
   double intph0 = 0;
   double intph1 = 0;
 
   //The precision in time is set to usec
     
-  if ((timeTilde - (StartMissionDateMJD - m_t0)*SecsOneDay > 0.0)  //check if Dt is > of 10us
-      && ((fabs(modf(ph0,&intph0) - ((time -m_period*int(time/m_period))/m_period))*m_period) > 5.0e-5))
-    //  || ((fabs(modf(ph1,&intph1) - ((nextTime -m_period*int(nextTime/m_period))/m_period))*m_period) > 5.0e-5)))
-    {
+  //if ((timeTilde - (StartMissionDateMJD - m_t0)*SecsOneDay > 0.0)  //check if Dt is > of 10us
+  //  && ((fabs(modf(ph0,&intph0) - ((time -m_period*int(time/m_period))/m_period))*m_period) > 5.0e-5))
+	  //  || ((fabs(modf(ph1,&intph1) - ((nextTime -m_period*int(nextTime/m_period))/m_period))*m_period) > 5.0e-5)))
+  //  {
   
       std::cout << "\n\n** " <<  m_PSRname << " Warning: 2 Order Approx (LAT-ST pulsePhase): " <<std::endl; 
       std::cout << std::setprecision(20) << "\n**** t0~ = " << timeTilde  << " (RefStart="
@@ -232,14 +259,71 @@ double PulsarSpectrum::interval(double time)
   
       std::cout <<  std::setprecision(16)   << "**  ph1(th) : " << modf(ph1,&intph1) << " ph1(sim) : " 
 		<< ((nextTime -m_period*int(nextTime/m_period))/m_period)
-		<< " deltaPh1 " << fabs(modf(ph1,&intph1) - ((nextTime -m_period*int(nextTime/m_period))/m_period)) << std::endl;
+		<< " deltaPh1 " << fabs(modf(ph1,&intph1) - ((nextTime -m_period*int(nextTime/m_period))/m_period))  << std::endl;
       std::cout	<<  std::setprecision(16) <<   "     deltat1 " 
 		<<  m_period*fabs(modf(ph1,&intph1) - ((nextTime -m_period*int(nextTime/m_period))/m_period)) << " \n\n" << std::endl;
       
+      //}
+
+
+  */ // end of Cut...
+
+
+   return nextTimeTilde - timeTilde;
 }
 
-  return nextTimeTilde - timeTilde;
+/////////////////////////////////////////////
+double PulsarSpectrum::getTurns( double time )
+{
+  double dt = time - m_t0*SecsOneDay;
+  return m_phi0 + m_f0*dt + 0.5*m_f1*dt*dt + ((m_f2*dt*dt*dt)/6.0);
 }
+
+////////////////////////////////////////////
+double PulsarSpectrum::retrieveNextTimeTilde( double tTilde, double totalTurns, double err )
+{
+  //err = 1e-6;
+  double tStep = m_period;
+  double tempTurns = 0.0;
+  double tTildeHigh = 0.0;
+  double tTildeLow = tTilde;
+  //  std::cout << " Retrieving Period " << std::endl;
+  //  std::cout << std::setprecision(30) << " tTilde " << tTilde << " totalTurns " << totalTurns << " err " << err << std::endl;
+  //First part to find Extrema...
+
+  while (tempTurns < totalTurns)
+    {
+      tTilde = tTilde + tStep;
+      tempTurns = getTurns(tTilde);
+    }
+  tTildeHigh = tTilde;
+  //std::cout << "\n **First Iter: Low is " << tTildeLow << " High is " << tTildeHigh << " -->turns " << tempTurns <<std::endl;
+
+
+  //Iterative procedure to find the correct nextTime
+
+ tStep = (tTildeHigh-tTildeLow)/2;
+
+  while (fabs(tempTurns - totalTurns ) > err)
+    {
+
+      tTilde = tTildeLow+tStep;
+      tempTurns = getTurns(tTilde);
+      if ((tempTurns-totalTurns) > 0.0)
+	{
+	  tTildeHigh = tTilde;
+	}
+      else 
+	{
+	  tTildeLow = tTilde;
+	}
+      //   std::cout <<  std::setprecision(30) << " Low is " << tTildeLow << " High is " << tTildeHigh << " -->turns " << tempTurns <<std::endl;;
+      tStep = tStep/2;
+    }
+
+  return tTilde;
+}
+
 
 double PulsarSpectrum::energy(double time)
 {
