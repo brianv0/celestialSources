@@ -95,7 +95,7 @@ double MapCube::energy(double time) {
 
 double MapCube::mapValue(unsigned int i, unsigned int j, unsigned int k) {
    unsigned int indx = k*m_lon.size()*m_lat.size() + j*m_lon.size() + i;
-   return m_image[indx];
+   return m_image.at(indx);
 }
 
 void MapCube::readEnergyVector(const std::string & fitsFile) {

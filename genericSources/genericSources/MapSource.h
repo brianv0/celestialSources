@@ -62,7 +62,7 @@ public:
    virtual std::pair<double, double> dir(double energy);
 
    /// @return Integral over the map.
-   double mapIntegral() const {
+   virtual double mapIntegral() const {
       return m_mapIntegral;
    }
 
