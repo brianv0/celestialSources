@@ -178,8 +178,7 @@ TH1D *SpectObj::ComputeProbability(double enph)
 photon SpectObj::GetPhoton(double t0, double enph)
 {
   photon ph;
-  std::cout << "$$$ DEBUG time t0 is " << t0 << std::endl;
-
+  
   if (sourceType == 0 ) // Transient
     {
       double time   = 1.0e8; // > 1 year!
@@ -216,138 +215,84 @@ photon SpectObj::GetPhoton(double t0, double enph)
       delete P;  
     } else if (sourceType == 1) //Periodic //Max
       {
-	std::cout << "#### Using Periodic Source " << std::endl;
-	
+	double TimeToFirstPeriod = 0.0;
+	double TimeFromLastPeriod = 0.0;
+	int IntNumPer = 0;
+	double ProbRest = 0.0;
 	double InternalTime = t0 - Int_t(t0/tmax)*tmax; // InternalTime is t0 reduced to a period
 	TH1D *P = ComputeProbability(enph); //ph/m² 
-	double Ptot = P->GetBinContent(nt) - P->GetBinContent(1); //Total proability in a period 	
-	int IntNumPer = Int_t(1.0/Ptot); // Int number of period such that Ptot*NumPerPeriod <= 1
-	double ProbRest = 1 - IntNumPer*Ptot; //Probability rest after NumPerPeriod periods 
-
-
-	std::cout << " ## DeBUG - " << std::endl;
-	std::cout << " Total Probablity in 1 Per " << Ptot 
-		  << " Int # of Per " << IntNumPer << " Prest " << ProbRest << std::endl;
-
-
-	int tBinStart = Nv->GetXaxis()->FindBin(InternalTime);
-	if (tBinStart == 0) tBinStart = 1;
-	// if(tBinStart>=nt)  { tBinStart = 1;};
-	int t2 = tBinStart;
-	int t3 = tBinStart;
-	double CumulativeProb = 0.0; // Cumulative Probability
+	double Ptot = P->GetBinContent(nt) - P->GetBinContent(1); //Total proability in a period 
 	int ei  = TMath::Max(1,Nv->GetYaxis()->FindBin(enph));
-	double dp=0;
-	int tBinCurr = tBinStart+1;
-	int ElapsedPeriods = 0; //Complete Pulsar Periods elapsed after t0 
-	std::cout << "$$$$$$ DEBUGGING...  " << " Total bins " << nt << std::endl;
-	std::cout << "$$$$$$ t0 " << t0 
-		  << " | InternalTime " << InternalTime 
-		  << " | tBinStart " << tBinStart << std::endl;
-	std::cout << "$$$$$$ Ptot " << Ptot << " | ProbRest " << ProbRest 
-		  << " | NumPerProb " << IntNumPer << std::endl;
-	std::cout << "$$$$$$ t1 " << tBinStart << " | t2 " << t2 << " | t3 " << t3 << std::endl;
-	
-	while (CumulativeProb < 1.0)
+
+        //First checks if next photon lies in the same period
+	if (((P->GetBinContent(nt) - P->GetBinContent(Nv->GetXaxis()->FindBin(InternalTime))) < 1.0 ))
 	  {
-	    if (tBinCurr == (nt+1)) 
+	    TimeToFirstPeriod = tmax - InternalTime;
+	    // std::cout << "Time to first period " << TimeToFirstPeriod << std::endl;
+	  }
+	else
+	  {
+	    TimeToFirstPeriod = 0.0;
+	    std::cout << "Next Photon comes within the same period " << std::endl;
+	  }
+
+	// If not, proceed to find the integer number of period required to have Prob = 1
+	if (TimeToFirstPeriod != 0.0)
+	  {
+	    ProbRest = 1 - (P->GetBinContent(nt) - P->GetBinContent(Nv->GetXaxis()->FindBin(InternalTime)));
+	    //std::cout << "Computing Integer Periods , Now ProbRest is " << ProbRest << std::endl;
+	    IntNumPer = Int_t(ProbRest/Ptot);
+	    //std::cout << " Integer Number of Period is " << IntNumPer <<std::endl; 
+	  }
+	
+	// Then checks for the remnant part of the probability
+	if (IntNumPer > 0 )
+	  {
+	    ProbRest = ProbRest - IntNumPer*Ptot;
+	    // std::cout << "Computing Residual time , Now ProbRest is " << ProbRest << std::endl;
+            int tBinCurrent = 1;
+	    while ((P->GetBinContent(tBinCurrent) - P->GetBinContent(1)) < ProbRest ) 
 	      {
-		tBinCurr = 1;
-		ElapsedPeriods++;
-	      }
-	    CumulativeProb += (P->GetBinContent(tBinCurr) - P->GetBinContent(tBinCurr-1));
-	    //if ((tBinCurr % (nt) ) == 0) 	    
-	    //std::cout << "tBinCurr " << tBinCurr << " CumulProb " << CumulativeProb << std::endl;
-	    tBinCurr++;
+		tBinCurrent++;
+	      }	 
+	    TimeFromLastPeriod = TimeFromLastPeriod = Nv->GetXaxis()->GetBinCenter(tBinCurrent-1);
+	    ProbRest = ProbRest - (P->GetBinContent(tBinCurrent-1) - P->GetBinContent(1));
 	  }
-	
-	double timeToFirstPeriodEnd = tmax - InternalTime; //Time from Internal Time to End of Period
-	double timeFromLastPeriodStart = Nv->GetXaxis()->GetBinCenter(tBinCurr);
-	double dt = 0.0;
-	dt = timeToFirstPeriodEnd + timeFromLastPeriodStart + tmax*ElapsedPeriods;
-	
-	std::cout << " #########STOP " << std::endl;
-	std::cout << "tBinCurr " << tBinCurr << " CumulProb " << CumulativeProb << std::endl;
-	std::cout << "ElapsedPeriods " << ElapsedPeriods << std::endl;
-	std::cout << " timeToFirstPeriodEnd " << timeToFirstPeriodEnd <<std::endl;
-	std::cout << " timeFromLastPeriodStart " << timeFromLastPeriodStart <<std::endl;
-	std::cout << "---> dT " << dt << std::endl;
-	
-	
-	//La parte dell'energia rimane da calcolare, e da mettere il Pdot
-	
-	/* Da qui in giu' parte vecchia da levare.
-	double InternalTime = t0 - Int_t(t0/tmax)*tmax;
- 	TH1D *P = ComputeProbability(enph); //ph/m²
-	int t1 = Nv->GetXaxis()->FindBin(InternalTime);
-	if(t1>=nt)t1=1;
-	int t2 = t1;
-	int t3 = t1;
-	double Ptot = P->GetBinContent(nt) - P->GetBinContent(1);
-	int ei  = TMath::Max(1,Nv->GetYaxis()->FindBin(enph));
- 	double dp=0;
-	int Mperiod = Int_t(1.0/Ptot);
-	double tperiods = Ptot*tmax;
-	double Mrest = 1 - Mperiod*Ptot;
-	
-	  std::cout << "DEBUG Period pTot " << Ptot 
-	  << " Mperiod " << Mperiod 
-	  << "M*ptot < " << Mperiod*Ptot 
-	  << " Mrest " << Mrest << std::endl;
-	
-	while(dp < 1.0 - Mperiod*Ptot)
-	  {
-	    t2++;
-	     //      t3++;
-	    if(t2>nt) t2=1;
-	      double P0  = P->GetBinContent(t2)-P->GetBinContent(t1);
-	    double P1 = P->GetBinContent(nt)-P->GetBinContent(t1);
-	    double P2 = P->GetBinContent(t2)-P->GetBinContent(1);
-	    // std::cout << " P1 " << P1 << " P2 " << P2 << std::endl;
-	    //    double P1  = (Int_t((t3-1)/nt) > 0 ) ? Int_t((t3-1)/nt)*Ptot : 0; 
-	    dp = P1+P2;// + P1;
-	    //std::cout<<dp<<std::endl;
-	  } 
-	
-	//Int_t(t3/nt)*ptot*tmax;
-	//double dt = Int_t(t3/nt)*tmax + Nv->GetXaxis()->GetBinCenter(t2) - Nv->GetXaxis()->GetBinCenter(t1);
-	//  double dp = Int_t(t3/nt)*ptot + P->GetBinContent(t2) - P->GetBinContent(t1);
-	//  double dt = Int_t(t3/nt)*tmax+(Nv->GetXaxis()->GetBinCenter(t2) - Nv->GetXaxis()->GetBinCenter(t1));
-	double dt = Mperiod * tmax + (Nv->GetXaxis()->GetBinCenter(t2) - Nv->GetXaxis()->GetBinCenter(t1));
-	TH1D* Sp;
-	if(t1<t2) 
-	  {
-	    Sp = Integral_T(t1,t2,ei);
-	    Sp->Add(Integral_T(1,nt,ei),Int_t(t3/nt));
-	  }
-	else if(t1>t2) 
-	  {
-	    Sp = Integral_T(t1,t2,ei);
- 	     Sp->Scale(-1);
-	    Sp->Add(Integral_T(1,nt,ei),Int_t(t3/nt));
-	  }
-	else 
-	  {
-	    Sp = Integral_T(1,nt,ei);
-	    }
-	
-          */
 
-	ph.time   = t0 + dt;//dt/(dp+Mperiod*Ptot) + t0;
-	ph.energy = 1e5;//Sp->GetRandom();
-	std::cout<< "Delta t " << ph.time << " Energy  (KeV) " << ph.energy << std::endl;
+	//std::cout << " At End ProbRest is (should be 0 ) " << ProbRest << std::endl;
+
+	/*
+	std::cout << " First Step " << t0 
+		  << " to " << t0 + TimeToFirstPeriod 
+		  << " (" << TimeToFirstPeriod << ")" << std::endl;  
+	std::cout << " Second Step " << t0 + TimeToFirstPeriod 
+		  << " to " << t0 + TimeToFirstPeriod + IntNumPer*tmax 
+		  << " (" << IntNumPer*tmax << "," << IntNumPer << " periods)" << std::endl;  
+	std::cout << " Third Step " << t0 + TimeToFirstPeriod + IntNumPer*tmax 
+		  << " to " << t0 + TimeToFirstPeriod + IntNumPer*tmax + TimeFromLastPeriod 
+		  << " (" << TimeFromLastPeriod << ")" << std::endl;  
+	*/      
+	// Now evaluate the Spectrum Histogram
+ 	TH1D* Sp;
+	Sp = Integral_T(1,nt,ei);
+	Sp->Scale(IntNumPer*1.0);
+	Sp->Add(Sp,Integral_T(Nv->GetXaxis()->FindBin(TimeToFirstPeriod),nt,ei));	
+	Sp->Add(Sp,Integral_T(1,Nv->GetXaxis()->FindBin(TimeFromLastPeriod),ei));
+	
+ 	ph.time   = t0 + TimeToFirstPeriod + IntNumPer*tmax +TimeFromLastPeriod; 
+	ph.energy = Sp->GetRandom();
+	std::cout << " ====> NextTime " << ph.time
+		  << " | Energy " << ph.energy << " KeV " << std::endl;
+	delete Sp;
 	delete P;
       }
-
-  std::cout << "$$$ DEBUG NextTime is " << ph.time << std::endl;
-
   return ph;
 }
 
 void SpectObj::ScaleAtBATSE(double fluence)
 {
 
-  double BATSE1 = 20.0;    //20 keV
+  double BATSE1 = 20.0;    // 20 keV
   double BATSE2 = 1.0e+3;  // 1 MeV
   int ei1 = Nv->GetYaxis()->FindBin(BATSE1);
   int ei2 = Nv->GetYaxis()->FindBin(BATSE2);
