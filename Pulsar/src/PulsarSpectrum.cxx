@@ -150,7 +150,7 @@ double PulsarSpectrum::flux(double time) const
 double PulsarSpectrum::interval(double time)
 {  
   double timeTilde = time + (StartMissionDateMJD)*SecsOneDay;
-  if ((int(timeTilde - (StartMissionDateMJD)*SecsOneDay) % 20000) < 2.0)
+  if ((int(timeTilde - (StartMissionDateMJD)*SecsOneDay) % 20000) < 1.5)
     std::cout << "**  Time reached is: " << timeTilde-(StartMissionDateMJD)*SecsOneDay
 	      << " seconds from Mission Start " << std::endl;
   //std::cout << " 1 " << std::endl;
@@ -233,10 +233,16 @@ double PulsarSpectrum::retrieveNextTimeTilde( double tTilde, double totalTurns, 
       //std::cout <<  std::setprecision(30) << " Low is " << tTildeLow << " High is " << tTildeHigh << " -->turns " << tempTurns <<std::endl;;
       tStep = tStep/2;
       nIter++;
-      if (nIter == 400)
+      if (nIter == 50)
 	{
-	  std::cout << " Warning!! Amplyfing tolerance for convergence " << std::endl;
-	  err = err*10;
+	  //	  	  std::cout << std::setprecision(30) << " Warning!! Amplifying tolerance for convergence at time " 
+	  //		    << tTilde - (StartMissionDateMJD)*SecsOneDay << std::endl;
+	  //	  std::cout <<  std::setprecision(30) << " Low is " << tTildeLow << " High is " << tTildeHigh 
+	  //    << " -->turns " << tempTurns << "(total " << totalTurns << " ) " << std::endl;
+	  //std::cout << "    diff " << fabs(tempTurns-totalTurns) << " , err " << err << std::endl;
+	  //std::cout << " Error from " << err ; 
+	  err = err*5.0;
+	  //std::cout << " to " << err << " diff " << fabs(tempTurns-totalTurns) <<std::endl;
 	  nIter = 0;
 	}
     }
