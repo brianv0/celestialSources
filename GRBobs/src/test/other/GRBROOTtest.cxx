@@ -516,10 +516,14 @@ void MakeGRB(int NGRB=1, double enph=0, bool gbm=false)
   GRBobsParameters *params = new GRBobsParameters();  
   //////////////////////////////////////////////////
   params->ReadParametersFromFile(paramFile,NGRB);
+  
   GRBobsSim* m_grb = new GRBobsSim(params);
   m_grb->MakeGRB();
   m_grb->SaveNv();
-  if (gbm)  m_grb->GetGBMFlux();
+
+  char GRBname[100];
+  sprintf(GRBname,"%d",params->GetGRBNumber());
+  if (gbm)  m_grb->GetGBMFlux(GRBname);
   delete m_grb;
   char name[100];
   sprintf(name,"grbobs_%d.root",params->GetGRBNumber());

@@ -9,6 +9,7 @@
 #include "GRBobsConstants.h"
 #include "GRBobsPulse.h"
 #include "GRBobsengine.h"
+#include "TString.h"
 #include "TF1.h"
 #include "TH1D.h"
 #include "TH2D.h"
@@ -47,7 +48,9 @@ class GRBobsSim
   inline std::pair<double,double> GRBdir(){return m_GRBengine->GetDirection();}
   inline double Tmax(){return m_tfinal;}
   void SaveNv();
-  void GetGBMFlux();
+  void GetGBMFlux(TString GRBname);
+  void SaveGBMDefinition(TString GRBname, double ra, double dec, double theta, double phi, double tstart);
+
  private:
   
   //! Gathers all relevant constants for the simulation 

@@ -7,8 +7,10 @@
 #include "GRBobs/GRBobsPulse.h"
 
 #include "TFile.h"
-
 #include "TCanvas.h"
+#define DEBUG 0
+
+
 using namespace ObsCst;
 //////////////////////////////////////////////////
 GRBobsSim::GRBobsSim(GRBobsParameters *params)
@@ -148,77 +150,153 @@ void GRBobsSim::SaveNv()
 };
 
 //////////////////////////////////////////////////
-double BandObsF(double *var, double *par)
+void GRBobsSim::SaveGBMDefinition(TString GRBname, double ra, double dec, double theta, double phi, double tstart)
 {
-  // GRB function from Band et al.(1993) ApJ.,413:281-292
-  double a  = par[0];
-  double b  = par[1];
-  double E0 = pow(10.,par[2]);
-  double NT = pow(10.,par[3]);
-  
-  double E   = var[0];
-  double C   = pow((a-b)*E0/100.0,a-b)*exp(b-a);
-  double H   = (a-b) * E0;
-  if(E <= H) 
-    return NT *  pow(E/100.0,a) * exp(-E/E0);
-  return C* NT * pow(E/100.0,b); // ph cm^(-2) s^(-1) keV
+  TString name = "GRBOBS_";
+  name+=GRBname; 
+  name+="_DEF.txt";
+  std::ofstream os(name,std::ios::out);
+  os<<"BURST DEFINITION FILE"<<std::endl;
+  os<<"Burst Name"<<std::endl;
+  os<<GRBname<<std::endl;
+  os<<"RA,DEC (deg):"<<std::endl;
+  os<<ra<<" "<<dec<<std::endl;
+  os<<"S/C azimuth, elevation (deg):"<<std::endl;
+  os<<phi<<" "<<theta<<std::endl;
+  os<<"Trigger Time (s):"<<std::endl;
+  os<<tstart<<std::endl;
+  os.close();
 }
 
-void GRBobsSim::GetGBMFlux()
+double LogFBOBS(double *var, double *par)
 {
-  double *e = new double[Ebin +1];
-  for(int i = 0; i<=Ebin; i++)
-    {
-      e[i] = emin*pow(de,1.0*i); //keV
-    }
+  
+  // GRB function from Band et al.(1993) ApJ.,413:281-292
+  double a  = par[0];
+  double b  = par[0]+par[1];
+  
+  double LogE0     = par[2];
+  double LogNT     = par[3];
+  double LogE      = var[0];
+  static const double loge= log10(exp(1.));
+  double LogH,LogC; 
+  if((a-b)<=0) std::cout<<"WARNING"<<std::endl;
+  
+  //  if((a-b)>=1.0e-4)
+  //    {
+  LogH   = log10(a-b) + LogE0;  
+  LogC   = (a-b) * (LogH-2.0)-loge*pow(10.0,LogH-LogE0);
+  //    }
+  //  else
+  //    {
+  //      a=b+1.0e-4;
+  //      LogH  = -4.0 + LogE0;  
+  //      LogC  = 1.0e-4 * ((LogH-2.0)- loge);
+  //    }
+  
+  if(LogE <= LogH) 
+    return      LogNT + a * (LogE-2.0) - pow(10.0,LogE-LogE0)*loge; 
+  return LogC + LogNT + b * (LogE-2.0); // cm^(-2) s^(-1) keV^(-1) 
+}
+
+
+
+void GRBobsSim::GetGBMFlux(TString GRBname)
+{
+  //  double *e = new double[Ebin +1];
+  //  for(int i = 0; i<=Ebin; i++)
+  //    {
+  //      e[i] = emin*pow(de,1.0*i); //keV
+  //    }
   //////////////////////////////////////////////////
   // GBM Spectrum:
-  TF1 band("grb_f",BandObsF,emin,1.0e+4,4); 
-  band.SetParNames("a","b","Log10(E0)","Log10(Const)");
-  band.SetParameters(-1.0,-2.25,2.5,-3.0);
-  band.SetParLimits(0,-3.0,0.0);
-  band.SetParLimits(1,-10.0,0.0);
+  TF1 band("grb_f",LogFBOBS,log10(emin), 4.0, 4); 
+  band.SetParNames("a","b","logE0","Log10(Const)");
+ 
+  band.SetParLimits(0,-2.0 , 2.0); // a
+  band.SetParLimits(1,-3.0 , -0.001); // b-a; b < a -> b-a < 0 !
   band.SetParLimits(2,log10(emin),4.0);
-  band.SetParLimits(3,-10.0,3.0);
+  //  band.SetParLimits(3,-3.,3.);
+
   double a,b,E0,Const;
-  TH1D GBM("GBM","GBM",Ebin, e);
-  GBM.SetMinimum(1e-5);
-  GBM.SetMaximum(1e6);
-  double t=0;
-  double dt = m_Nv->GetXaxis()->GetBinWidth(1);
+  TH1D GBM("GBM","GBM",Ebin,log10(emin),log10(emax));
+  GBM.SetMinimum(5);
+  GBM.SetMaximum(-5);
+  
+  double t    = 0;
+  double dt   = m_Nv->GetXaxis()->GetBinWidth(1);
   double tbin = m_Nv->GetXaxis()->GetNbins();
-  std::ofstream os("GBM_spectrum.txt",std::ios::out);
-  os<<" t   Norm   alf   beta  E_p "<<std::endl;
+  
+  TString name = "GRBOBS_";
+  name+=GRBname; 
+  name+="_GBM.txt";
+  std::ofstream os(name,std::ios::out);
+  os<<"Sample Spectrum File "<<std::endl;
+  os<<tbin<<" bins"<<std::endl;
+  os<<"Norm   alf   beta  E_p "<<std::endl;
+  
+  if(DEBUG)
+    {
+      TCanvas *GBMCanvas;
+      GBMCanvas = new TCanvas("GBMCanvas","GBMCanvas",500,400);
+      std::cout<<"Norm   alf   beta  E_p "<<std::endl;
+      GBM.Draw();
+      
+    }
+  
+  a =  -1.00;
+  b =  -2.25;
+  
+  
   for(int ti = 0; ti<tbin; ti++)
     {
       t = ti*dt;
       for(int ei = 0; ei < Ebin; ei++)
 	{
-	  double nv = m_Nv->GetBinContent(ti+1, ei+1); // [ph/(m² s keV)]
-	  GBM.SetBinContent(ei+1, /*e[ei] * e[ei] */ nv * 1.0e-4); // [(ph)/(cm² s keV)]
+	  //	  double en = pow(10.0,GBM.GetBinCenter(ei+1));
+	  // Notice that Nv is in [ph/(m² s keV)]; nv is in [(ph)/(cm² s keV)]
+	  double nv = TMath::Max(1e-10,m_Nv->GetBinContent(ti+1,ei+1)); // [ph/( m² s keV)]
+	  nv = log10(nv)-4.0;                                           // [ph/(cm² s keV)]
+	  GBM.SetBinContent(ei+1 , nv);                                 // [ph/(cm² s keV)]
+	  GBM.SetBinError(ei+1 , nv/100.0);                             // arbitrary small error (1%)
 	}
-      GBM.Fit("grb_f","rq");
       
-      a=band.GetParameter(0);
-      b=band.GetParameter(1);
-      E0=pow(10.,band.GetParameter(2));
-      Const=pow(10.,band.GetParameter(3));
-      band.SetParameters(a,b,band.GetParameter(2),band.GetParameter(3));
-      //Ep=(a+2)*E0; 
-      os<<t<<" "<<Const<<" "<<a<<" "<<b<<" "<<E0<<" "<<std::endl;
-      //      std::cout<<t<<" "<<Const<<" "<<a<<" "<<b<<" "<<E0<<" "<<std::endl;
-      //band.Draw("same");
-      gPad->SetLogx();
-      gPad->SetLogy();
-      gPad->Update();
-      /*
-	TString gbmFlux= "GBMFlux";
-	gbmFlux+=ti;
-	gbmFlux+=".gif";
-	if(ti%10==0) gPad->Print(gbmFlux);
-      */
+      double LogC0  = GBM.GetBinContent(GBM.FindBin(2.0));
+      double LogEp0 = 2.0;
+
+      band.SetParameters(a,b-a,LogEp0,LogC0);
+      if(LogC0>-5) 
+	{
+	  if(DEBUG)
+	    GBM.Fit("grb_f","r");	  
+	  else 
+	    GBM.Fit("grb_f","nqr");	  
+	} 
+      else 
+	{
+	  band.SetParameters(-2.0,-3.0,LogEp0,-10.0);
+	}
+      
+      a  = band.GetParameter(0);
+      b  = a+band.GetParameter(1);
+      E0    = pow(10.,band.GetParameter(2));
+      Const = pow(10.,band.GetParameter(3));
+      double Ep=(2.0+a)*E0; 
+      os<<Const<<" "<<a<<" "<<b<<" "<<Ep<<" "<<std::endl;
+      
+      if(DEBUG)
+	{
+	  std::cout<<"t= "<<t<<" C= "<<Const<<" a= "<<a<<" b= "<<b<<" E0= "<<E0<<" Ep= "<<Ep<<std::endl;
+	  //gPad->SetLogx();
+	  //gPad->SetLogy();
+	  gPad->Update();
+	  //	  TString gbmFlux= "GBMFlux";
+	  //	  gbmFlux+=ti;
+	  //	  gbmFlux+=".gif";
+	  //	  if(ti%10==0) gPad->Print(gbmFlux);
+	}
     }   
   os.close();
   //////////////////////////////////////////////////
-  delete[] e;
+  //  delete[] e;
 }

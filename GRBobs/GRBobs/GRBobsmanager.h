@@ -13,6 +13,8 @@
 #define GRBobsmanager_H
 #include "GRBobsConstants.h"
 
+#include "TString.h"
+
 #include <vector>
 #include <string>
 #include <map>
@@ -60,19 +62,19 @@ class GRBobsmanager : public ISpectrum
   double interval(double time);
   
   //! direction, taken from GRBobsSim
-  inline std::pair<double,double>
-    dir(double energy) 
+  inline std::pair<double,double> dir(double energy) 
     {
-      return m_par->GetGalDir();
+      return m_GalDir;
     } 
-
+  
   double energy(double time);
   
   std::string title() const {return "GRBobsmanager";} 
   const char * particleName() const {return "gamma";}
   const char * nameOf() const {return "GRBobsmanager";}
-
+  TString GetGRBname(double time);
   void GenerateGRB();  
+  void DeleteGRB();  
 
   /*! 
     This method parses the parameter list
@@ -83,16 +85,24 @@ class GRBobsmanager : public ISpectrum
   double parseParamList(std::string input, int index);  
   
  private:
-  
-  SpectObj    *m_spectrum;
+  double m_Rest;
+  double m_Frac;
+  double m_ra;
+  double m_dec;
+  double m_theta;
+  double m_phi;
 
+
+  SpectObj    *m_spectrum;
   GRBobsSim   *m_GRB;
   GRBobsParameters  *m_par;
 
   const std::string& m_params;
   std::string paramFile;
-
+  std::pair<double,double> m_GalDir;
   bool m_grbGenerated;
+  bool m_grbdeleted;
+  bool m_GenerateGBMOutputs;
 
   double m_l;
   double m_b;

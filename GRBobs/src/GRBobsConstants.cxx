@@ -12,7 +12,7 @@ GRBobsParameters::GRBobsParameters()
   m_enph=emin;
 }
 
-//////////////////////////////////////////////////
+
 double GRBobsParameters::GetBATSEFluence()
 {
   return pow(10.0,rnd->Gaus(-5.4,0.62)); //erg/cm^2 (Long Burst)
@@ -24,7 +24,7 @@ void GRBobsParameters::SetGRBNumber(long GRBnumber)
 {
   m_GRBnumber = GRBnumber;
   rnd->SetSeed(m_GRBnumber);
-  rnd->Uniform();
+  double tmp = rnd->Uniform();
 }
 
 void GRBobsParameters::SetFluence(double fluence)
@@ -95,8 +95,8 @@ void GRBobsParameters::ReadParametersFromFile(std::string paramFile, int NGRB)
       std::cout<<"GRBobsConstants: Error Opening paramFile\n";
       exit(1);
     }
-  
-  int seed,NumberOfPulses;
+  double tstart;
+  int NumberOfPulses;
   double l0,b0,fluence,alpha,beta;
   
   char buf[100];
@@ -106,8 +106,7 @@ void GRBobsParameters::ReadParametersFromFile(std::string paramFile, int NGRB)
   
   while(i<=NGRB && f1.getline(buf,100))
     {
-      if(sscanf(buf,"%d %lf %lf %lf %d %lf %lf",
-		&seed,&l0,&b0,&fluence,&NumberOfPulses,&alpha,&beta)<=0) break;
+      if(sscanf(buf,"%lf %lf %d %lf %lf",&tstart,&fluence,&NumberOfPulses,&alpha,&beta)<=0) break;
       i++;
     } 
   i--;
@@ -121,15 +120,17 @@ void GRBobsParameters::ReadParametersFromFile(std::string paramFile, int NGRB)
       for(int j = 1; j<=(NGRB %i);j++)
 	{
 	  f2.getline(buf,100);
-	  sscanf(buf,"%d %lf %lf %lf %d %lf %lf",
-		 &seed,&l0,&b0,&fluence,&NumberOfPulses,&alpha,&beta);
+	  sscanf(buf,"%lf %lf %d %lf %lf",&tstart,&fluence,&NumberOfPulses,&alpha,&beta);
 	}
-      seed=NGRB;
       f2.close();
     }
-  SetGRBNumber(65540+ (long) seed);  
-  SetGalDir(l0,b0);
+  SetGRBNumber(65540+ (long) floor(tstart));  
   SetNumberOfPulses(NumberOfPulses);
   SetFluence(fluence);
   SetAlphaBeta(alpha,beta);
+  
+  SetMinPhotonEnergy(3e4); //keV
+  SetGalDir(-200,-200);
+  SetGRBNumber(65540+ (long) floor(tstart));  
+
 }

@@ -5,6 +5,7 @@ author Nicola Omodei<nicola.omodei@pi.infn.it>
 # $Id$
 
 use flux       v*
+use astro      v*
 use ROOT       v*  IExternal 
 use SpectObj   v* celestialSources
 
