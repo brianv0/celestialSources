@@ -10,14 +10,6 @@ use flux       *
 use ROOT       *  IExternal
 use GlastSvc   *  
 
-apply_pattern packageShr
-
-# This needs to be fixed (?)
-#=============================================================
-path_append LD_LIBRARY_PATH ${GRBROOT}/${BINDIR}
-path_append LD_LIBRARY_PATH ${FLUXSVCROOT}/${BINDIR}
-#=============================================================
-
 private
 
 use RootIo     * -no_auto_imports
@@ -28,16 +20,11 @@ apply_pattern package_headers
 apply_pattern package_stamps
 macro_append GRB_stamps " $(GRBDir)/GRBLib.stamp"
 
-
-# component library, with GRB, GRBmaker, GRBUtil, and LatGRBAlert
-macro_append GRB_headers 	""  \
-			  WIN32 "../xml/*.xml test/*.xml GRBmaker/*.h LatGRBAlert/*.h GRB/*.h"
-
 macro source "*.cxx" WIN32 "*.cxx *.h"
 
-library GRBLib 	$(source) \
-     -s=GRB $(source)\
-     -s=GRBmaker $(source)\
+library GRBLib -no_share $(source) \
+     -s=GRB         $(source)\
+     -s=GRBmaker    $(source)\
      -s=LatGRBAlert $(source)
 
 macro libs ""   WIN32 " $(GRBDir)/GRBLib.lib "
@@ -45,19 +32,21 @@ macro libs ""   WIN32 " $(GRBDir)/GRBLib.lib "
 macro GRB_linkopts "-L $(GRBDir) -lGRBLib" \
                        WIN32 ""
 
-macro_append ROOT_linkopts " -lHist  -lMatrix -lGraf -lGraf3d -lGpad "\ 
-      WIN32  ' libHist.lib libMatrix.lib  libGraf.lib libGraf3d.lib libGpad.lib'
-
+#  Component library with Dll only
 library GRB  Dll/*.cxx $(libs)
 
-macro GRB_extrastamps "$(GRBDir)/GRBLib.stamp"
+apply_pattern Llinkopts
 
-#
-#	Executables:	
-#
+apply_pattern ld_library_path
 
-# this executable provides visualization with ROOT at runtime
-#
+macro append GRB_stamps "$(GRBDir)/GRBLib.stamp"
+
+private
+macro_append ROOT_linkopts " $(ROOT_GUI_libs) "
+#WHY DO I NEED THAT NOW????
+macro_append ROOT_linkopts "-lGui -lGX11" \
+	             WIN32 "libGUI.lib "
+
 application test_GRBROOT  test/other/GRBROOTtest.cxx $(libs)
 
 apply_pattern package_test
