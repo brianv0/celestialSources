@@ -89,7 +89,7 @@ public:
   inline void setGal_b(double value)  {m_b=value;}
 
   //! Returns the time stored in DataOut 
-  inline double Time()   {return m_time;}
+  inline double Time() const  {return m_time;}
   //! Returns the energy stored in DataOut 
   inline double Energy() {return m_energy;}
   //! Returns phi stored in DataOut 
@@ -143,7 +143,7 @@ public:
     \param data2
     \retval bool true if data1.Time() < data2.Time()
   */
-  bool operator()(DataOut& data1, DataOut& data2)
+  bool operator()(const DataOut& data1, const DataOut& data2)
   {
     return data1.Time() < data2.Time();    
   }

@@ -259,7 +259,8 @@ const double ClusterData::jointLikelihood() const
     double denom = 0.52 * pow(0.30, -0.93) + 0.063;
     
     --sz;
-    for (long i=0; i<sz; ++i)
+    long i;
+    for (i=0; i<sz; ++i)
     {
         pdist += (log10(pdistValue(m_extractedClusterData[i].dist())));
         pdt   += (log10(pdtValue(clusterTimes[i+1] - clusterTimes[i])));

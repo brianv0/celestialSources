@@ -96,7 +96,7 @@ private:
 class timeCmp
 {
 public:
-    bool operator()(PhotonInfo &data1, PhotonInfo &data2)
+    bool operator()(const PhotonInfo &data1, const PhotonInfo &data2)
     {
         return data1.time() < data2.time();    
     }

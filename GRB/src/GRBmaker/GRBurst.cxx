@@ -7,6 +7,7 @@
 #ifdef WIN32
 #include <sstream>
 #else // gcc < 2.9.5.3 dosen't know <sstream>,stringstream
+#include <sstream>
 #include <strstream>
 #endif
 
@@ -287,9 +288,12 @@ std::string GRBurst::baseFilename(const std::string &prefix, const std::string &
     ind << grbcst::nbsim;
     int i = strlen(ind.str().c_str());
 #else
-    char *ind = new char(80);
-    sprintf(ind, "%ld", grbcst::nbsim);
-    int i = strlen(ind);
+    std::ostringstream ind;
+    ind << grbcst::nbsim;
+    int i = strlen(ind.str().c_str());
+    //    char *ind = new char(80);
+    //    sprintf(ind, "%ld", grbcst::nbsim);
+    //    int i = strlen(ind);
 #endif
     
     for (int j=0; j<i; ++j)
@@ -314,9 +318,12 @@ std::string GRBurst::outputFilename(const std::string &base, const long isim) co
     ind << isim;
     fname.replace(baseSize-strlen(ind.str().c_str()), baseSize-1, ind.str());
 #else
-    char *ind = new char(80);
-    sprintf(ind, "%ld", isim);
-    fname.replace(baseSize-strlen(ind), baseSize-1, ind);
+    std::ostringstream ind;
+    ind << isim;
+    fname.replace(baseSize-strlen(ind.str().c_str()), baseSize-1, ind.str());
+    //    char *ind = new char(80);
+    //    sprintf(ind, "%ld", isim);
+    //    fname.replace(baseSize-strlen(ind), baseSize-1, ind);
 #endif
     
     fname += ".lis";

@@ -1,9 +1,9 @@
 package GRB
 
-use FluxSvc
-use ROOT
-use RootIo
-use GlastSvc
+use FluxSvc    *
+use ROOT       *  IExternal
+use RootIo     *
+use GlastSvc   *  
 
 apply_pattern packageShr
 

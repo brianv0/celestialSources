@@ -138,7 +138,7 @@ private:
 class distCmp
 {
 public:
-    bool operator()(ClusterInfo &data1, ClusterInfo &data2)
+    bool operator()(const ClusterInfo &data1, const ClusterInfo &data2)
     {
         return data1.dist() < data2.dist();    
     }
