@@ -15,6 +15,7 @@
 #include <cmath>
 #include <fstream>
 #include <iomanip>
+#include <time.h>
 
 #define DEBUG 0
 
@@ -179,6 +180,11 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
   astro::EarthOrbit m_earthOrbit();
   astro::SolarSystem m_solSys();
 
+
+  astro::SkyDir m_PulsarDir(m_RA,m_dec,astro::SkyDir::EQUATORIAL);
+  m_PulsarVectDir = m_PulsarDir.dir();
+
+
   
   m_Pulsar    = new PulsarSim(m_PSRname, m_seed, m_flux, m_enphmin, m_enphmax, m_period, m_numpeaks);
 
@@ -209,9 +215,9 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
   //ofstream file;
   //file.open ("example.bin", ios::out | ios::app | ios::binary);
 
-  ofstream BaryOutFile;
+  //  ofstream BaryOutFile;
   
-  BaryOutFile.open("BaryDeCorr.txt",std::ios::app);
+  //BaryOutFile.open("BaryDeCorr.txt",std::ios::app);
 
   //  BaryOutFile << "TestFile for barycentric decorrections " << std::endl;
   //  std::cout  << "TestFile for barycentric decorrections " << std::endl;
@@ -224,7 +230,7 @@ PulsarSpectrum::~PulsarSpectrum()
 {  
   delete m_Pulsar;
   delete m_spectrum;
-  BaryOutFile.close();
+  //  BaryOutFile.close();
 }
 
 /////////////////////////////////////////////////
@@ -253,8 +259,28 @@ double PulsarSpectrum::flux(double time) const
  */
 double PulsarSpectrum::interval(double time)
 {  
+  clock_t intStart,intEnd;;
+  intStart =  clock();
+
   double timeTildeDecorr = time + (StartMissionDateMJD)*SecsOneDay;
   double timeTilde = timeTildeDecorr + getBaryCorr(timeTildeDecorr);
+
+//Timing the baryCorr 
+  clock_t barySt,baryEnd,bary1,bary2,bary3;
+  barySt = clock();
+  for (int i=0; i < 1000; i++)
+    {
+      double bc = getBaryCorr(timeTildeDecorr);
+    }
+  baryEnd = clock();
+  std::cout << "\n\n\ @@@timing of BaryCorr : " << (baryEnd-barySt) << " cycles " <<  " s " << (baryEnd-barySt)/1e8 << std::endl;
+
+
+
+
+
+
+
 
   if ((int(timeTilde - (StartMissionDateMJD)*SecsOneDay) % 20000) < 1.5)
     std::cout << "**  Time reached is: " << timeTilde-(StartMissionDateMJD)*SecsOneDay
@@ -270,8 +296,9 @@ double PulsarSpectrum::interval(double time)
   double totTurns = initTurns + inteTurns; //Total turns at the nextTimeTilde
   double finPh =  modf(initTurns,&intPart);
   finPh = modf(finPh + inteTurns,&intPart); //finPh is the expected phase corresponding to the nextTimeTilde
+  //std::cout << "2" << std::endl;
   double nextTimeTilde = retrieveNextTimeTilde(timeTilde, totTurns, (1e-6/m_period));
-  
+  //std::cout << "3" << std::endl;
   // std::cout << " corr " << getBaryCorr(nextTimeTilde) << std::endl;  
 
 
@@ -317,16 +344,33 @@ double PulsarSpectrum::interval(double time)
 	    << " corr " << getBaryCorr(ttMid) 
 	     << " -->Diff " << (nextTimeTilde-(ttMid + (getBaryCorr(ttMid)/SecsOneDay))) <<std::endl; 
   */
-  std::cout << "\nTimeTildeDEcorr in TDB is" << timeTildeDecorr - (StartMissionDateMJD)*SecsOneDay << "sec." << std::endl;
-  std::cout << "TimeTilde in TDB is" << timeTilde - (StartMissionDateMJD)*SecsOneDay << "sec." << std::endl;
-  std::cout << "nextTimeTilde in TDB is" << nextTimeTilde - (StartMissionDateMJD)*SecsOneDay << "sec." << std::endl;
-  double nextTimeDecorr = ttMid;
 
-  std::cout << " nextTimeTilde decorrected is" << nextTimeDecorr - (StartMissionDateMJD)*SecsOneDay << "sec." << std::endl;
-  std::cout << " corrected is " << nextTimeDecorr + getBaryCorr(nextTimeDecorr) - (StartMissionDateMJD)*SecsOneDay << std::endl;
-  std::cout << " interval is " <<  nextTimeDecorr - timeTildeDecorr << std::endl;
+  //  std::cout << "3" << std::endl;
+  double nextTimeDecorr = ttMid;
+  
+
+  if (DEBUG)
+    { 
+     std::cout << "\nTimeTildeDEcorr in TDB is" << timeTildeDecorr - (StartMissionDateMJD)*SecsOneDay << "sec." << std::endl;
+     std::cout << "TimeTilde in TDB is" << timeTilde - (StartMissionDateMJD)*SecsOneDay << "sec." << std::endl;
+     std::cout << "nextTimeTilde in TDB is" << nextTimeTilde - (StartMissionDateMJD)*SecsOneDay << "sec." << std::endl;
+     std::cout << " nextTimeTilde decorrected is" << nextTimeDecorr - (StartMissionDateMJD)*SecsOneDay << "sec." << std::endl;
+     std::cout << " corrected is " << nextTimeDecorr + getBaryCorr(nextTimeDecorr) - (StartMissionDateMJD)*SecsOneDay << std::endl;
+     std::cout << " interval is " <<  nextTimeDecorr - timeTildeDecorr << std::endl;
+  }
+  
+   intEnd = clock();   
+   printf("^^^^^^^^^^^^^Interval -  CPU Time = %.i c\n",(intEnd-intStart));
+   std::cout << "EEE" << (intEnd-intStart)/1e6 << std::endl;
+
+   //   std::cout << "\n\n OCCKIO " << std::endl;
+   //std::cout << getBaryCorr(timeTilde) << std::endl;
+   //std::cout << "\n\n OCCKIO " << std::endl;
+
 
   return nextTimeDecorr - timeTildeDecorr; //+ getBaryDeCorr(nextTimeTilde)  - timeTilde;
+  //return nextTimeTilde-timeTilde;
+
 }
 
 /////////////////////////////////////////////
@@ -368,6 +412,9 @@ double PulsarSpectrum::getTurns( double time )
  */
 double PulsarSpectrum::retrieveNextTimeTilde( double tTilde, double totalTurns, double err )
 {
+  time_t retStart,retEnd;
+  retStart = clock();
+
   //err = 1e-6;
   double tStep = m_period;
   double tempTurns = 0.0;
@@ -419,54 +466,91 @@ double PulsarSpectrum::retrieveNextTimeTilde( double tTilde, double totalTurns, 
 	  nIter = 0;
 	}
     }
+  retEnd = clock();
+  printf("Retrieve - CPU Time = %.i c\n",(retEnd-retStart));
+
 
   return tTilde;
 }
 
 /////////////////////////////////////////////
 /*!
- * \param tdbInput Arrival Time in Solar System Barycentric Time
+ * \param ttInput Photon arrival time Terrestrial Time
  *
- * <br>This method performs the barycentric decorrections and returns the time in Terrestrial Time. The corrections 
- * now taken into account are:
+ * <br>This method performs the compute the barycentric corrections and returns the time in Solar System Barycentric Time
+ *. The corrections  now taken into account are:
  * <ul>
- *  <li> Conversion from TDB to TT;
+ *  <li> Conversion from TT to TDB;
  *  <li> Geometric Time Delay due to light propagation;
  *  <li> Relativistic Shapiro delay;
  * </ul>   
  */
 double PulsarSpectrum::getBaryCorr( double ttInput )
 {
+
+  //Timing 
+  //  clock_t barySt,baryEnd,bary1,bary2,bary3;
+  //  barySt = clock();
+
+
+  //Start Date;
   astro::JulianDate ttJD(2007, 1, 1, 0.0);
+  //  std::cout << std::setprecision(30) << "Barycentric Corrections for time " << ttJD + (ttInput/SecsOneDay) << " (JD)" << std::endl;
+
+
   ttJD = ttJD+(ttInput - (StartMissionDateMJD)*SecsOneDay)/86400.;
 
-  //std::cout << "\n#######\n** Computing barycentric corrections for JD  " <<std::setprecision(30) << ttJD << std::endl;
-
-  //Position of source in sky
-  astro::SkyDir PsrDir(m_RA,m_dec,astro::SkyDir::EQUATORIAL);
-  Hep3Vector sDir = PsrDir.dir();
-
   // Conversion TT to TDB, from JDMissionStart (that glbary uses as MJDref)
-  // For sake of best correctness here we should use the inverse of this function, but the difference is not so big.
   double tdb_min_tt = m_earthOrbit.tdb_minus_tt(ttJD);
 
+  //  bary1 = clock();
+
   //Correction due to geometric time delay of light propagation 
-  double c = 299792.45;
+  Hep3Vector GeomVect = (m_earthOrbit.position(ttJD)/clight) - m_solSys.getBarycenter(ttJD);
+  double GeomCorr = GeomVect.dot(m_PulsarVectDir);
 
-  Hep3Vector GeomVect = (m_earthOrbit.position(ttJD)/c) - m_solSys.getBarycenter(ttJD);
-  double GeomCorr = GeomVect.dot(sDir);
-
-  //Correction due to Shapiro delay
-  double ShapiroCorr = -1.0*m_earthOrbit.calcShapiroDelay(ttJD,PsrDir);
+  // bary2 = clock();
+  //Correction due to Shapiro delay.
 
 
 
-  // std::cout << std::setprecision(15) << "** --> TDB-TT = " << tdb_min_tt << std::endl;
-  // std::cout << std::setprecision(15) << "** --> Geom. delay = " << GeomCorr << std::endl;
-  // std::cout << std::setprecision(15) << "** --> Shapiro delay = " << ShapiroCorr << std::endl;
-  //  std::cout << std::setprecision(15) << "** ====> Total= " << tdb_min_tt + GeomCorr + ShapiroCorr  << std::endl;
+  //double ShapiroCorr = -1.0*m_earthOrbit.calcShapiroDelay(ttJD,m_PulsarDir);
+  //std::cout << std::setprecision(30) << "Shapiro-astro " << ShapiroCorr << std::endl;
+
+  Hep3Vector sun2 = m_solSys.getSolarVector(ttJD);
+  // std::cout << " pulsar x " << sun2.x() << "y " << sun2.y() << " z" << sun2.z() << std::endl;
+  // Angle of source-sun-observer
+   double costheta = - sun2.dot(m_PulsarVectDir) / ( sun2.mag() * m_PulsarVectDir.mag() );
+   //std::cout << "costheta-Pulsar " << costheta << std::endl;
+   //std::cout << " pulsar dir  - x " << m_PulsarVectDir.x() << " y " << m_PulsarVectDir.y() << " z " << m_PulsarVectDir.z() << std::endl;
+   double m = 4.9271e-6;
+   double ShapiroCorr = 2 * m * log(1+costheta);
+   //std::cout << std::setprecision(30) << "Shapiro-Pulsa " << ShapiroCorr << std::endl;
+
+
+
+
+   //bary3 = clock();
+  if (DEBUG)
+  {
+    std::cout << "Barycentric Corrections for time " << ttJD/SecsOneDay << " (MJD)" << std::endl;
+    std::cout << std::setprecision(15) << "** --> TDB-TT = " << tdb_min_tt << std::endl;
+    std::cout << std::setprecision(15) << "** --> Geom. delay = " << GeomCorr << std::endl;
+    std::cout << std::setprecision(15) << "** --> Shapiro delay = " << ShapiroCorr << std::endl;
+    std::cout << std::setprecision(15) << "** ====> Total= " << tdb_min_tt + GeomCorr + ShapiroCorr  << std::endl;
+  }  
+
+  //
+  //  baryEnd = clock();
+
+  //  printf("@@@@@@@@@@@@@222Bary - CPU Time = 1 - %.i cycl\n",(bary1-barySt));
+  //printf("@@@@@@@@@@@@@222Bary - CPU Time = 2 - %.i cycl\n",(bary2-bary1));
+  //printf("@@@@@@@@@@@@@222Bary - CPU Time = 3 - %.i cycl\n",(bary3-bary2));
+  //printf("@@@@@@@@@@@@@222Bary - CPU Time = %.i cycl\n",(baryEnd-barySt));
+
   
-  return tdb_min_tt + GeomCorr + ShapiroCorr;
+
+  return tdb_min_tt + GeomCorr + ShapiroCorr; //seconds
 
 }
 

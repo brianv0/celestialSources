@@ -35,6 +35,9 @@ namespace cst
   //! Conversion erg-->MeV
   const double erg2meV   = 624151.0;
 
+  //! Spedd of light (km/s)
+  const double clight = 299792.45;
+
   //! Lower energy of GBM band, expressed in keV (10keV)
   const double GBM1=10.0;                     
   

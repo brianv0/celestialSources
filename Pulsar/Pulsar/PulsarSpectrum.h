@@ -81,14 +81,15 @@ class PulsarSpectrum : public ISpectrum
   astro::EarthOrbit m_earthOrbit;
   astro::SolarSystem m_solSys;
 
-
-  ofstream BaryOutFile;
+  astro::SkyDir m_PulsarDir;
+  Hep3Vector m_PulsarVectDir;
 
   const std::string& m_params; 
   
   std::string m_PSRname;
 
-  //  double m_JDStartMission = 2453569.5; //corresponding to  2005,7,18,0.0
+  //double m_JDStartMission = 2453569.5; //corresponding to  2005,7,18,0.0
+
   double m_RA, m_dec, m_l, m_b;  
   double m_period, m_pdot, m_p2dot, m_t0, m_phi0, m_f0, m_f1, m_f2;
   int m_numpeaks;
