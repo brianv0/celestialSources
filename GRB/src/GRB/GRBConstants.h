@@ -11,24 +11,24 @@
  * \author Nicola Omodei       nicola.omodei@pi.infn.it 
  * \author Johann Cohen-Tanugi johann.cohen@pi.infn.it
  */
-#include "iterator.h"
-#include "iostream.h"
-#include "fstream.h"
+//#include <iterator>
+//#include <iostream.h>
+//#include <fstream.h>
 
-#include "math.h"
-#include <vector>
-#include <string>
-#include <algorithm>
-#include <cmath>
-#include "stdio.h"
+/* #include <math.h> */
+#include <vector> 
+/* #include <string> */
+/* #include <algorithm> */
+/* #include <cmath> */
+/* #include "stdio.h" */
 
-#include "TFile.h"
-#include "TCanvas.h"
-#include "TPad.h"
-#include "TF1.h"
-#include "TF2.h"
-#include "TH1D.h"
-#include "TH2D.h"
+/* #include "TFile.h" */
+/* #include "TCanvas.h" */
+/* #include "TPad.h" */
+/* #include "TF1.h" */
+/* #include "TF2.h" */
+/* #include "TH1D.h" */
+/* #include "TH2D.h" */
 #include "TRandom.h"
 
 

@@ -2,6 +2,8 @@
 //    GRBShock: Class that describes the a Shock between 2 Shells
 //    Authors: Nicola Omodei & Johann Cohen Tanugi 
 //
+#include <iostream>
+
 #include "GRBShock.h"
 #include "GRBShell.h"
 
