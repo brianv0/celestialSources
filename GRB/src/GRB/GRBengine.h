@@ -72,6 +72,7 @@ class GRBengine
    * are considered, selecting 30% short bursts and 70% long bursts.
    */
   double getDurationFromBATSE(char* burst_type="Both");
+  double GetTime(double duration,int nshok,double rnd);
   inline double getDuration(){return m_duration;}
   inline double getDistance(){return m_distance;}
   inline std::pair<double,double> getDirection(){return m_direction;}

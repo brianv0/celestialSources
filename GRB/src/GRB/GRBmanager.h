@@ -18,6 +18,7 @@
 #include "FluxSvc/ISpectrum.h"
 #include "facilities/Observer.h"
 #include "src/GPS.h"
+#include "CLHEP/Random/RandomEngine.h"
 #include "GRBSpectrum.h"
 
 class ISpectrum;

@@ -30,7 +30,7 @@ GRBSpectrum::GRBSpectrum(const std::string& params)
 ///return flux, given a time
 double GRBSpectrum::flux(double time) const
 {
-  return m_grbsim->IRate(m_spectrum,m_grbsim->EnergyPh()); // in ph/(m^2 s) 
+  return m_spectrum.integrated_Flux(m_grbsim->EnergyPh());//IRate(m_spectrum,m_grbsim->EnergyPh()); // in ph/(m^2 s) 
 }
 
 double GRBSpectrum::interval(double time)// const
@@ -65,8 +65,7 @@ double GRBSpectrum::interval(double time)// const
       { 
 	sum+=temp*dt; //...integrate...
 	t1+=dt;       // ... and  incrase the time...
-	temp=m_grbsim->IRate(m_grbsim->ComputeFlux(t1),
-			     m_grbsim->EnergyPh()); // is the rate at t1...
+	temp=(m_grbsim->ComputeFlux(t1)).integrated_Flux(m_grbsim->EnergyPh()); // is the rate at t1...
 	inter = t1-time;
       }
   }//end of while
@@ -76,20 +75,20 @@ double GRBSpectrum::interval(double time)// const
 
 double GRBSpectrum::energy(double time)
 {
+  std::cout<<"energySrc @ time "<<time<<std::endl;
   //return the flux in photons/(m^2 sec)
-  ///Use time to update the spectrum
-  m_spectrum.clear();
+  /// Use time to update the spectrum
+  //  m_spectrum.clear();
+  //  m_grbsim->ComputeFlux(time);
   m_spectrum = m_grbsim->ComputeFlux(time);//;m_grbsim->Spectrum();
-  m_grbsim->setSpectrum( m_spectrum);
+  //m_grbsim->setSpectrum(m_spectrum);
     /// Then returns a uniform random value, to be used by operator()
   return (*this)(RandFlat::shoot(1.0));
 }
 
 float GRBSpectrum::operator() (float u) const
 {
-  
-  double energy = m_grbsim->DrawPhotonFromSpectrum(m_spectrum, 
-						   u,m_grbsim->EnergyPh());
+  double energy = m_spectrum.DrawPhotonFromSpectrum(u,m_grbsim->EnergyPh());
   return (float) energy;
 }
 

@@ -58,9 +58,9 @@ namespace cst
   //! Scale factor, indicates the ratio of accelerated electrons
   const double csi       = 1.0; 
   //! Part of the internal energies that goes in electrons
-  const double alphae    = .5;
+  const double alphae    = .3;
   //! Part of the internal energies that goes in magnetic fiels
-  const double alphab    = .1;
+  const double alphab    = .3;
   //! The shock accelerate electron with a power low energy disptribution:
   //! \f$N(E)dE\propto E^{-p}dE\f$ 
   const double p         = 2.5;
@@ -85,7 +85,7 @@ namespace cst
     calculated tacking into account the optical depht of the shell.
     \sa GRBSynchrotron, GRBICompton, GRBSim
   */
-  const float flagIC     = 1;
+  const float flagIC     = 0;
   /*! \brief Flag to compute the Quantum Gravity Effect
      
      Quantum gravity, if present, will calculate the dispersion low 
@@ -118,7 +118,7 @@ namespace cst
      like function. A Fast Rise pulse followed by an Exponential Decay.
   \sa RadiationProcess::electronNumber
   */
-  const std::string pulse_shape="agauss"; 
+  const std::string pulse_shape="sgauss"; 
 }
 
 class GRBConstants 

@@ -30,33 +30,29 @@ double RadiationProcess::processFlux(double E,
       else 
 	value = pow(ec/em,-(cst::p-1.)/2.)*pow(E/ec,-cst::p/2.);
     }
-  return value;
+  return value; //adim
 }
 
 double RadiationProcess::electronNumber(double gi,
 					double gamma_min, 
 					double gamma_max,
-					double dr,
-					double ComovingTime, 
-					double CoolingTime,
 					double N0)
 {
-  //if (gi < gamma_min) gi = gamma_min;
+  if (gi < gamma_min || gi > gamma_max) return 0.0;
   
-  //SPECTRAL DISTRIBUTION
   const double N_0  = N0*(cst::p-1.)/
     (pow(gamma_min,1.0-cst::p)-pow(gamma_max,1.0-cst::p)); 
-  double N_e = N_0;
-  
-  if (gi < gamma_min || gi > gamma_max) 
-    N_e *= 0.0;
-  else 
-    N_e *= pow(gi,-cst::p); //adim;
-  
-  // TEMPORAL DISTRIBUTION
-  
+  return N_0*pow(gi,-cst::p)/1.32985; //adim;
+}
+
+double RadiationProcess::TemporalEvolution(double gi,
+					   double gamma_min,
+					   double dr,
+					   double ComovingTime, 
+					   double CoolingTime)
+{
   double gi2     = pow(gi,2.);
-  
+  double N_e = 1.0;
   if(cst::pulse_shape=="sgauss")
     {
       double tpeak   = (dr/cst::c)*sqrt((gi+1.)/(gi-1.));
@@ -86,6 +82,11 @@ double RadiationProcess::electronNumber(double gi,
       //        else
       //  	N_e *= (exp(-(ComovingTime-tpeak)/CoolingTime)); 
     }
+  else if(cst::pulse_shape=="test")
+    {
+      if(ComovingTime < CoolingTime ) return 1.0;
+      return 0.0;
+    }
   else
     {
       // Exponential shape, FRED like function...
@@ -99,6 +100,28 @@ double RadiationProcess::electronNumber(double gi,
 	  exp((tpeak-ComovingTime)/CoolingTime);
     }
   return N_e;
+}
+
+double RadiationProcess::electronNumber(double gi,
+					double gamma_min, 
+					double gamma_max,
+					double dr,
+					double ComovingTime, 
+					double CoolingTime,
+					double N0)
+{
+  // TEMPORAL DISTRIBUTION
+  double N_e = electronNumber(gi,
+			      gamma_min,
+			      gamma_max,
+			      N0)*
+    TemporalEvolution(gi,
+		      gamma_min,
+		      dr,
+		      ComovingTime,
+		      
+		      CoolingTime);
+    return N_e;
 } 
 
 double RadiationProcess::timeShiftForDispersion(const double time, 
@@ -114,9 +137,9 @@ double RadiationProcess::timeShiftForDispersion(const double time,
 }
 
 
-double RadiationProcess::comovingTime(const double time, 
+double RadiationProcess::comovingTime(const double time, //observed
 				      const double gamma, 
-				      const double E, 
+				      const double E,    //observed
 				      const double distance_to_source)
 {
   if(cst::flagQG)

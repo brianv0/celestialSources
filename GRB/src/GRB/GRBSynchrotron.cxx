@@ -1,5 +1,7 @@
 #include "GRBSynchrotron.h"
 #include "GRBConstants.h"
+#include "SpectObj.h"
+
 
 GRBSynchrotron::GRBSynchrotron()
   : RadiationProcess()
@@ -42,32 +44,18 @@ void GRBSynchrotron::load(const double time,
   if (time<=0.) 
     {
       m_spectrumObj *= 0.0; 
-      /*
-	cout<<"   SYNCRO      "<<endl;
-	cout<<"   Rise Time  = "<<(dr/cst::c)/GAMMAF<<endl;
-	cout<<"   Decay Time = "<<gamma_min*cst::mec2/
-	(4./3.* Umag(B)*cst::erg2MeV*cst::c*cst::st*
-	(pow(gamma_min,2.)-1.))/GAMMAF<<endl;
-	cout<<" Gamma_min    = "<<gamma_min<<endl;
-      */
       return;
     }
   const int type=0; // Power Law
   //  const int type=1; // Complete integration;
   double ComovingTime; 
   const double EnergyTransformation = 
-    1.e+6 * cst::mec2 *
-    ( GAMMAF + sqrt(GAMMAF*GAMMAF+1.)*cos(angle) );
+    m_spectrumObj.getEnergyTransformation(GAMMAF,angle); // in eV
+  //m_spectrumObj.obs2em(GAMMAF,angle);
   
   //////////////////////////////////////////////////
   // Gamma e+-
   //////////////////////////////////////////////////
-  
-  std::vector<double>  x  = 
-    m_spectrumObj.getEnergyVector(1./(EnergyTransformation));
-  std::vector<double>  dx = 
-    m_spectrumObj.getBinVector(1./(EnergyTransformation));
-  std::vector<double> fsyn(cst::enstep+1, 0.0);
   
   const double Psyn_0 = 4./3.*Umag(B)*cst::erg2MeV*cst::c*cst::st; //MeV/s
   const double esyn_0 = (3.*cst::pi/8.)*(B/cst::BQ)*cst::mec2; //MeV
@@ -77,21 +65,27 @@ void GRBSynchrotron::load(const double time,
   const double tcross  = dr/cst::c;
   
   //////////////////////////////////////////////////
-  
-  std::vector<double>::iterator x1 = x.begin();
-  std::vector<double>::iterator its = fsyn.begin();
+  /*
+    std::vector<double>::iterator x1 = x.begin();
+    std::vector<double>::iterator its = fsyn.begin();
+  */
   double   dgamma     = pow((gamma_max/gamma_min),1./cst::enstep);
-  
-  while(x1!=x.end()) 
+  int it,j;
+  for(it = 0; it < m_spectrumObj.size();) 
     {
-      ComovingTime = comovingTime(time,GAMMAF,EnergyTransformation*(*x1),
+      double value=0.0;
+      // Observed Energy, in eV
+      double obs_energy = m_spectrumObj.getEnergy(it);
+      ComovingTime = comovingTime(time,GAMMAF,obs_energy,
 				  distance_to_source);
       //comoving time <0 means that dispersive effect delayed 
       //to much the photon at this energy bin
-      if(ComovingTime<=0){its++; x1++; continue;}
+      if(ComovingTime<=0){it++; continue;}
       
-      // Here the integral beween the population of electron and 
-      // the syncrotron emission from each of those electrons.
+      // Observed Energy, in mec2 units
+      obs_energy *= (1.e-6/cst::mec2);
+      // Emitted  Energy, in mec2 units
+      double em_energy  = obs_energy/EnergyTransformation;
       
       if(type == 0) //Power Law approx...
 	{
@@ -107,70 +101,73 @@ void GRBSynchrotron::load(const double time,
 	  tau *= (tsyn<tcross)? tsyn: tcross;
 	  if(tau>1.) tau = 1.;
 	  double N_e = (1.-tau)*electronNumber(gi, gamma_min, gamma_max,
-						   dr, ComovingTime, tsyn, N0);
+					       dr, ComovingTime, tsyn, N0);
 	  
 	  //	  if(*x1<gc) //ekn == gc
-	    (*its) = processFlux(*x1,ec,em);
-	    //  else 
-	    //  (*its) = 0.0;
-	  
-	  (*its) *= N_e*gi*(dgamma-1.); // adim
+	  value = processFlux(em_energy,ec,em) //adim
+	    *N_e*gi*(dgamma-1.); 
 	}
       else // Complete integration
 	{
-	  for (int j = 0; j < cst::enstep;)
+	  // Here the integral beween the population of electron and 
+	  // the syncrotron emission from each of those electrons.
+	  for (j = 0; j < cst::enstep;)
 	    {
 	      double gi      = gamma_min*pow(dgamma,j);
 	      double gi2     = pow(gi,2.);
 	      double esyn    = esyn_0*(gi2-1.)/cst::mec2; // In mec2 units
-	      
+	      // an electronb with gi, emits its energy e0 = (gi*cst::mec2) with a power
+	      // Psyn = Psyn_0*(gi2-1.), in a time tsyn = e0/Psyn
 	      double tsyn    = (gi*cst::mec2)/(Psyn_0*(gi2-1.)); 
-	      double tau = tau_0;
-	      tau *= (tsyn<tcross)? tsyn: tcross;
+	      double tau = tau_0; //1/sec
+	      tau *= (tsyn<tcross)? tsyn : tcross;
 	      if(tau>1.) tau = 1.;
-	      double N_e     = (1.-tau)*electronNumber(gi, gamma_min, gamma_max,
-						       dr, ComovingTime, tsyn, N0);
-	      (*its) += SynchrotronFunction(esyn,(*x1))*N_e
-		*gamma_min*(pow(dgamma,j+2)-pow(dgamma,j)); //adim
-	      //cout<<" SYN = "<<(*its)<<endl;
-	      j+=2; // This is for speed up the simulation
+
+	      /*
+		double N_e = electronNumber(gi, gamma_min, gamma_max,
+		N0);
+	      */
+	      //Test the number of electron:
+	      /*
+		value += N_e*gamma_min*(pow(dgamma,j+1)-pow(dgamma,j));
+	      */
+	      //Test the total electron energy: 0.895193
+	      //	      value += cst::mec2*gi*N_e*gamma_min*(pow(dgamma,j+1)-pow(dgamma,j));
+	      //Test the temporal evolution:
+	      /*
+		value += TemporalEvolution(gi,
+		gamma_min,
+		dr,
+		ComovingTime, 
+		tsyn); // *gamma_min*(pow(dgamma,j+1)-pow(dgamma,j));
+	      */
+	      double dg = gamma_min*(pow(dgamma,j+1)-pow(dgamma,j)); //adim 
+	      double N_e = (1.-tau)
+		*electronNumber(gi, gamma_min, gamma_max,
+				dr, ComovingTime, tsyn, N0);
+	      value+=N_e*SynchrotronFunction(esyn,em_energy)*dg;
+	      
+	      
+	      j+=1; // This is for speed up the simulation
 	    }
 	}
-      its++;
-      x1++;
+      //      cout<<(value/cst::erg2MeV)/(Umag(B)*Vol)<<" "<<Umag(B)*Vol<<endl;
+      //cout<<value<<" "<<endl;
+      m_spectrumObj.SetSpectrum(it,value*1.e+6/m_spectrumObj.getBin(it) );
+      // 1/MeV
+      it++;
     } 
-  //OBSERVED SPECTRUM
-  // LT = Lorentz Transformation
-  // P  is a power -> P_obs = P_em
-  // Esyn          -> LT * Esyn
-  // Psyn/Esyn     -> Psyn/Esyn/LT [MeV/MeV/s]
-  // Psyn/Esyn/DE  -> Psyn/Esyn/LT^2 [1/MeV/s]
   
-  m_spectrumObj.clear();
-  x1  =    x.begin();
-  its = fsyn.begin();
-  std::vector<double>::iterator dx1 =   dx.begin();
-  
-  while(dx1!= dx.end()) 
-    { 
-      (*x1 ) *= EnergyTransformation; //eV
-      (*dx1) *= 1.0e-6*EnergyTransformation; //MeV
-      (*its) *= GAMMAF*(Psyn_esyn)/(*dx1); //1/s/MeV
-      x1++;
-      dx1++;
-      its++;
-    } 
-  (*x1) *= EnergyTransformation; //eV 
-  (*its) = 0.0;
-  m_spectrumObj.SetSpectrum(x,fsyn);  // is in ph/s/MeV
-  return; 
+  m_spectrumObj *= (Psyn_esyn); // 1/MeV/s
+  m_spectrumObj.em2obs(GAMMAF,angle);  // is in ph/s/MeV
+  //  return m_spectrumObj; 
 } 
 
 double GRBSynchrotron::SynchrotronFunction(double esyn, double energy)
 {
   // note that energy and esyn are in unit of mec2
-  esyn = (esyn>0.0) ? 1./esyn : 0.0; 
-  double y       = energy*esyn; //adim
+  if(esyn <= 0.0) return 0.0;
+  double y       = energy/esyn; //adim
   double f1      = pow(y,0.297)*exp(-y); //adim
   return f1;
 }

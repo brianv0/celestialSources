@@ -128,6 +128,7 @@ void Burst(int argc, char** argv)
   double tmax;
   
   std::vector<double> spectrum,energy,deltae;
+  SpectObj spectrum_obj;
   std::string arg_name(default_arg);
   
   while(current_arg < argc)
@@ -220,9 +221,10 @@ void Burst(int argc, char** argv)
       // 4) Prepare the time and energy binning 
       if (!set_tmax) tmax=myGRB->Tmax();
       double m_dt=tmax/cst::nstep;
-      energy=myGRB->Energy();
-      deltae=myGRB->DeltaE();
-      ch4L  =myGRB->myParam->EnergyPh();
+      spectrum_obj = myGRB->getSpectrum();
+      energy = spectrum_obj.getEnergyVector();
+      deltae = spectrum_obj.getBinVector();
+      ch4L   = myGRB->myParam->EnergyPh();
       TApplication theApp("App",0,0);
       // Logaritmic Binning for energy
       double *e_bins;
@@ -255,8 +257,9 @@ void Burst(int argc, char** argv)
       for (t=0;t<cst::nstep;t++)
 	{
 	  m_time.push_back(t*m_dt);
-	  spectrum.clear();	  
-	  spectrum=myGRB->ComputeFlux(m_time[t]); // is in ph/s/MeV/m^2
+	  //spectrum.clear();	  
+	  spectrum_obj = myGRB->ComputeFlux(m_time[t]);
+	  spectrum=spectrum_obj.getSpectrumVector(); // is in ph/s/MeV/m^2
 	  for (en=0;en<=cst::enstep;en++)
 	    {
 	      m_flux[en][t]=spectrum[en]*energy[en]/(cst::erg2MeV*1.0e+6);  
@@ -306,16 +309,23 @@ void Burst(int argc, char** argv)
 		}
 	    }
 	  //myGRB->IFlux returns eV/s/m^2 ; fluences are in erg/cm^2: 
-	  fluenceTOT+=myGRB->IFlux(spectrum,cst::enmin,cst::enmax)/(cst::erg2MeV*1.0e+6)*(1.0e-4)*m_dt;
-	  fluence1+=myGRB->IFlux(spectrum,ch1L,ch1H)              /(cst::erg2MeV*1.0e+6)*(1.0e-4)*m_dt;
-	  fluence2+=myGRB->IFlux(spectrum,ch2L,ch2H)              /(cst::erg2MeV*1.0e+6)*(1.0e-4)*m_dt;
-	  fluence3+=myGRB->IFlux(spectrum,ch3L,ch3H)              /(cst::erg2MeV*1.0e+6)*(1.0e-4)*m_dt;
-	  fluence4+=myGRB->IFlux(spectrum,ch4L,ch4H)              /(cst::erg2MeV*1.0e+6)*(1.0e-4)*m_dt;
-	  fluence5+=myGRB->IFlux(spectrum,ch5L,ch5H)              /(cst::erg2MeV*1.0e+6)*(1.0e-4)*m_dt;
+	  fluenceTOT+=spectrum_obj.integrated_E_Flux(cst::enmin,cst::enmax)
+	    /(cst::erg2MeV*1.0e+6)*(1.0e-4)*m_dt;
+	  fluence1+=spectrum_obj.integrated_E_Flux(ch1L,ch1H)              
+	    /(cst::erg2MeV*1.0e+6)*(1.0e-4)*m_dt;
+	  fluence2+=spectrum_obj.integrated_E_Flux(ch2L,ch2H)
+	    /(cst::erg2MeV*1.0e+6)*(1.0e-4)*m_dt;
+	  fluence3+=spectrum_obj.integrated_E_Flux(ch3L,ch3H)
+	    /(cst::erg2MeV*1.0e+6)*(1.0e-4)*m_dt;
+	  fluence4+=spectrum_obj.integrated_E_Flux(ch4L,ch4H)
+	    /(cst::erg2MeV*1.0e+6)*(1.0e-4)*m_dt;
+	  fluence5+=spectrum_obj.integrated_E_Flux(ch5L,ch5H)
+	    /(cst::erg2MeV*1.0e+6)*(1.0e-4)*m_dt;
 	  // erg/cm^2
 	  if (video_out)
 	    std::cout<<"Time / tmax = "<<m_time[t]<<"/" <<tmax<<" Ftot [erg]= "
-		<<fluenceTOT*(myGRB->Area()*1.0e+4)<<std::endl;
+		     <<fluenceTOT*(myGRB->Area()*1.0e+4)<<std::endl;
+	  
 	}
       //////////////////////////////////////////////////
       if(save_gif) 

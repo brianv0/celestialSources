@@ -89,7 +89,7 @@ public:
   inline void setGal_b(double value)  {m_b=value;}
 
   //! Returns the time stored in DataOut 
-  inline double Time() const  {return m_time;}
+  inline double Time()   const {return m_time;}
   //! Returns the energy stored in DataOut 
   inline double Energy() {return m_energy;}
   //! Returns phi stored in DataOut 

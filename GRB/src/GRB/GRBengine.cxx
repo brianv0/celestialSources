@@ -31,8 +31,8 @@ GRBengine::GRBengine(GRBConstants *myParam)
       double BurstDuration     = myParam->Duration();
       if (BurstDuration<=0) BurstDuration=getDurationFromBATSE();
       int NumberOfShocks       = myParam->Nshock();
-      double timeBetweenShocks = 
-	2.*BurstDuration/NumberOfShocks*RandFlat::shoot(1.0);
+      //double timeBetweenShocks = 
+      //	2.*BurstDuration/NumberOfShocks*RandFlat::shoot(1.0);
       double ShockTime         = 0.;
       // internal energy of the shocked material
       double ei = myParam->Etot()/NumberOfShocks; 
@@ -63,8 +63,9 @@ GRBengine::GRBengine(GRBConstants *myParam)
 		ShockTime+ComputedShockDuration : 1.5*BurstDuration;
 	    }
 	  ns++;
-	  ShockTime += timeBetweenShocks; 
-	  timeBetweenShocks = 2.*BurstDuration/NumberOfShocks*RandFlat::shoot(1.0);
+	  ShockTime += GetTime(BurstDuration,NumberOfShocks,RandFlat::shoot(1.0));
+	  //timeBetweenShocks; 
+	  //timeBetweenShocks = 2.*BurstDuration/NumberOfShocks*RandFlat::shoot(1.0);
 	  std::cout<<" **************************************************"<<std::endl;
 	  std::cout<<" Estimated Rise Time      = "<<
 	    C1*myParam->Thickness()/gamma<<std::endl;
@@ -83,7 +84,7 @@ GRBengine::GRBengine(GRBConstants *myParam)
       double BurstDuration     = myParam->Duration();
       if (BurstDuration<=0) BurstDuration=getDurationFromBATSE();
       int NumberOfShocks       = myParam->Nshock();
-      double timeBetweenShocks = 2.*BurstDuration/NumberOfShocks*RandFlat::shoot(1.0);
+      //double timeBetweenShocks = 2.*BurstDuration/NumberOfShocks*RandFlat::shoot(1.0);
       double ShockTime         = 0.;
       double ei = myParam->Etot()/NumberOfShocks; // internal energy of the shocked material
       int ns=0;
@@ -122,8 +123,8 @@ GRBengine::GRBengine(GRBConstants *myParam)
 	      
 	    }
 	  ns++;
-	  ShockTime += timeBetweenShocks; 
-	  timeBetweenShocks = 2.*BurstDuration/NumberOfShocks*RandFlat::shoot(1.0);
+	  ShockTime += GetTime(BurstDuration,NumberOfShocks,RandFlat::shoot(1.0)); 
+	  //	  timeBetweenShocks = 2.*BurstDuration/NumberOfShocks*RandFlat::shoot(1.0);
 	  
 	  
 	  
@@ -182,8 +183,8 @@ GRBengine::GRBengine(GRBConstants *myParam)
 	      m_duration = ShockTime+ComputedShockDuration;
 	    }
 	  ns++;
-	  double timeBetweenShocks = 2.*BurstDuration/NumberOfShocks*RandFlat::shoot(1.0);
-	  ShockTime += timeBetweenShocks; 
+	  //	  double timeBetweenShocks = 2.*BurstDuration/NumberOfShocks*RandFlat::shoot(1.0);
+	  ShockTime += GetTime(BurstDuration,NumberOfShocks,RandFlat::shoot(1.0));//timeBetweenShocks; 
 	  
 	  std::cout<<" **************************************************"<<std::endl;
 	  std::cout<<" Estimated Rise Time      = "<<C1*thickness/gamma<<std::endl;
@@ -216,6 +217,15 @@ GRBengine::GRBengine(GRBConstants *myParam)
 			       (RandFlat::shoot(1.0)*180.0)-90.);
   m_distance  = myParam->Distance();
 }
+
+
+double GRBengine::GetTime(double duration,int nshock,double rnd)
+{
+  double tau = duration/(nshock*log(2));
+  return -log(1.-rnd)*tau;
+}
+
+
 
 double GRBengine::getDurationFromBATSE(char* burst_type)
 {

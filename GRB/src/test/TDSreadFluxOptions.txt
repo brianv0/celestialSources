@@ -22,12 +22,12 @@ ApplicationMgr.TopAlg +=  {"TDSReadFluxAlg"};
 // -----> To set the source <-----
 // From here we can select the model for GRB ... 
 //FluxAlg.source_name="GRBspectrum_Gal";  
-//FluxAlg.source_name="GRBspectrum_Test"; // with fixed direcion
+FluxAlg.source_name="GRBspectrum_Test"; // with fixed direcion
 
 //FluxAlg.source_name="GRBobsspectrum_Gal";
 //FluxAlg.source_name="GRBobsspectrum_Test"; // with fixed direcion
 
-FluxAlg.source_name="GRBmanager_Gal";
+//FluxAlg.source_name="GRBmanager_Gal";
 
 // ---------------------- Save options: -----------------------
 TDSReadFluxAlg.savefile={"ascii"};
@@ -35,7 +35,7 @@ TDSReadFluxAlg.savefile+={"root"};
 // ------------------------------------------------------------
 
 MessageSvc.OutputLevel=2;
-ApplicationMgr.EvtMax = 10000;
+ApplicationMgr.EvtMax = 100000;
 
 //==============================================================
 //

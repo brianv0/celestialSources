@@ -8,15 +8,17 @@
  * \author Johann Cohen-Tanugi johann.cohen@pi.infn.it
  *
  */
-#include <vector>
-#include"GRBConstants.h"
-#include "SpectObj.h"
-#include "GRBShock.h"
-
-#include "RadiationProcess.h"
 
 #ifndef GRBSYNCHROTRON_H
 #define GRBSYNCHROTRON_H 1
+
+#include <vector>
+#include <iterator>
+#include <map>
+#include"GRBConstants.h"
+#include "SpectObj.h"
+#include "GRBShock.h"
+#include "RadiationProcess.h"
 
 class GRBSynchrotron : virtual public RadiationProcess
 {

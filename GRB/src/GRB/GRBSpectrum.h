@@ -9,6 +9,7 @@
 #include "facilities/Observer.h"
 #include "src/GPS.h"
 #include "GRBSim.h"
+#include "SpectObj.h"
 
 /*!
  * \class GRBSpectrum
@@ -63,7 +64,8 @@ class GRBSpectrum : public ISpectrum
   double interval(double time);
 
   //! Galactic direction 
-  inline std::pair<double,double> dir(double){return m_grbsim->GRBdir();} 
+  inline std::pair<double,double> 
+    dir(double){return m_grbsim->GRBdir();} 
 
   /*! \brief Draws from the current spectrum the energy of a sampled photon. 
    *  \param u uniform random number drawn in the method \c energySrc .  
@@ -74,7 +76,6 @@ class GRBSpectrum : public ISpectrum
    *  Method called by \c FluxSource::event(). 
    *  It returns the energy of a sampled photon, by calling 
    *  the operator() method. 
-   *  \param engine  random engine for uniform sampling;
    *  \param time    current time. 
    */
   double energy(double time);
@@ -94,6 +95,6 @@ class GRBSpectrum : public ISpectrum
    *  The energy binning is defined in \c GRBConstants.
    *  It is recomputed by \c GRBSim at each time step.
    */ 
-  std::vector<double>  m_spectrum;
+  SpectObj m_spectrum;
 };
 #endif

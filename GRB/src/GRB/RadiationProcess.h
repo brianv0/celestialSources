@@ -58,7 +58,19 @@ class RadiationProcess
 				double ComovingTime, 
 				double CoolingTime,
 				double N0);
-  /*! \brief Calculates the time shift due to Quantum Gravity
+  
+  virtual double electronNumber(double gi,
+				double gamma_min, 
+				double gamma_max,
+				double N0);
+  
+  virtual double TemporalEvolution(double gi,
+				   double gamma_min,
+				   double dr,
+				   double ComovingTime, 
+				   double CoolingTime);
+  
+    /*! \brief Calculates the time shift due to Quantum Gravity
    *
    * The theory of QG preview a dispersion law for the observed photons 
    * that depends on the distance where thay have been produced, 
