@@ -12,7 +12,7 @@ using namespace cst;
 // S2 --> S1 ->
 GRBShock::GRBShock(GRBShell *S1, GRBShell *S2, double tshock)
 {
-  p = 2.5;
+  p = 3.0;
   m_IC =  1.0;
   
   tsh = tshock;
@@ -25,7 +25,6 @@ GRBShock::GRBShock(GRBShell *S1, GRBShell *S2, double tshock)
 
   double dr1 = S1->GetThickness();
   double dr2 = S2->GetThickness();
-
   double m1 = S1->GetMass();
   double m2 = S2->GetMass();
   
@@ -42,7 +41,8 @@ GRBShock::GRBShock(GRBShell *S1, GRBShell *S2, double tshock)
   double M,b12,b1,b2,nc,Psyn;
   
   //  std::cout<<"--------------------My Model--------------------"<<std::endl;
-  M   = sqrt(m1*m1+m2*m2+2.0*m1*m2*(g1*g2-sqrt(g1*g1-1.0)*sqrt(g2*g2-1.0)))-(mf);//g
+  
+  M   = sqrt(m1*m1+m2*m2+2.0*m1*m2*(g1*g2-sqrt(g1*g1-1.0)*sqrt(g2*g2-1.0)))-(mf);
   
   gf  = (m1*g1+m2*g2)/(mf+M);
   // Final: (obs) 
@@ -56,18 +56,26 @@ GRBShock::GRBShock(GRBShell *S1, GRBShell *S2, double tshock)
   rf  = r2;//cm
 
   // Thickness of the final shell
-  drf = (dr2 + dr1);///2.;//cm
-
+  drf = (dr2 + dr1)/2.;//cm
+  
   MS = new GRBShell(gf,rf,drf,ef,mf);
   
   b1  = S1->GetBeta();
   b2  = S2->GetBeta();
-  b12 = (b1-b2)/(1-b1*b2);
-  nc  = S1->GetComPartDens(); //1/cm^3
-  gsh = 1.0/sqrt(1.0 - b12*b12);
-  nsh = 4.0 * nc * gsh;//1/cm^3
-  B   = 0.39 * sqrt(ab * nsh) * gsh;//G
+  b12 = (b1-b2)/(1.0-b1*b2);
+  double g12 = 1.0/sqrt(1.0 - b12*b12);
+  double n1  = S1->GetComPartDens(); //1/cm^3
+  double n2  = S1->GetComPartDens(); //1/cm^3
+  double x = n1/n2;
 
+  gsh = TMath::Max(1.0,pow(x,1./4.)*sqrt(g12));
+  nsh  = 4.0 * n1 * gsh;//1/cm^3
+  
+  //TMath::Max(sqrt((pow(G14,2.0)+1.0)/2),1.0);
+  //  double G13 = TMath::Max(1.0,pow(x,-1./4.)*sqrt(G14));
+  
+  B   = 0.39 * sqrt(ab * nsh) * gsh;//G
+  
   double Psyn0 = 6.6e-7 * pow(B,2.); //KeV/s (/g^2) 
   Es0 =1.1447e-11 * B * gf; //keV (/g^2)
 
@@ -75,34 +83,21 @@ GRBShock::GRBShock(GRBShell *S1, GRBShell *S2, double tshock)
 
   // Cooling & time scales in observer frame:
   // a) Hydrodinamical time scale:
-  tc    =   drf/c;//(2.* gf * c);  // oss
+  tc    =   drf/(c);  // oss
   // b) angular time scale
   ta    =   rf/(2.* c * gf * gf);  // oss
   // c) cooling time scale:
-  ts    = (mec2/Psyn0)/(2.*gf)*sqrt(Es0); //oss //*sqrt(Es0); // s (ts(E) ~ 1/sqrt(E[kev]) 
+  // Tavani and Rybicki Lightman (esercizio 6.1):
+  ts = 2.0e8*pow(B,-2.)/(2.*gf)*sqrt(Es0); //oss; // (*g)
+  //ts    = (mec2/Psyn0)/(2.*gf)*sqrt(Es0); //oss //*sqrt(Es0); // s (ts(E) ~ 1/sqrt(E[kev]) 
   //characteristic gamma factors:
   // a) Minimum:
-  gem  =   TMath::Max(1.0, mpc2/mec2 * gsh * ae);
+  gem  = TMath::Max(1.0, (p-2.0)/(p-1.0)* mpc2/mec2 * gsh * ae);
   // b) Cooling :
   gec  = TMath::Max(1.0,ts*(2.*gf)*sqrt(Es0));//mec2/(Psyn0 * tc);*tc
   // c) Maximum:
   geM  = TMath::Max(1.,1.17e8/sqrt(B)); 
   
-  // characteristic synchrotron energies
-  /*
-    Esm = Es0 * gem * gem;  // keV
-    Esc = Es0;// * gec * gec;  // keV 
-    EsM = Es0 * geM * geM;  // keV
-  */  
-  // IC
-  //  Eicm = gem*gem * Esm; 
-  // EicM = geM*geM * EsM;
-
-  
-  /*
-    std::cout<<"gf = "<<gf<<" Esyn m, M= "<<Esm<<" "<<EsM<<" Eic m, M = "<<Eicm<<" "<<EicM<<" ts(100kev) = "<<ts <<std::endl;
-    std::cout<<"tc,ta,ts = "<<tc<<" "<<ta<<" "<<ts<<std::endl;
-  */
 }
 
 void GRBShock::SetTime(double time)
@@ -116,10 +111,9 @@ Double_t GRBShock::Peak(Double_t time,Double_t energy)
   Double_t to  = time-tsh;   // oss
   if(to<=0.0) return 0.0;
   //  return 1.0;
-
-  Double_t tts = ts;
-  Double_t tta = sqrt(ta*ta+tts*tts)/sqrt(energy);
-  //Double_t tta = ta;
+  
+  Double_t tts = ts/sqrt(energy);
+  Double_t tta = sqrt(ta*ta+tts*tts);//sqrt(energy);
   
   Double_t F1 = 1./pow(1.+       to/tta,2.);
   Double_t F2 = 1./pow(1.+(to - tc)/tta,2.);
@@ -139,26 +133,15 @@ Double_t GRBShock::SynSpectrum(Double_t time, Double_t energy)
 {
   if(time<=tsh) return 0.0;
   double tt = time-tsh;
-  //  return 1.0;
   double ec,em,gc;
-  /*
-  if(tt<tc) 
-    {
-      gc = TMath::Max(1.0,ts/tt); //?    
-      gm = TMath::Max(1.0,gem);
-    }
-  else
-    {
-      gc = TMath::Max(1.0,ts/(tc+tt));
-      gm = TMath::Max(1.0,gem*ts/(ts+tt*gem));
-    }
-  */
-  gc = TMath::Max(1.0,gec/tc); //?    
+  
+  gc = TMath::Max(1.0,gec/TMath::Min(tc,tt)); //?    
 
-  //  double ec = Esc*TMath::Max(1.0,pow(ts/(time-tsh),2.0)); //?
   em = Es0*gem*gem;
   ec = Es0*gc*gc;
+
   Double_t Fv;
+
   if(ec <= em) //FAST COOLOING REGIME
     {
       if(energy<=ec)
@@ -186,47 +169,12 @@ Double_t GRBShock::ICSpectrum(Double_t time, Double_t energy)
 { 
   if(time<=tsh) return 0.0;
   double tt = time-tsh;
-  /*
-  if(tt<tc) 
-    {
-    gem = TMath::Max(1.0,gem);
-    }
-  else
-  {
-  gem = TMath::Max(1.0,gem*ts/(ts+tt*gem));
-  }
-  */
   return SynSpectrum(time,energy/(gem*gem)) / (gem*gem);
 }
 
-/*
-  //  Double_t N;
-  Double_t E;
-  if(energy > EicM) return 0.0;   
-  if (Eicm>emin)
-    {
-      //      N = (pow(Eicm  ,a+1.)- pow(emin,a+1.))/((a+1.)*pow(Eicm,a)) +
-      //	(pow(emax,b+1.)- pow(  Eicm,b+1.))/((b+1.)*pow(Eicm,b));
-      
-      E = (pow(Eicm  ,a+2.)- pow(emin,a+2.))/((a+2.)*pow(Eicm,a)) +
-	(pow(emax,b+2.)- pow(  Eicm,b+2.))/((b+2.)*pow(Eicm,b));
-    }
-  else
-    {
-      //      N = 
-      //	(pow(emax,b+1.)- pow(  Eicm,b+1.))/((b+1.)*pow(Eicm,b));
-      E = 
-	(pow(emax,b+2.)- pow(  Eicm,b+2.))/((b+2.)*pow(Eicm,b));
-    }
-  
-  if(energy < Eicm) 
-    return pow(energy/Eicm,a)/E ;
-  return pow(energy/Eicm,b)/E;
-}
-*/
-
 double GRBShock::ComputeFlux(double time, double energy)
 {
+  //this has to return Nv in [ph/(cm² s keV)]
   return Peak(time,energy) * (SynSpectrum(time,energy) + m_IC * ICSpectrum(time,energy))/energy;
 }
 
@@ -238,7 +186,7 @@ void GRBShock::Print()
   std::cout<<"t shock = "<<tsh<<" ta = "<<ta<<" tc = "<<tc<<" ts = "<<ts<<std::endl;
   std::cout<<"Efficiency: "<<eff<<" Initial E = "<<ei<<" Final E = "<<ef<<std::endl;
   std::cout <<" Int E (obs): "<<eint_o<<" (com): "<<eint_c<<" B Field = "<<B<<std::endl;
-  std::cout<<"Gmin = "<<gem<<" Gcool = "<<gec/tc<<" Gmax = "<<geM<<std::endl;
+  std::cout<<"Gmin = "<<gem<<" Gcool = "<<gec/tc<<" Gmax = "<<geM<<" Gsh = "<<gsh<<std::endl;
   std::cout<<"Es0 = "<<Es0<<" Esm = "<<Es0*gem*gem<<" Esc = "<<Es0*gec*gec/(tc*tc)<<" EsM = "<<Es0*geM*geM<<" IC/Syn = "<<m_IC<<std::endl;
 
   std::cout<<"--------------------------------------------------"<<std::endl;

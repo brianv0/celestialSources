@@ -76,7 +76,7 @@ TH2D* GRBSim::Fireball()
   
   int ei1 = nph->GetYaxis()->FindBin(BATSE1);
   int ei2 = nph->GetYaxis()->FindBin(BATSE2);
-  double norm = nph->Integral(0,Tbin,ei1,ei2,"width")*(1.0e-3)/(dt*erg2meV); //erg/m²
+  double norm = nph->Integral(0,Tbin,ei1,ei2,"width")*(1.0e-3)/(erg2meV)/dt; //erg/m²
   
   // IMPORTANT m_Nv has to  be in [ph/(m² s keV)]
   m_Nv->Scale(m_fluence/norm);

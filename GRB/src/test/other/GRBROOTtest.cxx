@@ -1,5 +1,5 @@
 #include <iostream>
-#include <vector>
+//#include <vector>
 
 #include "TROOT.h"
 #include "TApplication.h"
@@ -33,9 +33,11 @@ double Band(double *var, double *par)
   double NT = pow(10.,par[3]);
 
   double E   = var[0];
-  double C  = pow((a-b)*E0/100.,a-b)*exp(b-a);
-  if(E <= (a-b)*E0) return NT * pow(E/100.,a) * exp(-E/E0);
-  return C* NT * pow(E/100.,b); // ph cm^(-2) s^(-1) keV^(-1)
+  double C   = pow((a-b)*E0,a-b)*exp(b-a);
+  double H   = (a-b) * E0;
+  if(E <= H) 
+    return NT * pow(E,a) * exp(-E/E0)*E;
+  return C* NT * pow(E,b)*E; // ph cm^(-2) s^(-1) keV^(-1)
 }
 
 TH2D *Load(char name[100]="grb_65540.root")
@@ -51,6 +53,7 @@ TH2D *Load(char name[100]="grb_65540.root")
   TBIN = Nv->GetXaxis()->GetNbins();   
   EBIN = Nv->GetYaxis()->GetNbins();
   DT   = TMAX/(TBIN-1.);
+
   std::cout<<" Matrix Loaded "<<std::endl; 
   std::cout<<" Bin t = "<<TBIN<<" TMIN = "<<TMIN<<" TMAX = "<<TMAX<<std::endl; 
   std::cout<<" Bin e = "<<EBIN<<" EMIN = "<<EMIN<<" EMAX = "<<EMAX<<std::endl; 
@@ -64,7 +67,16 @@ TH2D *Load(char name[100]="grb_65540.root")
   Nv->GetXaxis()->CenterTitle();
   Nv->GetYaxis()->CenterTitle();
   Nv->GetZaxis()->CenterTitle();
-  
+
+  // Nv ph/m^2/s/keV
+  /*
+  for(int t=0;t<TBIN;t++)
+    for(int e=0;e<EBIN;e++)
+      {
+	double ene = Nv->GetYaxis()->GetBinCenter(e+1);
+	Nv->SetBinContent(t+1,e+1,pow(ene,-2.0));  
+      }
+  */
   return Nv;
 }
 
@@ -72,13 +84,13 @@ TH2D *Load(char name[100]="grb_65540.root")
 void PlotGRB(double enph = 0,char name[100]="grb_65540.root")
 {
   gStyle->SetCanvasColor(10);
-
+  
   TCanvas *cNv = new TCanvas("cNv","Nv");
   cNv->SetLogy();
   cNv->SetLogz();
   
   TH2D *Nv = Load(name);
-
+  
   // Ne =  [ph/keV/s/m²]
   gDirectory->Delete("Ne");
   Nv->ProjectionY("Ne");
@@ -131,19 +143,19 @@ void PlotGRB(double enph = 0,char name[100]="grb_65540.root")
 	{
 	  TH1D *AnimatedSpectrum =   Nv->ProjectionY("Animated",i1,i2);
 	  AnimatedSpectrum->GetXaxis()->SetTitle("Energy [keV]");
-	  AnimatedSpectrum->GetYaxis()->SetTitle("#nu F_{#nu} [keV/m^{2}/s]");
+	  AnimatedSpectrum->GetYaxis()->SetTitle("F_{#nu} [ph/m^{2}/s]");
 	  AnimatedSpectrum->GetXaxis()->SetTitleOffset(1.1);
 	  AnimatedSpectrum->GetYaxis()->SetTitleOffset(1.5);
 	  for(int j=0; j < EBIN; j++)
 	    {
 	      double ne = AnimatedSpectrum->GetBinContent(j+1);
 	      double de = AnimatedSpectrum->GetBinWidth(j+1);//GetBinCenter(i+1);
-	      double e = AnimatedSpectrum->GetBinCenter(j+1);
+	      //double e = AnimatedSpectrum->GetBinCenter(j+1);
 	      //	      AnimatedSpectrum->SetBinContent(i+1,de*ne);
-	      AnimatedSpectrum->SetBinContent(j+1,e*de*ne);
+	      AnimatedSpectrum->SetBinContent(j+1,ne*de);
 	    }  
-	  AnimatedSpectrum->SetMaximum(1e10);
-	  AnimatedSpectrum->SetMinimum(1e0);
+	  AnimatedSpectrum->SetMaximum(1e7);
+	  AnimatedSpectrum->SetMinimum(1e-3);
 	  AnimatedSpectrum->Draw("l");
 	  animatedCanvas->Update();
 	  i1=i;
@@ -212,25 +224,35 @@ void PlotGRB(double enph = 0,char name[100]="grb_65540.root")
   vFv->Draw("al");
   Fv->Draw("samel");
   Ne->Draw("samel");
-  //  gDirectory->Delete("band");
-  /*
-    TF1 band("grb_f",Band,EMIN,1.0e+3,4); 
-    //  band.SetParNames("a","b","Log10(E0)","Log10(Const)");
-    band.SetLineStyle(2);
-    band.SetParameters(-1.0,-2.5,1.0,4.0);
-    band.SetParLimits(0,-2.0,0.0);
-    band.SetParLimits(1,-4.0,-1.0);
-    band.SetParLimits(2,1.0,3.0);
-    band.SetParLimits(3,0.0,10.0);
-    //  band.Draw("lsame");
-    //  Ne->Fit("grb_f","v","lsame");
-    std::cout<<"--------------------------------------------------"<<std::endl;
-    std::cout<<" a     = "<<band.GetParameter(0)<<std::endl;
-    std::cout<<" b     = "<<band.GetParameter(1)<<std::endl;
-    std::cout<<" E0    = "<<pow(10.,band.GetParameter(2))<<std::endl;
-    std::cout<<" Const = "<<pow(10.,band.GetParameter(3))<<std::endl;
-    std::cout<<"--------------------------------------------------"<<std::endl;
-  */ 
+  gDirectory->Delete("band");
+  
+  TF1 band("grb_f",Band,EMIN,1.0e+3,4); 
+  band.SetParNames("a","b","Log10(E0)","Log10(Const)");
+  band.SetLineStyle(2);
+
+  band.SetParLimits(0,-2.0,0.0);
+  band.SetParLimits(1,-3.0,-1.0);
+  band.SetParLimits(2,1.0,3.0);
+  band.SetParLimits(3,0.0,10.0);
+
+  band.FixParameter(0,-0.86);
+  band.FixParameter(1,-2.5);
+  band.FixParameter(2,2.65);
+  band.SetParameter(3,3.0);
+  //band.Draw("lsame");
+  Fv->Fit("grb_f","v","lsame");
+  double a=band.GetParameter(0);
+  double b=band.GetParameter(1);
+  double E0=pow(10.,band.GetParameter(2));
+  double Ep=(a+2)*E0;
+  std::cout<<"--------------------------------------------------"<<std::endl;
+  std::cout<<" a     = "<<a<<std::endl;
+  std::cout<<" b     = "<<b<<std::endl;
+  std::cout<<" E0    = "<<E0<<std::endl;
+  std::cout<<" Ep    = "<<Ep<<std::endl;
+  std::cout<<" Const = "<<pow(10.,band.GetParameter(3))<<std::endl;
+  std::cout<<"--------------------------------------------------"<<std::endl;
+   
   TLegend *leg = new TLegend(0.11,0.12,0.37,0.25);
   leg->SetFillStyle(0);
   leg->AddEntry(Ne," Ne  [ph/keV/m^{2}] ","lp");
