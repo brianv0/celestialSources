@@ -3,6 +3,7 @@
 #include "TH2D.h"
 #include "TH1D.h"
 #include "TROOT.h"
+#include "TRandom.h"
 #include <vector>
 
 struct photon
@@ -21,7 +22,7 @@ class SpectObj
       delete spec;
       delete times;
       delete Nv;
-      
+      delete m_SpRandGen;
     }
   void GetUniqueName(const void *ptr, std::string & name);
     
@@ -47,16 +48,20 @@ class SpectObj
   void ScaleAtBATSE(double fluence);
   double GetFluence(double BL=0.0, double BH=0.0);
   double GetT90(double BL=0.0, double BH=0.0);
+  void GetGBM();
   //////////////////////////////////////////////////
   TH1D* GetSpectrum(double t=0.0);
   TH1D* GetTimes(double t=0.0);
-
+  TH1D *CloneSpectrum();
+  TH1D *CloneTimes();
+    
  private:
+  TRandom *m_SpRandGen;
   TH2D* Nv;
   int ne,nt;
   int sourceType; //"0=Transient,1=Periodic"
   double emin,emax;
-  double tmin,tmax,deltat;
+  double m_Tmin,m_Tmax, m_TimeBinWidth;
   TH1D *spec,*times;
   photon ph;
 };
