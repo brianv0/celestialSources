@@ -40,8 +40,9 @@
   - The reconstructed direction (from TkrVertexCol)
   Then it compute the galactic direction (using \e transformGlastToGalactic(time)
   from \e fluxSvc.
-  Finally this algorithm save the "real" data and the "recon" data in output files.
-  From the jobOptions file it is possible to select tyhe format: ROOT tree, 
+  Finally this algorithm save the "real" data and the "recon" data in 
+  output files.
+  From the jobOptions file it is possible to select the format: ROOT tree, 
   ascii file, or both. 
   To test the algorithm, run: 
   \verbatim
@@ -53,6 +54,17 @@
 
 const double deg = 180.0 / M_PI;
 
+/*! @struct Data 
+  \brief This structure stores the data
+  
+  The data that we read from the TDS and we whant to store are:
+  \param time the time at which the particle arrives to the satellite
+  \param energy is the energy of the particle
+  \param theta relative to Glast
+  \param phi relative to glast
+  
+  @author Nicola Omodei, Francesco Longo, Sandhia Bansal
+*/
 struct Data
 {
 	float  time;

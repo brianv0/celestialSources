@@ -5,26 +5,14 @@
  * 
  * There are different type of engine:
  *
- * -# GRBengine will create a Shock sequence, 
- *    according with the physical parameter choosen in the configuration 
- *    file "GRBParam.txt", and stored in GRBConstants.
- *    GRBengine will read the number of shock,
- *    the duration of the burst,
- *    the energy, the Lorentz factor, and the thickness of the shell.
- *    Depending on the Shell_type, GRBengine will read the radios of the shell,
- *    or the jet angle and the jet radius.
- * -# In the second case GRBengine will first create two Shells for each shock,
- *    retriving the carateristic parameters of GRBShells from GRBConstants,
- *    and then will campute their collisions giving up to the GRBShock 
- *    sequence.
- * -# In this case the GRBengine uses some relations between the physical
+ * - Type 0: GRBengine uses some relations between the physical
  *    parameters, such as the dimension of the shocked material,
  *    and some quantities, such as the duration of a spike,
  *    and position of the break energy in the flux.
  *    In particular, if \f$t_r\f$ and \f$t_d\f$ are the rise and 
  *    the decay time of a single spike, \f$\delta_r\f$ is the thickness 
  *    of a shell, \f$E_i\f$ is the internal energy available in a shock,
- *    then the estimated relations are:
+ *    then the estimated relations are: 
  *
  *    \f$t_r\propto\displaystyle{\delta_r\over \Gamma c}\f$.
  *
@@ -35,13 +23,27 @@
  *    From this equations it is easy to estimate three parameters, 
  *    living free the fourth (\f$E_i\f$).
  *
- * GRBengine does the following:
+ * - Type 1: GRBengine will create a Shocks sequence, 
+ *    according with the physical parameter chosen in the configuration 
+ *    file The file  <a href="../../src/test/GRBParam.txt"> GRBParam.txt </a>,
+ *    and stored in GRBConstants.
+ *    GRBengine will read the number of shocks,
+ *    the duration of the burst,
+ *    the energy, the Lorentz factor, and the thickness of the shell.
+ *    Depending on the Shell_type, GRBengine will read the radios of the shell,
+ *    or the jet angle and the jet radius.
+
+ * - Type 2: GRBengine will first create two Shells for each shock,
+ *    retrieving the characteristic parameters of GRBShells from GRBConstants,
+ *    and then will compute their collisions giving up to the GRBShock 
+ *    sequence.
+ 
+ * \e GRBengine \e does \e the \e following:
  * - Reads the parameter file.
- * - Depending on the particular type of engine it fills a shock vector
+ * - Depending on the particular type of engine, fills a shocks vector
  * (that is a vector of GRBShock)
- * - Set the distance and the position in the sky of the GRB.
+ * - Sets the distance and the position in the sky of the GRB.
  * 
- *
  * \author Nicola Omodei       nicola.omodei@pi.infn.it 
  * \author Johann Cohen-Tanugi johann.cohen@pi.infn.it
  *

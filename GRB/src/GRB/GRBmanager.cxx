@@ -16,11 +16,12 @@ GRBmanager::~GRBmanager()
   std::cout<<"**************************************************"<<std::endl;
   delete m_GRB;
 }
-
-double GRBmanager::solidAngle() const
-{
+/*
+  double GRBmanager::solidAngle() const
+  {
   return 1.0;
-}
+  }
+*/
 
 //return flux, given a time
 double GRBmanager::flux(double time) const

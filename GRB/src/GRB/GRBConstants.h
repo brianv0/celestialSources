@@ -5,7 +5,7 @@
  * The namespace cst contains all the constant needed to the simulation.
  * All the constant relative to physical model are included in the GRBParam.txt
  *
- * \author Nicola Omodei nicola.omodei@pi.infn.it
+ * \author Nicola Omodei       nicola.omodei@pi.infn.it 
  * \author Johann Cohen-Tanugi johann.cohen@pi.infn.it
  */
 
@@ -14,6 +14,10 @@
 #include <string>
 #include <cmath>
 #include "CLHEP/Random/RandomEngine.h"
+
+/*!
+  Namespace contaning all the constants
+*/
 namespace cst
 {
   // Universal constants :
@@ -42,8 +46,8 @@ namespace cst
   const double p         = 2.5;
   const double viscosity = 0.0;
   // Internal Parameters
-  const int    nstep        = 400;
-  const int    enstep       = 100;
+  const int    nstep        = 500; // Number of time step
+  const int    enstep       =  50; // Number of energy step
   const double enmin     = 1.0e+3;
   const double enmax     =1.0e+12;
   // Minimal Temporal separation between 2 photons
@@ -94,11 +98,25 @@ class GRBConstants
   //! Save the parameters in a file. It could be usefull to mantain trace of the models runned.
   void Save(bool flag=false);
 
-  //! Defines the engine`s type
-  inline int EngineType(){return m_engineType;}
-  
+
+  /*!  Defines the engine`s type
+
+    The type of engine defines the way GRBengine creates the shocks vector
+
+    \param value define the type: 
+    - type 0: Observed parameters
+    - type 1: Reads the Physical parameters and create a shock with 
+    the defined parameters
+    - type 2: Reads the physical parameters and generates shocks 
+    starting from the collision of two shells of the specified parameters.
+
+    \sa GRBengine, GRBShock
+   */
   inline void setEngineType(int value){m_engineType = value;}
   
+  //! Retrn The engine type 
+  inline int EngineType(){return m_engineType;}
+    
   ////////////////////  Engine: Shell Generator
 
   //  inline int Nshell() {return m_nshell;}
@@ -126,10 +144,18 @@ class GRBConstants
   inline double PeakEnergy(){return m_peak;}
  
   inline void setPeakEnergy(double value=0.4){m_peak = value;}
-  //! Defines the shell`s type
+  /*! Sets the type of shell
+    
+    GRBShell can have different geometries. 
+    This function set the appropriate geometry
+    - Type 0: Isotropic emission
+    - Type 1: Jet emission
+  */
+  inline void setShellType(int value){m_shellType = value;}
+  
+  //! Returns the shell`s type
   inline int ShellType(){return m_shellType;}
   
-  inline void setShellType(int value){m_shellType = value;}
   //////////////////// Shell: Spherical Shells
 
   inline double ShellRadius(){return m_d0;}
@@ -167,8 +193,10 @@ class GRBConstants
   inline double Redshift() {return m_redshift;}
 
   inline void setRedshift(double value=1.0){m_redshift = value;}
-  //! Set the minimum energy of the extracted photons 
-  //! (all the photons drown from the spectrum will be energy greater then m_enph)
+  /*! Set the minimum energy of the extracted photons 
+    
+    All the photons drawn from the spectrum will be energy greater then m_enph
+  */
   inline void setEnergyPh(double value=25.0e+3){m_enph = value;}
   
   inline double EnergyPh(){return m_enph;}

@@ -43,10 +43,10 @@ void GRBICompton::load(const double time,
 {
 
   if (time <= 0.){m_spectrumObj *= 0.; return;}
-  int type = 0; // 0 -> Power Law, from Sari and Esin, astro-ph/0005253
+  //int type = 0; // 0 -> Power Law, from Sari and Esin, astro-ph/0005253
   //int type = 1; // 0 -> Power Law, the electron have gamma_min, Low IC
   //int type = 2; // 0 -> Power Law, The electron have gc, High IC
-  //int type = 3; // 0 -> Integration, Slow computation but all the 
+  int type = 3; // 0 -> Integration, Slow computation but all the 
   //                                 electrons are considered
   
   double ComovingTime; 
@@ -246,7 +246,7 @@ void GRBICompton::load(const double time,
 		    *InverseComptonFunction(gi,x[e0],(*x1));
 		  //cout<<" gamma  "
 		  e0++;
-		  isy+=cst::enstep/5; // To speed up the integration. 
+		  isy+=2; // To speed up the integration. 
 		}
 	      j+=2;
 	    }

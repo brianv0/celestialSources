@@ -1,6 +1,6 @@
  /*! \mainpage GRB Package: simulating a transient source
    
-The GRB package has been developed to provide the GLAST simulator software 
+The GRB package has been developed to provide the Glast simulator software 
 with a full fledged simulator of a physical transient source.
 As such it has been designed to correctly interface FluxSvc, 
 by providing spectrum classes derived from ISpectrum.
@@ -17,12 +17,24 @@ the internal shocks configuration.
  
  \section physics Very short introduction to the physical model
 <br>
-We adopted a physical model based on the \em fireball model of Gamma Ray Burst, because it is able to well reproduce the fast time variability observed in the GRB signal: a series of shells is injected in the circum burst medium with different Lorentz factor. When a faster shell reach a slower one a shock occurs, and an accelerated electron distribution is obtained due to the shock acceleration process. Some of the energy dissipated during the shock is converted into a randomly oriented magnetic field. The electrons can loose their energy via synchrotron emission. The characteristic synchrotron spectrum is boosted (and beamed) thanks to the Lorentz factor of the emitting material. The higher energy part of a GRB spectrum can be obtained keeping into account the possibility of Compton scattering of the synchrotron photons against the electron accelerated by the shock (Inverse Compton Scattering).
+We adopted a physical model based on the \em fireball model of Gamma Ray 
+Burst, because it is able to well reproduce the fast time variability 
+observed in the GRB signal: a series of shells is injected in the circum 
+burst medium with different Lorentz factors. 
+When a faster shell reaches a slower one a shock occurs, and an accelerated 
+electron distribution is obtained due to the shock acceleration process. 
+Some of the energy dissipated during the shock is converted into a randomly 
+oriented magnetic field. The electrons can loose their energy via synchrotron
+ emission. The characteristic synchrotron spectrum is boosted (and beamed) 
+thanks to the Lorentz factor of the emitting material. 
+The higher energy part of a GRB spectrum can be obtained keeping into account 
+the possibility of Compton scattering of the synchrotron photons against the 
+electron accelerated by the shock (Inverse Compton Scattering).
 <br>
 
 \subsection parameters Parameters for the GRB physical model
 <br>
-The file /src/test/GRBParam.txt holds information used for the description of 
+The file  <a href="../../src/test/GRBParam.txt"> GRBParam.txt </a> holds information used for the description of 
 the GRB. 
 It can be changed without recompiling the entire package.
 <br>
@@ -30,7 +42,7 @@ It MUST be in /src/test directory of the GRB package.
 <br>
 Depending on how GRBengine works, the sequence of shock that give up the GRB
 can be formed in different ways. 
-The File GRBParam.txt contains information about:
+The File <a href="../../src/test/GRBParam.txt"> GRBParam.txt </a> contains information about:
 - The Number of shocks
 - The total energy available to the fireball
 - The Redshift of the source
@@ -47,31 +59,6 @@ energy are extracted from the flux and stent to FluxSvc
 - The thickness of the shells
 - The minimum Lorentz factor to assign to a shell
 - The maximum Lorentz factor to assign to a shell
-
-A tipical "GRBParam.txt" configuration file look like this:
-\verbatim
-1	        // Nshock
-1.0e+55		// Etot
-1.0		// Redshift
-1.0e+7          // Minimum Energy Extracted
-Shell  type = 1 // 1= jet, 0 = spherical 
-## If Shell == 1 : Jet Shells
-1.0e+18	  	// Radius of the jet [cm]
-0.0		// Angle of the jet  [degree]
-## If Shell == 0 : Isotropic Shells
-1.0e+18	  	// Radius of the Shell [cm]	
-Engine type = 0 // 0=OP, 1= PP1S, 2= PP2S
-## If  Engine type == 0 (Observed parameters are):
-.2		// Duration of the Burst.
-.1 		// Rise  time of a peak
-.1              // decay time of a peak
-0.3             // Peak  energy (MeV)
-## If  Engine type == 1 or 2 (Physical parameters are):
-1.0e+13		// Thickness of the shells[cm]
-1000.		// Minimum Lorenz Factor
-1000.		// Maximum Lorenz Factor
-\endverbatim
-
 
 \section phenomenological Very short introduction to the phenomenological model
 
@@ -131,15 +118,14 @@ file), but it manages some options available for the GRB Algorithm.
 
 \section jobOptions jobOptions files
 There are two different jobOptions.txt file:
+- <a href="../../src/test/test_jobOptions.txt"> test_jobOptions.txt </a>
+is meant to be used in nightly builds together with test_GRB.exe
 
-- <a href="../../src/test/test_jobOptions.txt>test_jobOptions.txt</a> is meant to be used in nightly 
-builds together with test_GRB.exe
-
-- <a href="../../src/test/jobOptions.txt>jobOptions.txt</a>:
+- <a href="../../src/test/jobOptions.txt"> jobOptions.txt </a>:
 This file is used to choose (by picking up/commenting out '\c #include' statements) between the 3 files: 
  GRBtestAlgOptions.txt, TDSreadFluxOptions.txt, and LatGRBAlertOptions.txt
 
-- <a href="../../src/test/GRBtestAlgOptions.txt>GRBtestAlgOptions.txt</a>:
+- <a href="../../src/test/GRBtestAlgOptions.txt"> GRBtestAlgOptions.txt</a>:
 \param GRBTestAlg.source_name
 passes the name of the GRB source, to be chosen among the ones defined in 
 <a href="../../xml/GRB_user_library.xml>GRB_user_library.xml</a>
@@ -175,9 +161,8 @@ Name of file containing background mixed data.
 \section requirements CMT requirements
 \include cmt/requirements
 <hr>
-@section notes Release Notes
-@include release.notes
-
+\section notes Release Notes
+\include doc/release.notes
 <hr>
  */
 

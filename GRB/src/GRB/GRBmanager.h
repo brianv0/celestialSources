@@ -17,7 +17,7 @@ class ISpectrum;
   
   \brief Spectrum class for many GRBs inheriting from GRBSpectrum.
   This class concatenates several GRBSpectrum one after the other 
-  for simulating a seriers of several GRBs.
+  for simulating a series of several GRBs.
   
   \author Nicola Omodei       nicola.omodei@pi.infn.it 
   \author Johann Cohen-Tanugi johann.cohen@pi.infn.it
@@ -55,7 +55,7 @@ class GRBmanager : public ISpectrum
    */
   double interval(double time);
   //! \retval 1
-  double solidAngle() const;
+  inline double solidAngle() const{return 1.0;}
   //! direction, taken from GRBSim
   inline std::pair<double,double> 
     dir(double energy, HepRandomEngine* engine)

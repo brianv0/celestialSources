@@ -1,4 +1,4 @@
-1	        // Nshock
+10	        // Nshock
 1.0e+53		// Etot
 1.0		// Redshift
 1.0e+6          // Minimum Energy Extracted
@@ -10,10 +10,10 @@ Shell  type = 1 // 1= jet, 0 = spherical
 1.0e+18	  	// Radius of the Shell [cm]	
 Engine type = 0 // 0=OP, 1= PP1S, 2= PP2S
 ## If  Engine type == 0 (Observed parameters are):
-.2		// Duration of the Burst.
-.1 		// Rise  time of a peak
-.1              // decay time of a peak
-0.3             // Peak  energy (MeV)
+10		// Duration of the Burst.
+1 		// Rise  time of a peak
+1               // decay time of a peak
+0.5             // Peak  energy (MeV)
 ## If  Engine type == 1 or 2 (Physical parameters are):
 1.0e+13		// Thickness of the shells[cm]
 1000.		// Minimum Lorenz Factor

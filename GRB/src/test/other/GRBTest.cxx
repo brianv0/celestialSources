@@ -65,31 +65,42 @@ class DataOut{
 public:
   DataOut();
   ~DataOut(){}  
+  //! Stores the time 
   inline void setTime(double value)   {m_time=value;}
+  //! Store the energy 
   inline void setEnergy(double value) {m_energy=value;}
-  
+  //! Store Phi 
   inline void setPhi(double value)    {m_phi=value;}
+  //! Store the Theta
   inline void setTheta(double value)  {m_theta=value;}
-  
+  //! Store the Galactic \e l direction 
   inline void setGal_l(double value)  {m_l=value;}
+  //! Store the Galactic \e b direction 
   inline void setGal_b(double value)  {m_b=value;}
 
+  //! Returns the time stored in DataOut 
   inline double Time()   {return m_time;}
+  //! Returns the energy stored in DataOut 
   inline double Energy() {return m_energy;}
-  
+  //! Returns phi stored in DataOut 
   inline double Phi()    {return m_phi;}
+  //! Returns theta stored in DataOut 
   inline double Theta()  {return m_theta;}
-  
+  //! Returns the galactic \e l direction stored in DataOut 
   inline double Gal_l()  {return m_l;}
+  //! Returns the galactic \e b direction stored in DataOut 
   inline double Gal_b()  {return m_b;}
 
   /*!
     \brief Type of the source
     
-    SourceType = 1 means the source has been chosen as a primary source, like a GRB.
-    SourceType = 0 flags the source as a Background source. 
-    Sometime is useful to have the possibility to distinguish between sources and 
-    background.
+    The type of a source is defined as:
+    - SourceType = 1 means the source has been chosen as a primary source, 
+    like a GRB.
+    - SourceType = 0 flags the source as a Background source. 
+    
+    Sometime is useful to have the possibility to distinguish between 
+    sources and background.
   */
   inline void setSourceType(int value)    {m_source_type=value;}
   //! return the source type.
@@ -106,10 +117,22 @@ private:
   
   int m_source_type;
 };
-
+/*!
+  \class TimeCmp
+  \brief This class is used to sort the data array
+  
+  It gives a comparison method to be use with the sort operation of a vector.
+*/
+  
 class TimeCmp{
 public:
-//  bool operator()(const DataOut& data1,const DataOut& data2)
+  /*!  This operator compares the time DataOut member of two DataOut using
+    the method DataOut::Time
+    
+    \param data1
+    \param data2
+    \retval bool true if data1.Time() < data2.Time()
+  */
   bool operator()(DataOut& data1, DataOut& data2)
   {
     return data1.Time() < data2.Time();    
