@@ -22,6 +22,17 @@
 #include "CLHEP/Random/RandomEngine.h"
 #include "GRBSim.h"
 
+/*!
+ * \class GRBSpectrum
+ *
+ * \brief Main interface to FluxSvc for the physical model
+ *  This class inherits from ISpectrum, and allows to pass the result of GRB
+ *  physical model simulation to Gleam framework
+ * 
+ * \author Nicola Omodei       nicola.omodei@pi.infn.it 
+ * \author Johann Cohen-Tanugi johann.cohen@pi.infn.it
+ *
+ */
 class GRBSpectrum : public ISpectrum
 {
   friend class GRBmanager;  

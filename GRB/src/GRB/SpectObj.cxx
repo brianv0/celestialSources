@@ -123,13 +123,21 @@ SpectObj SpectObj::extractSub(std::map<double,double>::const_iterator start,
 }
 
 SpectObj SpectObj::SetSpectrum(double energy, double spectrum)
+  //purpose and method 
+  //inputs 
+  //outputs
+  //caveat: needs a safeguard for out of range energy value 
 {
   m_spectrum[energy] = spectrum;
   return (*this);
 }
 
 SpectObj SpectObj::SetSpectrum(std::vector<double> energy, std::vector<double> spectrum)
-{
+  //purpose and method 
+  //inputs 
+  //outputs
+  //caveat: needs a safeguard for out of range energy and spectrum values
+{ 
   std::vector<double>::const_iterator ite = energy.begin();
   std::vector<double>::const_iterator its = spectrum.begin();
   while (ite != energy.end())
