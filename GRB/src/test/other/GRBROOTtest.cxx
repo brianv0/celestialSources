@@ -1,23 +1,39 @@
-/*!\class GRBROOTTest
- * \brief Test program for GRB simulation studies.
- * 
- * This executable uses ROOT to display several histograms at run time.
- * To use it, type on the prompt ./test_GRBROOT.exe
- * After a period of initialization, a canvas pops up showing the 
- * complete evolution of the burst in function of the time. 
- * At the end, 4 new canvas pops up, showing several summary 
- * histograms.
- */
+// Description:
+//    GRBROOTTest is a test program for GRB simulation studies.
+//    This executable uses ROOT to display several histograms at run time.
+//    It is just an interface to GRBSim, which actually does all the job.
+//
+// Usage:
+//    test_GRBROOT.exe [options] [option_args]
+//
+// Options:
+//    -time <time in sec> fix the maximum time
+//    -save Save the parameters for the model and the output in a file ("GRBdata.txt").
+//    -root Save the histograms in a in a root file ("histos.root")
+//    -seed <seed> set the seed for the random engine
+//    -mute It turns off the graphical output
+//    -cycle <N> it runs the program N times
+//    -gif  It save the moovie of the evolving flux in a gif file.
+//
+// Graphical output:
+//    After a period of initialization, a canvas pops up showing the 
+//    complete evolution of the burst in function of the time. 
+//    At the end, 4 new canvas pops up, showing several summary 
+//    histograms.
+//
+// Authors
+//    Nicola Omodei
+//    Johann Cohen-Tanugi
+//
+// [Header File]
 #include <iterator>
 #include <iostream>
 #include <stdio.h>
 #include <string>
 #include <vector>
+// include facilities
 #include "facilities/Util.h"
-//Include files for spectrum...
-
 //include files for ROOT...
-
 #include "TROOT.h"
 #include "TApplication.h"
 #include "TCanvas.h"
@@ -30,40 +46,25 @@
 #include "TTree.h"
 #include "TBranch.h"
 #include "TObjArray.h"
-//#include "BranchObject.h"
 #include "TFile.h" 
-
 //GRB include files...
 #include "../../GRB/GRBShell.h"
 #include "../../GRB/GRBShock.h"
 #include "../../GRB/GRBConstants.h"
 #include "../../GRB/GRBSim.h"
-//#include "../../src/GRB/GRBSpectrum.h"
+// CLHEP include
 #include "CLHEP/Random/RandFlat.h"
 using namespace std;
 
-//! The size of the energy array is taken from GRBConstant.h file in FluxSvc
+// The size of the energy array is taken from GRBConstant.h
 #define ENERGYSIZE cst::enstep
-//! The size of the time array is taken from GRBConstant.h file in FluxSvc
+// The size of the time array is taken from GRBConstant.h
 #define TIMESIZE cst::nstep
 ////////////////////////////////////////////////////////////
-// Channel for the output Light Curves
-/*
-  // GBM 1 Channel:
-  const double ch1L      =   10.0e+3;
-  const double ch1H      =   50.0e+3;
-  // GBM 2 Channel
-  const double ch2L      =   50.0e+3;
-  const double ch2H      =  300.0e+3;
-  // GBM 3 Channel:
-  const double ch3L      =  300.0e+3;
-  const double ch3H      = 1000.0e+3;
-  // LAT RANGE
-  double ch4L            = 10.0e+6; //!MeV this will be change by enph
-  const double ch4H      = 10.0e+9;  //!GeV 
-  const double ch5L      = 10.0e+9; 
-  const double ch5H      = cst::enmax;
-*/
+// Channel for the output Light Curves, all the values are in eV
+// the values are: ch*L : channel * lowest energy (eV)
+//                 ch*H : channel * highest enery (eV)
+//                 Nch* : channel * noise value (counts)
 // GBM 1 Channel:
 const double ch1L      =   50.0e+3;
 const double ch1H      =  100.0e+3;
@@ -72,12 +73,10 @@ const double Nch1      =  200.0;
 const double ch2L      =  100.0e+3;
 const double ch2H      =  300.0e+3;
 const double Nch2      =  150.0;
-
 // GBM 3 Channel:
 const double ch3L            = 300.0e+3;  //1GeV
 const double ch3H      = 1.0e+6; //2 GeV
 const double Nch3      =  100.0;
-
 // LAT RANGE
 double ch4L      = 1.0e+9; //!MeV this will be change by enph
 const double ch4H      = 1.0e+9;  //!GeV 
@@ -86,37 +85,6 @@ const double Nch4      =  10.0;
 const double ch5L      = 10.0e+9; 
 const double ch5H      = cst::enmax;
 const double Nch5      =  1.0;
-
-/*
-  // BATSE 1 Channel:
-  const double ch1L      = 20.0e+3;
-  const double ch1H      = 50.0e+3;
-  // BATSE 2 Channel
-  const double ch2L      = 50.0e+3;
-  const double ch2H      = 100.0e+3;
-  // BATSE 3 Channel:
-  const double ch3L      = 100.0e+3;
-  const double ch3H      = 300.0e+3;
-  // LAT RANGE
-  double ch4L      = 10.0e+6; //!MeV
-  const double ch4H      = cst::enmax;
-*/
-// GLAST Energies ?
-//const double ch1L      = 0.001e+9;
-//const double ch1H      = 0.0025e+9;
-//const double ch2L      = 0.0025e+9;
-//const double ch2H      = 0.005e+9;
-//const double ch3L      = 0.005e+9;
-//const double ch3H      = 0.01e+9;
-//const double ch4L      = 0.01e+9;
-//const double ch4H      = 1.00e+9;
-
-// GBM Energy Range:
-//const double ch3L      = 25.0e+3;
-//const double ch3H      = 10.0e+6;
-// LAT Energy Range
-//const double ch4L      = 20.0e+6;
-//const double ch4H      = 300.0e+9;
 ////////////////////////////////////////////////////////////
 
 const double TIME=10.0;
@@ -125,31 +93,17 @@ double m_flux[ENERGYSIZE][TIMESIZE];
 double timex[TIMESIZE];
 double energyx[ENERGYSIZE];
 
-//! It starts the simulation of a new Gamma-Ray Burst
 void Burst(int argc, char** argv);
+
 int main(int argc, char** argv)
 {
   Burst(argc,argv);
   return 0;
 }
 
-double CalculateFluence(double ee,double e1=cst::enmin*1e-9,double e2=cst::enmax*1e-9)
-{
-  double fluence;
-  if (ee>=e1 && ee<=e2) 
-    {
-      fluence=ee;
-    }
-  else 
-    {
-      fluence=0.0;
-    }
-  return fluence;
-}
-
 void Burst(int argc, char** argv)
 {
-  // definition and default options // 
+  // definition and default options 
   bool savef      = false;
   bool save_gif   = false;
   bool save_root  = false;
@@ -202,28 +156,22 @@ void Burst(int argc, char** argv)
   
   for(int i=0;i<Ncycle;i++)
     {
-      GRBSim* _myGRB = new GRBSim(seed);
-      /// This initializes the GRB simulation...
+      // 1) Initialize ROOT
       std::cout<<"******     Initializing ROOT    ******"<<std::endl;
       static const   TROOT root("GRB", "GRB Simulator");
-      //TROOT->Stat()
-      _myGRB->MakeGRB();
+      // 2) Initialize the GRB simulation, setting the seed
+      GRBSim* myGRB = new GRBSim(seed);
+      // 3) Build a new GRB
+      myGRB->MakeGRB();
       
-      if (!set_tmax) tmax=_myGRB->Tmax();
-      
-      std::cout<<" MAX TIME = "<<tmax<<std::endl;
+      // 4) Prepare the time and energy binning 
+      if (!set_tmax) tmax=myGRB->Tmax();
       double m_dt=tmax/cst::nstep;
-      
-      energy=_myGRB->Energy();
-      deltae=_myGRB->DeltaE();
-      ch4L  =_myGRB->myParam->EnergyPh();
+      energy=myGRB->Energy();
+      deltae=myGRB->DeltaE();
+      ch4L  =myGRB->myParam->EnergyPh();
       TApplication theApp("App",0,0);
-      
-      
-      //------------------------------------------------------//
-      ////////////////  Compute the Total Flux /////////////////
-      //------------------------------------------------------//
-      // Logaritmic Binning
+      // Logaritmic Binning for energy
       double *e_bins;
       e_bins=(double*)malloc(sizeof(double)*(cst::enstep+1));
   
@@ -231,19 +179,13 @@ void Burst(int argc, char** argv)
 	{
 	  e_bins[i]=energy[i]*1.0e-6;
 	}
-      
-      TH1D *h1 = new TH1D("h1","h1",cst::enstep,e_bins);//log10(cst::enmin)-6,log10(cst::enmax)-6);
+     
+      TH1D *h1 = new TH1D("h1","h1",cst::enstep,e_bins);
       
       TCanvas *cc2;
       if(video_out)
 	{
 	  cc2 = new TCanvas();
-	 	  //	  h1->GetXaxis()->SetTitle("Energy [MeV]");
-	  //  h1->GetXaxis()->SetLabelSize(0.05);
-	  // h1->GetXaxis()->SetTitleOffset(1.5);
-	  //  h1->GetYaxis()->SetTitle("flux[ph/s/eV/m^2]");  
-	  //  h1->GetYaxis()->SetTitle("F#nu[erg/s/cm^2]");  
-	  //  h1->SetFillColor(5);
 	}
       
       double fluence1=0.0;
@@ -256,12 +198,12 @@ void Burst(int argc, char** argv)
       
       // to not have confusion between widows and linux...
       int en,t;
+      // 5) STARTS the main loop. For each time, it computs the flux and update the histograms
       for (t=0;t<cst::nstep;t++)
 	{
 	  m_time.push_back(t*m_dt);
-	  // Compute the flux @ time
 	  spectrum.clear();	  
-	  spectrum=_myGRB->ComputeFlux(m_time[t]); // is in ph/s/MeV/m^2
+	  spectrum=myGRB->ComputeFlux(m_time[t]); // is in ph/s/MeV/m^2
 	  for (en=0;en<=cst::enstep;en++)
 	    {
 	      m_flux[en][t]=spectrum[en]*energy[en]/(cst::erg2MeV*1.0e+6);  
@@ -310,17 +252,17 @@ void Burst(int argc, char** argv)
 		  cc2->SaveAs(gif);
 		}
 	    }
-	  //_myGRB->IFlux returns eV/s/m^2 ; fluences are in erg/cm^2: 
-	  fluenceTOT+=_myGRB->IFlux(spectrum,cst::enmin,cst::enmax)/(cst::erg2MeV*1.0e+6)*(1.0e-4)*m_dt;
-	  fluence1+=_myGRB->IFlux(spectrum,ch1L,ch1H)              /(cst::erg2MeV*1.0e+6)*(1.0e-4)*m_dt;
-	  fluence2+=_myGRB->IFlux(spectrum,ch2L,ch2H)              /(cst::erg2MeV*1.0e+6)*(1.0e-4)*m_dt;
-	  fluence3+=_myGRB->IFlux(spectrum,ch3L,ch3H)              /(cst::erg2MeV*1.0e+6)*(1.0e-4)*m_dt;
-	  fluence4+=_myGRB->IFlux(spectrum,ch4L,ch4H)              /(cst::erg2MeV*1.0e+6)*(1.0e-4)*m_dt;
-	  fluence5+=_myGRB->IFlux(spectrum,ch5L,ch5H)              /(cst::erg2MeV*1.0e+6)*(1.0e-4)*m_dt;
+	  //myGRB->IFlux returns eV/s/m^2 ; fluences are in erg/cm^2: 
+	  fluenceTOT+=myGRB->IFlux(spectrum,cst::enmin,cst::enmax)/(cst::erg2MeV*1.0e+6)*(1.0e-4)*m_dt;
+	  fluence1+=myGRB->IFlux(spectrum,ch1L,ch1H)              /(cst::erg2MeV*1.0e+6)*(1.0e-4)*m_dt;
+	  fluence2+=myGRB->IFlux(spectrum,ch2L,ch2H)              /(cst::erg2MeV*1.0e+6)*(1.0e-4)*m_dt;
+	  fluence3+=myGRB->IFlux(spectrum,ch3L,ch3H)              /(cst::erg2MeV*1.0e+6)*(1.0e-4)*m_dt;
+	  fluence4+=myGRB->IFlux(spectrum,ch4L,ch4H)              /(cst::erg2MeV*1.0e+6)*(1.0e-4)*m_dt;
+	  fluence5+=myGRB->IFlux(spectrum,ch5L,ch5H)              /(cst::erg2MeV*1.0e+6)*(1.0e-4)*m_dt;
 	  // erg/cm^2
 	  if (video_out) 
 	    std::cout<<"Time / tmax = "<<m_time[t]<<"/" <<tmax<<" Ftot [erg]= "
-		<<fluenceTOT*(_myGRB->Area()*1.0e+4)<<std::endl;
+		<<fluenceTOT*(myGRB->Area()*1.0e+4)<<std::endl;
 	}
       //////////////////////////////////////////////////
       if(save_gif) 
@@ -329,14 +271,14 @@ void Burst(int argc, char** argv)
 	  system("rm -f flux_*.gif");
 	}
       
-      //      gSystem->Exec("gifsicle --delay=10 --loop=5 flux_*.gif > anim.gif");
+      // gSystem->Exec("gifsicle --delay=10 --loop=5 flux_*.gif > anim.gif");
       // gSystem->Exec("rm -f flux_*.gif");
       
       //You can view the animated file anim.gif with Netscape/IE
       //or with gifview as shown below (finish by typing "q" in the window)
       //for more info about gifsicle, gifview, see above url or do
-      // gifsicle --help     gifview --help
-      //  gSystem->Exec("gifview -a anim.gif");
+      //gifsicle --help     gifview --help
+      //gSystem->Exec("gifview -a anim.gif");
       //////////////////////////////////////////////////
 
       std::cout<<"**************************************************"<<std::endl;
@@ -371,41 +313,19 @@ void Burst(int argc, char** argv)
       std::cout<<"Fluence ("<<ch5L*1.0e-6<<" MeV - "<<ch5H*1.0e-6<<" MeV) [ph/cm^2/s] = "
 	  <<fluence5*(cst::erg2MeV)*1.0e+6/(ch4H-ch4L)/tmax<<std::endl;
       //////////////////////////////////////////////////
-      // Save the results in the GRBlogfile...        //
+      // Save the results in the paramFile (defined in GRBConstant.h)
       //////////////////////////////////////////////////
       if(savef)
 	{
-	  _myGRB->myParam->Save(!(cst::savef));
-	  std::string paramFile = _myGRB->myParam->GetParamFile();
-	  //"$(GRBROOT)/src/test/GRBlog.txt";
-	  //	  std::string paramFile2 = "$(GRBROOT)/src/test/GRBdata.txt";
-	  
-	  //facilities::Util::expandEnvVar(&paramFile);
+	  myGRB->myParam->Save(!(cst::savef));
+	  std::string paramFile = myGRB->myParam->GetParamFile();
 	  facilities::Util::expandEnvVar(&paramFile);
-	  
-	  //ofstream f1(paramFile.c_str(),ios::app);
+	
 	  std::ofstream f2(paramFile.c_str(),ios::app);
-	  /*
-	  if (! f1.is_open()) 
-	    {
-	      std::cout<<"Error Opening $(GRBROOT)/src/test/GRBlog.txt\n";
-	      //TODO LIST: still need to remove this exit, without getting a core dump!
-	      exit(1);
-	    }
-	  std::cout<<"Save results into the file: "<<paramFile.c_str()<<std::endl;
-	  std::cout<<"*******************************************"<<std::endl;
 	  
-	  f1<<"Tmax = "<<tmax<<" Ftot [erg]= "<<fluence1<<std::endl;
-	  f1<<"Fluence [erg/cm^2] = "<<fluence1/_myGRB->Area()<<std::endl;
-	  f1<<"Fluence ("<<ch1L*1.0e-6<<" MeV - "<<ch1H*1.0e-6<<" MeV) [erg/cm^2] = "<<fluence2/_myGRB->Area()<<std::endl;
-	  f1<<"Fluence ("<<ch2L*1.0e-6<<" MeV - "<<ch2H*1.0e-6<<" MeV) [erg/cm^2] = "<<fluence3/_myGRB->Area()<<std::endl;
-	  f1<<"Fluence ("<<ch3L*1.0e-6<<" MeV - "<<ch3H*1.0e-6<<" MeV) [erg/cm^2] = "<<fluence4/_myGRB->Area()<<std::endl;
-	  f1<<"Fluence ("<<ch4L*1.0e-6<<" MeV - "<<ch4H*1.0e-6<<" MeV) [erg/cm^2] = "<<fluence5/_myGRB->Area()<<std::endl;
-	  f1.close();
-	  */
 	  f2<<seed<<std::endl;
 	  f2<<tmax<<std::endl;
-	  f2<<fluenceTOT*(_myGRB->Area()*1.e+4)<<std::endl;
+	  f2<<fluenceTOT*(myGRB->Area()*1.e+4)<<std::endl;
 	  f2<<fluenceTOT<<std::endl;
 	  f2<<fluence1<<std::endl;
 	  f2<<fluence2<<std::endl;
@@ -432,7 +352,6 @@ void Burst(int argc, char** argv)
 	  TCanvas *c1 = new TCanvas("c1","GRB Flux",10,10,700,800);
 	  TCanvas *c2 = new TCanvas("c2","GRB Light Curve");
 	  TCanvas *c3 = new TCanvas("c3","3D Flux Rapresentation");
-	  //std::cout<<"xmin = "<< energyx[0] << "   xmax = "<<energyx[cst::nstep-1]<< "  ymin = "<<timex[0] <<"   ymax =" << timex[cst::nstep-1] <<std::endl;
 	 	  
 	  TH1D *fl = new TH1D("fl","fl",cst::enstep,e_bins);
 	  TH1D *ph = new TH1D("ph","ph",cst::enstep,e_bins);
@@ -736,7 +655,7 @@ void Burst(int argc, char** argv)
       ////////////////////////////////////////////
       
       if (video_out) theApp.Run();
-      delete _myGRB;
+      delete myGRB;
       //To kill the application press control C //
     }
 }
