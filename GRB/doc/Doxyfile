@@ -303,9 +303,11 @@ WARN_LOGFILE           =
 # documented source files. You may enter file names like "myfile.cpp" or 
 # directories like "/usr/src/myproject". Separate the files or directories 
 # with spaces.
-
-INPUT                  = ../src ../src/GRB ../src/test/GRBTestAlg.cxx ../src/test/other/GRBTest.cxx ../src/test/other/GRBROOTtest.cxx release.notes
-
+	
+INPUT  = ../src 
+INPUT += ../src/test/GRBTestAlg.cxx 
+INPUT += ../src/test/other/GRBTest.cxx
+INPUT += ../src/TDSReadFluxAlg.cxx
 
 # If the value of the INPUT tag contains directories, you can use the 
 # FILE_PATTERNS tag to specify one or more wildcard pattern (like *.cpp 
