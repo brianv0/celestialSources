@@ -69,9 +69,8 @@ private:
    /// from the flux/Spectrum base class).
    mutable std::pair<double, double> m_currentDir;
 
-   std::vector<std::vector<double> > m_spectra;
-   std::vector<double> m_eMin;
-   std::vector<double> m_eMax;
+   std::vector<std::vector<std::pair<double,double> > > m_spectra;
+   std::vector<double> m_energies;
 
    double mapValue(unsigned int i, unsigned int j, unsigned int k);
 
@@ -82,8 +81,14 @@ private:
 
    void makeCumulativeSpectra();
 
-   double drawEnergy(const std::vector<double> & spectrum) const;
+   double powerLawIntegral(double x1, double x2, double y1, double y2,
+                           double & gamma) const;
+                           
+   double drawEnergy(const std::vector<std::pair<double, double> > & spectrum)
+      const;
 
+   static bool cmpPair(const std::pair<double, double> & x, 
+                       const std::pair<double, double> & y); 
 };
 
 #endif // mySpectrum_MapCube_h

@@ -10,6 +10,8 @@
 #include <cstdlib>
 
 #include <algorithm>
+#include <sstream>
+#include <stdexcept>
 
 #include "CLHEP/Random/RandomEngine.h"
 #include "CLHEP/Random/JamesRandom.h"
@@ -46,7 +48,7 @@ MapCube::MapCube(const std::string &paramString) : MapSource() {
    makeCumulativeSpectra();
    std::vector<double> totalCounts(m_solidAngles.size());
    for (unsigned int i = 0; i < m_solidAngles.size(); i++) {
-      totalCounts[i] = m_spectra[i].back();
+      totalCounts[i] = m_spectra[i].back().first;
    }
    makeIntegralDistribution(totalCounts);
 
@@ -54,8 +56,7 @@ MapCube::MapCube(const std::string &paramString) : MapSource() {
 //              << m_mapIntegral << std::endl;
 }
 
-float MapCube::operator()(float) const {
-   double xi = RandFlat::shoot();
+float MapCube::operator()(float xi) const {
    std::vector<double>::const_iterator it 
       = std::upper_bound(m_integralDist.begin(), m_integralDist.end(), xi);
    unsigned int indx = it - m_integralDist.begin();
@@ -88,7 +89,7 @@ void MapCube::readEnergyVector(const std::string & fitsFile) {
 
    std::string routineName("readEnergyVector");
 
-   int hdu = genericSources::FitsImage::findHdu(fitsFile, "EBOUNDS");
+   int hdu = genericSources::FitsImage::findHdu(fitsFile, "ENERGIES");
    
    int status(0);
    fitsfile * fptr = 0;
@@ -104,8 +105,7 @@ void MapCube::readEnergyVector(const std::string & fitsFile) {
    fits_get_num_rows(fptr, &nrows, &status);
    genericSources::FitsImage::fitsReportError(status, routineName);
 
-   readColumn(fptr, "E_MIN", m_eMin);
-   readColumn(fptr, "E_MAX", m_eMax);
+   readColumn(fptr, "Energy", m_energies);
 
    fits_close_file(fptr, &status);
    genericSources::FitsImage::fitsReportError(status, routineName);
@@ -137,24 +137,54 @@ void MapCube::makeCumulativeSpectra() {
 
    for (unsigned int j = 0; j < m_lat.size(); j++) {
       for (unsigned int i = 0; i < m_lon.size(); i++) {
-         std::vector<double> counts_spectrum(m_eMin.size());
-         counts_spectrum[0] = 0;
-         for (unsigned int k = 1; k < m_eMin.size(); k++) {
-            counts_spectrum[k] = counts_spectrum[k-1] + mapValue(i, j, k);
+         std::vector<std::pair<double, double> > counts_spectrum;
+         counts_spectrum.reserve(m_energies.size());
+         counts_spectrum.push_back(std::make_pair(0, -2));
+         for (unsigned int k = 1; k < m_energies.size(); k++) {
+            double gamma;
+            double counts = counts_spectrum[k-1].first + 
+               powerLawIntegral(m_energies.at(k-1), m_energies.at(k),
+                                mapValue(i, j, k-1), mapValue(i, j, k),
+                                gamma);
+            counts_spectrum.push_back(std::make_pair(counts, gamma));
          }
          m_spectra.push_back(counts_spectrum);
       }
    }
 }
 
-double MapCube::drawEnergy(const std::vector<double> & spectrum) const {
-   double xi = RandFlat::shoot()*spectrum.back();
-   std::vector<double>::const_iterator it 
-      = std::upper_bound(spectrum.begin(), spectrum.end(), xi);
-   unsigned int indx = it - spectrum.begin();
-   double gamma(2.);
-   double value = genericSources::Util::drawFromPowerLaw(m_eMin.at(indx),
-                                                         m_eMax.at(indx),
-                                                         gamma);
+double MapCube::powerLawIntegral(double x1, double x2,
+                                 double y1, double y2, double & gamma) const {
+   gamma = std::log(y2/y1)/std::log(x2/x1);
+   double n0 = y1/std::pow(x1, gamma);
+   double integral;
+   if (gamma != 1.) {
+      double gp1 = gamma + 1.;
+      integral = n0/gp1*(std::pow(x2, gp1) - std::pow(x1, gp1));
+   } else {
+      integral = n0*std::log(x2/x1);
+   }
+   return integral;
+}
+
+double MapCube::
+drawEnergy(const std::vector<std::pair<double, double> > & spectrum) const {
+   double xi = RandFlat::shoot()*spectrum.back().first;
+   std::vector<std::pair<double, double> >::const_iterator it 
+      = std::upper_bound(spectrum.begin(), spectrum.end(),
+                         std::make_pair(xi, 0), cmpPair);
+   int indx = it - spectrum.begin() - 1;
+   int nmax = spectrum.size() - 2;
+   indx = std::min(std::max(0, indx), nmax);
+   double value 
+      = genericSources::Util::drawFromPowerLaw(m_energies.at(indx),
+                                               m_energies.at(indx+1),
+                                               -spectrum.at(indx+1).second);
    return value;
 }
+
+bool MapCube::cmpPair(const std::pair<double, double> & x, 
+                      const std::pair<double, double> & y) {
+   return x.first < y.first;
+}
+

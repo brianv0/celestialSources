@@ -110,14 +110,25 @@ samplePixel(unsigned int indx, double &lon, double &lat) const {
 
 // Sample uniformly in longitude
    double xi = RandFlat::shoot();
-   double lon_step = m_lon[i+1] - m_lon[i];
-   lon = xi*lon_step + m_lon[i];
+   double lon_step;
+   if (i == m_lon.size()-1) {
+      lon_step = m_lon.at(i) - m_lon.at(i-1);
+   } else {
+      lon_step = m_lon.at(i+1) - m_lon.at(i);
+   }
+
+   lon = xi*lon_step + m_lon.at(i);
 
 // Sample as cos(lat) in latitude
    xi = RandFlat::shoot();
-   double lat_step = m_lat[j+1] - m_lat[j];
-   double arg = 2.*xi*cos(m_lat[j]*M_PI/180.)*sin(lat_step/2.*M_PI/180.)
-      + sin((m_lat[j] - lat_step/2.)*M_PI/180.);
+   double lat_step;
+   if (j == m_lat.size()-1) {
+      lat_step = m_lat.at(j) - m_lat.at(j-1);
+   } else {
+      lat_step = m_lat.at(j+1) - m_lat.at(j);
+   }
+   double arg = 2.*xi*cos(m_lat.at(j)*M_PI/180.)*sin(lat_step/2.*M_PI/180.)
+      + sin((m_lat.at(j) - lat_step/2.)*M_PI/180.);
    lat = asin(arg)*180./M_PI;
 }
 
