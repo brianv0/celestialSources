@@ -35,10 +35,9 @@ LatGrb::LatGrb(HepRandomEngine *engine, const std::string &prefix, const std::st
 
 
 // Constructor
-LatGrb::LatGrb(HepRandomEngine *engine, const std::string &prefix, const double duration, const int npuls, const double flux,
-               const double fraction, const double alpha, const double beta, const double epeak, const double specnorm,
-               const bool flag)
-    : GRB(engine, prefix, duration, npuls, flux, fraction, alpha, beta, epeak, specnorm, flag)   
+LatGrb::LatGrb(HepRandomEngine *engine, const double duration, const int npuls, const double flux, const double fraction, 
+               const double alpha, const double beta, const double epeak, const double specnorm, const bool flag)
+    : GRB(engine, duration, npuls, flux, fraction, alpha, beta, epeak, specnorm, flag)   
 {
 }
 
@@ -120,13 +119,13 @@ long LatGrb::calcNphoton(HepRandomEngine *engine)
 
 void LatGrb::calcSpecnorm(HepRandomEngine *engine)
 {
-    // ******* Disable specnorm calculations that work with GBM GRBs for now *******
+    // Code for NEW LAT/GBM
     //double specnorm = 3.0 * pow((grbcst::ethresLAT*1000.), (-m_globalData->beta() + 1.0)) * pow(m_globalData->fraction(), 1.15);
     //specnorm *= (pow(10., (- grbcst::logdyn * engine->flat())));
     //std::cout << "specnorm: " << specnorm << std::endl;
     
     
-    
+    // Code for OLD LAT
     double specnorm = 3.0 * pow((grbcst::ethresLAT*1000.), -1) * pow(m_globalData->fraction(), 1.5);
     specnorm *= (25.0 / exp(m_globalData->beta()));
     specnorm *= (pow(10., (- grbcst::logdyn * engine->flat())));

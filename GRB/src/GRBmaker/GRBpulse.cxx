@@ -483,7 +483,7 @@ void GRBpulse::getPulse(const int npuls)
     
     std::vector<double> temp(sz);
     
-    for (int i=0; i<sz; ++i)
+    for (DoubleSize i=0; i<sz; ++i)
         temp[i] = exp(-pow((abs(m_tdiff[i]) / m_sigma[i]), grbcst::nu));
     
     m_pulse.reserve(npuls);

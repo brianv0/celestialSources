@@ -30,10 +30,9 @@ GbmGrb::GbmGrb(HepRandomEngine *engine, const std::string &prefix, const std::ve
 
 
 // Constructor
-GbmGrb::GbmGrb(HepRandomEngine *engine, const std::string &prefix, const double duration, const int npuls, const double flux,
-               const double fraction, const double alpha, const double beta, const double epeak, const double specnorm,
-               const bool flag)
-    : GRB(engine, prefix, duration, npuls, flux, fraction, alpha, beta, epeak, specnorm, flag)
+GbmGrb::GbmGrb(HepRandomEngine *engine, const double duration, const int npuls, const double flux, const double fraction, 
+               const double alpha, const double beta, const double epeak, const double specnorm, const bool flag)
+    : GRB(engine, duration, npuls, flux, fraction, alpha, beta, epeak, specnorm, flag)
 {
 }
 

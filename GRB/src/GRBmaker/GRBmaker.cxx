@@ -51,7 +51,6 @@ GRB *GRBmaker::create(const std::vector<std::string> &paramVector)
         HepRandom::setTheSeed(grbcst::seed);
         
         LatGrb *latGrb = new LatGrb(engine, "LAT", paramVector[0]);
-        // ******* Disable construction of GBM for now *******
         //GbmGrb *gbmGrb = new GbmGrb(engine, "GBM", latGrb->specnorm(), paramVector[0]);
         
         //delete gbmGrb;
@@ -107,8 +106,8 @@ GRB *GRBmaker::create(const double duration, const int npuls, const double flux,
     HepRandomEngine *engine = HepRandom::getTheEngine();
     HepRandom::setTheSeed(grbcst::seed);
     
-    LatGrb *latGrb = new LatGrb(engine, "LAT", duration, npuls, flux, fraction, alpha, beta, epeak, specnorm, flag);
-    GbmGrb *gbmGrb = new GbmGrb(engine, "GBM", duration, npuls, flux, fraction, alpha, beta, epeak, specnorm, flag);
+    LatGrb *latGrb = new LatGrb(engine, duration, npuls, flux, fraction, alpha, beta, epeak, specnorm, flag);
+    GbmGrb *gbmGrb = new GbmGrb(engine, duration, npuls, flux, fraction, alpha, beta, epeak, specnorm, flag);
     
     delete gbmGrb;
     return latGrb;

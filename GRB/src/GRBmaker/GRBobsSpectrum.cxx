@@ -20,9 +20,9 @@ static std::ofstream os("gleam.lis");
 // Constructors
 
 GRBobsSpectrum::GRBobsSpectrum(const std::string &params)
-:ISpectrum(),
-m_title("GRBobsSpectrum"),
-m_particleName("gamma")
+    :ISpectrum(),
+     m_title("GRBobsSpectrum"),
+     m_particleName("gamma")
 {
     std::vector<std::string> paramVector;
     parseParamList(params, paramVector);
@@ -47,8 +47,9 @@ GRBobsSpectrum::GRBobsSpectrum(const double duration, const int npuls, const dou
 
 // Copy Constructor
 GRBobsSpectrum::GRBobsSpectrum(const GRBobsSpectrum &right)
-:m_title(right.m_title),
-m_particleName(right.m_particleName)
+    :ISpectrum(),
+     m_title(right.m_title),
+     m_particleName(right.m_particleName)
 {
     if (right.m_grb)
         m_grb = right.m_grb->clone();
@@ -84,7 +85,7 @@ GRBobsSpectrum &GRBobsSpectrum::operator=(const GRBobsSpectrum &right)
 // Parse input parameter list obtained from the xml file
 void GRBobsSpectrum::parseParamList(const std::string &input, std::vector<std::string>& output) const
 { 
-    int i = input.find_last_of("/");
+    std::string::size_type i = input.find_last_of("/");
     
     if (i > 0)
     {

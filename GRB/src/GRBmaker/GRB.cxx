@@ -12,6 +12,7 @@
 #include <fstream>
 #include <algorithm>              // for transform
 #include <numeric>                // for accumulate
+#include <sstream>
 
 #include "GRB.h"
 #include "GRBpulse.h"
@@ -72,9 +73,8 @@ GRB::GRB(const std::vector<std::string> &paramVector)
 
 
 
-GRB::GRB(HepRandomEngine *engine, const std::string &prefix, const double duration, const int npuls, const double flux,
-         const double fraction, const double alpha, const double beta, const double epeak, const double specnorm,
-         const bool flag)
+GRB::GRB(HepRandomEngine *engine, const double duration, const int npuls, const double flux, const double fraction, 
+         const double alpha, const double beta, const double epeak, const double specnorm, const bool flag)
          :m_grbdir(std::make_pair<float,float>(0.0,0.0)),
           m_univFWHM(0.0),
           m_specnorm(),
@@ -82,7 +82,7 @@ GRB::GRB(HepRandomEngine *engine, const std::string &prefix, const double durati
           m_photonlist(),
           m_globalData(new GlobalData)
 {
-    createGRB(engine, prefix, duration, npuls, flux, fraction, alpha, beta, epeak, specnorm, flag);
+    createGRB(engine, duration, npuls, flux, fraction, alpha, beta, epeak, specnorm, flag);
 }
 
 
@@ -189,7 +189,7 @@ GRB &GRB::operator=(const GRB &right)
 //		outputFilename
 
 
-GRB::createGRB(HepRandomEngine *engine, const std::string &prefix, const std::string &dir)
+void GRB::createGRB(HepRandomEngine *engine, const std::string &prefix, const std::string &dir)
 {
     // Choose from the distributions for durations, peak fluxes, and spectral power-law indices
     std::vector<double> duration      = GrbGlobalData::instance(engine)->duration();	
@@ -281,9 +281,8 @@ GRB::createGRB(HepRandomEngine *engine, const std::string &prefix, const std::st
 //		makeGRB	
 //		operator<<	
 
-GRB::createGRB(HepRandomEngine *engine, const std::string &prefix, const double duration, const int npuls, const double flux,
-               const double fraction, const double alpha, const double beta, const double epeak, const double specnorm,
-               const bool flag)
+void GRB::createGRB(HepRandomEngine *engine, const double duration, const int npuls, const double flux, const double fraction, 
+                    const double alpha, const double beta, const double epeak, const double specnorm, const bool flag)
 {
     m_globalData->setDuration(duration);
     m_globalData->setFlux(flux);
@@ -335,7 +334,7 @@ GRB::createGRB(HepRandomEngine *engine, const std::string &prefix, const double 
 // Caller:
 //      constructor
 
-GRB::readGRB(const std::vector<std::string> &paramVector)
+void GRB::readGRB(const std::vector<std::string> &paramVector)
 {
     try
     {
@@ -404,8 +403,6 @@ GRB *GRB::clone() const
 
 std::string GRB::baseFilename(const std::string &prefix, const std::string &dir) const
 {
-    char *ind = new char(80);
-    
     std::string base;
     
     if (dir.size() > 1)    // null terminated - so the size is at least "1"
@@ -418,8 +415,11 @@ std::string GRB::baseFilename(const std::string &prefix, const std::string &dir)
     else
         base = prefix + "_GRB_";
     
-    sprintf(ind, "%ld", grbcst::nbsim);
-    int i = strlen(ind);
+    std::ostringstream ind;
+	ind << grbcst::nbsim;
+
+
+    int i = strlen(ind.str().c_str());
     
     for (int j=0; j<i; ++j)
         base += '0';
@@ -452,10 +452,10 @@ std::string GRB::outputFilename(const std::string &base, const long isim) const
     
     std::string fname = base;
     
-    char *ind = new char(80);
-    sprintf(ind, "%ld", isim);
+    std::ostringstream ind;
+	ind << isim;
     
-    fname.replace(baseSize-strlen(ind), baseSize-1, ind);
+    fname.replace(baseSize-strlen(ind.str().c_str()), baseSize-1, ind.str());
     fname += ".lis";
     
     return fname;

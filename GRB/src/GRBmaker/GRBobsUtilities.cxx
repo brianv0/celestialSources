@@ -117,7 +117,7 @@ void GRBobsUtilities::sortVector(const long index, const std::vector<double> &in
     
     std::vector<double> temp(out);
     
-    for (long i=0; i<sz; ++i)
+    for (DoubleSize i=0; i<sz; ++i)
     {
         DoubleConstIter it = std::find(sorted.begin(), sorted.end(), in[i]);
         

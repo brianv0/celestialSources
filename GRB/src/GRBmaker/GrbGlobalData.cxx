@@ -378,7 +378,7 @@ void GrbGlobalData::powerLawIndex(HepRandomEngine *engine, const std::vector<int
     //		last element is the max
     long diff = intgplawdist[intgplawdist.size()-1] - intgplawdist[0];
     
-    // ******* Disable construction of data for GBM GRBs for now ******* 
+    // Code for NEW LAT/GBM
     //std::vector<int>::size_type sz = histpl.size();
     //std::vector<double> loEdges(sz+1);
     //for (int i=0; i<=sz; ++i)
@@ -415,12 +415,13 @@ void GrbGlobalData::powerLawIndex(HepRandomEngine *engine, const std::vector<int
 
 void GrbGlobalData::getPowerLawIndex(HepRandomEngine *engine)
 {
+    // Code for OLD LAT
     std::vector<double>  loEdges  = GRBsimvecCreator::instance()->pl_loEdge();
     std::vector<int>     histpl = GRBsimvecCreator::instance()->pl_histplaw();
     m_beta.reserve(grbcst::nbsim);
     powerLawIndex(engine, histpl, loEdges, 7.2, m_beta);
     
-    // ******* Disable construction of data for GBM GRBs for now *******
+    // Code for NEW LAT/GBM
     //std::vector<int>  histpl = GRBsimvecCreator::instance()->pl_histbeta();
     //m_beta.reserve(grbcst::nbsim);
     //powerLawIndex(engine, histpl, 7.2, m_beta);
