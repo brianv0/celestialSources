@@ -5,6 +5,7 @@
 #include "flux/SpectrumFactory.h"
 #include "astro/JulianDate.h"
 #include <cmath>
+#include <fstream>
 
 using namespace cst;
 
@@ -18,6 +19,7 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
   : m_params(params)
 {
   std::cout<<m_flux<<std::endl;
+  //Read from XML file
   m_flux = parseParamList(params,1); //Flux above 100 MeV in ph/cm2/s
   m_period  = parseParamList(params,2); //Period in sec.
   m_pdot = parseParamList(params,3); //Pdot
@@ -33,7 +35,12 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
   m_t0 = 51900.0;
   m_f0 = 1.0/m_period;
   m_f1 = -m_pdot/(m_period*m_period);
-  
+ 
+  //Read from PulsarDataList.txt
+
+
+
+ 
   std::cout << " \n********   PulsarSpectrum initialized !   ********" << std::endl;
   std::cout << "**   Flux above 100 MeV : " << m_flux << " ph/cm2/s " << std::endl;
   std::cout << "**   # of peaks : " << m_numpeaks << std::endl;
@@ -72,28 +79,45 @@ double PulsarSpectrum::flux(double time) const
 double PulsarSpectrum::interval(double time)
 {  
   double timeTilde = time + (StartMissionDateMJD - m_t0)*SecsOneDay;
+  if ((int(time) % 10000) < 2)
+    std::cout << "Time reached is: " << time << " seconds from Start " << std::endl;
+
   time = (m_period/m_pdot)*log(1+(m_pdot/m_period)*timeTilde) + m_phi0*m_period; 
   double nextTime = time + m_spectrum->interval((time - m_period*int(time/m_period)),m_enphmin);
   double nextTimeTilde = (m_period/m_pdot)*(exp((m_pdot/m_period)*(nextTime-m_phi0*m_period))-1);
 
 
-
+  /*
   std::cout << "\n****t0~ = " << timeTilde  << " (RefStart="
 	    << timeTilde - (StartMissionDateMJD - m_t0)*SecsOneDay  << ")" << std::endl;
   std::cout << " -->t0  = " << time << " (Fract = " << (time - m_period*int(time/m_period)) << " ), phase " 
 	    <<  (time - m_period*int(time/m_period))/m_period << std::endl;
-  std::cout << " ----> Interval " << inte << std::endl;
   std::cout << "\n****t1~ = " << nextTimeTilde  << " (RefStart="
 	    << nextTimeTilde - (StartMissionDateMJD - m_t0)*SecsOneDay  << ")" << std::endl;
   std::cout << " -->t1  = " << nextTime << " (Fract = " << (nextTime - m_period*int(nextTime/m_period)) << " ), phase " 
 	    << (nextTime - m_period*int(nextTime/m_period))/m_period << std::endl;
- 
-  double ph = ph = m_phi0 + m_f0*(timeTilde) +0.5*m_f1*(timeTilde)*(timeTilde);
+  */
+
+  double ph =  m_phi0 + m_f0*(timeTilde) +0.5*m_f1*(timeTilde)*(timeTilde);
   double intph = 0;
 
+  if (fabs(modf(ph,&intph) - ((time - m_period*int(time/m_period))/m_period)) > 1e-4)
+    {
+      std::cout << "\n****t0~ = " << timeTilde  << " (RefStart="
+		<< timeTilde - (StartMissionDateMJD - m_t0)*SecsOneDay  << ")" << std::endl;
+      std::cout << " -->t0  = " << time << " (Fract = " << (time - m_period*int(time/m_period)) << " ), phase " 
+		<<  (time - m_period*int(time/m_period))/m_period << std::endl;
+      std::cout << "\n****t1~ = " << nextTimeTilde  << " (RefStart="
+		<< nextTimeTilde - (StartMissionDateMJD - m_t0)*SecsOneDay  << ")" << std::endl;
+      std::cout << " -->t1  = " << nextTime << " (Fract = " << (nextTime - m_period*int(nextTime/m_period)) << " ), phase " 
+		<< (nextTime - m_period*int(nextTime/m_period))/m_period << std::endl;
+    }
+
+  //std::cout << "diff " << fabs(modf(ph,&intph) - ((time - m_period*int(time/m_period))/m_period)) << std::endl;
 
 
-  std::cout << "\n\n *** theory : ph0 " << ph <<  " " << modf(ph,&intph) << std::endl;
+
+  //std::cout << "\n\n *** theory : ph0 " << ph <<  " " << modf(ph,&intph) << std::endl;
   return nextTimeTilde - timeTilde;
 }
 

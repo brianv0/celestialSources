@@ -1,6 +1,8 @@
 
 #include <iostream>
 #include <vector>
+#include <fstream>
+#include <time.h>
 
 #include "TROOT.h"
 #include "TApplication.h"
@@ -16,6 +18,7 @@
 #include "SpectObj/SpectObj.h"
 #include "Pulsar/PulsarSim.h"
 #include "Pulsar/PulsarConstants.h"
+
 
 using namespace cst;
 double EMIN, EMAX, TMIN, TMAX, DT;
@@ -212,6 +215,9 @@ void PlotPulsar(double enph = 0,char name[100]="pulsar.root")
       int i = 0;
       time = sp->interval(0.0,enph); // s
       std::cout << "Extracting photon above " << enph << std::endl;
+
+
+
       while(time < nLoops*TMAX && time>=0)
 	{
 	  Interval = sp->interval(time,enph); // s  
@@ -222,16 +228,18 @@ void PlotPulsar(double enph = 0,char name[100]="pulsar.root")
 	  Lc->Fill((time - (TMAX*int(time/TMAX))));       // ph
 	
 	  time+=Interval;
+	  /*
 	  std::cout<<" Time (s)  = "<<time
 		   << " within period = " << time - (TMAX*int(time/TMAX))
 		   <<" Flux (ph/s/m^2)  = "<<flux
 		   <<" energy (keV) = "<<energy
 		   <<" Interval (s) = "<<Interval<<std::endl;
-	 
+	  */	 
 	
 	  i++;
-	} 
-      
+	}
+
+
     }
   
   if(Counts->GetEntries() == 0 && ExtractPhotons) 
@@ -287,12 +295,12 @@ void PlotPulsar(double enph = 0,char name[100]="pulsar.root")
       std::cout<<" flux (exp)        : = "<<Counts->Integral(0,EBIN,"width")<<" keV/m^2"<<std::endl;
       std::cout<<" flux (exp)        : = "<<Counts->Integral(0,EBIN,"width")*1.0e-7/erg2meV<<" erg/cm^2"<<std::endl;
       Lct_LAT->Scale(nLoops*DT*6e4);
-      Lct_LAT->Draw();          
+      //Lct_LAT->Draw();          
       lcleg->AddEntry(Lc,"LAT extracted photons in ph/cm2/s (30 MeV-300GeV)","lp");
       Lc->SetLineColor(2);
       Lct_EXT->Scale(nLoops);
-      Lct_EXT->Draw("same");
-      Lc->Draw("epsame");  
+      //Lct_EXT->Draw("same");
+      Lc->Draw("ep");  
       std::cout << " Photon expecteed : " << Lct_EXT->Integral(0,TBIN) << " ph " << std::endl;  
 
     } 
@@ -324,7 +332,7 @@ int main(int argc, char** argv)
   std::string arg_name("");
   int current_arg = 1;
   double enph=0.0;
-  double enphmin = 0.2e5;
+  double enphmin = 0.2e4;
   double enphmax = 4e6;
 
   while(current_arg < argc)
@@ -385,11 +393,20 @@ int main(int argc, char** argv)
   double ppar4 = 1.0; // 1.0 for outer
  */
 
+
+
+
   PulsarSim* m_pulsar = new PulsarSim(flux,enphmin, enphmax, Period, npeaks);
   m_pulsar->SaveNv((TH2D*)m_pulsar->PSRPhenom(ppar1,ppar2,ppar3,ppar4));
   char name[100];
   sprintf(name,"pulsar.root");
+
+  ofstream f("test.txt");
+  double tSt = time(NULL);
+  f<< "Start " << tSt <<std::endl;
   PlotPulsar(enph,name);
-  
+  double tFin = time(NULL); 
+  f << "finish " << tFin << std::endl;
+  f << "delta " << tFin - tSt << std::endl;
   theApp.Run();
 }
