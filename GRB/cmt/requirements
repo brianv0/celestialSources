@@ -1,6 +1,6 @@
 package GRB
 
-use FluxSvc v5r8
+use FluxSvc v5r10
 use ROOT
 use RootIo
 use GlastSvc
@@ -22,11 +22,11 @@ apply_pattern package_headers
 
 
 
-# component library, with GRB, GRBmaker, GRBUtil, and LatTrigger
+# component library, with GRB, GRBmaker, GRBUtil, and LatGRBAlert
 
-macro_append GRB_headers "" WIN32 "../xml/*.xml test/*.xml GRBmaker/*.h LatTrigger/*.h GRB/*.h"
+macro_append GRB_headers "" WIN32 "../xml/*.xml test/*.xml GRBmaker/*.h LatGRBAlert/*.h GRB/*.h"
 
-library GRB *.cxx GRB/*.cxx Dll/*.cxx GRBmaker/*.cxx  LatTrigger/*.cxx ${GRB_headers}
+library GRB *.cxx GRB/*.cxx Dll/*.cxx GRBmaker/*.cxx  LatGRBAlert/*.cxx ${GRB_headers}
 
 macro GRB_lib "-L${GRBROOT}/${CMTCONFIG} -lGRB "\
         WIN32 "${GRBROOT}/${BINDIR}/GRB.lib "
