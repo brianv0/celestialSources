@@ -15,7 +15,7 @@ ApplicationMgr.TopAlg = {"GRBTestAlg"};
 MessageSvc.OutputLevel      = 3;
 
 // Set the default for a source library document
-FluxSvc.source_lib ={"$(FLUXSVCROOT)/xml/source_library.xml"};
+FluxSvc.source_lib ={"$(FLUXROOT)/xml/source_library.xml"};
 
 // Append to a list of source library documents
 //FluxSvc.source_lib += {"$(FLUXSVCROOT)/xml/user_library.xml"};
