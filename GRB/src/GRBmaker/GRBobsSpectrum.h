@@ -26,7 +26,7 @@ public:
         const double beta, const double epeak, const double specnorm, const bool flag);
     
     // --- Need a destructor, copy constrctor and assignement operator to manage memory ---
-    ~GRBobsSpectrum();
+    virtual ~GRBobsSpectrum();
     GRBobsSpectrum(const GRBobsSpectrum &right);   // private copy constructor
     GRBobsSpectrum &operator=(const GRBobsSpectrum &right);
     

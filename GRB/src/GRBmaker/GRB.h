@@ -60,12 +60,11 @@ public:
     // Constructors
     GRB();
     GRB(const std::vector<std::string> &paramVector);
-    GRB(HepRandomEngine *engine, const std::string &prefix, const double duration, const int npuls, const double flux,
-        const double fraction, const double alpha, const double beta, const double epeak, const double specnorm,
-        const bool flag);
+    GRB(HepRandomEngine *engine, const double duration, const int npuls, const double flux, const double fraction, 
+        const double alpha, const double beta, const double epeak, const double specnorm, const bool flag);
     
     
-    ~GRB();
+    virtual ~GRB();
     GRB(const GRB &right);   
     GRB &operator=(const GRB &right);
     
@@ -84,12 +83,11 @@ public:
     
     // Class methods
     // Create "n" GRBs
-    createGRB(HepRandomEngine *engine, const std::string &prefix, const std::string &dir=0);
+    void createGRB(HepRandomEngine *engine, const std::string &prefix, const std::string &dir=0);
     
     // Create GRB for specified input parameters
-    createGRB(HepRandomEngine *engine, const std::string &prefix, const double duration, const int npuls, const double flux, 
-        const double fraction, const double alpha, const double beta, const double epeak, const double specnorm, 
-        const bool flag);
+    void createGRB(HepRandomEngine *engine, const double duration, const int npuls, const double flux, const double fraction, 
+        const double alpha, const double beta, const double epeak, const double specnorm, const bool flag);
     
 protected:
     // data members
@@ -105,7 +103,7 @@ protected:
     // private accessor functions
     std::vector<TimeEnergy> &photonlist()  { return m_photonlist; }
     
-    virtual long calcNphoton(HepRandomEngine *engine)   { return 0; }
+    virtual long calcNphoton(HepRandomEngine *engine)   { return m_nphoton; }
     void makeTimes(HepRandomEngine *engine, const double ethres);
     
 private:
@@ -130,7 +128,7 @@ private:
     virtual void makeGRB(HepRandomEngine *engine)   {}
     
     // Read GRB from input file
-    readGRB(const std::vector<std::string> &paramVector);
+    void readGRB(const std::vector<std::string> &paramVector);
     
     void swap(GRB &other) throw();
 };
@@ -183,8 +181,8 @@ public:
     inline void setTime(double time)   {m_time=time;}
     inline void setEnergy(double energy) {m_energy=energy;}
     
-    inline double time()   {return m_time;}
-    inline double energy() {return m_energy;}
+    inline double time() const   {return m_time;}
+    inline double energy() const {return m_energy;}
     
 private:
     double m_time;
@@ -196,7 +194,7 @@ private:
 class timeCmp
 {
 public:
-    bool operator()(TimeEnergy &data1, TimeEnergy &data2)
+    bool operator()(const TimeEnergy &data1, const TimeEnergy &data2)
     {
         return data1.time() < data2.time();    
     }

@@ -32,14 +32,12 @@ public:
     // Constructors
     LatGrb(HepRandomEngine *engine, const std::string &prefix, const std::string &dir=0);
         
-    LatGrb(HepRandomEngine *engine, const std::string &prefix, const double duration, const int npuls, const double flux,
-        const double fraction, const double alpha, const double beta, const double epeak, const double specnorm,
-        const bool flag);
+    LatGrb(HepRandomEngine *engine, const double duration, const int npuls, const double flux, const double fraction, 
+        const double alpha, const double beta, const double epeak, const double specnorm, const bool flag);
  
+    virtual ~LatGrb()   {};
                
-    // No memory management function required
-    // So - need for destructor, copy constructor and assignment operator to be defined
-    
+     
     
     // Accessor Methods
     static double emax()    { return s_emax; }

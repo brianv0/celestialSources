@@ -62,9 +62,9 @@ public:
         
         std::deque<bool> qused(sz, 0);
         
-        for (long i=0; i<sz; ++i)
+        for (LongSize i=0; i<sz; ++i)
         {
-            for (long j=0; j<sz; ++j)
+            for (LongSize j=0; j<sz; ++j)
             {
                 if ((!qused[j]) && (sorted[i] == in[j]))
                 {
