@@ -32,7 +32,7 @@ class GRBICompton : virtual public RadiationProcess
 	    const double angle = 0.0,
 	    const double distance_to_source =0.0);
 
-  /*! General Interface for computing the synchrotron spectrum at a certain /param time.
+  /*! General Interface for computing the IC spectrum at a certain /param time.
    */
   void load(const double time      = 0.0,
 	    const double angle     = 0.0,

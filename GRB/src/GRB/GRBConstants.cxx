@@ -1,7 +1,6 @@
 #include <iostream>
 #include <stdio.h>
 #include <string>
-
 #include <ctime>
 
 #include "GRBConstants.h"
@@ -42,7 +41,7 @@ HepRandomEngine* GRBConstants::GetTheRandomEngine(long seed)
   InitializeRandom(seed);
   return HepRandom::getTheEngine();
 }
-// This method read tyhe parameter file, and sets all the private data members.
+// This method read the parameter file, and sets all the private data members.
 int GRBConstants::ReadParam(){   
   char buf[100];
   std::string paramFile = "$(GRBROOT)/src/test/GRBParam.txt";
@@ -72,14 +71,12 @@ int GRBConstants::ReadParam(){
   f1.getline(buf,100);
   sscanf(buf,"%lf",&m_rt);
 
-
   f1.getline(buf,100);
   sscanf(buf,"%lf",&m_dt);
 
   f1.getline(buf,100);
   sscanf(buf,"%lf",&m_peak);
   
-
   f1.getline(buf,100);
 
   f1.getline(buf,100);

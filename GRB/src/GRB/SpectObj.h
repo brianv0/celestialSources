@@ -4,11 +4,23 @@
 #include <math.h>
 #ifndef SpectObj_H
 #define SpectObj_H
-
+/*!
+ * \class SpectObj
+ *
+ * \brief This class describe the Spectrum Object.
+ * 
+ * A Spectrum Object is basically a map containing in the first entry 
+ * the energy and in the second entry the value of the spectrum.
+ *
+ * \author Nicola Omodei       nicola.omodei@pi.infn.it 
+ * \author Johann Cohen-Tanugi johann.cohen@pi.infn.it
+ *
+ */
 class SpectObj
 {
  public:
   SpectObj(){;}
+  // Initialize the spectrum
   SpectObj(double,double,double);
   SpectObj(std::map<double,double>::const_iterator,
 	   std::map<double,double>::const_iterator);

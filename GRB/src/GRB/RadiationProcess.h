@@ -1,4 +1,14 @@
-
+/*!
+ * \class RadiationProcess
+ *
+ * \brief This class describe a generic radiatioon process
+ * 
+ * Synchrotron Radiation and Inverse Comton scattering inherit from here
+ *
+ * \author Nicola Omodei       nicola.omodei@pi.infn.it 
+ * \author Johann Cohen-Tanugi johann.cohen@pi.infn.it
+ *
+ */
 #ifndef RadiationProcess_H
 #define RadiationProcess_H 1
 

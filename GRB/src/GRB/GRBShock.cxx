@@ -37,10 +37,6 @@ GRBShock::GRBShock(GRBShell Sh1)
   m_gemax = c1*m_gemin;
 }
 
-//////////////////////////////////////////////////
-// Syncrotron Radiation:
-//////////////////////////////////////////////////
-
 double GRBShock::duration()
 {
   double tau_rise    = m_thickness/(cst::c)/m_gf;
@@ -49,18 +45,6 @@ double GRBShock::duration()
   //  std::cout<<" Decay Time "<<tau_decay<<std::endl;
   return (1./2.7*sqrt(tau_decay)+tau_rise);
 }
-/*
-  std::vector<double> GRBShock::FluxAtT(double time)
-  {
-  std::vector<double> spectrum(cst::enstep,0.);
-  if (time<=m_tobs) return spectrum;
-  GRBSynchrotron m_syn(time-m_tobs,m_gf,m_Beq,
-  m_partnumber,m_gemin,m_gemax,
-  m_volume,m_thickness);
-  //std::cout<<m_syn->getSpectrum().size()<<std::endl;
-  return m_syn.getSpectrum();
-  }
-*/
 
 void GRBShock::Write()
 {

@@ -67,9 +67,6 @@ GRBShell GRBShell::operator+(GRBShell Sh)
   double dr1= m_thickness;
   double dr2= Sh.getThickness();
   
-  //Number and density of particles in the shocked material:
-  //std::cout<<m_gamma<<std::endl;
-  
   // Gamma of the resulting shell: 
   m_gamma=sqrt((m1*g1+m2*g2)/(m1/g1+m2/g2));
   m_gamma=((m_gamma<=1.) ? 1.+1.0e-6 : m_gamma);
@@ -78,7 +75,6 @@ GRBShell GRBShell::operator+(GRBShell Sh)
   //Updating Shell Info. after shock:
   setMass(m1+m2);
   setGamma(m_gamma);
-  //std::cout<<m_gamma<<std::endl;
   setThickness((dr1+dr2)/2.);
   setEint(m1*cst::c2*(g1-m_gamma)+m2*cst::c2*(g2-m_gamma));
   return (*this);
