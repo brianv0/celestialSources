@@ -86,7 +86,7 @@ void PlotPulsar(double enph = 0,char name[100]="pulsar.root")
   vFv->SetTitle("vFv");
   vFv->SetName("vFv");
 
-  vFv->SetYTitle(" Flux ");
+  vFv->SetYTitle(" vFv ");
   vFv->SetStats(0);
 
   Ne->SetLineColor(2);

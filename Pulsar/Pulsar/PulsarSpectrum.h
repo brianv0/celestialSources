@@ -11,6 +11,8 @@
 #include "SpectObj/SpectObj.h"
 
 #include "facilities/Util.h"
+#include "astro/JulianDate.h" //de-corr
+
 
 //class ISpectrum;
 
@@ -48,7 +50,9 @@ class PulsarSpectrum : public ISpectrum
   std::string title() const {return "PulsarSpectrum";} 
   const char * particleName() const {return "gamma";}
   const char * nameOf() const {return "PulsarSpectrum";}
+
   
+
   /*! 
     This method parses the parameter list
     \param input is the string to parse
@@ -61,9 +65,12 @@ class PulsarSpectrum : public ISpectrum
   
   PulsarSim   *m_Pulsar;
   SpectObj *m_spectrum;
+  
+  astro::JulianDate *JDStartMission; //de-corr
+  astro::JulianDate *JDStartSimulation; //de-corr
+  astro::JulianDate *m_JDCurrent; //de-corr
 
-
-  const std::string& m_params;
+  const std::string& m_params; 
 
   double m_period, m_pdot, m_fluence;
   int m_numpeaks;

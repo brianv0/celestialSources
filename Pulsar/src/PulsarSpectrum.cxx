@@ -2,6 +2,7 @@
 #include "Pulsar/PulsarSpectrum.h"
 #include "SpectObj/SpectObj.h"
 #include "flux/SpectrumFactory.h"
+#include "astro/JulianDate.h"
 
 ISpectrumFactory &PulsarSpectrumFactory() 
  {
@@ -32,6 +33,18 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
   m_Pulsar   = new PulsarSim(m_fluence,m_period,m_numpeaks);
   m_spectrum = new SpectObj(m_Pulsar->PSRPhenom(ppar1,ppar2,ppar3,ppar4),1);
 
+  JDStartMission = new astro::JulianDate(2001,1,1,0);
+  JDStartSimulation = new astro::JulianDate(2008, 2, 24, 6.5);
+  m_JDCurrent = new astro::JulianDate(2008, 2, 24, 6.5);
+
+
+
+  std::cout << " Mission Started at " << JDStartMission->seconds() <<  " ( " 
+	    << JDStartMission->getGregorianDate() << " ) " << std::endl;
+  std::cout << " Simulation Started at " << JDStartSimulation->seconds() <<  " ( " 
+	    << JDStartSimulation->getGregorianDate() << " ) " << std::endl;
+ 
+
   //////////////////////////////////////////////////
   
 }
@@ -60,6 +73,15 @@ double PulsarSpectrum::interval(double time)
   double nextTime = time + inte;
   double nextTimeTilde = nextTime + m_pdot*nextTime;
   inte = nextTimeTilde - timeTilde;
+
+
+
+  std::cout << "Next Photon at Mission Elapsed Time (sec.) " 
+	    << (inte + timeTilde + JDStartSimulation->seconds() 
+		- JDStartMission->seconds()) 
+	    << std::endl;
+
+
   return inte;
 }
 
