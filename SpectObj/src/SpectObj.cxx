@@ -366,8 +366,8 @@ photon SpectObj::GetPhoton(double t0, double enph)
 	    {
 	      tBinCurrent++;
 	    }	 
-	  TimeFromLastPeriod = Nv->GetXaxis()->GetBinCenter(tBinCurrent-1);
-	  ProbRest = ProbRest - (Probability->GetBinContent(tBinCurrent-1) - Probability->GetBinContent(1));
+	  TimeFromLastPeriod = Nv->GetXaxis()->GetBinCenter(tBinCurrent);
+	  ProbRest = ProbRest - (Probability->GetBinContent(tBinCurrent) - Probability->GetBinContent(1));
 	  TimeFromLastPeriod += m_SpRandGen->Uniform()*m_TimeBinWidth - m_TimeBinWidth/2 ;
 	}
       
