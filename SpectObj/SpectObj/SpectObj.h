@@ -6,14 +6,24 @@
 #include "TRandom.h"
 #include <vector>
 
+/*! 
+  \struct photon
+  Trivial struct for storing time and energy.
+*/
+
 struct photon
 {
   double time;
   double energy;
 };
 
-/*!
-  Constructor 
+/*! 
+  \class SpectObj
+  \brief general interface for astronomical spectrum.
+  
+  SpectObj takes as input a two dimensional histogram containing the photons per square meter as a function of the energy of the time.
+  SpectObj compute both the relevant integrals (in energy and time), and both extracts photons to feed the simulators (flux). 
+
 */
 class SpectObj
 {
@@ -46,13 +56,13 @@ class SpectObj
   TH1D *N(TH1D *EN);
   photon GetPhoton(double t0, double enph);
   
-  inline double SetAreaDetector(double AreaDetector=6.0)
+  inline void SetAreaDetector(double AreaDetector=6.0)
     {
       Nv->Scale(AreaDetector/m_AreaDetector); // ph
       m_AreaDetector = AreaDetector;
     }
 
-  inline double GetAreaDetector() { return m_AreaDetector; };
+  inline double GetAreaDetector() { return m_AreaDetector; }
   double flux(double time, double enph);
   double interval(double time, double enph);
   double energy(double time, double enph);

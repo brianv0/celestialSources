@@ -8,11 +8,7 @@
 #define DEBUG 0
 
 const double erg2meV      = 624151.0;
-//const double AreaDetector = EventSource::totalArea();//AreaDetector;//6.0; //m2
 
-/*!
-  Constructor 
-*/
 SpectObj::SpectObj(const TH2D* In_Nv, int type)
 {
   m_AreaDetector=1.0;
