@@ -49,10 +49,10 @@ TH2D* PulsarSim::PSRPhenom(double par1, double par2, double par3, double par4)
 	    << " | b  = "  << b << std::endl;
 
  
-  TF1 *PulsarSpectralShape = new TF1("PulsarSpectralShape", 
-				     "([0]*((x/[1])^[2])*exp(-1.0*((x/[3])^[4])))",cst::emin,cst::emax);
+  TF1 PulsarSpectralShape("PulsarSpectralShape", 
+			  "([0]*((x/[1])^[2])*exp(-1.0*((x/[3])^[4])))",cst::emin,cst::emax);
 
-  PulsarSpectralShape->SetParameters(K1,En,G1,E0,b);
+  PulsarSpectralShape.SetParameters(K1,En,G1,E0,b);
 
   // Part 2- LightCurve
 
@@ -61,39 +61,39 @@ TH2D* PulsarSim::PSRPhenom(double par1, double par2, double par3, double par4)
   
   //Set the Random engine.
 
-  TRandom *engine = new TRandom();
+  TRandom engine;
   //engine->SetSeed(time(NULL));
-  engine->SetSeed(43242);
+  engine.SetSeed(43242);
   
   // LightCurve generation:
 
 
-  ampl1 = engine->Uniform();
-  while (ampl1 < 0.1)  ampl1 = engine->Uniform();
-  ampl2 = engine->Uniform();
-  while (ampl2 < 0.1)  ampl2 = engine->Uniform();
+  ampl1 = engine.Uniform();
+  while (ampl1 < 0.1)  ampl1 = engine.Uniform();
+  ampl2 = engine.Uniform();
+  while (ampl2 < 0.1)  ampl2 = engine.Uniform();
 
-  peak1 = engine->Uniform()*m_period; 
-  fwhm1 = engine->Uniform()*m_period;
+  peak1 = engine.Uniform()*m_period; 
+  fwhm1 = engine.Uniform()*m_period;
   while ((peak1 > 0.5*m_period)
 	 || (peak1 < (fwhm1*2))
 	 || (fwhm1 < (0.005*ampl1)))
     {
-      peak1 = engine->Uniform()*m_period; 
-      fwhm1 = engine->Uniform()*m_period;
+      peak1 = engine.Uniform()*m_period; 
+      fwhm1 = engine.Uniform()*m_period;
     }    
 
 
 
-  peak2 = engine->Uniform()*m_period; 
-  fwhm2 = engine->Uniform()*m_period;
+  peak2 = engine.Uniform()*m_period; 
+  fwhm2 = engine.Uniform()*m_period;
 
   while ((peak2 > (m_period-2*fwhm2))
 	 || (peak2 <(peak1+mindist))
 	 || (fwhm2 < (0.005*ampl2)))
     {
-      peak2 = engine->Uniform()*m_period; 
-      fwhm2 = engine->Uniform()*m_period;
+      peak2 = engine.Uniform()*m_period; 
+      fwhm2 = engine.Uniform()*m_period;
     }
   
 
@@ -102,7 +102,7 @@ TH2D* PulsarSim::PSRPhenom(double par1, double par2, double par3, double par4)
   //Remove first or second peak.
   if ((m_numpeaks == 1) || (m_numpeaks == 3))
     {
-      if (engine->Uniform() < 0.5) 
+      if (engine.Uniform() < 0.5) 
 	{
 	  ampl1 = 0;
 	}
@@ -115,16 +115,14 @@ TH2D* PulsarSim::PSRPhenom(double par1, double par2, double par3, double par4)
 
   //Case of delta Function..
 
-  TH1D *deltaFunction = new TH1D("deltaFunction","DeltaFuction",Tbin,0,m_period);
+  TH1D deltaFunction("deltaFunction","DeltaFuction",Tbin,0,m_period);
 
   double dt = m_period/(Tbin-1);
   if ((m_numpeaks == 3 ) || (m_numpeaks == 4 ))
     {
       
-      deltaFunction->SetBinContent(int(peak1/dt),ampl1);
-      deltaFunction->SetBinContent(int(peak2/dt),ampl2);
-      //  for (int i=0; i < Tbin; i++)
-      //deltaFunction->SetBinContent(i,deltaFunction->GetBinContent(i)+((ampl1+ampl2)/100));
+      deltaFunction.SetBinContent(int(peak1/dt),ampl1);
+      deltaFunction.SetBinContent(int(peak2/dt),ampl2);
     } 
 
 
@@ -141,10 +139,10 @@ TH2D* PulsarSim::PSRPhenom(double par1, double par2, double par3, double par4)
       std::cout << "\n***********************************************" << std::endl;
     }
 
-  TF1 *PulsarTimeCurve = new TF1("PulsarTimeCurve",
-                                 "([2]*(1/(((x-[0])^2)+(([1]/2)^2))) + [5]*(1/(((x-[3])^2)+(([4]/2)^2))))",
-                                 0, m_period);
-  PulsarTimeCurve->SetParameters(peak1,fwhm1,ampl1,peak2,fwhm2,ampl2);  
+  TF1 PulsarTimeCurve("PulsarTimeCurve",
+		      "([2]*(1/(((x-[0])^2)+(([1]/2)^2))) + [5]*(1/(((x-[3])^2)+(([4]/2)^2))))",
+		      0, m_period);
+  PulsarTimeCurve.SetParameters(peak1,fwhm1,ampl1,peak2,fwhm2,ampl2);  
 
   // Part 3 - Combination of Spectrum and lightCurve and filling of TH2D
 
@@ -163,16 +161,16 @@ TH2D* PulsarSim::PSRPhenom(double par1, double par2, double par3, double par4)
   for(int ti = 0; ti<Tbin; ti++)
     {
       t = ti*dt;
-      double nt = PulsarTimeCurve->Eval(t);
+      double nt = PulsarTimeCurve.Eval(t);
 
       if ((m_numpeaks == 3 ) || (m_numpeaks == 4 ))
 	{
-	  nt = deltaFunction->GetBinContent(ti);
+	  nt = deltaFunction.GetBinContent(ti);
 	}
 
       for(int ei = 0; ei < Ebin; ei++)
 	{
-	  double nv = PulsarSpectralShape->Eval(e[ei]);
+	  double nv = PulsarSpectralShape.Eval(e[ei]);
 	  m_Nv->SetBinContent(ti+1, ei+1, nt*nv);// [ph/(cm² s KeV)]
 	}
     }
@@ -198,13 +196,9 @@ TH2D* PulsarSim::PSRPhenom(double par1, double par2, double par3, double par4)
   m_Nv->Scale(m_flux/norm);
 
   
-  delete e;
+  delete[] e;
   delete nph;
-  delete deltaFunction;
-  delete PulsarSpectralShape;
-  delete PulsarTimeCurve;
-
-
+  
   SaveNv(m_Nv); // ph/m2/s/keV
 
   // Saving TimeProfile on a TXT Output file.
@@ -212,12 +206,12 @@ TH2D* PulsarSim::PSRPhenom(double par1, double par2, double par3, double par4)
 
   ofstream OutTimeProf("PSRTimeProfile.txt");
   OutTimeProf <<  m_flux << "\t" << m_period << "\n-----------------------\n";  
-  TH1D *NvTimeProf = new TH1D("NvTimeProf","NvTimeProf",Tbin,0.0,m_period);
+  TH1D NvTimeProf("NvTimeProf","NvTimeProf",Tbin,0.0,m_period);
 
   for (int t=0; t < Tbin; t++)
     {
-      NvTimeProf->SetBinContent(t+1,m_Nv->Integral(t+1,t+1,ei2,ei3));
-      OutTimeProf << t << "\t" <<  NvTimeProf->GetBinContent(t+1)*1e4 << "\n";
+      NvTimeProf.SetBinContent(t+1,m_Nv->Integral(t+1,t+1,ei2,ei3));
+      OutTimeProf << t << "\t" <<  NvTimeProf.GetBinContent(t+1)*1e4 << "\n";
     }
 
 
@@ -225,6 +219,7 @@ TH2D* PulsarSim::PSRPhenom(double par1, double par2, double par3, double par4)
 
 
   return m_Nv;
+  delete m_Nv;
 }
 
 //////////////////////////////////////////////////

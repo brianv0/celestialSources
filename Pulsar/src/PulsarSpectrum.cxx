@@ -53,6 +53,9 @@ PulsarSpectrum::~PulsarSpectrum()
 {  
   delete m_Pulsar;
   delete m_spectrum;
+  delete JDStartMission;
+  delete JDStartSimulation;
+  delete m_JDCurrent;
 }
 
 //return flux, given a time

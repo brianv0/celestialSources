@@ -224,13 +224,13 @@ void PlotPulsar(double enph = 0,char name[100]="pulsar.root")
 	  
 	  Counts->Fill(energy); // ph
 	  Lc->Fill( time - (TMAX*int(time/TMAX)));       // ph
-	  
+	 
 	  std::cout<<" Time (s)  = "<<time
 		   << " within period = " << time - (TMAX*int(time/TMAX))
 		   <<" Flux (ph/s/m^2)  = "<<flux
 		   <<" energy (keV) = "<<energy
 		   <<" Interval (s) = "<<Interval<<std::endl;
-	  
+	 
 	  time+=Interval;
 	  i++;
 	} 
@@ -307,7 +307,8 @@ void PlotPulsar(double enph = 0,char name[100]="pulsar.root")
 
 
   //  if(ExtractPhotons) std::cout<<" Flux[ erg/cm^2] EXT ("<<enph<<","<<EMAX<<")  = "<<Fv->Integral(iEXP,EBIN,"width")*1.0e-7/erg2meV<<" erg/cm^2"<<std::endl;
-  
+ 
+  delete sp; 
 }
 
 
@@ -335,7 +336,7 @@ int main(int argc, char** argv)
 
   double Period  = 0.089; // s
   double flux = 9e-6; // ph/cm2/s
-  int npeaks = 3;
+  int npeaks = 2;
   double ppar1 = 1e6;
   double ppar2 = 8e6;
   double ppar3 = -1.62;
