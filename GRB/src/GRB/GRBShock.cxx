@@ -4,7 +4,7 @@
 //
 
 #include <iostream>
-#include <math.h>
+#include <cmath>
 #include "GRBShock.h"
 
 using namespace std;

@@ -3,7 +3,7 @@
 #include <iterator>
 #include <map>
 #include <vector>
-#include <math.h>
+#include <cmath>
 #include "GRBConstants.h"
 /*!
  * \class SpectObj

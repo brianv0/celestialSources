@@ -15,9 +15,7 @@
 #ifndef LATGRBALERT_CONSTANTS_H
 #define LATGRBALERT_CONSTANTS_H 
 
-#ifndef WIN32
-#include <math.h>
-#endif
+#include <cmath>
 
 
 

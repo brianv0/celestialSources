@@ -131,13 +131,13 @@ SpectObj GRBSim::ComputeFlux(const double time)
   while(itr != theShocks.end())
     {
       
-      m_synchrotron.load((itr),time,m_jetangle,m_distance);
+      m_synchrotron.load(&(*itr),time,m_jetangle,m_distance);
       m_spectobj+=m_synchrotron.getSpectrumObj();
       
       if (cst::flagIC!=0.0)
 	{
 	  m_icompton = GRBICompton(m_synchrotron.getSpectrumObj());
-	  m_icompton.load((itr),time,m_jetangle,m_distance);
+	  m_icompton.load(&(*itr),time,m_jetangle,m_distance);
 	  m_spectobj+=m_icompton.getSpectrumObj();
 	}
       

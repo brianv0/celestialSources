@@ -5,7 +5,7 @@
 #include "GRBSpectrum.h"
 #include "CLHEP/Random/RandFlat.h"
 #include <iostream>
-#include <math.h>
+#include <cmath>
 
 GRBSpectrum::GRBSpectrum(const std::string& params) 
 {
