@@ -5,7 +5,7 @@
 <!-- The reference frame is galactic. -->
 
     <source name=" GRBspectrum_Gal">
-    <spectrum  escale="GeV"> <SpectrumClass name="GRBSpectrum"/>
+    <spectrum  escale="GeV"> <SpectrumClass name="GRBSpectrum" params="temp.txt"/>
     <!--This will live the direction free-->
     <use_spectrum frame="galaxy"/>
     </spectrum> </source>
@@ -46,7 +46,7 @@
         <source name=" GRBspectrum_Test" >
 	<spectrum escale="GeV"> <SpectrumClass name="GRBSpectrum"  /> 
 	<!--This will fix the direction -->
-	<galactic_dir l="120" b="-50"/>
+	 <direction theta="0" phi="0" />
 	</spectrum> </source>
 
 	<source name=" GRBobsSpectrum_Test" >
