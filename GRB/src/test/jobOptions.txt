@@ -10,7 +10,7 @@
 #include "$GRBROOT/src/test/TDSreadFluxOptions.txt"
 
 // This will test the LatTrigger algorithm
-//#include "$GRBROOT/src/test/LatTriggerOptions.txt"
+//#include "$GRBROOT/src/test/LatGRBAlertOptions.txt"
 
 //==============================================================
 //
