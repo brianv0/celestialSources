@@ -118,10 +118,10 @@ private:
     /*!
      * \brief Compute power law indices.
      */
-    void powerLawIndex(HepRandomEngine *engine, const std::vector<int> &histpl, 
-        const std::vector<double> &loEdges,
-        const double factor, std::vector<double> &vect);
-    //void powerLawIndex(HepRandomEngine *engine, const std::vector<int> &histpl, const double factor, std::vector<double> &vect);
+    //void powerLawIndex(HepRandomEngine *engine, const std::vector<int> &histpl, 
+    //    const std::vector<double> &loEdges,
+    //    const double factor, std::vector<double> &vect);
+    void powerLawIndex(HepRandomEngine *engine, const std::vector<int> &histpl, const double factor, std::vector<double> &vect);
     
     
     
