@@ -1,3 +1,6 @@
+#ifndef GRBCONSTANT_HH
+#define GRBCONSTANT_HH 1
+
 /*! 
  * \class GRBConstants
  * \brief Class instantiated to access general parameters and constants.
@@ -8,9 +11,9 @@
  * \author Nicola Omodei       nicola.omodei@pi.infn.it 
  * \author Johann Cohen-Tanugi johann.cohen@pi.infn.it
  */
-#include <iterator>
-#include <iostream>
-#include <fstream>
+#include <iterator.h>
+#include <iostream.h>
+#include <fstream.h>
 
 #include <math.h>
 #include <vector>
@@ -28,20 +31,15 @@
 #include "TH2D.h"
 #include "TRandom.h"
 
-#ifndef GRBCONSTANT_HH
-#define GRBCONSTANT_HH 1
 
 namespace cst
 {
   static const double pi = acos(-1.0); 
-  const Double_t c = 3.e+10; //cm
-  const Double_t c2 = c*c;
-  const Double_t mpc2  = 938.2;
-  const Double_t mec2  = 0.510999;       //MeV
-  const double st      = 6.65225e-25;
-  const double gmin = 100;
-  const double gmax = 10.*gmin;
-  
+  static const Double_t c = 3.e+10; //cm
+  static const Double_t c2 = c*c;
+  static const Double_t mpc2  = 938.2;
+  static const Double_t mec2  = 0.510999;       //MeV
+  static const double st      = 6.65225e-25;
   
   const float ab = .3; 
   const float ae = .3; 
@@ -55,8 +53,8 @@ namespace cst
   const double emax = 1e9;  //keV
   const double enph = 1e5;  //keV (100 MeV) 
   
-  const    int Ebin =  100; 
-  const    int Tbin =  100; 
+  const    int Ebin =  50; 
+  const    int Tbin =  500; 
   static const double de   = pow(emax/emin,1.0/Ebin);
   //  static const double dt   = tmax/(Tbin-1);
   const double erg2meV   = 624151.0;
@@ -68,22 +66,45 @@ namespace cst
   const double LAT1=50.0e3;                   // 50 MeV 
   const double LAT2=3.0e6;                    //300 GeV 
   //////////////////////////////////////////////////
+  /*
+  int Nshell     = 10;
+  double Gmin    = 100.;
+  double Gmax    = 1000.;
+  double Fluence = 1e-5;
+  double Etot    = 1e52;
+  double InitialSeparation = 1e10;
+  double InitialThickness  = 1e10;
+  double InverseCompton    = 1.0;
+
+  */  
 };
 
 class Parameters
 {
  public:
   Parameters();
+  double GetNshell() {return m_Nshell;}
+  double GetFluence(){return m_Fluence;}
+  double GetEtot()   {return m_Etot;}
+  double GetInitialSeparation(){return m_InitialSeparation;}
+  double GetInitialThickness() {return m_InitialThickness;}
+  double GetGammaMin(){return m_Gmin;}
+  double GetGammaMax(){return m_Gmax;}
+  double GetInverseCompton() {return m_InverseCompton;}
+
   double GetBATSEFluence();
   double GetLESI();
   double GetHESI();
+  
+
   void SetNshell(int nshell);
   void SetFluence(double fluence);
   void SetEtot(double etot);
   void SetInitialSeparation(double initialSeparation);
   void SetInitialThickness(double initialThickness);		  
-  //  void SetLESI(double beta);
-  //void SetHESI(double alpha);
+  void SetGammaMin(double gmin);
+  void SetGammaMax(double gmax);
+  void SetInverseCompton(double ic);
   void ReadParametersFromFile(std::string paramFile);
   void PrintParameters();
   inline long GetGRBNumber(){return m_GRBnumber;}
@@ -95,10 +116,16 @@ class Parameters
     }
   
   TRandom *rnd;
-  int    m_nshell;
-  long m_GRBnumber;
-  double m_fluence,m_etot,m_initialSeparation,m_initialThickness;
-  //  double m_alpha,m_beta;
+  int    m_Nshell;
+  double m_Gmin;
+  double m_Gmax ;
+  double m_Fluence;
+  double m_Etot   ;
+  double m_InitialSeparation;
+  double m_InitialThickness ;
+  double m_InverseCompton ;
+  long   m_GRBnumber;
+
   
 };
 

@@ -18,7 +18,7 @@ GRBmanager::GRBmanager(const std::string& params)
   m_startTime = TMath::Max(0.,parseParamList(params,0));
   m_endTime   = m_startTime + m_GRB->Tmax();
   m_nextBurst = m_endTime   + m_timeToWait;
-
+  
 }
 
 GRBmanager::~GRBmanager() 
@@ -42,7 +42,7 @@ double GRBmanager::interval(double time)
 {  
   double inte;  
 
-  if(time < m_startTime) inte = m_startTime - time; //+ m_spectrum->interval(0.0,cst::enph);
+  if(time <= m_startTime) inte = m_startTime - time + m_spectrum->interval(0.0,cst::enph);
   else if (time<m_endTime)
     {
       inte = m_spectrum->interval(time - m_startTime,cst::enph);
@@ -59,11 +59,11 @@ double GRBmanager::interval(double time)
       m_par->PrintParameters();
       m_GRB = new GRBSim(m_par);
       m_spectrum = new  SpectObj(m_GRB->Fireball());
-      //////////////////////////////////////////////////m_par->PrintParameters();
+      //////////////////////////////////////////////////
       m_endTime   = m_startTime + m_GRB->Tmax();
       m_nextBurst = m_endTime   + m_timeToWait;
       
-      inte = m_startTime-time;
+      inte = m_startTime-time + m_spectrum->interval(0.0,cst::enph);
     }
   //double t1 = TMath::Max(m_GRB->Tmax(),m_timeToWait);
   inte = TMath::Min(inte,m_nextBurst-time);

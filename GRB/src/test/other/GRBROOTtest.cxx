@@ -215,6 +215,7 @@ void PlotGRB(double enph = 0,char name[100]="grb_65540.root")
       double energy;
       double flux;
       int i = 0;
+      time = sp->interval(0.0,enph); // s
       while(time < TMAX && time>=0)
 	{
 	  Interval = sp->interval(time,enph); // s  

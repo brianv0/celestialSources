@@ -31,12 +31,16 @@ class GRBShock
       a = alpha;
       b = beta;
     }
+  inline   void SetICComponent(double ic){m_IC = ic;}
+  
   double GetTime(){return tsh;}
+  double GetDuration(){return sqrt(ta*ta+tc*tc+ts*ts);}
   double GetEfficiency(){return eff;}
   double Peak(double time, double energy);
   double SynSpectrum(double energy);
   double ICSpectrum(double energy);
   double ComputeFlux(double time, double energy);
+  void Print();
  private:
   GRBShell *MS; 
   double tsh;
@@ -45,6 +49,7 @@ class GRBShock
   double ta,tc,ts;
   double Esyn,Eic;
   double a,b;
+  double m_IC;
     
 };
 

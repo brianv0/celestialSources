@@ -24,11 +24,15 @@ GRBengine::GRBengine(Parameters *params)
   
 }
 
-std::vector<GRBShock*> GRBengine::CreateShocksVector(const int Nshell, 
-						     const double L, //initial separation 
-						     const double l, //initial tickness
-						     const double etot)
+std::vector<GRBShock*> GRBengine::CreateShocksVector()
 {
+  //////////////////////////////////////////////////
+  const   int    Nshell            = m_params->GetNshell();
+  const   double Etot              = m_params->GetEtot();
+  const   double InitialSeparation = m_params->GetInitialSeparation();
+  const   double InitialThickness  = m_params->GetInitialThickness();
+  const   double Gmin              = m_params->GetGammaMin();
+  const   double Gmax              = m_params->GetGammaMax();
   std::vector<GRBShell*> theShells;
   std::vector<GRBShock*> theShocks;
   
@@ -37,10 +41,10 @@ std::vector<GRBShock*> GRBengine::CreateShocksVector(const int Nshell,
   
   for(int i = 0; i < Nshell ; i++ )
     {
-      double g  = m_params->rnd->Uniform(gmin,gmax); // lorentz factor;
-      double r  = L + (Nshell-(i+1))*(L+l); // initial radius
+      double g  = m_params->rnd->Uniform(Gmin,Gmax); // lorentz factor;
+      double r  = InitialSeparation + (Nshell-(i+1))*(InitialSeparation+InitialThickness); // initial radius
       //      double dr = r/(g*g); 
-      GRBShell *ashell = new GRBShell(g,r,l,etot/Nshell);
+      GRBShell *ashell = new GRBShell(g,r,InitialThickness,Etot);
       theShells.push_back(ashell);
     }
   
@@ -68,7 +72,7 @@ std::vector<GRBShock*> GRBengine::CreateShocksVector(const int Nshell,
 		}
 	    }
 	}
-      if(FirstShell==-1) break;
+      if(FirstShell==-1) return CreateShocksVector();
       
       for(int i = 0; i < N; i++ )
 	{  
@@ -107,9 +111,8 @@ std::vector<GRBShock*> GRBengine::CreateShocksVector(const int Nshell,
     {   
       std::cout<<"---- Shock N = "<<i
 	       <<" at tobs = "<<theShocks[i]->GetTime()
-	       <<" "<<theShocks[i]->GetEfficiency()
+	       <<" Efficiency: "<<theShocks[i]->GetEfficiency()
 	       <<std::endl;
-      //      GRBShell *Ms = theShocks[i]->MergedShell();
     }
   return theShocks;
 }

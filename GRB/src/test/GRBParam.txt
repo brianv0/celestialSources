@@ -1,5 +1,8 @@
-20	        // Nshock
-1.0e+52		// Etot
+10	        // Nshock
+1.0e+53	        // Etot
 0.0e-5          // Fluence
 1.0e+10		// initial separation
 5.0e+9		// initial Thickness
+100.0		// Minimum Lorentz Factor
+1000.0		// Maximum Lorentz Factor
+1.0             // Inverse Compton Power/Synchrotron Power

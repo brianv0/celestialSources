@@ -25,40 +25,44 @@ double Parameters::GetHESI()
 //////////////////////////////////////////////////
 void Parameters::SetNshell(int nshell)
 {
-  m_nshell = (nshell>0) ? nshell : 10;
+  m_Nshell = (nshell>0) ? nshell : 10;
 }
 
 void Parameters::SetFluence(double fluence)
 {
-  m_fluence = (fluence>0.0) ? fluence : GetBATSEFluence();
+  m_Fluence = (fluence>0.0) ? fluence : GetBATSEFluence();
 }
 
 void Parameters::SetEtot(double etot)
 {
-  m_etot = (etot>0.0) ? etot : pow(10.0,rnd->Gaus(50.,53.0)); //erg
+  m_Etot = (etot>0.0) ? etot : pow(10.0,rnd->Gaus(50.,53.0)); //erg
 }
 
 void Parameters::SetInitialSeparation(double initialSeparation)
 {
-  m_initialSeparation = (initialSeparation>0.0) ? initialSeparation : 1.0e10;
+  m_InitialSeparation = (initialSeparation>0.0) ? initialSeparation : 1.0e10;
 }
 
 void Parameters::SetInitialThickness(double initialThickness)
 {
-  m_initialThickness = (initialThickness>0.0) ? initialThickness : 1.0e10;
+  m_InitialThickness = (initialThickness>0.0) ? initialThickness : 1.0e10;
 }
 
-/*
-  void Parameters::SetLESI(double alpha)
-  {
-  m_alpha = (alpha>0.0) ? alpha : GetLESI();
-  }
-  
-  void Parameters::SetHESI(double beta)
-  {
-  m_beta = (beta>0.0) ? beta : GetHESI();
-  }
-*/
+void Parameters::SetGammaMin(double gmin)
+{
+  m_Gmin = (gmin>=1.0) ? gmin : 100.0;
+}
+
+void Parameters::SetGammaMax(double gmax)
+{
+  m_Gmax = (gmax>=1.0 && gmax>=m_Gmin) ? gmax : 10.0*m_Gmin;
+}
+
+void Parameters::SetInverseCompton(double ic)
+{
+  m_InverseCompton = (ic>=0.0 && ic<=1.0) ? ic : rnd->Uniform(0.,1.);
+}
+
 //..................................................
 void Parameters::ReadParametersFromFile(std::string paramFile)
 {
@@ -72,7 +76,8 @@ void Parameters::ReadParametersFromFile(std::string paramFile)
   SetGRBNumber((long)GetGRBNumber()+1);
 
   int    nshell;
-  double fluence,etot,initialSeparation,initialThickness;//,alpha,beta;  
+  double fluence,etot,initialSeparation,initialThickness;
+  double gmin,gmax,ic;
 
   f1.getline(buf,50);
   sscanf(buf,"%d",&nshell);
@@ -89,33 +94,36 @@ void Parameters::ReadParametersFromFile(std::string paramFile)
   f1.getline(buf,50);
   sscanf(buf,"%lf",&initialThickness);
 
-  /*
-    f1.getline(buf,50);
-    sscanf(buf,"%lf",&alpha);
-    
-    f1.getline(buf,50);
-    sscanf(buf,"%lf",&beta);
-  */
-  //cout<<nshell<<" "<<etot<<" "<<fluence<<" "<<initialSeparation<<" "<<initialThickness<<endl;
+  
+  f1.getline(buf,50);
+  sscanf(buf,"%lf",&gmin);
+  
+  f1.getline(buf,50);
+  sscanf(buf,"%lf",&gmax);
+
+  f1.getline(buf,50);
+  sscanf(buf,"%lf",&ic);
+
   SetNshell(nshell);
   SetEtot(etot);
   SetFluence(fluence);
   SetInitialSeparation(initialSeparation);
   SetInitialThickness(initialThickness);		
-  //SetLESI(alpha);
-  //SetHESI(beta);
+  SetGammaMin(gmin);
+  SetGammaMax(gmax);
+  SetInverseCompton(ic);
 
 }
 
 void Parameters::PrintParameters()
 {
   std::cout<<"--------------------------------------------------"<<std::endl;
-  std::cout<<" Nshell                      = "<<m_nshell<<std::endl;
-  std::cout<<" Etot                        = "<<m_etot<<" Erg "<<std::endl;
-  std::cout<<" Fluence in the Batse Range  = "<<m_fluence<<std::endl;
-  std::cout<<" Initial Separation          = "<<m_initialSeparation<<std::endl;
-  std::cout<<" Initial Thickness           = "<<m_initialThickness<<std::endl;
-  //  std::cout<<" Low Energy Spectral Index (a) = "<<m_alpha<<std::endl;
-  //  std::cout<<" High Energy Spectral Index(b) = "<<m_beta<<std::endl;
-  
+  std::cout<<" Nshell                      = "<<m_Nshell<<std::endl;
+  std::cout<<" Etot                        = "<<m_Etot<<" Erg "<<std::endl;
+  std::cout<<" Fluence in the Batse Range  = "<<m_Fluence<<std::endl;
+  std::cout<<" Initial Separation          = "<<m_InitialSeparation<<std::endl;
+  std::cout<<" Initial Thickness           = "<<m_InitialThickness<<std::endl;
+  std::cout<<" Minimum Lorentsz Factor     = "<<m_Gmin<<std::endl;
+  std::cout<<" Maximum Lorentsz Factor     = "<<m_Gmax<<std::endl;
+  std::cout<<" Inverse Compton Parameter   = "<<m_InverseCompton<<std::endl;
 }

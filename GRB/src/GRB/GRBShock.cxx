@@ -12,7 +12,7 @@ GRBShock::GRBShock(GRBShell *S1, GRBShell *S2, double tshock)
 {
   a = -2./3.; // +- 0.15
   b = -2.5;  // +- 0.07
-  
+  m_IC =  1.0;
   // Qty, LESI, HESI
   //  Ne   a     b
   //  Fv   a+1   b+1
@@ -23,7 +23,7 @@ GRBShock::GRBShock(GRBShell *S1, GRBShell *S2, double tshock)
   double g1 = S1->GetGamma();
   double g2 = S2->GetGamma();
   
-  //  double r1 = S1->GetRadius();
+  double r1 = S1->GetRadius();
   double r2 = S2->GetRadius();
 
   double dr1 = S1->GetThickness();
@@ -128,14 +128,15 @@ GRBShock::GRBShock(GRBShell *S1, GRBShell *S2, double tshock)
   tc    =   drf/(2.*c);  // oss
   ta    =   rf/(2.*c*gf*gf);  // oss
   ts    =  2.9*pow(ae/csi,-1.)*pow(ab/0.1,-1.)*pow(e2/1e53,-1.)*pow(g1/100.0,7)*pow(tv,-3.)*(G*G/((G-y)*C1*C1))/(2*gf*gf);
-  cout<<ta<<" "<<tc<<" "<<ts<<" "<<sqrt(ta*ta+ts*ts)<<endl;
+  //cout<<ta<<" "<<tc<<" "<<ts<<" "<<sqrt(ta*ta+ts*ts)<<endl;
   
   //////////////////////////////////////////////////  
   /*
-    std::cout<<" e1= "<<e1<<" m1= "<<m1<<" g1= "<<g1<<" r1= "<<r1<<" dr1= "<<dr1<<" n1c = "<<n1c<<std::endl;
-    std::cout<<" e2= "<<e2<<" m2= "<<m2<<" g2= "<<g2<<" r2= "<<r2<<" dr2= "<<dr2<<" n2c = "<<n2c<<std::endl;
-    std::cout<<" ef= "<<ef<<" mf= "<<mf<<" gf= "<<gf<<" rf= "<<rf<<" drf= "<<drf<<" nfc = "<<nfc<<std::endl;
-    std::cout<<" ei= "<<ei<<" eint_o = "<<eint_o<<" eint_c= "<<eint_c<<std::endl;
+  std::cout<<" e1= "<<e1<<" m1= "<<m1<<" g1= "<<g1<<" r1= "<<r1<<" dr1= "<<dr1<<std::endl;
+  std::cout<<" e2= "<<e2<<" m2= "<<m2<<" g2= "<<g2<<" r2= "<<r2<<" dr2= "<<dr2<<std::endl;
+  std::cout<<" ef= "<<ef<<" mf= "<<mf<<" gf= "<<gf<<" rf= "<<rf<<" drf= "<<drf<<std::endl;
+    
+      std::cout<<" ei= "<<ei<<" eint_o = "<<eint_o<<" eint_c= "<<eint_c<<std::endl;
     //std::cout<<" Ub "<<Ub<<" Ue "<<Ue<<" B "<<B<<" ge "<<ge<<std::endl;
     std::cout<<" B "<<B<<" Esyn "<<Esyn<<" Eic "<<Eic<<std::endl;
     //std::cout<<" Tau Thompson  "<<tau_th<<" Tau Pair Prod."<<tau_pp<<std::endl;
@@ -235,6 +236,16 @@ Double_t GRBShock::ICSpectrum(Double_t energy)
 
 double GRBShock::ComputeFlux(double time, double energy)
 {
-  return Peak(time,energy) * (SynSpectrum(energy) + 1.0* ICSpectrum(energy));
+  return Peak(time,energy) * (SynSpectrum(energy) + m_IC * ICSpectrum(energy));
 }
 
+void GRBShock::Print()
+{
+  std::cout<<"--------------------------------------------------"<<std::endl;
+  std::cout<<tsh<<" "<<ta<<" "<<tc<<" "<<ts<<std::endl;
+  std::cout<<eff<<" "<<ei<<" "<<ef<<" "<<eint_o<<" "<<eint_c<<" "<<std::endl;
+  std::cout<<gf<<" "<<mf<<" "<< rf<<" "<<drf<<std::endl;
+  std::cout<<Esyn<<" "<<Eic<<" "<<m_IC<<std::endl;
+  std::cout<<a<<" "<<b<<std::endl;
+  std::cout<<"--------------------------------------------------"<<std::endl;
+}

@@ -22,11 +22,7 @@ class GRBengine
   
   //  void   EraseShocksVector();
   
-  std::vector<GRBShock*> CreateShocksVector(const int N,
-					    const double L,
-					    const double l,
-					    const double etot
-					    );
+  std::vector<GRBShock*> CreateShocksVector();
   double GenerateGamma(double gammamax,double gammamin);
   //double getDistance();
   inline std::pair<double,double> GetDirection(){return m_dir;}
