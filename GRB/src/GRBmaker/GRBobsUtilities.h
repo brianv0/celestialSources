@@ -92,9 +92,9 @@ public:
     }
     
     
-    /*! 
-     * \brief Create cumulative sum of the input vector "in".
-     */
+     /*! 
+      * \brief Create cumulative sum of the input vector "in".
+      */
     template<class S, class T>
         static void cumulativeSum(const std::vector<S> &in, std::vector<T> &out)
     {
@@ -102,7 +102,7 @@ public:
         
         out.reserve(in.size());
         
-        std::vector<S>::const_iterator it = in.begin();
+        typename std::vector<S>::const_iterator it = in.begin();
         T value = *it;
         out.push_back(value);
         
@@ -115,6 +115,7 @@ public:
             ++it;
         }
     }
+
 };
 
 #endif
