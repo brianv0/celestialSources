@@ -245,8 +245,8 @@ void GRBurst::readGRB(const std::vector<std::string> &paramVector)
         is >> *this;
         
         //std::cout << "m_flux: " << m_globalData->flux() << std::endl;
-        std::ofstream os("GRB_c2.lis");
-        os << *this;
+        //std::ofstream os("GRB_c2.lis");
+        //os << *this;
     }
     
     catch (...)
