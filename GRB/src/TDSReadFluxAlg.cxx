@@ -1,5 +1,7 @@
 #include "astro/SkyDir.h"
 #include "flux/GPS.h"
+#include "FluxSvc/IFluxSvc.h"
+
 
 #include "GaudiKernel/MsgStream.h"
 #include "GaudiKernel/AlgFactory.h"
@@ -29,7 +31,6 @@
 
 //#include "TkrRecon/Cluster/TkrMakeClusters.h" //max
 #include "GaudiKernel/DataSvc.h" //max
-#include "FluxSvc/IFluxSvc.h"
 //#include <map>
 #include <vector>
 #include <fstream>
@@ -98,7 +99,7 @@ private:
   std::vector<int> Hits;
   TTree *FRevents,*MCevents;
 
-  //  IFluxSvc* m_fsvc; // pointer to the flux Service
+  IFluxSvc* m_fsvc; // pointer to the flux Service
   
   //  TH1D *hitmap[numPlanes];//,*hitmap0y,*hitmap1x,*hitmap1y,*hitmap2x,*hitmap2y;
   int numPlanes,numTowers;
@@ -134,8 +135,8 @@ StatusCode TDSReadFluxAlg::initialize()
    
   StatusCode sc = StatusCode::SUCCESS;
   MsgStream log(msgSvc(), name());
-  
   setProperties();
+  sc = service("FluxSvc", m_fsvc);
   //////////////////////////////////////////////////
   /*
     IService*   iService = 0; // questa parte serve per i cluster...
@@ -263,7 +264,7 @@ StatusCode TDSReadFluxAlg::readEvent()
 	  
 	  if(GRBAlertFlag == 1)  sc = GRBAlert(FREvent);
 	  NumReconTracks++;
-	  cout<<" Number of reconstructed tracks = "<<NumReconTracks<<endl;
+	  std::cout<<" Number of reconstructed tracks = "<<NumReconTracks<<std::endl;
 	  FRevents->Fill(); 
 	}
     }
@@ -278,9 +279,9 @@ StatusCode TDSReadFluxAlg::readEvent()
 
 StatusCode TDSReadFluxAlg::finalize()
 {
-  cout<<"--------------------------------------------------"<<endl;
-  cout<<" Number of reconstructed tracks = "<<NumReconTracks<<endl;
-  cout<<"--------------------------------------------------"<<endl;
+  std::cout<<"--------------------------------------------------"<<std::endl;
+  std::cout<<" Number of reconstructed tracks = "<<NumReconTracks<<std::endl;
+  std::cout<<"--------------------------------------------------"<<std::endl;
 
   if(JointLike.size()>0)
     {
@@ -346,7 +347,7 @@ StatusCode TDSReadFluxAlg::GRBAlert(myEvent Evt)
   //////////////////////////////////////////////////
   PhotonInfo myPhoton;
  
-  cout<<Evt.time<<" "<<Evt.energy<<endl;
+  std::cout<<Evt.time<<" "<<Evt.energy<<std::endl;
 
   myPhoton.setTime(Evt.time);
   myPhoton.setEnergy(Evt.energy);
@@ -356,14 +357,14 @@ StatusCode TDSReadFluxAlg::GRBAlert(myEvent Evt)
   PhotonsData.push_back(myPhoton);    
   GRBAlertData AlertData;
   
-  cout<<PhotonsData[0].time()<<" "<<PhotonsData.back().time()<<endl;
+  std::cout<<PhotonsData[0].time()<<" "<<PhotonsData.back().time()<<std::endl;
 
   if((int) PhotonsData.size() == lattrigcst::nrange)
     {
       double tstart = PhotonsData[0].time();
       double tend   = PhotonsData.back().time();
       double like   = clusterData->triggerLikelihood(PhotonsData);
-      cout<<tstart<<" "<<tend<<" "<<like<<endl;
+      std::cout<<tstart<<" "<<tend<<" "<<like<<std::endl;
       if(like>100)
 	{
 	  std::cout << " *********************************************** " << std::endl;

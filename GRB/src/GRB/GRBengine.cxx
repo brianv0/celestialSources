@@ -12,12 +12,15 @@ double Beta(double gamma)
 GRBengine::GRBengine(Parameters *params)
   : m_params(params)
 {
+  
   double l = m_params->rnd->Uniform(180.0,-180.0);
   double b = m_params->rnd->Uniform(90.0,-90.0);
   
   m_dir = std::make_pair(l,b);
   
-  std::cout<<"Create GRB engine at the galactic position: l="<<l<<", b = "<<b<<std::endl;
+  std::cout<<" Create new GRB : "<<std::endl;
+  std::cout<<" Seed           = "<<m_params->GetGRBNumber()<<std::endl;
+  std::cout<<" Position    : l="<<l<<", b = "<<b<<std::endl;
   
 }
 

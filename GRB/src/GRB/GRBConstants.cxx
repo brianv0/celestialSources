@@ -2,12 +2,13 @@
 
 Parameters::Parameters()
 {
-  rnd = new TRandom();  
+  rnd = new TRandom();
+  SetGRBNumber((long) rnd->GetSeed());
 }
 
 double Parameters::GetBATSEFluence()
 {
-  return pow(10.0,rnd->Gaus(-6.00,1.0)); //erg/cm^2
+  return pow(10.0,rnd->Gaus(-6.00,0.5)); //erg/cm^2
 }
 
 void Parameters::SetNshell(int nshell)
@@ -21,7 +22,7 @@ void Parameters::SetFluence(double fluence)
 
 void Parameters::SetEtot(double etot)
 {
-  m_etot = (etot>0.0) ? etot : 1.0e53;
+  m_etot = (etot>0.0) ? etot : pow(10.0,rnd->Gaus(50.,53.0)); //erg
 }
 
 
@@ -43,6 +44,8 @@ void Parameters::ReadParametersFromFile(std::string paramFile)
       std::cout<<"Error Opening paramFile.c_str()\n";
       exit(1);
     }
+  SetGRBNumber((long)GetGRBNumber()+1);
+
   int    nshell;
   double fluence,etot,initialSeparation,initialThickness;  
   f1.getline(buf,50);

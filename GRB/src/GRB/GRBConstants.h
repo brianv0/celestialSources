@@ -53,7 +53,7 @@ namespace cst
   
   const double emin =  1.0; //keV
   const double emax = 1e9;  //keV
-  const double enph = 1e5;  //keV 
+  const double enph = 5e4;  //keV 
   
   const    int Ebin =  100; 
   const    int Tbin =  500; 
@@ -61,8 +61,13 @@ namespace cst
   //  static const double dt   = tmax/(Tbin-1);
   const double erg2meV   = 624151.0;
   
-  const double BATSE1=20.0;    //20 keV
-  const double BATSE2=1.0e+3;  // 1 MeV
+  const double BATSE1=20.0;                   //20 keV
+  const double BATSE2=1.0e+3;                 // 1 MeV
+  const double GBM1=10.0;                     // 10 keV 
+  const double GBM2=25.0e3;                   // 25 MeV 
+  const double LAT1=50.0e3;                   // 50 MeV 
+  const double LAT2=3.0e6;                    //300 GeV 
+  //////////////////////////////////////////////////
 };
 
 class Parameters
@@ -77,9 +82,16 @@ class Parameters
   void SetInitialThickness(double initialThickness);		  
   void ReadParametersFromFile(std::string paramFile);
   void PrintParameters();
-
+  inline long GetGRBNumber(){return m_GRBnumber;}
+  inline void SetGRBNumber(long GRBnumber)
+    {
+      m_GRBnumber = GRBnumber;
+      rnd->SetSeed(m_GRBnumber);
+    }
+  
   TRandom *rnd;
   int    m_nshell;
+  long m_GRBnumber;
   double m_fluence,m_etot,m_initialSeparation,m_initialThickness;
 };
 

@@ -3,42 +3,19 @@
 // Job options file for GRB test program
 //
 //==================================================
+// primary DLLs, including auditor 
+ApplicationMgr.DLLs+= { "GaudiAlg", "GaudiAud"};
 
 // This will call GRBtestAlg
-
 #include "$FLUXSVCROOT/src/defaultOptions.txt"
 
 ApplicationMgr.DLLs   += { "GRB" }; 
 ApplicationMgr.TopAlg = {"GRBTestAlg"};
+FluxSvc.source_lib += {"$(GRBROOT)/xml/GRB_user_library.xml"};
+FluxAlg.source_name="One_GRB_each_Hour"; 
 
 // Set output level threshold (2=DEBUG, 3=INFO, 4=WARNING, 5=ERROR, 6=FATAL )
 MessageSvc.OutputLevel      = 3;
-
-// Set the default for a source library document
-FluxSvc.source_lib ={"$(FLUXROOT)/xml/source_library.xml"};
-
-// Append to a list of source library documents
-//FluxSvc.source_lib += {"$(FLUXSVCROOT)/xml/user_library.xml"};
-
-// Append to a list of source library documents
-FluxSvc.source_lib += {"$(GRBROOT)/xml/GRB_user_library.xml"};
-
-//------------------------------------------------------------
-// Primary source name (default GRBSpectrum)
-// From here we can select one of the 2 models...
-GRBTestAlg.source_name="GRBspectrum_Test";
-//------------------------------------------------------------
-// Background source name
-GRBTestAlg.background_name={"backgndmix"};
-
-//Maximum observation time (default 10 s)
-GRBTestAlg.observation_time=10;
-// Maximum number of photons generated (default 100000)
-GRBTestAlg.EvtMax=100;
-
-// No idea...
-ApplicationMgr.EvtSel = "NONE";
-
 // How many times the application will run...
 ApplicationMgr.EvtMax = 1;
 

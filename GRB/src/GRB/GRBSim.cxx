@@ -11,6 +11,7 @@ GRBSim::GRBSim(Parameters *params)
   : m_params(params)
 {
   m_GRB = new GRBengine(params);
+  //std::cout<<m_params->GetGRBNumber()<<std::endl;
 }
 
 TH2D* GRBSim::Fireball()

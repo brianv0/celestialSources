@@ -17,7 +17,7 @@
 #include <map>
 #include <cmath>
 #include "flux/ISpectrum.h"
-#include "facilities/Observer.h"
+//#include "facilities/Observer.h"
 #include "GRBSim.h"
 #include "SpectObj.h"
 
@@ -63,7 +63,6 @@ class GRBmanager : public ISpectrum
   inline std::pair<double,double> 
     dir(double energy) 
     {
-      cout<<"dir"<<endl;
       return m_GRB->GRBdir();
     } 
   //! calls GRBSpectrum::energySrc
