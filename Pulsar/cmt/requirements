@@ -1,6 +1,6 @@
 package Pulsar
 version v1r0p1
-author Nicola Omodei<nicola.omodei@pi.infn.it> Massimiliano Razzano <massimiliano.razzano@pi.infn.it>
+author Nicola Omodei<nicola.omodei@pi.infn.it>, Massimiliano Razzano <massimiliano.razzano@pi.infn.it>
 # $Id$
 
 use flux       v8r*
