@@ -1,5 +1,6 @@
 package GRB
-
+# $Id$
+# author ?
 use FluxSvc    *
 use ROOT       *  IExternal
 use RootIo     *
@@ -26,9 +27,12 @@ macro_append GRB_stamps " $(GRBDir)/GRB_lib.stamp"
 macro_append GRB_headers 	""  \
 			  WIN32 "../xml/*.xml test/*.xml GRBmaker/*.h LatGRBAlert/*.h GRB/*.h"
 
-library GRB_lib -no_share 	*.cxx GRB/*.cxx \
-			  	GRBmaker/*.cxx  LatGRBAlert/*.cxx \
-				${GRB_headers}
+macro source "*.cxx" WIN32 "*.cxx *.h"
+
+library GRB_lib -no_share 	$(source) \
+     -s=GRB $(source)\
+     -s=GRBmaker $(source)\
+     -s=LatGRBAlert $(source)
 
 macro libs ""   WIN32 " $(GRBDir)/GRB_lib.lib "
 
