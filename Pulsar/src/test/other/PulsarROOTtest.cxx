@@ -334,8 +334,6 @@ int main(int argc, char** argv)
       if("-extract"==arg_name)
 	{
 	  enph  = atof(argv[++current_arg]);
-	  if (enph < enphmin) enph = enphmin; 
-	  std::cout << "Extracting photon above " << enph << std::endl;
 	}
       current_arg++;
     }
