@@ -10,7 +10,7 @@
 #include "GRBurst.h"
 #include "GRBobsSpectrum.h"
 #include "GRBobsConstants.h"
-#include "flux/GPS.h"
+#include "astro/GPS.h"
 #include "flux/SpectrumFactory.h"
 #include "CLHEP/Random/RandFlat.h"
 

@@ -1,5 +1,5 @@
 #include "astro/SkyDir.h"
-#include "flux/GPS.h"
+#include "astro/GPS.h"
 #include "FluxSvc/IFluxSvc.h"
 
 
