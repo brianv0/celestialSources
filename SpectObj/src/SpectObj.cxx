@@ -51,16 +51,26 @@ SpectObj::SpectObj(const TH2D* In_Nv, int type)
 
   gDirectory->Delete("spec");
   gDirectory->Delete("times");
-  spec  = new TH1D("spec","spec",ne,en);
-  times = new TH1D("times","times",nt,m_Tmin,m_Tmax);
+  gDirectory->Delete("Probability");
+
+  spec        = new TH1D("spec","spec",ne,en);
+  times       = new TH1D("times","times",nt,m_Tmin,m_Tmax);
+  Probability = new TH1D("Probability","Probability",nt,m_Tmin,m_Tmax);
+  
     //times = new TH1D("times","times",nt,m_Tmin,m_Tmax);
   GetUniqueName(spec ,name);
   gDirectory->Delete(name.c_str());
   spec->SetName(name.c_str());
+
   GetUniqueName(times,name);
   gDirectory->Delete(name.c_str());
   times->SetName(name.c_str());
 
+  GetUniqueName(Probability,name);
+  gDirectory->Delete(name.c_str());
+  Probability->SetName(name.c_str());
+  ProbabilityIsComputed=false;
+  
   delete[] en;
   if(DEBUG)  std::cout<<" SpectObj initialized ! ( " << sourceType <<")"<<std::endl;
   //////////////////////////////////////////////////
@@ -185,6 +195,7 @@ TH1D *SpectObj::Integral_T(double t1, double t2, double en)
   int ei  = TMath::Max(1,Nv->GetYaxis()->FindBin(en));
   return Integral_T(ti1,ti2,ei); //ph
 }
+
 TH1D *SpectObj::Integral_T(double t1, double t2, double e1, double e2)
 {
   //nv is in ph
@@ -228,6 +239,7 @@ double SpectObj::Integral_T(TH1* Pt, int ti1, int ti2)
 //////////////////////////////////////////////////
 TH1D *SpectObj::ComputeProbability(double enph)
 {
+  ProbabilityIsComputed=true;
   TH1D *P = CloneTimes();
   TH1D *pt = Integral_E(enph,emax); //ph
   for(int ti = 1; ti <= nt; ti++)
@@ -245,6 +257,8 @@ photon SpectObj::GetPhoton(double t0, double enph)
 {
   //  photon ph;
   int ei  = TMath::Max(1,Nv->GetYaxis()->FindBin(enph));
+  if(!ProbabilityIsComputed)
+    Probability = ComputeProbability(enph);
   
   if (sourceType == 0 ) // Transient
     {
@@ -259,46 +273,46 @@ photon SpectObj::GetPhoton(double t0, double enph)
   	  return ph;
 	}
       
-      TH1D *P = ComputeProbability(enph); //ph
+      //      TH1D *P = ComputeProbability(enph); //ph
       
-      int t1 = P->FindBin(t0);
+      int t1 = Probability->FindBin(t0);
       int t2 = t1;
-      double dt0 = t0 - P->GetBinCenter(t1);
+      double dt0 = t0 - Probability->GetBinCenter(t1);
       double dP0 = 0;
 
       if(dt0>0 && t1<nt)
 	{
-	  dP0 = (P->GetBinContent(t1+1) - P->GetBinContent(t1))*dt0/m_TimeBinWidth;
+	  dP0 = (Probability->GetBinContent(t1+1) - Probability->GetBinContent(t1))*dt0/m_TimeBinWidth;
 	}
       else if(dt0<0 && t1>1)
 	{
-	  dP0 = (P->GetBinContent(t1) - P->GetBinContent(t1-1))*dt0/m_TimeBinWidth;
+	  dP0 = (Probability->GetBinContent(t1) - Probability->GetBinContent(t1-1))*dt0/m_TimeBinWidth;
 	}
-      double P0  = P->GetBinContent(t1) + dP0;
+      double P0  = Probability->GetBinContent(t1) + dP0;
 
-      while(P->GetBinContent(t2) < P0 + 1.0 && t2 < nt)
+      while(Probability->GetBinContent(t2) < P0 + 1.0 && t2 < nt)
 	{
 	  t2++;
 	}
       
       if(DEBUG)
 	{
-	  std::cout<<P->GetBinCenter(t1)<<" "<<P->GetBinCenter(t2-1)<<" "<<P->GetBinCenter(t2)<<" , "
-		   <<P->GetBinContent(t2-1)- P->GetBinContent(t1)<<" "
-		   <<P->GetBinContent(t2) - P->GetBinContent(t1)<<std::endl;
+	  std::cout<<Probability->GetBinCenter(t1)<<" "<<Probability->GetBinCenter(t2-1)<<" "<<Probability->GetBinCenter(t2)<<" , "
+		   <<Probability->GetBinContent(t2-1)- Probability->GetBinContent(t1)<<" "
+		   <<Probability->GetBinContent(t2) - Probability->GetBinContent(t1)<<std::endl;
 	}
 
       if(t2 < nt) // the burst has finished  dp < 1 or dp >=1
 	{
-	  double dtf = (P0 + 1.0 - P->GetBinContent(t2-1))/ 
-	    (P->GetBinContent(t2) - P->GetBinContent(t2-1))*m_TimeBinWidth;
-      	  time    = P->GetBinCenter(t2-1) + dtf;
+	  double dtf = (P0 + 1.0 - Probability->GetBinContent(t2-1))/ 
+	    (Probability->GetBinContent(t2) - Probability->GetBinContent(t2-1))*m_TimeBinWidth;
+      	  time    = Probability->GetBinCenter(t2-1) + dtf;
 	  energy  = Integral_T(t1,t2,ei)->GetRandom();
 	}
       
       ph.time   = time;
       ph.energy = energy;
-      delete P;  
+      //      delete P;  
 
     } 
 else if (sourceType == 1) //Periodic //Max
@@ -309,11 +323,11 @@ else if (sourceType == 1) //Periodic //Max
 	double ProbRest = 0.0;
 	double nextTime = 0.0;
 	double InternalTime = t0 - Int_t(t0/m_Tmax)*m_Tmax; // InternalTime is t0 reduced to a period
-	TH1D *P = ComputeProbability(enph); //ph/m² 
-	double Ptot = P->GetBinContent(nt) - P->GetBinContent(1); //Total proability in a period 
+	//	TH1D *P = ComputeProbability(enph); //ph/m² 
+	double Ptot = Probability->GetBinContent(nt) - Probability->GetBinContent(1); //Total proability in a period 
 
         //First checks if next photon lies in the same period
-	if (((P->GetBinContent(nt) - P->GetBinContent(Nv->GetXaxis()->FindBin(InternalTime))) < 1.0 ))
+	if (((Probability->GetBinContent(nt) - Probability->GetBinContent(Nv->GetXaxis()->FindBin(InternalTime))) < 1.0 ))
 	  {
 	    TimeToFirstPeriod = m_Tmax - InternalTime;
 	    // std::cout << "Time to first period " << TimeToFirstPeriod << std::endl;
@@ -327,7 +341,7 @@ else if (sourceType == 1) //Periodic //Max
 	// If not, proceed to find the integer number of period required to have Prob = 1
 	if (TimeToFirstPeriod != 0.0)
 	  {
-	    ProbRest = 1 - (P->GetBinContent(nt) - P->GetBinContent(Nv->GetXaxis()->FindBin(InternalTime)));
+	    ProbRest = 1 - (Probability->GetBinContent(nt) - Probability->GetBinContent(Nv->GetXaxis()->FindBin(InternalTime)));
 	    //std::cout << "Computing Integer Periods , Now ProbRest is " << ProbRest << std::endl;
 	    IntNumPer = Int_t(ProbRest/Ptot);
 	    //std::cout << " Integer Number of Period is " << IntNumPer <<std::endl; 
@@ -339,12 +353,12 @@ else if (sourceType == 1) //Periodic //Max
 	    ProbRest = ProbRest - IntNumPer*Ptot;
 	    // std::cout << "Computing Residual time , Now ProbRest is " << ProbRest << std::endl;
             int tBinCurrent = 1;
-	    while ((P->GetBinContent(tBinCurrent) - P->GetBinContent(1)) < ProbRest ) 
+	    while ((Probability->GetBinContent(tBinCurrent) - Probability->GetBinContent(1)) < ProbRest ) 
 	      {
 		tBinCurrent++;
 	      }	 
 	    TimeFromLastPeriod = Nv->GetXaxis()->GetBinCenter(tBinCurrent-1);
-	    ProbRest = ProbRest - (P->GetBinContent(tBinCurrent-1) - P->GetBinContent(1));
+	    ProbRest = ProbRest - (Probability->GetBinContent(tBinCurrent-1) - Probability->GetBinContent(1));
 	    TimeFromLastPeriod += m_SpRandGen->Uniform()*m_TimeBinWidth - m_TimeBinWidth/2 ;
 	  }
 	
@@ -366,7 +380,7 @@ else if (sourceType == 1) //Periodic //Max
 
 	ph.time   = t0 + TimeToFirstPeriod + IntNumPer*m_Tmax +TimeFromLastPeriod;
  	ph.energy = Integral_T(1,nt,ei)->GetRandom();
-	delete P;
+	//	delete P;
 
 	if (((ph.time - 1000*Int_t(ph.time/1000)) > 0) 
 	     && ((ph.time - 1000*Int_t(ph.time/1000)) < 10))
