@@ -122,7 +122,7 @@ int GRBConstants::ReadParam(){
   setJetRadius(m_r0);
   setJetAngle(m_angle);
   setThickness(m_t0);
-  setShellSeparation(m_d0);
+  setShellRadius(m_d0);
   setGammaMin(m_g0);
   setGammaMax(m_g1);
   setEnergyPh(m_enph);
@@ -143,7 +143,7 @@ void GRBConstants::Print()
   cout<<" Number of shells               = "<<Nshell()<<endl;
   cout<<" Redshift of the Source         = "<<Redshift()<<endl;
   cout<<" Total Energy at the Source     = "<<Etot()<<endl;
-  cout<<" Initial separation (cm)        = "<<ShellSeparation()<<endl;
+  cout<<" Initial shell radius (cm)      = "<<ShellRadius()<<endl;
   cout<<" Initial thickness  (cm)        = "<<Thickness()<<endl;
   cout<<" Radius of the shell(cm)        = "<<JetRadius()<<endl;
   cout<<" Minimum Lorentz factor         = "<<GammaMin()<<endl;
