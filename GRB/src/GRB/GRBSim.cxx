@@ -88,31 +88,38 @@ TH2D* GRBSim::Fireball()
 	  // [ph/(cm² s keV)]
 	}
     }
-  // Conersion 1/cm² -> 1/m²
-  m_Nv->Scale(1.0e+4); // [ph/(m² s keV)]
+ // Conersion 1/cm² -> 1/m²
+  //  m_Nv->Scale(1.0e+4); // [ph/(m² s keV)]
   // double fluence = 1.0e-6; //erg/cm²
-  m_fluence *= 1.0e+4;        //erg/m²
-  // nph = nv * dE * dt
-  TH2D *nph = Nph(m_Nv); //ph/m²
+  // nph = nv * dE * TimeBinWidth
+  TH2D *nph = Nph(m_Nv); //ph/cm²
   
   int ei1 = nph->GetYaxis()->FindBin(BATSE1);
   int ei2 = nph->GetYaxis()->FindBin(BATSE5);
-  double norm = nph->Integral(0,Tbin,ei1,ei2,"width")*(1.0e-3)/(erg2meV)/dt; //erg/m²
-  
-  if (norm<1e-20) 
+  double F=0.0;
+  double en;
+  for (int ei = ei1; ei<=ei2; ei++)
     {
-      m_params->SetInitialSeparation(m_params->GetInitialSeparation()/5.0);
-      m_fluence =  m_params->GetBATSEFluence();
-      m_params->SetFluence(m_fluence);
-      delete[] e;
-      return Fireball();
+      en   = nph->GetYaxis()->GetBinCenter(ei);
+      for(int ti = 1; ti<=Tbin; ti++)
+	{
+	  F+= nph->GetBinContent(ti, ei) * en;//[keV/cm²]
+	}  
     }
-  
-  // IMPORTANT m_Nv has to  be in [ph/(m² s keV)]
-  
-  m_Nv->Scale(m_fluence/norm);
-  
-   
+  double norm = F*1.0e-3/(erg2meV); //erg/cm²  
+  /*
+    if (norm<1e-20) 
+    {
+    m_fluence =  m_params->GetBATSEFluence();
+    m_params->SetFluence(m_fluence);
+    delete[] e;
+    return Fireball();
+    }
+  */
+  /////////////////////////////////////////////////////////////
+  //         IMPORTANT m_Nv has to  be in [ph/(m² s keV)]    //
+  //////////////////////////////////////////////////
+  m_Nv->Scale(1.0e4 * m_fluence/norm);
   Shocks.erase(Shocks.begin(), Shocks.end());
   
   if(DEBUG) 
@@ -120,7 +127,6 @@ TH2D* GRBSim::Fireball()
 
   delete[] e;
   delete nph;
-  //SaveNv(m_Nv);
   return m_Nv;
 }
 //////////////////////////////////////////////////

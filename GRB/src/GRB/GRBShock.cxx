@@ -193,7 +193,7 @@ Double_t GRBShock::SynSpectrum(Double_t time, Double_t energy)
       else
 	Fv = pow(ec/em,-(m_p-1.)/2.)*pow(energy/ec,-m_p/2.);
     }
-  return Fv*exp(-energy/eM)*Peak(time,energy);
+  return Fv*exp(-energy/eM)*Peak(time,energy);  // Fv in [keV/(cm² s keV)]
   //////////////////////////////////////////////////
   /*
     double tcom = 2.0*to*gf;
