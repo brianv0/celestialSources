@@ -7,15 +7,14 @@
 Parameters::Parameters()
 {
   rnd = new TRandom();
-  m_seed = 65539;
-  rnd->SetSeed(m_seed);
-  m_Nshell=10;
+  SetGRBNumber((long) rnd->GetSeed());
 }
 
 void Parameters::SetGRBNumber(UInt_t GRBnumber)
 {
-  m_seed = GRBnumber;
-  rnd->SetSeed(GRBnumber);
+  m_GRBnumber = GRBnumber;
+  rnd->SetSeed(m_GRBnumber);
+  rnd->Uniform();
 }
 
 //////////////////////////////////////////////////
@@ -41,26 +40,10 @@ void Parameters::SetGalDir(double l, double b)
 void Parameters::SetNshell(int nshell)
 {
   
-  if (nshell<2)
-    {
-      m_Nshell = int(2+rnd->Integer(100));
-      /*
-	if (m_InitialSeparation<pow(10,9))
-	m_Nshell = (int) pow(10.,rnd->Gaus(1.,0.5)); // 5.0e+8 5.0e8  //short
-	else 	
-	m_Nshell = (int) pow(10.,rnd->Gaus(2.,0.3)); //5.0e+10 1.0e7 //long
-      */
-    }
+  if (nshell<1)
+    m_Nshell = int(2+rnd->Integer(100));
   else
-    {
-      m_Nshell = nshell;
-    }
-  
-  if(m_Nshell<2 || m_Nshell>500) 
-    {
-      std::cout<<" Warning setting the shell "<<std::endl;
-      SetNshell(0);
-    }
+    m_Nshell = nshell;
 }
 
  void Parameters::SetFluence(double fluence)
@@ -68,7 +51,10 @@ void Parameters::SetNshell(int nshell)
   if(fluence == 0)  
     m_Fluence = GetBATSEFluence();
   else
-    m_Fluence = fluence;
+    {
+      m_Fluence = fluence;
+      rnd->Uniform;
+    }
 }
 
 void Parameters::SetEtot(double etot)
@@ -122,9 +108,9 @@ void Parameters::ReadParametersFromFile(std::string paramFile, int NGRB)
   
   char buf[200];
   f1.getline(buf,200);
-
+  
   int i=1;
-
+  
   while(i<=NGRB && f1.getline(buf,200))
     {
       if(sscanf(buf,"%d %lf %lf %lf %d %lf %lf %lf %lf %lf %lf",
@@ -149,8 +135,9 @@ void Parameters::ReadParametersFromFile(std::string paramFile, int NGRB)
 	}
       f2.close();
     }
-  //  SetGRBNumber(seed);
-  m_seed = rnd->GetSeed();
+
+  SetGRBNumber(65540+ (long) seed);  
+
   
   SetGalDir(l0,b0);
   SetEtot(etot);
@@ -174,77 +161,89 @@ void Parameters::ComputeParametersFromFile(std::string paramFile, int NGRB)
       exit(1);
     }
   int    nshell, seed;
-  double fluence,etot,r0,dr0,l0,b0;
+  double fluence,r0,dr0,l0,b0;
   double gmin,gmax,ic;
-  double gamma,tv,ep;
+  double gmax_gmin,tv,ep;
 
   char buf[200];
   f1.getline(buf,200);
   
   int i=1;
-  
-  while(i<=NGRB && f1.getline(buf,200))
+  while(i<=NGRB && f1.getline(buf,100))
     {
       if(sscanf(buf,"%d %lf %lf %lf %d %lf %lf %lf %lf %lf ",
-		&seed,&l0,&b0,&fluence,&nshell, &gamma,&tv,&etot,&ep,&ic)<=0) break;
+		&seed,&l0,&b0,&fluence,&nshell,&tv,&gmax_gmin,&ep,&ic)<=0) break;
       i++;
-    }
+    } 
   i--;
-  f1.close();
   
   if(i<NGRB)
     {
-      std::ifstream f2(paramFile.c_str());
-      f2.getline(buf,200);
-      int nb;
-      if((NGRB % i)==0) nb=3;
-      else nb=(NGRB % i);
-      for(int j = 1; j<=nb;j++)
+      f1.close();
+      f1.open(paramFile.c_str());
+      f1.getline(buf,100);
+
+      for(int j = 1; j<=(NGRB %i);j++)
 	{
-	  f2.getline(buf,200);
+	  f1.getline(buf,100);
 	  sscanf(buf,"%d %lf %lf %lf %d %lf %lf %lf %lf %lf ",
-		 &seed,&l0,&b0,&fluence,&nshell, &gamma,&tv,&etot,&ep,&ic);
+		 &seed,&l0,&b0,&fluence,&nshell,&tv,&gmax_gmin,&ep,&ic);
+
 	}
-      f2.close();
+      seed=NGRB;
     }
-  //  SetGRBNumber(seed);
-  m_seed = rnd->GetSeed();
+  f1.close();
+  if(gmax_gmin<1.5) gmax_gmin=1.5;
+  if(gmax_gmin>1.5) gmax_gmin=1.5;
+  SetGRBNumber(65540+ (long) seed);  
   
   SetGalDir(l0,b0);
-  SetEtot(etot);
+  SetEtot(1e52);
   SetFluence(fluence);
-  double g100 = gamma/100.;
+  //  double g100 = tau/100.;
+  double E52   = 1.0;
+  //  ep = pow(10,rnd->Gaus(2.,.5));//00.0)log10(ep),log10(ep/2.0)));
+  double Ep100 = ep/100.0/(gmax_gmin*gmax_gmin);
+  r0    = cst::c * tv;
+  double G100 = 3.0;
+  dr0   =  1.647e9*E52 * cst::ab * pow(cst::ae,4.0)/(pow(Ep100,2.0)*pow(tv,2.0)*pow(G100,4.0));//*pow(gmax_gmin,2.0);
+  //  double gmax_gmin = tau;
+  double G = G100*100.0;
 
-
-  r0  = 5.99e10* tv;
-  dr0 = 4.00e10 * (etot/1.e52) * pow(tv,-2.) * pow(g100,-4.)* pow(ep,-2.); 
-
-  /*  
-  double ec=ep/2.;  
-  r0  = 6.e10 * tv;
-  dr0 = 8.5e8*pow(etot/1.e52,1./3.)*pow(ec,-1./3.)*pow(ep,-5./3.)*pow(tv,-2./3.);
-  double gamma  = 262.0*pow(etot/1.e52,1./6.)*pow(ec/ep,1./12.)*pow(tv,-1/3.);
+  ////////////////////////////////////////////////// 
+  /*
+  double tc = tv;
+  
+  r0    = 2. * cst::c * tv;
+  dr0   = cst::c * tc;
+  
+  double G = 484.159 * pow(etot/1.e52,1./4.) * pow(cst::ab,1./4.) * cst::ae * pow(ep,-1./2.) 
+    * pow(tv,-1./2.) * pow(tc,-1./4.); 
+  double gmax_gmin = 10;
   */
-
-  gmin = 2./3. * 100.0 * g100;
+////////////////////////////////////////////////// 
+  gmin = 2.*G/(gmax_gmin + 1.);
+  //  m_Tau=tau;
   SetGammaMin(gmin);
-  SetGammaMax(2.*gmin);
-
-  //4.e10 *(etot/1.e52)/pow(ep * tv * pow((gmax-gmin)/100n.,2),2);
-
+  SetGammaMax(gmax_gmin*gmin);
+  
   SetInitialSeparation(r0);
-  SetInitialThickness(dr0);		
+  SetInitialThickness(dr0);
   SetNshell(nshell);
   SetInverseCompton(ic);
-  
 }
 
-
+/*
+  double Parameters::GetNextPeak()
+  {
+  return rnd->Exp(m_Tau);
+  }
+*/
 
 void Parameters::PrintParameters()
 {
   std::cout<<"--------------------------------------------------"<<std::endl;
-  std::cout<<"-GRB NUMBER :  ---------------> "<<m_seed<<std::endl;
+  std::cout<<"-GRB NUMBER :  ---------------> "<<m_GRBnumber<<std::endl;
   std::cout<<" Nshell                      = "<<m_Nshell<<std::endl;
   std::cout<<" Etot                        = "<<m_Etot<<" Erg "<<std::endl;
   std::cout<<" Fluence in the Batse Range  = "<<m_Fluence<<std::endl;

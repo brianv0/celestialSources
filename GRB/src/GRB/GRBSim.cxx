@@ -9,7 +9,14 @@
 
 #include "TFile.h"
 
+#include "TCanvas.h"
+#include "TF1.h"
+#include "TH1D.h"
+
+#define DEBUG 0 
+
 using namespace cst;
+
 
 //////////////////////////////////////////////////
 GRBSim::GRBSim(Parameters *params)
@@ -39,12 +46,23 @@ TH2D* GRBSim::Fireball()
   
   std::vector<GRBShock*> Shocks = 
     m_GRBengine->CreateShocksVector();
-  int nshocks = (int) Shocks.size();
-  int i=1;
-  double shift = 3.*Shocks.front()->GetDuration();
-  m_tfinal = 1.5*Shocks.back()->GetTime()+shift;
-  std::cout<<shift<<" "<<m_tfinal<<" "<<Shocks.back()->GetTime()<<std::endl;
 
+  double meanDuration = 0;
+  int nshocks = (int) Shocks.size();
+
+  std::vector<GRBShock*>::iterator pos;
+  for (pos=Shocks.begin();pos!=Shocks.end();++pos)
+    {
+      (*pos)->SetICComponent(m_params->GetInverseCompton());
+      if(DEBUG) (*pos)->Print();
+      meanDuration+=(*pos)->GetDuration();
+    }
+  meanDuration/=nshocks;
+
+  //  int i=1;
+  double shift =0.0;// Shocks.front()->GetTime() + 2.0*meanDuration;//3.*Shocks.front()->GetDuration();
+  m_tfinal = Shocks.back()->GetTime() + meanDuration + shift;
+  if(DEBUG) std::cout<<shift<<" "<<m_tfinal<<" "<<meanDuration<<std::endl;
   double dt = m_tfinal/(Tbin-1);
   
   m_Nv = new TH2D("Nv","Nv",Tbin,0.,m_tfinal,Ebin, e);
@@ -54,13 +72,6 @@ TH2D* GRBSim::Fireball()
   m_Nv->SetName(name.c_str());
   
   double t = 0.0;
-  
-  for (int i = 0; i< nshocks; i++)
-    {
-      Shocks[i]->SetICComponent(m_params->GetInverseCompton());
-      //      Shocks[i]->Print();
-    }
-
   
   for(int ti = 0; ti<Tbin; ti++)
     {
@@ -104,7 +115,8 @@ TH2D* GRBSim::Fireball()
    
   Shocks.erase(Shocks.begin(), Shocks.end());
   
-  m_params->PrintParameters();
+  if(DEBUG) 
+    m_params->PrintParameters();
 
   delete[] e;
   delete nph;
@@ -136,26 +148,93 @@ TH2D *GRBSim::Nph(const TH2D *Nv)
 }
 
 //////////////////////////////////////////////////
-void GRBSim::SaveNv(TH2D *Nv)
+void GRBSim::SaveNv()
 {
   
-  Nv->SetXTitle("Time [s]");
-  Nv->SetYTitle("Energy [keV]");
-  Nv->SetZTitle("N_{v} [ph/m^2/s/keV]");
-  Nv->GetXaxis()->SetTitleOffset(1.5);
-  Nv->GetYaxis()->SetTitleOffset(1.5);
-  Nv->GetZaxis()->SetTitleOffset(1.2);
-  Nv->GetXaxis()->CenterTitle();
-  Nv->GetYaxis()->CenterTitle();
-  Nv->GetZaxis()->CenterTitle();
+  m_Nv->SetXTitle("Time [s]");
+  m_Nv->SetYTitle("Energy [keV]");
+  m_Nv->SetZTitle("N_{v} [ph/m^2/s/keV]");
+  m_Nv->GetXaxis()->SetTitleOffset(1.5);
+  m_Nv->GetYaxis()->SetTitleOffset(1.5);
+  m_Nv->GetZaxis()->SetTitleOffset(1.2);
+  m_Nv->GetXaxis()->CenterTitle();
+  m_Nv->GetYaxis()->CenterTitle();
+  m_Nv->GetZaxis()->CenterTitle();
   
   char root_name[100];
   sprintf(root_name,"grb_%d.root",(int)m_params->GetGRBNumber());
+  
   TFile mod(root_name,"RECREATE");
-  std::string name = Nv->GetName();
-  Nv->SetName("Nv"); // I need a default name.
-  Nv->Write();
-  Nv->SetName(name.c_str());
+  std::string name = m_Nv->GetName();
+  m_Nv->SetName("Nv"); // I need a default name.
+  m_Nv->Write();
+  m_Nv->SetName(name.c_str());
   mod.Close();
 };
 
+//////////////////////////////////////////////////
+double BandF(double *var, double *par)
+{
+  double a  = par[0];
+  double b  = par[1];
+  double E0 = pow(10.,par[2]);
+  double NT = pow(10.,par[3]);
+  
+  double E   = var[0];
+  double C   = pow((a-b)*E0,a-b)*exp(b-a);
+  double H   = (a-b) * E0;
+  if(E <= H) 
+    return NT *E* E* pow(E,a) * exp(-E/E0);
+  return C* NT *E* E* pow(E,b); // ph cm^(-2) s^(-1) keV
+}
+
+void GRBSim::GetGBMFlux()
+{
+  double *e = new double[Ebin +1];
+  for(int i = 0; i<=Ebin; i++)
+    {
+      e[i] = emin*pow(de,1.0*i); //keV
+    }
+  //////////////////////////////////////////////////
+  // GBM Spectrum:
+  TF1 band("grb_f",BandF,emin,1.0e+4,4); 
+  band.SetParNames("a","b","Log10(E0)","Log10(Const)");
+  band.SetParameters(-1.4,-2.4,2.5,-3.0);
+  band.SetParLimits(0,-9.0,0.0);
+  band.SetParLimits(1,-10.0,0.0);
+  band.SetParLimits(2,log10(emin),4.0);
+  band.SetParLimits(3,-5.0,5.0);
+  double a,b,E0,Const;
+  TH1D GBM("GBM","GBM",Ebin, e);
+  GBM.SetMinimum(1e-5);
+  GBM.SetMaximum(1e6);
+  double t=0;
+  double dt = m_Nv->GetXaxis()->GetBinWidth(1);
+  for(int ti = 0; ti<Tbin; ti++)
+    {
+      t = ti*dt;
+      for(int ei = 0; ei < Ebin; ei++)
+	{
+	  double nv = m_Nv->GetBinContent(ti+1, ei+1); // [ph/(m² s keV)]
+	  GBM.SetBinContent(ei+1, e[ei]*e[ei]* nv *1.0e-4); // [(keV*keV)/(cm² s keV)]
+	}
+      GBM.Fit("grb_f","rq");
+      
+      a=band.GetParameter(0);
+      b=band.GetParameter(1);
+      E0=pow(10.,band.GetParameter(2));
+      Const=pow(10.,band.GetParameter(3));
+      band.SetParameters(a,b,band.GetParameter(2),band.GetParameter(3));
+      //Ep=(a+2)*E0;
+      std::cout<<t<<" "<<a<<" "<<b<<" "<<E0<<" "<<Const<<std::endl;
+      gPad->SetLogx();
+      gPad->SetLogy();
+      gPad->Update();
+      TString gbmFlux= "GBMFlux";
+      gbmFlux+=ti;
+      gbmFlux+=".gif";
+      if(ti%10==0) gPad->Print(gbmFlux);
+    }
+  //////////////////////////////////////////////////
+  delete[] e;
+}

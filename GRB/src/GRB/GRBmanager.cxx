@@ -19,16 +19,17 @@ GRBmanager::GRBmanager(const std::string& params)
 
   std::cout<<" Coumpute parameters from file :"<<paramFile<<std::endl;
  
+  m_startTime = TMath::Max(0.,parseParamList(params,0));
   m_timeToWait  = TMath::Max(0.,parseParamList(params,1));
+  m_endTime   = m_startTime + m_GRB->Tmax();
+  m_nextBurst = m_endTime   + m_timeToWait;
   m_par = new Parameters();
   //////////////////////////////////////////////////
   m_par->ComputeParametersFromFile(paramFile,1); 
   m_GRB      = new  GRBSim(m_par);
   m_spectrum = new  SpectObj(m_GRB->Fireball(),0);
+  m_spectrum->SetAreaDetector(EventSource::totalArea());
   //////////////////////////////////////////////////
-  m_startTime = TMath::Max(0.,parseParamList(params,0));
-  m_endTime   = m_startTime + m_GRB->Tmax();
-  m_nextBurst = m_endTime   + m_timeToWait;
 
   std::ofstream os("grb_generated.txt",std::ios::out);
   os<<m_GRB->GetGRBNumber()<<" "<<m_startTime<<" "<<m_endTime<<" "<<m_GRB->GetFluence()<<" "<<m_GRB->GRBdir().first<<" "<<m_GRB->GRBdir().second<<std::endl;
@@ -77,6 +78,7 @@ double GRBmanager::interval(double time)
       m_par->ComputeParametersFromFile(paramFile,m_Nbursts);
       m_GRB      = new  GRBSim(m_par);
       m_spectrum = new  SpectObj(m_GRB->Fireball(),0);
+      m_spectrum->SetAreaDetector(EventSource::totalArea());
       //////////////////////////////////////////////////
       m_endTime   = m_startTime + m_GRB->Tmax();
       m_nextBurst = m_endTime   + m_timeToWait;      

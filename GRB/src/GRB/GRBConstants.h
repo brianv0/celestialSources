@@ -41,13 +41,9 @@ namespace cst
   static const Double_t mec2  = 0.510999;       //MeV
   static const double st      = 6.65225e-25;
   
-  const float ab = .3; 
-  const float ae = .3; 
+  const float ab = 0.3;
+  const float ae = 0.3; 
   // const float ap = 1.-(ab-ae);
-  
-  const float csi = 1.0e-1;// Magnetic field fluctuation
-  
-  //  const double tmax = 10;
   
   const double emin =  10.0; //keV
   const double emax = 1e9;  //keV
@@ -101,7 +97,7 @@ class Parameters
   void ComputeParametersFromFile(std::string paramFile, int NGRB=1);
 
   void PrintParameters();
-  inline UInt_t GetGRBNumber(){return m_seed;}
+  inline UInt_t GetGRBNumber(){return m_GRBnumber;}
   inline std::pair<double,double> GetGalDir(){return m_GalDir;}
   inline double GetGamma(double gmin=0,double gmax=0)
     {
@@ -110,12 +106,15 @@ class Parameters
       return rnd->Uniform(gmin,gmax);
     }
   void SetGRBNumber(UInt_t GRBnumber);
+  //  double GetNextPeak();
+  //  inline   double GetTau(){return m_Tau;}
 
   TRandom *rnd; 
 
  private:
 
-  UInt_t m_seed;
+  UInt_t m_GRBnumber;
+
   int    m_Nshell;
   double m_Gmin;
   double m_Gmax ;
@@ -124,6 +123,7 @@ class Parameters
   double m_InitialSeparation;
   double m_InitialThickness ;
   double m_InverseCompton ;
+  //  double m_Tau ;
   std::pair<double,double> m_GalDir;
 };
 

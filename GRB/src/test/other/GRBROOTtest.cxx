@@ -27,6 +27,7 @@ int    TBIN, EBIN;
 Parameters *params;
 double Band(double *var, double *par);
 void ScanParameters(int Ngrb);
+void help();
 
 #define DEBUG=0
 
@@ -102,17 +103,16 @@ void PlotGRB(double enph = 0,char name[100]="grb_65540.root")
   Nv->ProjectionY("Ne");
   TH1D *Ne = (TH1D*) gDirectory->Get("Ne");
 
-  Ne->Scale(DT);
-
+  Ne->Scale(DT);// Ne =  [ph/keV/m²]
   Ne->SetYTitle("Ne [ph/keV/m^{2}]");
   Ne->SetXTitle(" Energy[keV] ");
-  // Fv = Ne * de: [ph/s/m^2]
+  // Fv = Ne * de: [ph/m^2]
   TH1D *Fv = (TH1D*) Ne->Clone();
   Fv->SetTitle("Fv");
   Fv->SetName("Fv");
   Fv->SetYTitle("Fv [keV/keV/m^{2}]");
   
-  // vFv = e * Ne * de: [keV/s/m^2]
+  // vFv = e * Ne * de: [keV/m^2]
   TH1D *vFv = (TH1D*) Ne->Clone();
   vFv->SetTitle("Fluxes");
   vFv->SetName("vFv");
@@ -193,7 +193,6 @@ void PlotGRB(double enph = 0,char name[100]="grb_65540.root")
   
   //////////////////////////////////////////////////
   SpectObj *sp = new SpectObj(Nv,0);              //ph
-  
   std::pair<float,float> dir = std::make_pair((float)0.0,(float)0.0);
   
   //  sp->SaveParameters(0.0,dir);
@@ -315,10 +314,9 @@ void PlotGRB(double enph = 0,char name[100]="grb_65540.root")
   leg->AddEntry(vFv," #nu F_{#nu} [keV/m^{2}] ","lp");
   leg->Draw();
   
-  TH1D *Counts   = sp->GetSpectrum(); //ph
-  Counts->SetName("Counts");
-  TH1D *Lc = sp->GetTimes();  
-  Lc->SetNameTitle("Counts[ph]","Counts[ph]");
+  TH1D *Counts   = sp->CloneSpectrum(); //ph
+  TH1D *Lc = sp->CloneTimes();  
+  Lc->SetTitle("Counts[ph]");
   Lc->SetXTitle("Time (s)");
   Lc->SetYTitle("photons");
 
@@ -333,22 +331,20 @@ void PlotGRB(double enph = 0,char name[100]="grb_65540.root")
       double energy;
       double flux;
       int i = 0;
-      time = sp->interval(0.0,enph); // s
+      Interval = sp->interval(time,enph); // s
+      time+=Interval;
       while(time < TMAX && time>=0)
 	{
-	  Interval = sp->interval(time,enph); // s  
 	  energy   = sp->energy(time,enph);   // keV
 	  flux     = sp->flux(time,enph);     // ph/s/m2
-	  
 	  Counts->Fill(energy); // ph
 	  Lc->Fill(time);       // ph
-	  
+	  Interval = sp->interval(time,enph); // s 
 	  std::cout<<" Time (s)  = "<<time
 		   <<" Flux (ph/s/m^2)  = "<<flux
 		   <<" energy (keV) = "<<energy
 		   <<" Interval (s) = "<<Interval<<std::endl;
-	  
-	  time+=Interval;
+	  time+=Interval;	  
 	  i++;
 	} 
       
@@ -468,7 +464,7 @@ std::cout<<" Flux[ erg/cm^2] BATSE ("<<BATSE1<<","<<BATSE2<<")  = "<<Fv->Integra
 }
 
 
-void MakeGRB(int NGRB=1, UInt_t seed=1, double enph=0)
+void MakeGRB(int NGRB=1, UInt_t seed=1, double enph=0, bool gbm = false)
 {
   std::cout<<" ****** GRB and ROOT test ****** "<<std::endl;
   
@@ -481,7 +477,8 @@ void MakeGRB(int NGRB=1, UInt_t seed=1, double enph=0)
   params->ComputeParametersFromFile(paramFile,NGRB);
   GRBSim* m_grb = new GRBSim(params);
   TH2D *matrix = m_grb->Fireball();
-  m_grb->SaveNv(matrix);
+  m_grb->SaveNv();
+  if(gbm) m_grb->GetGBMFlux();
   delete m_grb;
   char name[100];
   sprintf(name,"grb_%d.root",params->GetGRBNumber());
@@ -500,6 +497,7 @@ int main(int argc, char** argv)
   double enph=0.0;
   int ngrbs=0;
   bool video_out=true;
+  bool gbm = false;
   while(current_arg < argc)
     {
       arg_name = argv[current_arg];
@@ -520,19 +518,24 @@ int main(int argc, char** argv)
 	{
 	  ngrbs=atoi(argv[++current_arg]);
 	}
+      else if("-gbm"==arg_name)
+	{
+	  gbm=true;
+	}
       current_arg++;
     }
   
-  TApplication theApp("App",0,0);
 
   if(ngrbs>0)
     {
       ScanParameters(ngrbs);
     }
   else
-    MakeGRB(ngrb,seed,enph);
-
-  theApp.Run();
+    {
+      TApplication theApp("App",0,0);
+      MakeGRB(ngrb,seed,enph,gbm);
+      theApp.Run();
+    }
 }
 
 void ScanParameters(int Ngrb)
@@ -631,8 +634,8 @@ void ScanParameters(int Ngrb)
 	}
       Ep = log10(vFv->GetBinCenter(vFv->GetMaximumBin()));
       
-      SpectObj *sp = new SpectObj(Nv,0);              //ph² 
-      
+      SpectObj *sp = new SpectObj(Nv,0);              //ph
+
       
       TH1D *Lct_TOT   = sp->Integral_E(EMIN,EMAX);  // ph
       TH1D *Lct_BATSE = sp->Integral_E(BATSE1,BATSE5);  // ph
@@ -676,4 +679,19 @@ void ScanParameters(int Ngrb)
     }
   TFile aFile("GRBCatalogueFile.root","RECREATE");
   GRBTree->Write();
+}
+
+void help()
+{
+  std::cout<<"--------------------------------------------------"<<std::endl;
+  std::cout<<"   GRB ROOT test program author: Nicola Omodei    "<<std::endl;
+  std::cout<<"   Option are: "<<std::endl;
+  std::cout<<"  -extract [enph] : etxtract photons above enph"<<std::endl;
+  std::cout<<"  -seed [seed]    : change the seed for random number"<<std::endl;
+  std::cout<<"  -grb [N] processes the N grb in the $GRBROOT/src/test/GRBParam.txt file "<<std::endl;
+  std::cout<<"  -scan [N] process N GRBs, starting from the first. No video out. "<<std::endl;
+  std::cout<<"            It save a root file named GRBCatalog.root"<<std::endl;
+  std::cout<<"  -gbm      Fit the GBM spectrum with as Band function, as afunction of the time"<<std::endl;
+  std::cout<<"--------------------------------------------------"<<std::endl;
+
 }

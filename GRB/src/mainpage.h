@@ -13,8 +13,6 @@ transient signals. It is interfaced to ROOT for possible visualization.
 the internal shocks configuration.
  -# The phenomenological simulator of GRB signal. 
  -# The algorithm describing the LAT alert.
- -# The Transient Data Store reading utility.
-
  
  \section physics Very short introduction to the physical model
 <br>
@@ -48,22 +46,16 @@ It MUST be in /src/test directory of the GRB package.
 Depending on how GRBengine works, the sequence of shock that give up the GRB
 can be formed in different ways. 
 The File <a href="../../src/test/GRBParam.txt"> GRBParam.txt </a> contains information about:
-- The Number of shocks
-- The total energy available to the fireball
-- The Redshift of the source
-- The minimum energy of the extracted photons. Only photons with a greater 
-energy are extracted from the flux and stent to FluxSvc
-- The shell type, jet or iso. See GRBShell for explanations.
-- The radius of the jet (the jet is thought to be a cylinder)
-- The angle between the jet direction and the line of sight
-- The type of engine (see GRBengine for further explanations)
-- The observed duration of the burst
-- The observed rise time of the spikes
-- The observed decay time of the spikes
-- The energy at which \f$\nu f(\nu)\f$ peaks
-- The thickness of the shells
-- The minimum Lorentz factor to assign to a shell
-- The maximum Lorentz factor to assign to a shell
+- The GRB number for initializing the Random number generator. Equal seeds are equal sequence of numbers
+- The galacic l and b coordinates. NOTE if l or b are < -180 than their value is extracted randomly.
+- The fluence in BATSE energy range (20 keV-1 MeV). NOTE if the value is zero than the fluence is set by Parameters::GetBATSEFluence()
+- The Number of shell
+- The variability of the central engine which determines the characteristic temporal scale.
+- The ratio between the maximum lorentz factor and the minimum lorentz factor of the shells
+- The energy at which \f$\nu f(\nu)\f$ peaks (approximately)
+- The ratio between the synchrotron and Inverse Compton energies (0-> Only synchrotron, 1 equal energy in synchrotron and in Ic);
+
+The parameters of the fireball are then computed in Parameters::ComputeParametersFromFile(std::string paramFile, int NGRB).
 
 \section phenomenological Very short introduction to the phenomenological model
 
@@ -76,93 +68,16 @@ energy are extracted from the flux and stent to FluxSvc
 The GRB simulator can be use with several test program:
 
 - test_GRB.exe
-This executable tests the GRBTestAlg. It initializes the GRB simulation,
-and extracts photons according to the computed spectrum. 
-To launch it type "test_GRB.exe". All the options are contained in the 
-joboptions.txt file.
+This executable has been created for testing the code and it is a copy of the testMgr test program.
+To launch it type "test_GRB.exe". The test program will load all the sources of the GRB_user_library.xml file.
 
 - test_GRBROOT.exe
 This test program makes use of the \e ROOT graphical environment to display some plots regarding the simulated GRB. It shows the evolution of the flux with respect to time, and plots the integrated spectrum and the light curves.
 to execute it type "test_GRBROOT.exe".
-Type "test_GRBROOT.exe -help" to have a list of the available execution 
-options.
+Type "test_GRBROOT.exe -help" to have a list of the available options.
 See <a href="../../src/test/other/GRBROOTtest.cxx"> GRBROOTtest.cxx</a> 
 the test code.
 <br>
-
-\section Howto How-to use the GRB spectrum in Gleam
-<br>
-GRB is an independent package, it is an external service and it has to be 
-declared in the joboption file of FluxSvc. For example, here are the 
-two lines that add GRBSvc in the external services available and add the 
-GRB shared library. 
-They could be added, for example, to the "defaultOptions.txt" of FluxSvc
-<br>
-\verbatim 
-//================================================== 
-ApplicationMgr.ExtSvc += { "GRBSvc" };
-ApplicationMgr.DLLs   += { "GRB" };
-//==================================================
-\endverbatim
-
-<br>
-At this point GRB is available from an external application (as Gleam). 
-To have the item "GRB" in the sources menu of the GUI one can just edit 
-the xml file containing the source definition adding the following lines:  
-<br>
-\verbatim 
-<source name="GRB" >
-<spectrum> <SpectrumClass name="GRBSpectrum"/> <use_spectrum/> </spectrum>
-</source>
-\endverbatim
-<hr>
-
-
-The /src/test/jobOptions.txt file holds information used for the
-implementation of GRB algorithm. It doesn't contain any information 
-regarding the physics of the GRB (that are all included in the GRBParam 
-file), but it manages some options available for the GRB Algorithm.
-
-\section jobOptions jobOptions files
-There are two different jobOptions.txt file:
-- <a href="../../src/test/test_jobOptions.txt"> test_jobOptions.txt </a>
-is meant to be used in nightly builds together with test_GRB.exe
-
-- <a href="../../src/test/jobOptions.txt"> jobOptions.txt </a>:
-This file is used to choose (by picking up/commenting out '\c #include' statements) between the 3 files: 
- GRBtestAlgOptions.txt, TDSreadFluxOptions.txt, and LatGRBAlertOptions.txt
-
-- <a href="../../src/test/GRBtestAlgOptions.txt"> GRBtestAlgOptions.txt</a>:
-\param GRBTestAlg.source_name
-passes the name of the GRB source, to be chosen among the ones defined in 
-<a href="../../xml/GRB_user_library.xml"> GRB_user_library.xml</a>
-\param GRBTestAlg.background_name
-passes the name of the background source, to be added on top of the GRB signal. 
-It can be any spectrum defined in FluxSvc xml files.
-\param GRBTestAlg.EvtMax
-Maximum number of photon generated. Default is 100000
-\param GRBTestAlg.savefile
-"root" saves data in ROOT format, "ascii" in ASCII text file. 
-Saving in both is also possible
-
-- <a href="../../src/test/TDSreadFluxOptions.txt"> TDSreadFluxOptions.txt</a>:
-\param TDSreadFluxAlg.savefile
-"root" saves data in ROOT format, "ascii" in ASCII text file. 
-Saving in both is also possible
-
-- <a href="../../src/test/LatGRBAlertOptions.txt"> LatGRBAlertOptions.txt</a>:
-\param LatGRBAlertAlg.nbckoff
-Region threshold; determines when to start testing for false triggers. Default is 5.
-\param LatGRBAlertAlg.mix
-A value of 0 indicates that background mix has already been generated in file named by mixedFile field. Default is 0.
-\param LatGRBAlertAlg.grbFile
-Name of file listing events data.
-\param LatGRBAlertAlg.backgroundFile
-Name of file containing background data.
-\param LatGRBAlertAlg.grbOffsetTime
-Value to be used to offset events times. Default is 0.
-\param LatGRBAlertAlg.mixedFile
-Name of file containing background mixed data.
 
 <hr>
 \section requirements CMT requirements
