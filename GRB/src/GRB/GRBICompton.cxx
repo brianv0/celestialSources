@@ -43,10 +43,10 @@ void GRBICompton::load(const double time,
 {
 
   if (time <= 0.){m_spectrumObj *= 0.; return;}
-  //int type = 0; // 0 -> Power Law, from Sari and Esin, astro-ph/0005253
+  int type = 0; // 0 -> Power Law, from Sari and Esin, astro-ph/0005253
   //int type = 1; // 0 -> Power Law, the electron have gamma_min, Low IC
   //int type = 2; // 0 -> Power Law, The electron have gc, High IC
-  int type = 3; // 0 -> Integration, Slow computation but all the 
+  //int type = 3; // 0 -> Integration, Slow computation but all the 
   //                                 electrons are considered
   
   double ComovingTime; 
@@ -70,16 +70,19 @@ void GRBICompton::load(const double time,
   std::vector<double>::iterator dx1 =   dx.begin();
   std::vector<double>::iterator isy = fsyn.begin();
   std::vector<double>::iterator its =  fIC.begin();
-  
+  const double Urad      = cst::alphae/cst::alphab*Umag(B);
   const double Psyn_0    = 4./3.*Umag(B)*cst::erg2MeV*cst::c*cst::st; //MeV/s      
+  const double Pic_0     = 4./3.*  Urad *cst::erg2MeV*cst::c*cst::st; //MeV/s      
   const double esyn_0    = (3.*cst::pi/8.)*(B/cst::BQ)*cst::mec2; //MeV
   const double Psyn_esyn = Psyn_0/esyn_0; //1/sec
+  const double Pic_eic = Pic_0/esyn_0; //1/sec
+
   const double tau_0     = (cst::flagIC == 1.) ? cst::c*cst::st*N0/Vol : cst::flagIC; //1/s
   const double tcross  = dr/cst::c;
   
   while(dx1!= dx.end()) 
     {
-      (*isy) /= GAMMAF*(Psyn_esyn)/(*dx1); //Now fsyn is in ph
+      (*isy) *= (*dx1)/(GAMMAF*(Psyn_esyn)*Vol);  // Now fsyn is in ph/cm^3
       isy++;
       dx1++;
     }
@@ -97,34 +100,36 @@ void GRBICompton::load(const double time,
 	  //to much the photon at this energy bin
 	  if(ComovingTime<0){its++; x1++; continue;}
 
-	  //em and ec are specific: the compton scattering is with the gamma_min electron only...
-	  double gc = cst::mec2/(Psyn_0*ComovingTime);
+	  //em and ec are specific: 
+	  // the synchrotron cooling LF is:
+	  double gc = cst::mec2/(Psyn_0*ComovingTime); 
 	  gc = (gc <= 1. ? 1.+1.e-6 : gc);
+	  // The IC energy that conrespond to gamma_min is (em_syn*gamma_min^2)
 	  double em = 4./3.*pow(gamma_min,2.) *esyn_0*(pow(gamma_min,2.)-1.)/cst::mec2;
-	  double ec = 4./3.*pow(gc,2.)*esyn_0 *(pow(gc,2.)-1.)/cst::mec2;
-	  double ekn= gc;
+	  // The IC energy that conrespond to gc is (ec_syn*gc^2)
+	  double ec = 4./3.*pow(gc,2.)        *esyn_0*(pow(gc,2.)-1.)/cst::mec2;
+	  // The KN limit is when the electron give all its energy to the photon:
+	  double ekn= gc; 
 	  
-	  //double gKN     = sqrt((cst::mec2/esyn_0)/(2.*gamma_min)+1.);	  
-	  // the gamma of the original electron is:
-	  double gi      = sqrt(1. + (3.*(*x1)*cst::mec2)/(4.*pow(gamma_min,2.)*esyn_0));
+	  // the gamma of the original syn electron is:
+	  double gi      = gamma_min; //sqrt(1. + (3.*(*x1)*cst::mec2)/(4.*pow(gamma_min,2.)*esyn_0));
 	  double gi2     = pow(gi,2.);
-	  double Psyn    = Psyn_0*(gi2-1.); //MeV/s
-	  // The syn cooling time of the original electron is:
-	  double tsyn    = ((gi)*cst::mec2)/Psyn;
+	  // The IC cooling time of the original electron is:
+	  double tic    = (gi*cst::mec2)/(Pic_0*(gi2-1.));  
 	  
 	  double tau = tau_0;
-	  tau *= (tsyn<tcross)? tsyn: tcross;
+	  tau *= (tic<tcross)? tic: tcross;
 	  if(tau>1.) tau = 1.;
 	  
-	  double N_e = (tau)*electronNumber(2.*gamma_min, gamma_min, gamma_max,
-					    dr, ComovingTime, Psyn_0, N0);
+	  double N_e = N0/Vol*(tau)*electronNumber(gi, gamma_min, gamma_max,
+					    dr, ComovingTime, tic, N0);
 	  
 	  if(*x1<ekn)
 	    (*its) = processFlux(*x1,ec,em);
 	  else 
 	    (*its) = 0.0;
 	  
-	  (*its++) *= N_e; // adim
+	  (*its++) *= N_e*gi*(dgamma-1.); // adim
 	  
 	  (x1++);
 	}
@@ -144,28 +149,28 @@ void GRBICompton::load(const double time,
 	  double gc = cst::mec2/(Psyn_0*ComovingTime);
 	  gc = (gc <= 1. ? 1.+1.e-6 : gc);
 	  
-	  
 	  double em = 4./3.*pow(gamma_min,2.) *esyn_0 *(pow(gamma_min,2.)-1.)/cst::mec2;
 	  double ec = 4./3.*pow(gamma_min,2.) *esyn_0 *(pow(gc,2.)-1.)/cst::mec2;
 	  double ekn= gamma_min;
 	  // gamma of the seed electron
-	  double gi      = sqrt(1. + (3.*(*x1)*cst::mec2)/(4.*pow(gamma_min,2.)*esyn_0));
+	  double gi      = gamma_min; //sqrt(1. + (3.*(*x1)*cst::mec2)/(4.*pow(gamma_min,2.)*esyn_0));
 	  double gi2     = pow(gi,2.);
-	  double Psyn    = Psyn_0*(gi2-1.); //MeV/s
-	  double tsyn    = ((gi)*cst::mec2)/Psyn;
+	  
+	  double tic    = (gi*cst::mec2)/(Pic_0*(gi2-1.));  
 	  double tau = tau_0;
-	  tau *= (tsyn<tcross)? tsyn: tcross;
+	  tau *= (tic<tcross)? tic : tcross;
 	  if(tau>1.) tau = 1.;
 	  
 	  
-	  double N_e = (tau)*electronNumber(2.*gamma_min, gamma_min, gamma_max,
-					    dr, ComovingTime, tsyn, N0);
+	  double N_e = N0/Vol*(tau)*electronNumber(gi, gamma_min, gamma_max,
+					    dr, ComovingTime, tic, N0);
 	  if(*x1<ekn)
 	    (*its) = processFlux(*x1,ec,em);
 	  else 
 	    (*its) = 0.0;
+	  
+	  (*its++) *= N_e*gi*(dgamma-1.); // adim
 
-	  (*its++) *= N_e; // adim
 	  
 	  (x1++);
 	}
@@ -189,29 +194,28 @@ void GRBICompton::load(const double time,
 	  double em = 4./3.*pow(gc,2.) *esyn_0 *(pow(gamma_min,2.)-1.)/cst::mec2;
 	  double ec = 4./3.*pow(gc,2.) *esyn_0 *(pow(gc,2.)-1.)/cst::mec2;
 	  double ekn= gc;
-	  double gi      = sqrt(1. + (3.*(*x1)*cst::mec2)/(4.*pow(gc,2.)*esyn_0));
+	  double gi      = gc;//sqrt(1. + (3.*(*x1)*cst::mec2)/(4.*pow(gc,2.)*esyn_0));
 	  double gi2     = pow(gi,2.);
-	  double Psyn    = Psyn_0*(gi2-1.); //MeV/s
-	  double tsyn    = ((gi)*cst::mec2)/Psyn;
+	  double tic    = (gi*cst::mec2)/(Pic_0*(gi2-1.));  
 	  double tau = tau_0;
-	  tau *= (tsyn<tcross)? tsyn: tcross;
+	  tau *= (tic<tcross)? tic: tcross;
 	  if(tau>1.) tau = 1.;
 	  
 
-	  double N_e = (tau)*electronNumber(2.*gamma_min, gamma_min, gamma_max,
-					    dr, ComovingTime, tsyn, N0);
+	  double N_e = N0/Vol*(tau)*electronNumber(gc, gamma_min, gamma_max,
+					    dr, ComovingTime, tic, N0);
 	  
 	  if(*x1<ekn)
 	    (*its) = processFlux(*x1,ec,em);
 	  else 
 	    (*its) = 0.0;
 	  
-	  (*its++) *= N_e; // adim
+	  (*its++) *= N_e*gi*(dgamma-1.); // adim
 	  
 	  (x1++);
 	}
     }
-  else if (type==3)
+  else if (type==3) // Complete integration
     {
       x1  =    x.begin();
       //dx1 =   dx.begin();
@@ -225,19 +229,20 @@ void GRBICompton::load(const double time,
 	    {
 	      double gi      = gamma_min*pow(dgamma,j); 
 	      double gi2     = pow(gi,2.);
-	      double temp    = (esyn_0*(gi2-1.))/cst::mec2;
-	      temp = (temp>0.0) ? 1./temp : 0.0; 
-	      double tsyn    = (gi*cst::mec2)/(Psyn_0*(gi2-1.));  
-	      double tau = tau_0;
-	      tau *= (tsyn<tcross)? tsyn: tcross;
+	      //	      double temp    = (eic_0*(gi2-1.))/cst::mec2;
+	      // temp = (temp>0.0) ? 1./temp : 0.0; 
+	      double tic    = (gi*cst::mec2)/(Pic_0*(gi2-1.));  
+	      double tau = tau_0; // adim
+	      tau *= (tic<tcross)? tic: tcross;
 	      if(tau>1.) tau = 1.;
 	      double N_e = (tau)*electronNumber(gi, gamma_min, gamma_max,
-						dr, ComovingTime, tsyn, N0/Vol);
+						dr, ComovingTime, tic, N0);
 	      int e0=0;
 	      isy=fsyn.begin();
 	      while(isy<fsyn.end()) // Initial energy
 		{
-		  (*its) += N_e*(*isy)*(pow(dgamma,j+2)-pow(dgamma,j))
+		  (*its) += N_e*(*isy) 
+		    *gamma_min*(pow(dgamma,j+2)-pow(dgamma,j))
 		    *InverseComptonFunction(gi,x[e0],(*x1));
 		  //cout<<" gamma  "
 		  e0++;
@@ -260,7 +265,7 @@ void GRBICompton::load(const double time,
     {
       (*x1 ) *= EnergyTransformation; //eV
       (*dx1) *= 1.0e-6*EnergyTransformation; //MeV
-      (*its) *= GAMMAF*(Psyn_esyn)/(*dx1); //1/s/MeV
+      (*its) *= GAMMAF*(Pic_eic)/(*dx1); //1/s/MeV
       
       x1++;
       dx1++;

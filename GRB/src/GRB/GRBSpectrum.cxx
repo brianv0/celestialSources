@@ -20,7 +20,7 @@ GRBSpectrum::GRBSpectrum(const std::string& params)
 	}
       catch (char * s)
 	{
-	  std::cout<<"Restarting GRBSim...\n";
+	  std::cout<<"Restarting GRBSim..."<<std::endl;
 	  flag=0;
 	}
     }

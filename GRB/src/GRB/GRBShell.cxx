@@ -25,8 +25,8 @@ GRBShell::GRBShell(double gamma, double mass,
   else 
     {
       std::cout<<" Option for shell type, not recognized !! "<<std::endl;
-      std::cout<<" Please eneter 0 for isotropic fireballs, \n 
-or 1 for beamed fireballs in the GRBParam.txt file!! "<<std::endl;
+      std::cout<<" Please eneter 0 for isotropic fireballs "<<std::endl; 
+      std::cout<<" or 1 for beamed fireballs in the GRBParam.txt file!! "<<std::endl;
     }
 }
 

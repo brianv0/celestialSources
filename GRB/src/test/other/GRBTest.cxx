@@ -1,14 +1,3 @@
-/*!\class GRBTest
- * \brief Test class for GRB simulation studies.
- * 
- * This class is called from GRB Gaudi Algorithm.
- * It basically compute the spectrum and returns a photons for the montecarlo.
- * It calls the GRBSim class as kernel of the simulation.
- * Some quantities are also calculated to help people understanding 
- * GRB physics.
- *
- */
-
 // Include files
 #include "FluxSvc/IFluxSvc.h"
 #include "FluxSvc/IFlux.h"
@@ -65,45 +54,57 @@ namespace channel
 using namespace std;
 using namespace channel;
 
+/*!\class DataOut
+ * \brief Class containing all the information to be stored.
+ 
+ Time, energy direction and the source type (background or GRB) are
+ stored in this class.
+*/
+
 class DataOut{
 public:
   DataOut();
-  //! destructor
-  //  ~DataOut();
+  ~DataOut(){}  
+  inline void setTime(double value)   {m_time=value;}
+  inline void setEnergy(double value) {m_energy=value;}
+  
+  inline void setPhi(double value)    {m_phi=value;}
+  inline void setTheta(double value)  {m_theta=value;}
+  
+  inline void setGal_l(double value)  {m_l=value;}
+  inline void setGal_b(double value)  {m_b=value;}
 
-  inline void setTime(double value)   {o_time=value;}
-  inline void setEnergy(double value) {o_energy=value;}
+  inline double Time()   {return m_time;}
+  inline double Energy() {return m_energy;}
   
-  inline void setPhi(double value)    {o_phi=value;}
-  inline void setTheta(double value)  {o_theta=value;}
+  inline double Phi()    {return m_phi;}
+  inline double Theta()  {return m_theta;}
   
-  inline void setGal_l(double value)  {o_l=value;}
-  inline void setGal_b(double value)  {o_b=value;}
-  
-  inline void setSignal(int value)    {o_signal=value;}
-public:
+  inline double Gal_l()  {return m_l;}
+  inline double Gal_b()  {return m_b;}
 
-  inline double Time()   {return o_time;}
-  inline double Energy() {return o_energy;}
-  
-  inline double Phi()    {return o_phi;}
-  inline double Theta()  {return o_theta;}
-  
-  inline double Gal_l()  {return o_l;}
-  inline double Gal_b()  {return o_b;}
-  
-  inline int   Signal() {return o_signal;}
+  /*!
+    \brief Type of the source
+    
+    SourceType = 1 means the source has been chosen as a primary source, like a GRB.
+    SourceType = 0 flags the source as a Background source. 
+    Sometime is useful to have the possibility to distinguish between sources and 
+    background.
+  */
+  inline void setSourceType(int value)    {m_source_type=value;}
+  //! return the source type.
+  inline int   SourceType() {return m_source_type;}
 private:
-  double o_time;
-  double o_energy;
+  double m_time;
+  double m_energy;
   
-  double o_phi;
-  double o_theta;
+  double m_phi;
+  double m_theta;
   
-  double o_l;
-  double o_b;
+  double m_l;
+  double m_b;
   
-  int o_signal;
+  int m_source_type;
 };
 
 class TimeCmp{
@@ -115,21 +116,42 @@ public:
   }
 };
 
+/*!\class GRBTest
+ * \brief Test class for GRB simulation studies.
+ * 
+ * This class is called from GRB Gaudi Algorithm.
+ * It basically compute the spectrum and returns a photons for the montecarlo.
+ * It calls the GRBSim class as kernel of the simulation.
+ * Some quantities are also calculated to help people understanding 
+ * GRB physics.
+ *
+ */
 class GRBTest{
     
 public:
-  //! Constructor
   GRBTest();
   ~GRBTest(){}
-  //! Return the pointer to flux service
+  //! Set a pointer to flux service
   inline void setService(IFluxSvc* ptr){m_fsvc = ptr;}
   //! Calculate the fluence in the energy band between e1 and e2.
   double CalculateFluence(double ee/* MeV */,
 			  double e1=cst::enmin*1e-6/* MeV */,
 			  double e2=cst::enmax*1e-6/* MeV */);
-  //! Generate a GRB
+  /*!
+    \brief Generate a GRB
+
+    This method  initialize the Simulation. It parse the parameters and generates 
+    events (calling Flux::generate() method).
+    \param argv is the vector containing all the available options. It 
+    is parsed by this method.
+  */
   int Start(std::vector<char*> argv);
-  //! Help printout utility
+  
+  /*!
+    \brief Help printout utility
+    
+    It prints on the screen all the available options.
+  */
   void help();
   //! List all the sources available
   void listSources(const std::list<std::string>& source_list );
@@ -149,7 +171,6 @@ private:
 };
 
 DataOut::DataOut(){}
-
 
 GRBTest::GRBTest()
 {
@@ -298,8 +319,8 @@ int GRBTest::Start(std::vector<char*> argv)
   
   for(i = 0; i < num_sources; i++)
     {  
-      int signal=1;     
-      if(i>0) signal=0;
+      int source_type=1;     
+      if(i>0) source_type=0;
       nume=1;
       
       fluenceTot=0.0;
@@ -418,7 +439,7 @@ int GRBTest::Start(std::vector<char*> argv)
 	      myData.setGal_l(l); 
 	      myData.setGal_b(b); 
 	      
-	      myData.setSignal(signal); 
+	      myData.setSourceType(source_type); 
 
 	      theData.push_back(myData);
 	    }
@@ -494,7 +515,7 @@ int GRBTest::Start(std::vector<char*> argv)
 		  (*itr).Energy(),
 		  (*itr).Phi(),
 		  (*itr).Theta(),
-		  (*itr).Signal());
+		  (*itr).SourceType());
 	  std::cout<<(*itr).Energy()<<std::endl;
 	  /*
 	    phout<<(*itr).Time()<<"\t"
@@ -502,7 +523,7 @@ int GRBTest::Start(std::vector<char*> argv)
 	    <<(*itr).Time()<<"\t"
 	    <<(*itr).Phi()<<"\t"
 	    <<(*itr).Theta()<<"\t"
-	    <<(*itr).Signal()<<"\n";
+	    <<(*itr).SourceType()<<"\n";
 	  */
 	}
       //phout.close();

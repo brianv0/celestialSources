@@ -1,10 +1,14 @@
 /*!\class GRBTestAlg
- * \brief Test the GRB Gaudi algorithm.
- * 
- * It contains the structure of a general flux algorithm of Gaudi.
- * All the option available are declered in the joboptions file.
- * 
- */
+  \brief Test the GRB Gaudi algorithm.
+  
+  It contains the structure of a general algorithm of Gaudi.
+  All the option available are declered in the joboptions file.
+  To test the algorithm, run: 
+  \verbatim
+  test_GRB.exe ../src/test/GRBtestAlgOptions.txt
+  \endverbatim
+  
+*/
 
 // Include files
 #include "FluxSvc/IFluxSvc.h"
@@ -87,10 +91,11 @@ GRBTestAlg::GRBTestAlg(const std::string& name, ISvcLocator* pSvcLocator) :
 }
 
 //------------------------------------------------------------------------------
-/*! 
- * Initialize the algorithm, use the Job options service to set the 
- * Algorithm's parameters, and points to flux service 
- */
+/*! \brief Initialize the algorithm.
+  
+  It use the Job options service to set the Algorithm's parameters, 
+  and points to flux service 
+*/
 StatusCode GRBTestAlg::initialize() {
   
   
@@ -123,7 +128,7 @@ StatusCode GRBTestAlg::initialize() {
 
 //------------------------------------------------------------------------------
 /*! 
- * Execute the algorithm, calling GRBTest.
+ * \brief Execute the algorithm, calling GRBTest.
  */
 StatusCode GRBTestAlg::execute() {
   m_loop++;

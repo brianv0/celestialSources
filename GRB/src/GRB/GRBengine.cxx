@@ -76,7 +76,9 @@ GRBengine::GRBengine(GRBConstants *myParam)
     }
   else if(engine_type == 2) 
     {
-      std::cout<<"CASE 2: no shell evolution, collision , physical parameters "<<std::endl;
+      std::cout<<
+	"CASE 2: no shell evolution, collision , physical parameters "
+	       <<std::endl;
       m_duration=0.0;
       double BurstDuration     = myParam->Duration();
       if (BurstDuration<=0) BurstDuration=getDurationFromBATSE();
@@ -129,7 +131,9 @@ GRBengine::GRBengine(GRBConstants *myParam)
     }
   else if(engine_type == 0) 
     {
-      std::cout<<" CASE 0: no shell evolution, no collision, observable fixed "<<std::endl;  
+      std::cout<<
+	" CASE 0: no shell evolution, no collision, observable fixed "
+	       <<std::endl;  
       int NumberOfShocks       = myParam->Nshock();
       m_duration=0.0;
       double BurstDuration     = myParam->Duration();
@@ -191,11 +195,12 @@ GRBengine::GRBengine(GRBConstants *myParam)
     {
       std::cout<<" No valid option in GRBParam engine type."<<std::endl;
       std::cout<<" Possible choices are:"<<std::endl;
-      std::cout<<" \'PP1S\' Physical Parameter, for the shocked matherial "
+      std::cout<<" 0 Physical Parameter, for the shocked matherial "
 	       <<std::endl;
-      std::cout<<" \'PP2S\' Physical Parameter, for the shells, 
-Shock from their collision "<<std::endl;
-      std::cout<<" \'OP\' Observed Parameter fixed "<<std::endl;
+      std::cout<<" 1 Observed Parameter fixed "<<std::endl;
+      std::cout<<
+	" 2 Physical Parameter, for the shells, Shock from their collision "
+	       <<std::endl;
       exit(0);
     }
   std::cout<<""<<std::endl;

@@ -25,14 +25,31 @@
 #include <vector>
 #include <fstream>
 #include "CLHEP/Vector/Rotation.h"
-/** @class TDSReadFluxAlg
- * @brief Takes the data relatives to the incoming particle from the TDS
- * and write a simple Root Tree. 
- * Reads the TDS to retrive information about the triggered particles and 
- * save the output in a root tree and in a ascii file (from the joboption).
- *
- * @author Nicola Omodei, Francesco Longo, Sandia Bansal
- */
+/*! @class TDSReadFluxAlg
+  @brief Takes the data relatives to the incoming particle from the TDS
+  and write the output in files.
+ 
+  This method accesses to the transient data store to retrive information
+  about the incoming particles (mother particles) and about their trigger 
+  status and their reconstruction.  
+  From the TDS:
+  - The time (from EventHeader)
+  - The "real" energy (from McParticleCol)
+  - The reconstructed energy (from CalClusterCol)
+  - The "real" direction (from McParticleCol)
+  - The reconstructed direction (from TkrVertexCol)
+  Then it compute the galactic direction (using \e transformGlastToGalactic(time)
+  from \e fluxSvc.
+  Finally this algorithm save the "real" data and the "recon" data in output files.
+  From the jobOptions file it is possible to select tyhe format: ROOT tree, 
+  ascii file, or both. 
+  To test the algorithm, run: 
+  \verbatim
+  test_GRB.exe ../src/test/TDSreadFluxOptions.txt
+  \endverbatim
+  
+  @author Nicola Omodei, Francesco Longo, Sandhia Bansal
+*/
 
 const double deg = 180.0 / M_PI;
 
@@ -245,9 +262,9 @@ StatusCode TDSReadFluxAlg::readTDSData() {
 		l_recon = GalDir(GalDirVec).first;
     		b_recon = GalDir(GalDirVec).second;	
 		log << MSG::INFO << "Reconstructed Direction : Cos Theta = " 
-	<< cos_theta_recon <<" phi = "<< phi_recon<<endreq;
+		    << cos_theta_recon <<" phi = "<< phi_recon<<endreq;
 		log << MSG::INFO << " Galactic Coordinates : l = " 
-	<< l_recon <<" b = "<< b_recon << endreq;
+		    << l_recon <<" b = "<< b_recon << endreq;
 	
 	}
 	events_recon->Fill(); // The root tree is filled with all the triggered events. 

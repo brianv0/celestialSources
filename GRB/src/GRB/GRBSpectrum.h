@@ -1,14 +1,3 @@
-/*!
- *\class  GRBSpectrum
- *
- * Spectrum class for GRB source physical simulation.
- * Class interfacing the framework with the GRB generation.
- *
- * \author Nicola Omodei       nicola.omodei@pi.infn.it 
- * \author Johann Cohen-Tanugi johann.cohen@pi.infn.it
- *
- */
-
 #ifndef GRBSpectrum_H
 #define GRBSpectrum_H
 
@@ -27,7 +16,7 @@
  *
  * \brief Main interface to FluxSvc for the physical model
  *  This class inherits from ISpectrum, and allows to pass the result of GRB
- *  physical model simulation to Gleam framework
+ *  physical model simulation to the GLAST simulation framework
  * 
  * \author Nicola Omodei       nicola.omodei@pi.infn.it 
  * \author Johann Cohen-Tanugi johann.cohen@pi.infn.it
@@ -37,6 +26,24 @@ class GRBSpectrum : public ISpectrum
 {
   friend class GRBmanager;  
  public:
+  /*! 
+    This initialize the simulation parseing the parameters.
+    
+    \param params are set in the xml source library in xml directory.
+    It contains the name of the file in which the seed is read.
+    The seed is necessary to initialize the random number generator.
+    Saving the seed in an external file it is poossible to reproduce a particular 
+    GRB or increase the seed each time a simulation is running.
+
+    An example the xml source declaration for this spectrum should appears:
+    \verbatim
+    <source name=" GRBspectrum_Gal">
+    <spectrum  escale="GeV"> <SpectrumClass name="GRBSpectrum" params="temp.txt"/>
+    <!--This will live the direction free-->
+    <use_spectrum frame="galaxy"/>
+    </spectrum> </source>
+    \endverbatim
+  */
 
   GRBSpectrum(const std::string& params);
  
@@ -58,7 +65,7 @@ class GRBSpectrum : public ISpectrum
 
   //! Galactic direction 
   inline std::pair<double,double> 
-    dir(double energy, HepRandomEngine* engine){return m_grbsim->GRBdir();} 
+    dir(double, HepRandomEngine*){return m_grbsim->GRBdir();} 
 
   /*! \brief Draws from the current spectrum the energy of a sampled photon. 
    *  \param u uniform random number drawn in the method \c energySrc .  

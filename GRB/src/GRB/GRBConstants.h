@@ -37,8 +37,8 @@ namespace cst
   const double wzel      = 0.0;
 
   const double csi       = 1.0; //csi = 1, more efficient IC
-  const double alphae    = .33;
-  const double alphab    = .33; //smaller is alphab greater is the IC efficiency
+  const double alphae    = .5;
+  const double alphab    = .1; //smaller is alphab greater is the IC efficiency
   const double p         = 2.5;
   const double viscosity = 0.0;
   // Internal Parameters

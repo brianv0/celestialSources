@@ -28,6 +28,7 @@ GRBShock::GRBShock(GRBShell Shocked_Material)
   m_partdensity = m_partnumber/m_volume;
   m_Ue          = cst::alphae*m_Eint/m_volume;
   m_Ub          = cst::alphab*m_Eint/m_volume;
+  
   m_Beq         = Bfield(m_Ub);
   // Acceleration of the electrons:
   double c1 = 1.e+5; 

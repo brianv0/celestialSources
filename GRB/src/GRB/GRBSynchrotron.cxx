@@ -103,9 +103,10 @@ void GRBSynchrotron::load(const double time,
 	  if(tau>1.) tau = 1.;
 	  double N_e     = (1.-tau)*electronNumber(gi, gamma_min, gamma_max,
 						   dr, ComovingTime, tsyn, N0);
-	  (*its) += SynchrotronFunction(esyn,(*x1))*N_e*(pow(dgamma,j+2)-pow(dgamma,j)); //adim
+	  (*its) += SynchrotronFunction(esyn,(*x1))*N_e
+	    *gamma_min*(pow(dgamma,j+5)-pow(dgamma,j)); //adim
 	  //cout<<" SYN = "<<(*its)<<endl;
-	  j+=2; // This is for speed up the simulation
+	  j+=5; // This is for speed up the simulation
 	}
       its++;
       x1++;

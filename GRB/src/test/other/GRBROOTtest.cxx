@@ -100,7 +100,8 @@ void Burst(int argc, char** argv);
 int main(int argc, char** argv)
 {
   std::cout<<" ****** GRB and ROOT test ****** "<<std::endl;
-  std::cout<<" type test_GRBROOT.exe -help for help on the available options "
+  std::cout<<
+    " type test_GRBROOT.exe -help for help on the available options "
 	   <<std::endl;
   Burst(argc,argv);
   return 0;
@@ -145,7 +146,7 @@ does all the job."<<std::endl;
 	  std::cout<<"    -help or -h print this help         "<<std::endl;
 	  std::cout<<"    -time <time in sec> fix the maximum time "<<std::endl;
 	  std::cout<<"    -save Save the parameters for the model and 
-\t\t the output in a file (\'GRBdata.txt\')."<<std::endl;
+\t\t the output in a file (GRBdata.txt)."<<std::endl;
 	  std::cout<<"    -root Save the histograms in a in a root file 
 \t\t (\'histos.root\')"<<std::endl;
 	  std::cout<<"    -seed <seed> set the seed for the random engine"
