@@ -26,7 +26,7 @@ apply_pattern package_Cshlibflags
 apply_pattern package_headers
 
 apply_pattern package_stamps
-macro_append GRB_stamps " $(GRBDir)/GRB_lib.stamp"
+macro_append GRB_stamps " $(GRBDir)/GRBLib.stamp"
 
 
 # component library, with GRB, GRBmaker, GRBUtil, and LatGRBAlert
@@ -35,14 +35,14 @@ macro_append GRB_headers 	""  \
 
 macro source "*.cxx" WIN32 "*.cxx *.h"
 
-library GRB_lib -no_share 	$(source) \
+library GRBLIB -no_share 	$(source) \
      -s=GRB $(source)\
      -s=GRBmaker $(source)\
      -s=LatGRBAlert $(source)
 
-macro libs ""   WIN32 " $(GRBDir)/GRB_lib.lib "
+macro libs ""   WIN32 " $(GRBDir)/GRBLIB.lib "
 
-macro GRB_linkopts "-L $(GRBDir) -lGRB_lib" \
+macro GRB_linkopts "-L $(GRBDir) -lGRBLIB" \
                        WIN32 ""
 
 macro_append ROOT_linkopts " -lHist  -lMatrix -lGraf -lGraf3d -lGpad "\ 
@@ -50,7 +50,7 @@ macro_append ROOT_linkopts " -lHist  -lMatrix -lGraf -lGraf3d -lGpad "\
 
 library GRB  Dll/*.cxx $(libs)
 
-macro GRB_extrastamps "$(GRBDir)/GRB_lib.stamp"
+macro GRB_extrastamps "$(GRBDir)/GRBLIB.stamp"
 
 #
 #	Executables:	
