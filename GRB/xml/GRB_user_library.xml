@@ -1,4 +1,4 @@
-<source_library>
+<source_library title="GRB_user_library">
 
 <!-- Type of GRB spectrums : -->
 <!-- 1) GRBSpectrum: the physical model for simulating GRBs based on the fireball model.-->
