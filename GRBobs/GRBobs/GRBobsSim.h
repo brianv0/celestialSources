@@ -47,11 +47,11 @@ class GRBobsSim
   inline std::pair<double,double> GRBdir(){return m_GRBengine->GetDirection();}
   inline double Tmax(){return m_tfinal;}
   void SaveNv();
-  void GetGBMFlux(int view);
+  void GetGBMFlux();
  private:
   
   //! Gathers all relevant constants for the simulation 
-  int m_GRBNumber;
+  GRBobsParameters *m_params;
   GRBobsengine  *m_GRBengine;
   double m_tfinal;
   double m_fluence;

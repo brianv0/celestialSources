@@ -12,10 +12,10 @@
 using namespace ObsCst;
 //////////////////////////////////////////////////
 GRBobsSim::GRBobsSim(GRBobsParameters *params)
+  : m_params(params)
 {
   m_GRBengine = new GRBobsengine(params);
-  m_fluence = params->GetFluence();
-  m_GRBNumber = (int) params->GetGRBNumber();
+  m_fluence = m_params->GetFluence();
 }
 
 void GRBobsSim::GetUniqueName(const void *ptr, std::string & name)
@@ -23,6 +23,7 @@ void GRBobsSim::GetUniqueName(const void *ptr, std::string & name)
   std::ostringstream my_name;
   my_name << reinterpret_cast<int> (ptr);
   name = my_name.str();
+  gDirectory->Delete(name.c_str());
 }
 
 TH2D* GRBobsSim::MakeGRB()
@@ -49,12 +50,11 @@ TH2D* GRBobsSim::MakeGRB()
   s_TimeBinWidth = m_tfinal/m_tbin;
   //  double dt = m_tfinal/(m_tbin-1);
   std::cout<<"Tfinal  = "<<m_tfinal<<" TBin = "<<m_tbin<<" "<<s_TimeBinWidth<<std::endl;
-  
+  gDirectory->Delete("Nv");
   m_Nv = new TH2D("Nv","Nv",m_tbin,0.,m_tfinal,Ebin, e);
   
   std::string name;
   GetUniqueName(m_Nv,name);
-  gDirectory->Delete(name.c_str());
   m_Nv->SetName(name.c_str());
   
   double t = 0.0;
@@ -64,6 +64,7 @@ TH2D* GRBobsSim::MakeGRB()
       for(int ei = 0; ei < Ebin; ei++)
 	{
 	  double nv = 0.0;//m_Nv->GetBinContent(ti+1, ei+1);
+	  
 	  for(pos = Pulses.begin(); pos !=  Pulses.end(); ++pos)
 	    {	
 	      nv += (*pos)->PulseShape(t,e[ei]);
@@ -73,42 +74,31 @@ TH2D* GRBobsSim::MakeGRB()
 	}
     }
   // Conersion 1/cm² -> 1/m²
-  //  m_Nv->Scale(1.0e+4); // [ph/(m² s keV)]
+  m_Nv->Scale(1.0e+4); // [ph/(m² s keV)]
   // double fluence = 1.0e-6; //erg/cm²
+  m_fluence *= 1.0e+4;        //erg/m²
   // nph = nv * dE * TimeBinWidth
-  TH2D *nph = Nph(m_Nv); //ph/cm²
+  TH2D *nph = Nph(m_Nv); //ph/m²
   
   int ei1 = nph->GetYaxis()->FindBin(BATSE1);
-  int ei2 = nph->GetYaxis()->FindBin(BATSE5);
-  double F=0.0;
-  double en;
-  for (int ei = ei1; ei<=ei2; ei++)
-    {
-      en   = nph->GetYaxis()->GetBinCenter(ei);
-      for(int ti = 1; ti<=m_tbin; ti++)
-	{
-	  F+= nph->GetBinContent(ti, ei) * en;//[keV/cm²]
-	}  
-    }
-  double norm = F*1.0e-3/(erg2meV); //erg/cm²  
-  //  double norm = nph->Integral(0,m_tbin,ei1,ei2,"width")*(1.0e-3)/(erg2meV)/s_TimeBinWidth; //erg/m²
-  /////////////////////////////////////////////////////////////
-  //         IMPORTANT m_Nv has to  be in [ph/(m² s keV)]    //
-  //////////////////////////////////////////////////
-  m_Nv->Scale(1.0e4 * m_fluence/norm);
+  int ei2 = nph->GetYaxis()->FindBin(BATSE4);
+  double norm = nph->Integral(0,m_tbin,ei1,ei2,"width")*(1.0e-3)/(erg2meV)/s_TimeBinWidth; //erg/m²
+  
+  // IMPORTANT m_Nv has to  be in [ph/(m² s keV)]
+  m_Nv->Scale(m_fluence/norm);
   Pulses.erase(Pulses.begin(), Pulses.end());
-  delete[] e;
+  delete e;
   delete nph;
+  //SaveNv(m_Nv);
   return m_Nv;
 }
 //////////////////////////////////////////////////
 TH2D *GRBobsSim::Nph(const TH2D *Nv)
 {
 
-  TH2D *Nph = (TH2D*) Nv->Clone(); // [ph/(cm² s keV)]  
+  TH2D *Nph = (TH2D*) Nv->Clone(); // [ph/(m² s keV)]  
   std::string name;
   GetUniqueName(Nph,name);
-  gDirectory->Delete(name.c_str());
   Nph->SetName(name.c_str());
   
   double dei;
@@ -141,7 +131,7 @@ void GRBobsSim::SaveNv()
   m_Nv->GetZaxis()->CenterTitle();
   
   char root_name[100];
-  sprintf(root_name,"grbobs_%d.root",m_GRBNumber);
+  sprintf(root_name,"grbobs_%d.root",(int)m_params->GetGRBNumber());
   std::cout<<" Saving "<<root_name<<std::endl;
   TFile mod(root_name,"RECREATE");
   std::string name = m_Nv->GetName();
@@ -168,9 +158,8 @@ double BandObsF(double *var, double *par)
   return C* NT *E* E* pow(E,b); // ph cm^(-2) s^(-1) keV
 }
 
-void GRBobsSim::GetGBMFlux(int view)
+void GRBobsSim::GetGBMFlux()
 {
-  std::ofstream fout("GBMSpectralParameters.dat");
   double *e = new double[Ebin +1];
   for(int i = 0; i<=Ebin; i++)
     {
@@ -180,9 +169,9 @@ void GRBobsSim::GetGBMFlux(int view)
   // GBM Spectrum:
   TF1 band("grb_f",BandObsF,emin,1.0e+4,4); 
   band.SetParNames("a","b","Log10(E0)","Log10(Const)");
-  band.SetParameters(-2,-4,1,0.0);
-  band.SetParLimits(0,-9.0,1.0);
-  band.SetParLimits(1,-10.0,-1.0);
+  band.SetParameters(-1.4,-2.4,2.5,-3.0);
+  band.SetParLimits(0,-9.0,0.0);
+  band.SetParLimits(1,-10.0,0.0);
   band.SetParLimits(2,log10(emin),4.0);
   band.SetParLimits(3,-5.0,5.0);
   double a,b,E0,Const;
@@ -192,7 +181,8 @@ void GRBobsSim::GetGBMFlux(int view)
   double t=0;
   double dt = m_Nv->GetXaxis()->GetBinWidth(1);
   double tbin = m_Nv->GetXaxis()->GetNbins();
-  fout<<"t  a  b   E0  Const"<<std::endl;
+  std::ofstream os("GBM_spectrum.txt",std::ios::out);
+  os<<"    t      a      b    E0    Const"<<std::endl;
   for(int ti = 0; ti<tbin; ti++)
     {
       t = ti*dt;
@@ -208,22 +198,19 @@ void GRBobsSim::GetGBMFlux(int view)
       E0=pow(10.,band.GetParameter(2));
       Const=pow(10.,band.GetParameter(3));
       band.SetParameters(a,b,band.GetParameter(2),band.GetParameter(3));
-      //Ep=(a+2)*E0;
+      //Ep=(a+2)*E0; 
+      os<<t<<" "<<a<<" "<<b<<" "<<E0<<" "<<Const<<std::endl;
       std::cout<<t<<" "<<a<<" "<<b<<" "<<E0<<" "<<Const<<std::endl;
-      fout<<t<<" "<<a<<" "<<b<<" "<<E0<<" "<<Const<<std::endl;
-      if(view) 
-	{
-	  TString gbmFlux= "GBMFlux";
-	  gbmFlux+=ti;
-	  gbmFlux+=".gif";
-	  band.Draw("same");
-	  gPad->SetLogx();
-	  gPad->SetLogy();
-	  gPad->Update();
-	  //	  if(ti%10==0) gPad->Print(gbmFlux);
-  	}
-          
-    }
+      band.Draw("same");
+      gPad->SetLogx();
+      gPad->SetLogy();
+      gPad->Update();
+      TString gbmFlux= "GBMFlux";
+      gbmFlux+=ti;
+      gbmFlux+=".gif";
+      if(ti%10==0) gPad->Print(gbmFlux);
+    }   
+  os.close();
   //////////////////////////////////////////////////
   delete[] e;
 }
