@@ -39,6 +39,22 @@ using namespace grbobstypes;
 //      createGRB                   :   creates "n" GRBs
 //      readGRB                     :   reads GRB from the given file
 
+GRBmaker::GRBmaker(const std::string &fname)
+	:m_univFWHM(0.0),
+	 m_duration(0.0),
+	 m_grbdir(std::make_pair<float,float>(0.0,0.0)),
+	 m_flux(0.0),
+	 m_fraction(0.0),
+	 m_powerLawIndex(0.0),
+	 m_specnorm(0.0),
+	 m_npuls(0),
+ 	 m_nphoton(0),
+	 m_photonlist()
+{
+	readGRB("GRB_000.lis");
+}
+
+
 GRBmaker::GRBmaker(const std::vector<std::string> &paramVector)
 	:m_univFWHM(0.0),
 	 m_duration(0.0),
@@ -51,10 +67,12 @@ GRBmaker::GRBmaker(const std::vector<std::string> &paramVector)
  	 m_nphoton(0),
 	 m_photonlist()
 {
+	std::cout << "p.size: " << paramVector.size() << std::endl;
 	if (paramVector.size() <= 1)
 		createGRB(paramVector[0]);
 
 	else if (paramVector.size() == 2)
+		//readGRB("GRB_000.lis");
 		readGRB(paramVector);
 
 	else
@@ -254,6 +272,7 @@ GRBmaker::readGRB(const std::vector<std::string> &paramVector)
 	try
 	{
 		std::string location = paramVector[0];
+		std::cout << "location: " << location << std::endl;
 		facilities::Util::expandEnvVar(&location);
 
 		std::string fname = location + paramVector[1];
@@ -262,6 +281,7 @@ GRBmaker::readGRB(const std::vector<std::string> &paramVector)
 		std::ifstream is (fname.c_str());
 		is >> *this;
 
+		std::cout << "m_flux: " << m_flux << std::endl;
 		std::ofstream os("GRB_c2.lis");
 		os << *this;
 	}
@@ -269,6 +289,29 @@ GRBmaker::readGRB(const std::vector<std::string> &paramVector)
 	catch (...)
 	{
 		std::cout << "Error while opening input file: " << paramVector[1] << std::endl;
+	}
+}
+
+
+
+
+GRBmaker::readGRB(const std::string &fname)
+{
+	try
+	{
+
+		std::cout << "Reading photon list from " << fname << "..." << std::endl;
+		std::ifstream is (fname.c_str());
+		is >> *this;
+
+		std::cout << "m_flux: " << m_flux << std::endl;
+		std::ofstream os("GRB_c2.lis");
+		os << *this;
+	}
+
+	catch (...)
+	{
+		std::cout << "Error while opening input file: " << fname << std::endl;
 	}
 }
 
@@ -434,7 +477,7 @@ std::string GRBmaker::baseFilename(const std::string &dir) const
 {
 	char *ind = new char(80);
 
-	std::string location = dir;
+	std::string	location = dir;
 
 	if (location.size() > 0)
 		facilities::Util::expandEnvVar(&location);
@@ -447,6 +490,7 @@ std::string GRBmaker::baseFilename(const std::string &dir) const
 		base += '0';
 
 	std::cout << "base: " << base << std::endl;
+
 	return base;
 }
 
@@ -1087,6 +1131,9 @@ std::ofstream &operator<<(std::ofstream &os, const GRBmaker &grbMaker)
 		grbMaker.flux() << "   " <<
 		grbMaker.duration() << "   " << grbMaker.powerLawIndex() << "   " << grbMaker.specnorm() << "   " << 
 		grbMaker.npuls() << "  " << grbMaker.univFWHM() << std::endl;
+
+	//os << "ZenAng, AziAng = " << std::setw(12) << std::setiosflags(std::ios::fixed) << 
+	//	acos(grbdir.first) * grbcst::degInPi << "   " << grbdir.second * grbcst::degInPi << std::endl;
 	os << "ZenAng, AziAng = " << std::setw(12) << std::setiosflags(std::ios::fixed) << grbdir.first << "   " << grbdir.second << std::endl;
 
 	os << "nphotons = " << grbMaker.nphoton() << std::endl;
@@ -1103,5 +1150,3 @@ std::ofstream &operator<<(std::ofstream &os, const GRBmaker &grbMaker)
 
 	return os;
 }
-
-

@@ -15,9 +15,10 @@ namespace grbcst
 //	const int     ntotal      = 810;
 	const int     ntotal      = 667;
 
+	const double  degInPi     = 180.0 / M_PI;
 	const double  dynrange    = 3;
 	const double  ethres      = 0.03;
-	const double  zenNorm     = cos(0) - cos(75. / (180./M_PI));
+	const double  zenNorm     = cos(0) - cos(75. / degInPi);
 	const double  minwid      = 0.01;
 	const double  maxwid      = 10.0;
 	const double  logfac0     = pow((maxwid/minwid), (1./nbins));

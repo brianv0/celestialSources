@@ -11,6 +11,8 @@
 //static SpectrumFactory<GRBobsSpectrum> factory;
 //const ISpectrumFactory& GRBobsSpectrumFactory = factory;
 
+#include <fstream>
+static std::ofstream os("gleam.lis");
 
 
 // Constructors
@@ -19,8 +21,12 @@ GRBobsSpectrum::GRBobsSpectrum(const std::string &params)
 	:ISpectrum(),
 	 m_title("GRBobsSpectrum"),
 	 m_particleName("gamma")
+//	 m_grbMaker(new GRBmaker("GRB_000.lis"))
 {
+	std::cout << "GRBOBSSPECTRUM: params: " << params << std::endl;
 	std::vector<std::string> paramVector;
+	//paramVector.push_back("$(GRBROOT)/GRBmakerOutput/");
+	//paramVector.push_back("GRB_000.lis");
 	parseParamList(params, paramVector);
 
 	m_grbMaker = new GRBmaker(paramVector);
@@ -74,7 +80,40 @@ GRBobsSpectrum &GRBobsSpectrum::operator=(const GRBobsSpectrum &right)
 
 // Parse input parameter list obtained from the xml file
 void GRBobsSpectrum::parseParamList(const std::string &input, std::vector<std::string>& output) const
-{   
+{ 
+	std::cout << "input: " << input << std::endl;
+	int i = input.find_last_of("/");
+	std::cout << "i: " << i << std::endl;
+
+	if (i > 0)
+	{
+		std::cout << "input.size: " << input.size() << std::endl;
+		if (i == input.size()-1)
+			output.push_back(input);
+		else
+		{
+			std::string temp = input.substr(0,i+1);
+			std::cout << "temp: " << temp << std::endl;
+			output.push_back(temp);
+			temp = input.substr(i+1);
+			std::cout << "temp: " << temp << std::endl;
+			output.push_back(temp);
+		}
+	}
+
+	else
+	{
+		std::string temp = input;
+	    output.push_back(temp);
+	}
+
+#ifdef FOO
+	output.push_back("$(GRBROOT)/GRBmakerOutput/");
+	std::cout << "output: " << output.back() << std::endl;
+	output.push_back("GRB_000.lis");
+	std::cout << "output: " << output.back() << std::endl;
+
+	
 	int i = input.find_first_of(",");
 
 	if (i > 0)
@@ -88,13 +127,15 @@ void GRBobsSpectrum::parseParamList(const std::string &input, std::vector<std::s
 	else
 	{
 		std::string temp = input;
-        output.push_back(temp);
+	    output.push_back(temp);
 	}
+#endif
 }
 
 
 double GRBobsSpectrum::flux(double time) const
 { 
+	std::cout << "m_grbmaker->flux: " << m_grbMaker->flux() << std::endl;
 	return m_grbMaker->flux();
 }
 
@@ -115,6 +156,8 @@ double GRBobsSpectrum::interval(double time)
 
 	nextPTime = nextTime();
 	intv = nextPTime - currentPTime;
+	std::cout << "time: " << time << " nextPTime: " << nextPTime << " currentPTime: " << currentPTime << 
+		" intv: " << intv << std::endl;
 	currentPTime = nextPTime;
 
 	return intv;

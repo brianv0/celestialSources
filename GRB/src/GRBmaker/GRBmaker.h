@@ -37,6 +37,8 @@ class GRBmaker
 	 // If no filename is specified, enerate GRBobsConstants::nbsim bursts and create photon list for each burst
 	 // Otherwise, read burst information and photon list from the specified file
 	 GRBmaker(const std::vector<std::string> &paramVector);
+	 GRBmaker(const std::string &fname);
+	 //GRBmaker(const std::vector<std::string> &paramVector=std::vector<std::string>());
 
 	//	Create photon list from the burst information specified by the input parameters and record it in a file if flag is set
  	 GRBmaker(double duration, int npuls, double flux, double fraction, double powerLawIndex, bool flag);
@@ -173,6 +175,7 @@ class GRBmaker
 
 	 // Read GRB from input file
 	 readGRB(const std::vector<std::string> &paramVector);
+	 readGRB(const std::string &fname);
 
 	 // Computes spectral normalization
 	 double specnorm(HepRandomEngine *engine, double fraction, double powerLawIndex);
