@@ -133,6 +133,7 @@ TH1D *SpectObj::GetSpectrum(double t)
   int ti = Nv->GetXaxis()->FindBin(t);
   double dt0 = t - (Nv->GetXaxis()->GetBinCenter(ti));
   TH1D *sp = CloneSpectrum();
+  //  sp->Scale(0.0);
   double sp0,sp1,sp2;
   if(dt0>0 && ti<nt)
     {
@@ -229,6 +230,7 @@ TH1D *SpectObj::Integral_T(double t1, double t2, double e1, double e2)
 TH1D *SpectObj::Integral_T(int ti1, int ti2, int e1)
 {
   TH1D *en = CloneSpectrum();
+  en->Scale(0.0);
   for(int i = e1; i<=ne; i++)
     en->SetBinContent(i,Nv->Integral(ti1,ti2,i,i));
   return en; // ph
@@ -237,6 +239,7 @@ TH1D *SpectObj::Integral_T(int ti1, int ti2, int e1)
 TH1D *SpectObj::Integral_T(int ti1, int ti2, int e1, int e2)
 {
   TH1D *en = CloneSpectrum();
+  en->Scale(0.0);
   for(int i = e1; i<=e2; i++)
     en->SetBinContent(i,Nv->Integral(ti1,ti2,i,i));
   return en; // ph
@@ -257,17 +260,15 @@ double SpectObj::Integral_T(TH1* Pt, int ti1, int ti2)
 }
 
 //////////////////////////////////////////////////
-TH1D *SpectObj::ComputeProbability(double enph)
+void SpectObj::ComputeProbability(double enph)
 {
   ProbabilityIsComputed=true;
-  TH1D *P = CloneTimes();
   TH1D *pt = Integral_E(enph,emax); //ph
   for(int ti = 1; ti <= nt; ti++)
     {
-      P->SetBinContent(ti,Integral_T(pt,0,ti)); //ph
+      Probability->SetBinContent(ti,Integral_T(pt,0,ti)); //ph
     }
   delete pt;
-  return P; //ph
 }
 
 //////////////////////////////////////////////////
@@ -276,21 +277,19 @@ photon SpectObj::GetPhoton(double t0, double enph)
   //  photon ph;
   int ei  = TMath::Max(1,Nv->GetYaxis()->FindBin(enph));
   if(!ProbabilityIsComputed)
-    Probability = ComputeProbability(enph);
+    ComputeProbability(enph);
   
   if (sourceType == 0 ) // Transient
     {
       double time   = 1.0e8; // > 1 year!
       double energy =  enph;
-  
+      
       if(t0 > m_Tmax)
 	{
 	  ph.time   = time;
 	  ph.energy = energy;
   	  return ph;
 	}
-      
-      //      TH1D *P = ComputeProbability(enph); //ph
       
       int t1 = Probability->FindBin(t0);
       int t2 = t1;
@@ -312,20 +311,22 @@ photon SpectObj::GetPhoton(double t0, double enph)
 	{
 	  t2++;
 	}
-      
+      /*
       if(DEBUG)
 	{
 	  std::cout<<Probability->GetBinCenter(t1)<<" "<<Probability->GetBinCenter(t2-1)<<" "<<Probability->GetBinCenter(t2)<<" , "
 		   <<Probability->GetBinContent(t2-1)- Probability->GetBinContent(t1)<<" "
 		   <<Probability->GetBinContent(t2) - Probability->GetBinContent(t1)<<std::endl;
 	}
-
+      */
       if(t2 < nt) // the burst has finished  dp < 1 or dp >=1
 	{
 	  double dtf = (P0 + myP - Probability->GetBinContent(t2-1))/ 
 	    (Probability->GetBinContent(t2) - Probability->GetBinContent(t2-1))*m_TimeBinWidth;
       	  time    = Probability->GetBinCenter(t2-1)+dtf;
-	  energy  = Integral_T(t1,t2,ei)->GetRandom();
+	  TH1D *integral = Integral_T(t1,t2,ei);
+	  energy  = integral->GetRandom();
+	  delete integral;
 	}
       
       ph.time   = time;
@@ -333,88 +334,87 @@ photon SpectObj::GetPhoton(double t0, double enph)
       //      delete P;  
 
     } 
-else if (sourceType == 1) //Periodic //Max
-      {
-	
-	if (!PeriodicSpectrumIsComputed)
-	  {
-	    PeriodicSpectrum = Integral_T(1,nt,ei);
-	    PeriodicSpectrumIsComputed = true;
-	  }
-	
-	double TimeToFirstPeriod = 0.0;
-	double TimeFromLastPeriod = 0.0;
-	int IntNumPer = 0;
-	double ProbRest = 0.0;
-	double nextTime = 0.0;
-	double InternalTime = t0 - Int_t(t0/m_Tmax)*m_Tmax; // InternalTime is t0 reduced to a period
-	//	TH1D *P = ComputeProbability(enph); //ph/m² 
-	double Ptot = Probability->GetBinContent(nt) - Probability->GetBinContent(1); //Total proability in a period 
-
-        //First checks if next photon lies in the same period
-	if (((Probability->GetBinContent(nt) - Probability->GetBinContent(Nv->GetXaxis()->FindBin(InternalTime))) < 1.0 ))
-	  {
-	    TimeToFirstPeriod = m_Tmax - InternalTime;
-	  }
-	else
-	  {
-	    TimeToFirstPeriod = 0.0;
-	    if(DEBUG)
-	      std::cout << "Next Photon comes within the same period " << std::endl;
-	  }
-
-	// If not, proceed to find the integer number of period required to have Prob = 1
-	if (TimeToFirstPeriod != 0.0)
-	  {
-	    ProbRest = 1 - (Probability->GetBinContent(nt) - Probability->GetBinContent(Nv->GetXaxis()->FindBin(InternalTime)));
-	    //std::cout << "Computing Integer Periods , Now ProbRest is " << ProbRest << std::endl;
-	    IntNumPer = Int_t(ProbRest/Ptot);
+  else if (sourceType == 1) //Periodic //Max
+    {
+      
+      if (!PeriodicSpectrumIsComputed)
+	{
+	  PeriodicSpectrum = Integral_T(1,nt,ei);
+	  PeriodicSpectrumIsComputed = true;
+	}
+      
+      double TimeToFirstPeriod = 0.0;
+      double TimeFromLastPeriod = 0.0;
+      int IntNumPer = 0;
+      double ProbRest = 0.0;
+      double nextTime = 0.0;
+      double InternalTime = t0 - Int_t(t0/m_Tmax)*m_Tmax; // InternalTime is t0 reduced to a period
+      double Ptot = Probability->GetBinContent(nt) - Probability->GetBinContent(1); //Total proability in a period 
+      
+      //First checks if next photon lies in the same period
+      if (((Probability->GetBinContent(nt) - Probability->GetBinContent(Nv->GetXaxis()->FindBin(InternalTime))) < 1.0 ))
+	{
+	  TimeToFirstPeriod = m_Tmax - InternalTime;
+	}
+      else
+	{
+	  TimeToFirstPeriod = 0.0;
+	  if(DEBUG)
+	    std::cout << "Next Photon comes within the same period " << std::endl;
+	}
+      
+      // If not, proceed to find the integer number of period required to have Prob = 1
+      if (TimeToFirstPeriod != 0.0)
+	{
+	  ProbRest = 1 - (Probability->GetBinContent(nt) - Probability->GetBinContent(Nv->GetXaxis()->FindBin(InternalTime)));
+	  //std::cout << "Computing Integer Periods , Now ProbRest is " << ProbRest << std::endl;
+	  IntNumPer = Int_t(ProbRest/Ptot);
 	    //std::cout << " Integer Number of Period is " << IntNumPer <<std::endl; 
-	  }
-	
-	// Then checks for the remnant part of the probability
-	if (IntNumPer > 0 )
-	  {
-	    ProbRest = ProbRest - IntNumPer*Ptot;
-	    // std::cout << "Computing Residual time , Now ProbRest is " << ProbRest << std::endl;
-            int tBinCurrent = 1;
-	    while ((Probability->GetBinContent(tBinCurrent) - Probability->GetBinContent(1)) < ProbRest ) 
-	      {
-		tBinCurrent++;
-	      }	 
-	    TimeFromLastPeriod = Nv->GetXaxis()->GetBinCenter(tBinCurrent);
-	    ProbRest = ProbRest - (Probability->GetBinContent(tBinCurrent) - Probability->GetBinContent(1));
-	    TimeFromLastPeriod += m_SpRandGen->Uniform()*m_TimeBinWidth - m_TimeBinWidth/2 ;
-	  }
-	
-	//std::cout << " At End ProbRest is (should be 0 ) " << ProbRest << std::endl;
-
-
-	
-	
-	if(DEBUG)
-	  {
-	    std::cout << " First Step " << t0 
-		      << " to " << t0 + TimeToFirstPeriod 
-		      << " (" << TimeToFirstPeriod << ")" << std::endl;  
-	    std::cout << " Second Step " << t0 + TimeToFirstPeriod 
-		      << " to " << t0 + TimeToFirstPeriod + IntNumPer*m_Tmax 
-		      << " (" << IntNumPer*m_Tmax << "," << IntNumPer << " periods)" << std::endl;  
-	    std::cout << " Third Step " << t0 + TimeToFirstPeriod + IntNumPer*m_Tmax 
-		      << " to " << t0 + TimeToFirstPeriod + IntNumPer*m_Tmax + TimeFromLastPeriod 
-		      << " (" << TimeFromLastPeriod << ")" << std::endl;  
-
-	    //	    std::cout << "--> Time = " << ph.time << " s. , Energy = " << ph.energy << " keV" << std::endl; 
-	  }
-
-	// Now evaluate the Spectrum Histogram
-	
-	ph.time   = t0 + TimeToFirstPeriod + IntNumPer*m_Tmax +TimeFromLastPeriod;
- 	ph.energy = PeriodicSpectrum->GetRandom();
-	
-      }
+	}
+      
+      // Then checks for the remnant part of the probability
+      if (IntNumPer > 0 )
+	{
+	  ProbRest = ProbRest - IntNumPer*Ptot;
+	  // std::cout << "Computing Residual time , Now ProbRest is " << ProbRest << std::endl;
+	  int tBinCurrent = 1;
+	  while ((Probability->GetBinContent(tBinCurrent) - Probability->GetBinContent(1)) < ProbRest ) 
+	    {
+	      tBinCurrent++;
+	    }	 
+	  TimeFromLastPeriod = Nv->GetXaxis()->GetBinCenter(tBinCurrent);
+	  ProbRest = ProbRest - (Probability->GetBinContent(tBinCurrent) - Probability->GetBinContent(1));
+	  TimeFromLastPeriod += m_SpRandGen->Uniform()*m_TimeBinWidth - m_TimeBinWidth/2 ;
+	}
+      
+      //std::cout << " At End ProbRest is (should be 0 ) " << ProbRest << std::endl;
+      
+      
+      
+      
+      if(DEBUG)
+	{
+	  std::cout << " First Step " << t0 
+		    << " to " << t0 + TimeToFirstPeriod 
+		    << " (" << TimeToFirstPeriod << ")" << std::endl;  
+	  std::cout << " Second Step " << t0 + TimeToFirstPeriod 
+		    << " to " << t0 + TimeToFirstPeriod + IntNumPer*m_Tmax 
+		    << " (" << IntNumPer*m_Tmax << "," << IntNumPer << " periods)" << std::endl;  
+	  std::cout << " Third Step " << t0 + TimeToFirstPeriod + IntNumPer*m_Tmax 
+		    << " to " << t0 + TimeToFirstPeriod + IntNumPer*m_Tmax + TimeFromLastPeriod 
+		    << " (" << TimeFromLastPeriod << ")" << std::endl;  
+	  
+	  //	    std::cout << "--> Time = " << ph.time << " s. , Energy = " << ph.energy << " keV" << std::endl; 
+	}
+      
+      // Now evaluate the Spectrum Histogram
+      
+      ph.time   = t0 + TimeToFirstPeriod + IntNumPer*m_Tmax +TimeFromLastPeriod;
+      ph.energy = PeriodicSpectrum->GetRandom();
+      
+    }
   
-  if(DEBUG)  std::cout<< " New Photon at ("<<t0<<"): time =  " << ph.time << " Energy  (KeV) " << ph.energy << std::endl;
+  if(DEBUG)  std::cout<< " New Photon at ("<<t0<<"): Internal time =  " << ph.time << " Energy  (KeV) " << ph.energy << std::endl;
   return ph;
 }
 
@@ -468,6 +468,7 @@ double SpectObj::GetT90(double BL, double BH)
       i++;
     }  
   double T95 = LC->GetBinCenter(i);  
+  delete LC;
   return T95-T05;
 }
 
@@ -490,13 +491,12 @@ double SpectObj::flux(double time, double enph)
   if (time >= m_Tmax) return 1.0e-6;
   TH1D* fl = GetSpectrum(time);    //ph
   double integral = Integral_E(fl,enph,emax)/m_TimeBinWidth; //ph/s
-  //  delete fl;
+  delete fl;
   return integral/m_AreaDetector;//ph/m2/s
 }
 
 double SpectObj::interval(double time, double enph)
 {
-  
   return  GetPhoton(time,enph).time - time;
 }
 

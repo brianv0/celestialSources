@@ -52,7 +52,7 @@ class SpectObj
   double Integral_E(TH1* Sp, int ei1, int ei2);
   double Integral_T(TH1* Lc, double t1=0.0, double t2=0.0);
   double Integral_T(TH1* Lc, int ti1, int ti2);
-  TH1D *ComputeProbability(double enph);
+  void ComputeProbability(double enph);
   TH1D *N(TH1D *EN);
   photon GetPhoton(double t0, double enph);
   
