@@ -10,7 +10,7 @@ class PulsarSim
  public:
   
   //! The simulation can be initialized by setting the seed of the Random engine generator. If seed is 0, a Random Pulsar is computed.
-  PulsarSim(std::string name, double flux, double enphmin, double enphmax, double period, int numpeaks);
+  PulsarSim(std::string name, int seed, double flux, double enphmin, double enphmax, double period, int numpeaks);
   //! destructor
   ~PulsarSim()
     {
@@ -39,6 +39,7 @@ class PulsarSim
   double m_flux;
   int m_numpeaks;
   double m_enphmin, m_enphmax;
+  int m_seed;
   std::string m_name;
   TH2D *m_Nv;
 };

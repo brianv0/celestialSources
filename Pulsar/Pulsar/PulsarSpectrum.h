@@ -7,6 +7,7 @@
 #include <map>
 #include <cmath>
 #include "flux/ISpectrum.h"
+#include "flux/EventSource.h"
 #include "PulsarSim.h"
 #include "SpectObj/SpectObj.h"
 
@@ -79,6 +80,7 @@ class PulsarSpectrum : public ISpectrum
   int m_numpeaks;
   int m_model;
   double m_flux, m_enphmin, m_enphmax;
+  int m_seed;
   
 };
 #endif

@@ -30,6 +30,7 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
   m_t0 = 0.0;
   m_phi0 = 0.0;
   m_model = 0;
+  m_seed = 0;
 
   char* pulsar_root = ::getenv("PULSARROOT");
   char sourceFileName[80];
@@ -37,18 +38,19 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
 
   //Read from XML file
 
-  m_PSRname = parseParamList(params,0).c_str();
-  m_model = std::atoi(parseParamList(params,1).c_str());
+  m_PSRname    = parseParamList(params,0).c_str();
+  m_model      = std::atoi(parseParamList(params,1).c_str());
 
-  m_enphmin = std::atof(parseParamList(params,2).c_str());
-  m_enphmax = std::atof(parseParamList(params,3).c_str());
+  m_enphmin    = std::atof(parseParamList(params,2).c_str());
+  m_enphmax    = std::atof(parseParamList(params,3).c_str());
 
-  m_numpeaks = std::atoi(parseParamList(params,4).c_str()); //Number of peaks
+  m_seed       = std::atoi(parseParamList(params,4).c_str()); //Seed for random
+  m_numpeaks   = std::atoi(parseParamList(params,5).c_str()); //Number of peaks
 
-  double ppar1 = std::atof(parseParamList(params,5).c_str());
-  double ppar2 = std::atof(parseParamList(params,6).c_str());
-  double ppar3 = std::atof(parseParamList(params,7).c_str());
-  double ppar4 = std::atof(parseParamList(params,8).c_str());
+  double ppar1 = std::atof(parseParamList(params,6).c_str());
+  double ppar2 = std::atof(parseParamList(params,7).c_str());
+  double ppar3 = std::atof(parseParamList(params,8).c_str());
+  double ppar4 = std::atof(parseParamList(params,9).c_str());
 
   //Read from PulsarDataList.txt
   
@@ -106,12 +108,14 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
 
 
   m_JDCurrent = new astro::JulianDate(2001, 1, 1, 0.0);
-  m_Pulsar    = new PulsarSim(m_PSRname, m_flux, m_enphmin, m_enphmax, m_period, m_numpeaks);
+  m_Pulsar    = new PulsarSim(m_PSRname, m_seed, m_flux, m_enphmin, m_enphmax, m_period, m_numpeaks);
 
   if (m_model == 1)
     {
       std::cout << "\n**   Model chosen : " << m_model << " --> Using Phenomenological Pulsar Model " << std::endl;  
       m_spectrum = new SpectObj(m_Pulsar->PSRPhenom(ppar1,ppar2,ppar3,ppar4),1);
+      m_spectrum->SetAreaDetector(EventSource::totalArea());
+      std::cout << "**  Effective Area set to : " << m_spectrum->GetAreaDetector() << " m2 " << std::endl; 
     }
   else 
     {
@@ -141,7 +145,7 @@ double PulsarSpectrum::flux(double time) const
 double PulsarSpectrum::interval(double time)
 {  
   double timeTilde = time + (StartMissionDateMJD - m_t0)*SecsOneDay;
-  if ((int(time) % 10000) < 2)
+  if ((int(time) % 10000) < 10)
     std::cout << "Time reached is: " << time << " seconds from Start " << std::endl;
 
 

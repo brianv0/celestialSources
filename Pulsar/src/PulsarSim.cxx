@@ -1,21 +1,21 @@
-/////////
-// Da fare :
-// - Controllare che il flusso sia uguale a 0 a t=0 e a t=periodo
+//////////////////////////////////////////////////
+// File PulsarSim.cxx
+// contains the code for the implementation of the models
+//
+//////////////////////////////////////////////////
 
 #include <fstream>
 #include <iostream>
 #include <ctime>
-
 #include "Pulsar/PulsarConstants.h"
 #include "Pulsar/PulsarSim.h"
-
 #include "TFile.h"
 #include "TF1.h"
 
 using namespace cst;
 
 //////////////////////////////////////////////////
-PulsarSim::PulsarSim(std::string name, double flux, double enphmin, double enphmax, double period, int numpeaks)
+PulsarSim::PulsarSim(std::string name, int seed, double flux, double enphmin, double enphmax, double period, int numpeaks)
 {
   m_flux = flux; //ph/cm2/s
   m_period  = period;
@@ -23,6 +23,7 @@ PulsarSim::PulsarSim(std::string name, double flux, double enphmin, double enphm
   m_enphmin = enphmin;
   m_enphmax = enphmax;
   m_name = name;
+  m_seed = seed;
 }
 
 TH2D* PulsarSim::PSRPhenom(double par1, double par2, double par3, double par4)
@@ -45,6 +46,7 @@ TH2D* PulsarSim::PSRPhenom(double par1, double par2, double par3, double par4)
   double K1 = 138e-8; //This is the constant, will be overwritten by normalization
 
   std::cout << "\n******** Pulsar Phenomenological Model ********" << std::endl;
+  std::cout << "**  Random seed for the model : " << m_seed << std::endl;
   std::cout << "**  Spectrum parameters: " << std::endl;
   std::cout << "**           En = " << En  
 	    << " | E0 = " << E0 << std::endl;
@@ -57,17 +59,11 @@ TH2D* PulsarSim::PSRPhenom(double par1, double par2, double par3, double par4)
     m_enphmax = cst::EnNormMax;
   double HighEnBound = TMath::Max(cst::EnNormMax,m_enphmax); 
   
-
-
-  std::cout << "**           Normalisation between " << cst::EnNormMin << " and " << cst::EnNormMax << " keV " << std::endl;
-  std::cout << "**           Photon extraction between " << m_enphmin << " and " << m_enphmax << " keV " << std::endl;
-  std::cout << "**  Spectrum calculated between " << LowEnBound << " and " << HighEnBound << " keV " << std::endl; 
-
+  std::cout << "**           Normalisation between " << cst::EnNormMin << " keV and " << cst::EnNormMax << " keV " << std::endl;
+  std::cout << "**           Photon extraction between " << m_enphmin << " keV and " << m_enphmax << " keV " << std::endl;
+  std::cout << "**  Spectrum calculated between " << LowEnBound << " keV and " << HighEnBound << " keV " << std::endl; 
 
   double de = pow(HighEnBound/LowEnBound,1.0/Ebin);
-
-
-
  
   TF1 PulsarSpectralShape("PulsarSpectralShape", 
 			  "([0]*((x/[1])^[2])*exp(-1.0*((x/[3])^[4])))", LowEnBound, HighEnBound);
@@ -82,18 +78,16 @@ TH2D* PulsarSim::PSRPhenom(double par1, double par2, double par3, double par4)
   //Set the Random engine.
 
   TRandom engine;
-  //engine.SetSeed(time(NULL));
-  engine.SetSeed(43242);
+  //  engine.SetSeed(time(NULL));
+  engine.SetSeed(m_seed);
   
   // LightCurve generation:
-
 
   ampl1 = engine.Uniform();
   while (ampl1 < 0.1)  ampl1 = engine.Uniform();
   
   ampl2 = engine.Uniform();
   while (ampl2 < 0.1)  ampl2 = engine.Uniform();
-  
 
   peak1 = engine.Uniform()*m_period; 
   fwhm1 = engine.Uniform()*m_period;
@@ -104,7 +98,6 @@ TH2D* PulsarSim::PSRPhenom(double par1, double par2, double par3, double par4)
       peak1 = engine.Uniform()*m_period; 
       fwhm1 = engine.Uniform()*m_period;
     }    
-
   
   peak2 = engine.Uniform()*m_period; 
   fwhm2 = engine.Uniform()*m_period;
@@ -121,8 +114,6 @@ TH2D* PulsarSim::PSRPhenom(double par1, double par2, double par3, double par4)
 
   if (fwhm2 < (0.01*m_period))
     fwhm2 = 0.01*m_period;
-
-
   
     
   //Remove first or second peak.
@@ -144,9 +135,9 @@ TH2D* PulsarSim::PSRPhenom(double par1, double par2, double par3, double par4)
   TH1D deltaFunction("deltaFunction","DeltaFuction",Tbin,0,m_period);
 
   double dt = m_period/(Tbin-1);
+
   if ((m_numpeaks == 3 ) || (m_numpeaks == 4 ))
     {
-      
       deltaFunction.SetBinContent(int(peak1/dt),ampl1);
       deltaFunction.SetBinContent(int(peak2/dt),ampl2);
     } 
@@ -164,11 +155,17 @@ TH2D* PulsarSim::PSRPhenom(double par1, double par2, double par3, double par4)
 		<< " , FWHM " << fwhm2 << " ampl2 " << ampl2 << std::endl; 
       std::cout << "***********************************************" << std::endl;
     }
+  
 
   TF1 PulsarTimeCurve("PulsarTimeCurve",
 		      "([2]*(1/(((x-[0])^2)+(([1]/2)^2))) + [5]*(1/(((x-[3])^2)+(([4]/2)^2))))",
 		      0, m_period);
   PulsarTimeCurve.SetParameters(peak1,fwhm1,ampl1,peak2,fwhm2,ampl2);  
+
+  // test in case of stationary curve for flux calibration
+
+  //  TF1 PulsarTimeCurve("PulsarTimeCurve","15.0"); //In order to have a stationary source
+
 
   // Part 3 - Combination of Spectrum and lightCurve and filling of TH2D
 
@@ -177,7 +174,6 @@ TH2D* PulsarSim::PSRPhenom(double par1, double par2, double par3, double par4)
     {
       e[i] = LowEnBound*pow(de,1.0*i); //KeV
     }
-
 
   gDirectory->Delete("Nv");
   m_Nv = new TH2D("Nv","Nv",Tbin,0.,m_period,Ebin, e);
@@ -188,14 +184,13 @@ TH2D* PulsarSim::PSRPhenom(double par1, double par2, double par3, double par4)
     {
       t = ti*dt;
       double nt = PulsarTimeCurve.Eval(t);
-
       if ((m_numpeaks == 3 ) || (m_numpeaks == 4 ))
 	{
 	  nt = deltaFunction.GetBinContent(ti);
 	}
-
       for(int ei = 0; ei < Ebin; ei++)
 	{
+	  
 	  double nv = PulsarSpectralShape.Eval(e[ei]);
 	  m_Nv->SetBinContent(ti+1, ei+1, nt*nv);// [ph/(cm² s KeV)]
 	}
@@ -208,7 +203,7 @@ TH2D* PulsarSim::PSRPhenom(double par1, double par2, double par3, double par4)
   m_flux*= 1.0e+4;      //  ph/m²/s
   
   // nph = nv * dE * dt
-
+  
   TH2D *nph = Nph(m_Nv); //ph/m²
   
   int ei2 = nph->GetYaxis()->FindBin(cst::EnNormMin);
@@ -216,31 +211,16 @@ TH2D* PulsarSim::PSRPhenom(double par1, double par2, double par3, double par4)
  
   //Normalisation factor according to band betwee 100MeV and 30 GeV
   //Integration is on a averaged flux over period
- 
-  double norm = nph->Integral(0,Tbin,ei2,ei3)/m_period; // ph/m2/s
+
+  double norm = m_Nv->Integral(0,Tbin,ei2,ei3,"width")/m_period; // ph/m2/s
 
   m_Nv->Scale(m_flux/norm);
 
-  
-  delete[] e;
   delete nph;
+  delete[] e;
   
   SaveNv(m_Nv); // ph/m2/s/keV
   SaveTimeProfile(m_Nv); //ph/m2/s/kev
-
-  // Saving TimeProfile on a TXT Output file.
-  // This will be moved onto PulsarSpectrum
-  /*
-  ofstream OutTimeProf("PSRTimeProfile.txt");
-  
-  for (int t=0; t < Tbin; t++)
-    {
-      OutTimeProf << t+1 << "\t" <<  m_Nv->Integral(t+2,t+2,ei2,ei3)*1e4 << "\n";
-    }
-
-
-  OutTimeProf.close();
-  */
 
   return m_Nv;
   delete m_Nv;
@@ -281,7 +261,13 @@ void PulsarSim::SaveNv(TH2D *Nv)
   Nv->GetZaxis()->CenterTitle();
   
   char root_name[100];
-  sprintf(root_name,"pulsar.root");
+
+  for (int i=0; i< m_name.length()+1; i++)
+    {
+      root_name[i] = m_name[i];
+    }
+
+  sprintf(root_name,"%sroot.root",root_name);
   
   TFile mod(root_name,"RECREATE");
   Nv->Write();
