@@ -14,9 +14,17 @@ class RadiationProcess
   virtual ~RadiationProcess(){;}
 
   virtual double processFlux(double, double, double);
-  virtual double electronDensity(double, double, double,
-				 double, double, double, 
-				 double, double);
+  virtual double electronNumber(double, double, double,
+				double, double, double, 
+				double);
+
+  double timeShiftForDispersion(const double time, 
+				const double E, 
+				const double distance_to_source);
+
+  double comovingTime(const double time, 
+		      const double gamma, 
+		      const double E, const double D);
 
   //! return the Spectrum object.
   inline SpectObj getSpectrumObj() {return m_spectrumObj;}

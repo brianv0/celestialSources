@@ -36,11 +36,14 @@ void GRBSynchrotron::load(const double time,
 			  const double dr)
   
 {
-   if (time<=0.) {m_spectrumObj *= 0.0; return;}
+  if (time<=0.) {m_spectrumObj *= 0.0; return;}
   
   int type = 0; // integration
 
-  const double ComovingTime = time*GAMMAF; 
+  //should be replaced by the real disance from GRBSim
+  double distance_to_source = 1.e+28;// 1.e+28 cm <=> z~1
+  double ComovingTime; 
+
   const double EnergyTransformation = 
     1.e+6 * cst::mec2 *
     ( GAMMAF + sqrt(GAMMAF*GAMMAF+1.)*cos(angle) );
@@ -63,17 +66,25 @@ void GRBSynchrotron::load(const double time,
   
   if (type==0)
     {
-      double gc = cst::mec2/(Psyn_0*ComovingTime);
-      gc = (gc <= 1. ? 1.+1.e-6 : gc);
-
-      //em and ec are specific:
-      double em = esyn_0*(pow(gamma_min,2.)-1.)/cst::mec2;
-      double ec = esyn_0*(pow(gc,2.)-1.)/cst::mec2;
-
       std::vector<double>::iterator x1 = x.begin();
       std::vector<double>::iterator its = fsyn.begin();
       while(x1!=x.end()) 
 	{
+	  ComovingTime = comovingTime(time,GAMMAF,(*x1),distance_to_source);
+	  //comoving time <0 means that dispersive effect delayed 
+	  //to much the photon at this energy bin
+	  if(ComovingTime<0){its++; x1++; continue;}
+
+	  double gc = cst::mec2/(Psyn_0*ComovingTime);
+	  gc = (gc <= 1. ? 1.+1.e-6 : gc);
+	  
+	  //em and ec are specific:
+	  double em = esyn_0*(pow(gamma_min,2.)-1.)/cst::mec2;
+	  double ec = esyn_0*(pow(gc,2.)-1.)/cst::mec2;
+
+
+
+
 	  double gi      = sqrt(1. + (*x1)*cst::mec2/esyn_0);
 	  
 	  double gi2     = pow(gi,2.);
@@ -115,9 +126,14 @@ void GRBSynchrotron::load(const double time,
 	  double y = (*x1)*temp; //adim
 	  double f1= pow(y,0.297)*exp(-y); //adim 
 	  
-	  double N_e = electronDensity(gi, gamma_min, gamma_max,
+	  ComovingTime = comovingTime(time,GAMMAF,(*x1),distance_to_source);
+	  //comoving time <0 means that dispersive effect delayed 
+	  //to much the photon at this energy bin
+	  if(ComovingTime<0){its++; x1++; continue;}
+
+	  double N_e = electronNumber(gi, gamma_min, gamma_max,
 				       dr, ComovingTime, Psyn_0,
-				       tau_0, N0);
+				       N0);
 	  
 	  (*its)  = f1*N_e*1.104; //adim
 	  

@@ -31,11 +31,11 @@ double RadiationProcess::processFlux(double E,
   return value;
 }
 
-double RadiationProcess::electronDensity(double gi, double gamma_min, 
+double RadiationProcess::electronNumber(double gi, double gamma_min, 
 				       double gamma_max, double dr,
 				       double ComovingTime, 
 				       double Psyn_0,
-				       double tau_0,double N0)
+				       double N0)
 {
   const double N_0  = N0*(cst::p-1.)/(pow(gamma_min,1.0-cst::p)-pow(gamma_max,1.0-cst::p)); 
 
@@ -44,7 +44,7 @@ double RadiationProcess::electronDensity(double gi, double gamma_min,
   double tsyn    = ((gi)*cst::mec2)/Psyn;
   double tcross  = dr/(sqrt(1.-1./gi2)*cst::c);
 
-  double N_e = 1;
+  double N_e = N_0;
 
   if (gi<gamma_min ) 
     N_e *= (gi/gamma_min)*pow(gamma_min,-cst::p); //adim;
@@ -60,3 +60,25 @@ double RadiationProcess::electronDensity(double gi, double gamma_min,
   return N_e;
 }
 
+double RadiationProcess::timeShiftForDispersion(const double time, const double E, 
+						const double distance_to_source)
+{
+  const double E_QG = 1.e+19*1.e+3 / cst::mec2; //GeV->MeV->mc2 units
+  const double ksi = +1;
+  double dispersion_factor = ksi * E/ E_QG;
+
+  double shifted_time = time - (distance_to_source / cst::c) * dispersion_factor;
+  return shifted_time;
+}
+
+
+double RadiationProcess::comovingTime(const double time, 
+				      const double gamma, 
+				      const double E, const double D)
+{
+  bool disperse = true;
+  if(disperse)
+    return gamma * timeShiftForDispersion(time,E,D);
+  else 
+    return gamma * time;
+}
