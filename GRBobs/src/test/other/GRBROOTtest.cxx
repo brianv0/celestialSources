@@ -727,7 +727,7 @@ void help()
   std::cout<<"   Option are: "<<std::endl;
   std::cout<<"  -extract [enph] : etxtract photons above enph"<<std::endl;
   std::cout<<"  -grb [N] processes the N grb in the $GRBROOT/src/test/GRBParam.txt file "<<std::endl;
-  std::cout<<"  -gbm      Fit the GBM spectrum with as Band function, as afunction of the time"<<std::endl;
+  std::cout<<"  -band    Fit the GBM spectrum with as Band function, as afunction of the time"<<std::endl;
   std::cout<<"--------------------------------------------------"<<std::endl;
 
 }

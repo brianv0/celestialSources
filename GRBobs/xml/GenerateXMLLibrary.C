@@ -3,8 +3,8 @@ void GenerateXMLLibrary(int N=100)
 {
   TRandom *rnd = new TRandom();
   double MinExtractedPhotonEnergy = 30.0; //MeV
-  double FirstBurstTime  =      10;
-  double AverageInterval = 3600.0; //s
+  double FirstBurstTime  =      10000;
+  double AverageInterval = 86400.0; //s
   bool  GenerateFluence  =   true;
   double Fluence = 1.0e-5;
   

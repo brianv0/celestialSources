@@ -55,7 +55,7 @@ GRBobsmanager::GRBobsmanager(const std::string& params)
       m_l = m_GalDir.first;
       m_b = m_GalDir.second;
       
-      astro::SkyDir sky(m_l,m_b,0);
+      astro::SkyDir sky(m_l,m_b,astro::SkyDir::GALACTIC);
       HepVector3D skydir=sky.dir();
       HepRotation rottoglast = GPS::instance()->transformToGlast(m_startTime,GPS::CELESTIAL);
       HepVector3D scdir = rottoglast * skydir;
