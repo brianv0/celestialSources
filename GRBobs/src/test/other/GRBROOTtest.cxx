@@ -1,6 +1,4 @@
 #include <iostream>
-//#include <vector>
-
 #include "TROOT.h"
 #include "TApplication.h"
 #include "TStyle.h"
@@ -13,8 +11,6 @@
 #include "TGaxis.h"
 #include "TTree.h"
 
-
-//#include "../../GRBOBS/SpectObj.h"
 #include "SpectObj/SpectObj.h"
 #include "GRBobs/GRBobsSim.h"
 #include "GRBobs/GRBobsConstants.h"
@@ -24,26 +20,21 @@ double EMIN, EMAX, TMIN, TMAX, DT;
 int    TBIN, EBIN;
 //////////////////////////////////////////////////
 // options 
-bool video_out=true;
-bool gbm = false;
-bool savePlots = false;
-int frame=10;
-bool movie     = false;
+bool savePlots   = false;
+int frame        = 10;
+bool movie       = false;
 bool bandFit     = false;
 bool powerlawFit = false;
-bool scaled=false;
+bool scaled      = false;
 TString extension;
 
 double Band(double *var, double *par);
 void help();
 void ScanParameters(int Ngrb);
 
+#define DEBUG 0 
 
-
-
-#define DEBUG 0
-
-#define GenerationArea 1.00
+#define GenerationArea 1.00 
 
 double Band(double *var, double *par)
 {
@@ -146,7 +137,7 @@ void PlotGRB(double enph = 0,char name[100]="grb_65540.root",TString name2="GRB_
   Fv->SetLineWidth(2);
   e2Ne->SetLineWidth(2);
   
-
+  
   for(int i=0; i < EBIN; i++)
     {
       double ne = Ne->GetBinContent(i+1);
@@ -400,11 +391,6 @@ void PlotGRB(double enph = 0,char name[100]="grb_65540.root",TString name2="GRB_
       Counts->SetStats(1);
     }
   //////////////////////////////////////////////////      
-  //clc->cd();
-  double LowEnergyMax  = 1.05*Lct_GBM->GetMaximum();
-  double HighEnergyMax = Lct_LAT->GetMaximum();
-  double tmax = Lct_GBM->GetXaxis()->GetXmax();
-  double tmin = Lct_GBM->GetXaxis()->GetXmin();  
   clc->cd(1);
   if(scaled)
     {
@@ -522,11 +508,11 @@ void MakeGRB(int NGRB=1, double enph=0, bool gbm=false)
   m_grb->SaveNv();
 
   char GRBname[100];
-  sprintf(GRBname,"%d",params->GetGRBNumber());
+  sprintf(GRBname,"%d",(int) params->GetGRBNumber());
   if (gbm)  m_grb->GetGBMFlux(GRBname);
   delete m_grb;
   char name[100];
-  sprintf(name,"grbobs_%d.root",params->GetGRBNumber());
+  sprintf(name,"grbobs_%d.root",(int) params->GetGRBNumber());
   extension=params->GetGRBNumber();
   delete params; //??
   PlotGRB(enph,name);
@@ -594,7 +580,7 @@ void ScanParameters(int Ngrb)
       for(int i=0; i < EBIN; i++)
 	{
 	  double ne = e2Ne->GetBinContent(i+1);
-	  double de = e2Ne->GetBinWidth(i+1);//GetBinCenter(i+1);
+	  //	  double de = e2Ne->GetBinWidth(i+1);//GetBinCenter(i+1);
 	  double en = e2Ne->GetBinCenter(i+1);
 	  e2Ne->SetBinContent(i+1,en*en*ne);
 	  //if(en*de*ne > FEp && en < 1e4) Ep=e;
@@ -609,7 +595,7 @@ void ScanParameters(int Ngrb)
       TH1D *Lct_BATSE = sp->Integral_E(BATSE1,BATSE5);  // ph
       TH1D *Lct_GBM   = sp->Integral_E(GBM1,GBM2);  // ph
       TH1D *Lct_LAT   = sp->Integral_E(LAT1,LAT2);  // ph
-      TH1D *Lct_EXT   = sp->Integral_E(enph,EMAX);  // ph
+      //      TH1D *Lct_EXT   = sp->Integral_E(enph,EMAX);  // ph
       
       T90    = log10(sp->GetT90());
       fTOT   = log10(sp->GetFluence());
@@ -665,7 +651,6 @@ int main(int argc, char** argv)
   double enph=0.0;
   int ngrb=1;
   int ngrbs=0;
-  bool video_out=true;
   bool gbm = false;
   while(current_arg < argc)
     {
