@@ -1,5 +1,5 @@
 PROJECT_NAME           = "Pulsar package"
-PROJECT_NUMBER         = "v1r0"
+PROJECT_NUMBER         = "v1r0p4"
 OUTPUT_DIRECTORY       = "PulsarDoc"
 FILE_PATTERNS          = *.cxx *.cpp *.h
 STRIP_CODE_COMMENTS    = NO

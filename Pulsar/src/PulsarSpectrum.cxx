@@ -118,11 +118,11 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
   m_f0 = 1.0/m_period;
   m_f1 = -m_pdot/(m_period*m_period);
   m_f2 = 2*pow((m_pdot/m_period),2.0)/m_period - m_p2dot/(m_period*m_period);
-  std::cout << " ********   PulsarSpectrum initialized for Pulsar " << m_PSRname << std::endl;
+
   if (DEBUG)
     {
       //Writes out Pulsar Info
-      std::cout << " \********   PulsarSpectrum initialized !   ********" << std::endl;
+      std::cout << " ********   PulsarSpectrum initialized for Pulsar " << m_PSRname << std::endl;
       std::cout << "**   Name : " << m_PSRname << std::endl;
       std::cout << "**   Position : (RA,Dec)=(" << m_RA << "," << m_dec 
 		<< ") ; (l,b)=(" << m_l << "," << m_b << ")" << std::endl; 
@@ -155,6 +155,7 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
   ofstream PulsarLog;
   PulsarLog.open(logLabel);
 
+  
   PulsarLog << "\n********   PulsarSpectrum Log for pulsar" << m_PSRname << std::endl;
   PulsarLog << "**   Name : " << m_PSRname << std::endl;
   PulsarLog << "**   Position : (RA,Dec)=(" << m_RA << "," << m_dec 
@@ -247,12 +248,12 @@ double PulsarSpectrum::interval(double time)
 {  
   double timeTildeDecorr = time + (StartMissionDateMJD)*SecsOneDay; //Arrivat time decorrected
   double timeTilde = timeTildeDecorr+ getBaryCorr(timeTildeDecorr); //should be corrected before applying ephem de-corrections
-  //  if (DEBUG)
-  //{
-  //  if ((int(timeTilde - (StartMissionDateMJD)*SecsOneDay) % 20000) < 1.5)
-	std::cout << "\n\n**  Time reached is: " << timeTilde-(StartMissionDateMJD)*SecsOneDay
-		  << " seconds from Mission Start  - pulsar " << m_PSRname << std::endl;
-	// }
+    if (DEBUG)
+  {
+    if ((int(timeTilde - (StartMissionDateMJD)*SecsOneDay) % 1000) < 1.5)
+      std::cout << "**  Time reached is: " << timeTilde-(StartMissionDateMJD)*SecsOneDay
+		<< " seconds from Mission Start  - pulsar " << m_PSRname << std::endl;
+  }
 
   //First part: Ephemerides calculations...
   double initTurns = getTurns(timeTilde); //Turns made at this time 
@@ -277,7 +278,7 @@ double PulsarSpectrum::interval(double time)
   double hMid = 1e30; //for the 1st iteration
   while (fabs(hMid)>baryCorrTol )
     {
-      double hUp = (nextTimeTilde - (ttUp + getBaryCorr(ttUp)));
+      //      double hUp = (nextTimeTilde - (ttUp + getBaryCorr(ttUp)));
       double hDown = (nextTimeTilde - (ttDown + getBaryCorr(ttDown)));
       hMid = (nextTimeTilde - (ttMid + getBaryCorr(ttMid)));
                 
