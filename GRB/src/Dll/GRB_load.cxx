@@ -10,5 +10,6 @@
 
 DECLARE_FACTORY_ENTRIES(GRB) {
     DECLARE_TOOL( RegisterGRB );
+    DECLARE_ALGORITHM(TDSReadFluxAlg);
     
 } 
