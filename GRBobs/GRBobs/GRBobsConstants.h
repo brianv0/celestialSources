@@ -8,7 +8,7 @@
 
 /*! 
  * \namespace ObsCst
- * \brief Namespace containing the constants of the model such as the binning in tiime and energy
+ * \brief Namespace containing the constants of the model such as the binning in time and energy
  
  * \author Nicola Omodei       nicola.omodei@pi.infn.it 
  */
@@ -27,7 +27,7 @@ namespace ObsCst
   const double BATSE1=20.0;                   //20 keV
   const double BATSE2=50.0;;                 // 1 MeV
   const double BATSE3=100.0;                   //20 keV
-  const double BATSE4=300.0;                 // 1 MeV
+  const double BATSE4=300.0;                 // 300 keV
   const double BATSE5=1000.0;                 // 1 MeV
   const double GBM1=10.0;                     // 10 keV 
   const double GBM2=30.0e3;                   // 25 MeV 
@@ -52,7 +52,6 @@ class GRBobsParameters
   ~GRBobsParameters()
     { 
       delete rnd;
-      delete PeakSeparationDist;
     }
   inline  double GetFluence()        {return m_fluence;}
   inline  double GetRiseTime()       {return m_riseTime;}
@@ -70,14 +69,19 @@ class GRBobsParameters
   //////////////////////////////////////////////////
   void   SetGRBNumber(long);
   void   SetFluence(double);
-  void   SetRiseTime(double);
-  void   SetDecayTime(double);
-  void   SetPulseHeight(double);
-  void   SetPulseSeparation(double);
   void   SetNumberOfPulses(int);
-  void   SetTau(double);
+  inline void   SetAlphaBeta(double alpha, double beta)
+    {
+      m_LowEnergy       = alpha;
+      m_HighEnergy      = beta;
+      while (m_LowEnergy<-3.0 || m_LowEnergy>1.0) m_LowEnergy    = rnd->Gaus(-1.0,0.4);
+      while(m_HighEnergy >= m_LowEnergy || m_HighEnergy >= -1.0)         m_HighEnergy  = rnd->Gaus(-2.25,0.4);
+      m_LowEnergy       += 0.4;
+      m_HighEnergy      += 0.4;
+    } 
   void   SetMinPhotonEnergy(double);
   void   SetGalDir(double, double);  
+
   double GetBATSEFluence();
 
   void GenerateParameters();
@@ -100,10 +104,8 @@ class GRBobsParameters
   double m_pulseHeight;
   double m_pulseSeparation;
   long   m_GRBnumber;
-  double m_Tau;
   double m_enph;
   std::pair<double,double> m_GalDir;
-  TF1 *PeakSeparationDist;
 };
 
 #endif

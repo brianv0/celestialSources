@@ -19,7 +19,8 @@ SpectObj::SpectObj(const TH2D* In_Nv, int type)
   gDirectory->Delete(name.c_str());
   Nv->SetName(name.c_str());
   sourceType = type;
-  if(DEBUG) std::cout<<type<<" "<<name<<std::endl;
+  //  if(DEBUG) 
+  std::cout<<type<<" ->SpectObj<-  "<<name<<std::endl;
   m_SpRandGen = new TRandom();
   sourceType = type; //Max
 
@@ -39,6 +40,7 @@ SpectObj::SpectObj(const TH2D* In_Nv, int type)
     }
   
   double dei;
+
   for (int ei = 0; ei<ne; ei++)
     {
       dei   = Nv->GetYaxis()->GetBinWidth(ei+1);
@@ -83,6 +85,14 @@ SpectObj::SpectObj(const TH2D* In_Nv, int type)
   delete[] en;
   if(DEBUG)  std::cout<<" SpectObj initialized ! ( " << sourceType <<")"<<std::endl;
   //////////////////////////////////////////////////
+}
+
+
+void SpectObj::SetAreaDetector(double AreaDetector)
+{
+  std::cout<<"Set the generation area to "<<AreaDetector<<" m2"<<std::endl;
+  Nv->Scale(AreaDetector/m_AreaDetector); // ph
+  m_AreaDetector = AreaDetector;
 }
 
 void SpectObj::GetUniqueName(const void *ptr, std::string & name)
@@ -288,6 +298,7 @@ photon SpectObj::GetPhoton(double t0, double enph)
       int t2 = t1;
       double dt0 = t0 - Probability->GetBinCenter(t1);
       double dP0 = 0;
+      double myP = m_SpRandGen->Uniform(0.9,1.1);
 
       if(dt0>0 && t1<nt)
 	{
@@ -299,7 +310,7 @@ photon SpectObj::GetPhoton(double t0, double enph)
 	}
       double P0  = Probability->GetBinContent(t1) + dP0;
 
-      while(Probability->GetBinContent(t2) < P0 + 1.0 && t2 < nt)
+      while(Probability->GetBinContent(t2) < P0 + myP && t2 < nt)
 	{
 	  t2++;
 	}
@@ -313,9 +324,9 @@ photon SpectObj::GetPhoton(double t0, double enph)
 
       if(t2 < nt) // the burst has finished  dp < 1 or dp >=1
 	{
-	  double dtf = (P0 + 1.0 - Probability->GetBinContent(t2-1))/ 
+	  double dtf = (P0 + myP - Probability->GetBinContent(t2-1))/ 
 	    (Probability->GetBinContent(t2) - Probability->GetBinContent(t2-1))*m_TimeBinWidth;
-      	  time    = Probability->GetBinCenter(t2-1) + dtf;
+      	  time    = Probability->GetBinCenter(t2-1)+dtf;
 	  energy  = Integral_T(t1,t2,ei)->GetRandom();
 	}
       
@@ -414,7 +425,18 @@ double SpectObj::GetFluence(double BL, double BH)
   if(BH<=0) BH = emax;
   int ei1 = Nv->GetYaxis()->FindBin(TMath::Max(emin,BL));
   int ei2 = Nv->GetYaxis()->FindBin(TMath::Min(emax,BH));
-  return Nv->Integral(0,nt,ei1,ei2,"width")*1.0e-7/(m_TimeBinWidth*erg2meV)/m_AreaDetector; //KeV/cm²
+  double F=0.0;
+  double en;
+  for (int ei = ei1; ei<=ei2; ei++)
+    {
+      en   = Nv->GetYaxis()->GetBinCenter(ei);
+      for(int ti = 1; ti<=nt; ti++)
+	{
+	  F+= Nv->GetBinContent(ti, ei)*en;//[keV]
+	}  
+    }
+  return F*1.0e-7/(erg2meV*m_AreaDetector); //erg/cm²
+  //  return Nv->Integral(0,nt,ei1,ei2,"width")*1.0e-7/(m_TimeBinWidth*erg2meV)/m_AreaDetector; //erg/cm²
 }
 
 
@@ -423,7 +445,7 @@ void SpectObj::ScaleAtBATSE(double fluence)
 
   double BATSEL = 20.0;    //20 keV
   double BATSEH = 1.0e+3;  // 1 MeV
-  double norm = GetFluence(BATSEL,BATSEH);
+  double norm = GetFluence(BATSEL,BATSEH);//KeV/cm²
   Nv->Scale(fluence/norm);
 }
 

@@ -19,14 +19,15 @@ GRBobsmanager::GRBobsmanager(const std::string& params)
   m_startTime       = parseParamList(params,0);
   m_fluence         = parseParamList(params,1);
   m_Npulses         = (int) parseParamList(params,2);
-  m_ExponentialTau  = parseParamList(params,3);
-  m_MinPhotonEnergy = parseParamList(params,4)*1.0e3; //MeV
+  double alpha      = parseParamList(params,3);
+  double beta       = parseParamList(params,4);
+  m_MinPhotonEnergy = parseParamList(params,5)*1.0e3; //MeV
   
   m_par = new GRBobsParameters();
 
   m_par->SetGRBNumber(65540+m_Npulses);  
   m_par->SetNumberOfPulses(m_Npulses);
-  m_par->SetTau(m_ExponentialTau);
+  m_par->SetAlphaBeta(alpha,beta);
   m_par->SetMinPhotonEnergy(m_MinPhotonEnergy); //keV
   m_par->SetFluence(m_fluence);
   
@@ -36,8 +37,8 @@ GRBobsmanager::GRBobsmanager(const std::string& params)
   m_spectrum->SetAreaDetector(EventSource::totalArea());
   //////////////////////////////////////////////////
   m_endTime   = m_startTime + m_GRB->Tmax();
-  std::cout<<"GRB starting at time: "<<m_startTime<<std::endl;
-  std::cout<<"GRB ending at time: "<<m_endTime<<std::endl;
+  std::cout<<" GRB starting at time: "<<m_startTime<<" GRB ending at time: "<<m_endTime<<std::endl;
+  std::cout<<" EventSource::totalArea()= "<<EventSource::totalArea()<<std::endl;
 }
 
 GRBobsmanager::~GRBobsmanager() 

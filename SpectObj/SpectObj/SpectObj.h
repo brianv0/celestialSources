@@ -56,12 +56,8 @@ class SpectObj
   TH1D *N(TH1D *EN);
   photon GetPhoton(double t0, double enph);
   
-  inline void SetAreaDetector(double AreaDetector=6.0)
-    {
-      Nv->Scale(AreaDetector/m_AreaDetector); // ph
-      m_AreaDetector = AreaDetector;
-    }
-
+  void SetAreaDetector(double AreaDetector=6.0);
+    
   inline double GetAreaDetector() { return m_AreaDetector; }
   double flux(double time, double enph);
   double interval(double time, double enph);

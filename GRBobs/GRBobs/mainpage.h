@@ -17,19 +17,18 @@ The reference articles are listed below:
 The xml spectrum object has to be defined like:
 
 \verbatim 
-<source_library title="GRBobs_user_library">
     <source name=" GRB1 ">
         <spectrum escale="MeV"> 
-        <SpectrumClass name="GRBobsmanager" params="10,0.0e-5,10,0.1,100"/>
-        <celestial_dir ra="83." dec="22."/>
+        <SpectrumClass name="GRBobsmanager" params="100,0.0e-5,20,-1.0,-2.25,100"/>
+        <celestial_dir ra="10." dec="22."/>
     </spectrum> </source>
 \endverbatim
 where the params are:
-- Starting time of the burst
+- Starting time of the burst (s)
 - Fluence in \f$ erg/cm^{2}\f$. If it is 0 then it has sampled from the BATSE fluence distribution.
 - The number of pulses of the bursts.
-- The time scale (in seconds) for the width of exponential distribution of the pulse FWHM (see GRBobsParameters::GenerateParameters()).
-  Generally this parameter should be fixed to ~0.1, (100 ms) but more regular burst (with a lower value of sigma) can be simulated as well as bursts with high range of puls whidths. 
+- The low energy spectral index (\f$\alpha\f$)
+- The high energy spectral index (\f$\beta\f$)
 - The minimim energy for extractint photons (in MeV).
 
 <br>

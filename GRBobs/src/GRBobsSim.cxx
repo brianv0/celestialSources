@@ -64,7 +64,6 @@ TH2D* GRBobsSim::MakeGRB()
       for(int ei = 0; ei < Ebin; ei++)
 	{
 	  double nv = 0.0;//m_Nv->GetBinContent(ti+1, ei+1);
-	  
 	  for(pos = Pulses.begin(); pos !=  Pulses.end(); ++pos)
 	    {	
 	      nv += (*pos)->PulseShape(t,e[ei]);
@@ -74,29 +73,39 @@ TH2D* GRBobsSim::MakeGRB()
 	}
     }
   // Conersion 1/cm² -> 1/m²
-  m_Nv->Scale(1.0e+4); // [ph/(m² s keV)]
+  //  m_Nv->Scale(1.0e+4); // [ph/(m² s keV)]
   // double fluence = 1.0e-6; //erg/cm²
-  m_fluence *= 1.0e+4;        //erg/m²
   // nph = nv * dE * TimeBinWidth
-  TH2D *nph = Nph(m_Nv); //ph/m²
+  TH2D *nph = Nph(m_Nv); //ph/cm²
   
   int ei1 = nph->GetYaxis()->FindBin(BATSE1);
-  int ei2 = nph->GetYaxis()->FindBin(BATSE4);
-  double norm = nph->Integral(0,m_tbin,ei1,ei2,"width")*(1.0e-3)/(erg2meV)/s_TimeBinWidth; //erg/m²
-  
-  // IMPORTANT m_Nv has to  be in [ph/(m² s keV)]
-  m_Nv->Scale(m_fluence/norm);
+  int ei2 = nph->GetYaxis()->FindBin(BATSE5);
+  double F=0.0;
+  double en;
+  for (int ei = ei1; ei<=ei2; ei++)
+    {
+      en   = nph->GetYaxis()->GetBinCenter(ei);
+      for(int ti = 1; ti<=m_tbin; ti++)
+	{
+	  F+= nph->GetBinContent(ti, ei) * en;//[keV/cm²]
+	}  
+    }
+  double norm = F*1.0e-3/(erg2meV); //erg/cm²  
+  //  double norm = nph->Integral(0,m_tbin,ei1,ei2,"width")*(1.0e-3)/(erg2meV)/s_TimeBinWidth; //erg/m²
+  /////////////////////////////////////////////////////////////
+  //         IMPORTANT m_Nv has to  be in [ph/(m² s keV)]    //
+  //////////////////////////////////////////////////
+  m_Nv->Scale(1.0e4 * m_fluence/norm);
   Pulses.erase(Pulses.begin(), Pulses.end());
-  delete e;
+  delete[] e;
   delete nph;
-  //SaveNv(m_Nv);
   return m_Nv;
 }
 //////////////////////////////////////////////////
 TH2D *GRBobsSim::Nph(const TH2D *Nv)
 {
 
-  TH2D *Nph = (TH2D*) Nv->Clone(); // [ph/(m² s keV)]  
+  TH2D *Nph = (TH2D*) Nv->Clone(); // [ph/(cm² s keV)]  
   std::string name;
   GetUniqueName(Nph,name);
   gDirectory->Delete(name.c_str());
