@@ -26,7 +26,8 @@ FluxSvc.source_lib += {"$(GRBROOT)/xml/GRB_user_library.xml"};
 //------------------------------------------------------------
 // Primary source name (default GRBSpectrum)
 // From here we can select one of the 2 models...
-GRBTestAlg.source_name="GRBspectrum_Test";
+//GRBTestAlg.source_name="GRBspectrum_Test";
+GRBTestAlg.source_name="GRBobsspectrum_Test";
 //------------------------------------------------------------
 // Background source name
 GRBTestAlg.background_name={"electronavg"};
