@@ -15,14 +15,23 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
   std::cout<<m_fluence<<std::endl;
   m_fluence = parseParamList(params,1);
   m_period  = parseParamList(params,2);
+  m_pdot = parseParamList(params,3);
+  m_numpeaks = parseParamList(params,4);
 
-  double ppar1 = 1e6;
-  double ppar2 = 8e6;
-  double ppar3 = -1.62;
-  double ppar4 = 1.7;
-  
-  m_Pulsar   = new PulsarSim(m_fluence,m_period,2);
-  m_spectrum = new SpectObj(m_Pulsar->PSRPolarCapPhen(ppar1,ppar2,ppar3,ppar4),1);
+  double ppar1 = parseParamList(params,5);
+  double ppar2 = parseParamList(params,6);
+  double ppar3 = parseParamList(params,7);
+  double ppar4 = parseParamList(params,8);
+
+  std::cout << " PulsarSpectrum initialized ! " << std::endl;
+  std::cout << " Fluence " << m_fluence << " erg/cm2 " 
+	    << " | " << m_numpeaks << " peaks " << std::endl;
+  std::cout << " Period " << m_period << " s. " 
+	    << "  pDot " << m_pdot << std::endl;
+
+  m_Pulsar   = new PulsarSim(m_fluence,m_period,m_numpeaks);
+  m_spectrum = new SpectObj(m_Pulsar->PSRPhenom(ppar1,ppar2,ppar3,ppar4),1);
+
   //////////////////////////////////////////////////
   
 }
@@ -44,7 +53,13 @@ double PulsarSpectrum::flux(double time) const
 double PulsarSpectrum::interval(double time)
 {  
   double inte;  
+  // Variable with suffix tilde are reffered to dilated system
+  double timeTilde = time;
+  time = timeTilde - timeTilde*m_pdot;
   inte = m_spectrum->interval(time,cst::enph);
+  double nextTime = time + inte;
+  double nextTimeTilde = nextTime + m_pdot*nextTime;
+  inte = nextTimeTilde - timeTilde;
   return inte;
 }
 

@@ -313,8 +313,8 @@ int main(int argc, char** argv)
 
 
   std::cout << " --> Pulsar Sim init " << Fluence << " " << Period << std::endl; 
-  PulsarSim* m_pulsar = new PulsarSim(Fluence,Period,npeaks);
-  m_pulsar->SaveNv((TH2D*)m_pulsar->PSRPolarCapPhen(ppar1,ppar2,ppar3,ppar4));
+  PulsarSim* m_pulsar = new PulsarSim(Fluence,Period, npeaks);
+  m_pulsar->SaveNv((TH2D*)m_pulsar->PSRPhenom(ppar1,ppar2,ppar3,ppar4));
   char name[100];
   sprintf(name,"pulsar.root");
   PlotPulsar(enph,name);

@@ -23,24 +23,18 @@ PulsarSim::PulsarSim(double fluence,double period, int numpeaks)
   m_fluence = fluence; //ph/cm2/s
   m_period  = period;
   m_numpeaks = numpeaks;
-
-  std::cout << "----> General pulsar parameters " << std::endl;
-  std::cout << "              Fluence  : " << m_fluence << " ph/cm2/s " << std::endl;
-  std::cout << "              Period   : " << m_period << " sec. ( " 
-	    << m_period*1000 << " msec. ) " << std::endl;
-  std::cout << "              Number of peaks " << m_numpeaks << std::endl;
 }
 
-TH2D* PulsarSim::PSRPolarCapPhen(double par1, double par2, double par3, double par4)
+TH2D* PulsarSim::PSRPhenom(double par1, double par2, double par3, double par4)
 {
 
   // PSR parameterization for the PolarCap model from Nel & De Jager,Astr&SpSc.230:299-306
-  // PSR parameter (Vela)from De Jager 2002
+  // PSR parameter (Vela)from De Jager et al. 2002
 
-  double En = par1;//1e+6;
-  double G1 = par3; //-1.62;
-  double E0 = par2; // 8e+6;
-  double b =  par4; //1.7;
+  double En = par1;
+  double G1 = par3;
+  double E0 = par2;
+  double b =  par4;
   std::cout << "----> Spectral profile parameters " << std::endl;
   std::cout << "      En = " << En  
 	    << " | E0 = " << E0 << std::endl;

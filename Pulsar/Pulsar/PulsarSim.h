@@ -22,7 +22,7 @@ class PulsarSim
    *
    * Initialize the simulation
    */
-  TH2D* PSRPolarCapPhen(double par1, double par2, double par3, double par4);
+  TH2D* PSRPhenom(double par1, double par2, double par3, double par4);
 
   /*! Compute the Flux, as a function of time. It returns a matrix.
    * \param time is the time in which the spectrum is calculated.

@@ -65,6 +65,7 @@ class PulsarSpectrum : public ISpectrum
 
   const std::string& m_params;
 
-  double m_period,m_fluence;
+  double m_period, m_pdot, m_fluence;
+  int m_numpeaks;
 };
 #endif
