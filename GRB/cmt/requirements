@@ -1,24 +1,32 @@
 package GRB
-version v3r1
+version v4r0
 author Nicola Omodei<nicola.omodei@pi.infn.it> Johann Cohen-Tanugi <johann.cohen@pi.infn.it> Sandhia Bansal <sandhiab@lheapop.gsfc.nasa.gov>
 
 # $Id$
 
 
-use FluxSvc    *
-use flux       *
-use ROOT       *  IExternal
-use GlastSvc   *  
+use flux       v8r*
+use ROOT       v2r*  IExternal
+
+
+macro_prepend includes "-I $(GRBROOT)/src/ "
+
+macro GRB_linkopts "-L $(GRB_root)/$(BINDIR) -lGRBLib" \
+                       WIN32 ""
+
+macro_append ROOT_linkopts " $(ROOT_GUI_libs) "
+
+#WHY DO I NEED THAT NOW????
+macro_append ROOT_linkopts "-lGui -lGX11" \
+	             WIN32 "libGUI.lib "
 
 private
-
-use RootIo     * -no_auto_imports
 
 apply_pattern package_Cshlibflags
 apply_pattern package_headers
 
 apply_pattern package_stamps
-macro_append GRB_stamps " $(GRBDir)/GRBLib.stamp"
+macro_append GRB_stamps " $(GRB_root)/$(BINDIR)/GRBLib.stamp"
 
 macro source "*.cxx" WIN32 "*.cxx *.h"
 
@@ -27,27 +35,11 @@ library GRBLib -no_share $(source) \
      -s=GRBmaker    $(source)\
      -s=LatGRBAlert $(source)
 
-macro libs ""   WIN32 " $(GRBDir)/GRBLib.lib "
-
-macro GRB_linkopts "-L $(GRBDir) -lGRBLib" \
-                       WIN32 ""
-
-#  Component library with Dll only
-library GRB  Dll/*.cxx $(libs)
-
-apply_pattern Llinkopts
+macro libs    ""   \
+        WIN32 " $(GRB_root)/$(BINDIR)/GRBLib.lib "
 
 apply_pattern ld_library_path
 
-macro append GRB_stamps "$(GRBDir)/GRBLib.stamp"
-
-private
-macro_append ROOT_linkopts " $(ROOT_GUI_libs) "
-#WHY DO I NEED THAT NOW????
-macro_append ROOT_linkopts "-lGui -lGX11" \
-	             WIN32 "libGUI.lib "
-
+application test_GRB      test/testMgr.cxx $(libs)
 application test_GRBROOT  test/other/GRBROOTtest.cxx $(libs)
 
-apply_pattern package_test
-public set JOBOPTIONS ${GRBROOT}/src/test/jobOptions.txt
