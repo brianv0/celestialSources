@@ -234,13 +234,13 @@ void GrbGlobalData::getFlux(HepRandomEngine *engine, long nlong)
 // powerLawIndex(HepRandomEngine *engine, const std::vector<int> &histpl, const double factor, std::vector<double> &vect)
 //		returns broken power law indices for n bursts
 //
-void GrbGlobalData::powerLawIndex(HepRandomEngine *engine, 
-                                  const std::vector<int> &histpl, 
-                                  const std::vector<double> &loEdges, 
-                                  const double factor, 
-                                  std::vector<double> &vect)
 //void GrbGlobalData::powerLawIndex(HepRandomEngine *engine, 
-//const std::vector<int> &histpl, const double factor, std::vector<double> &vect)
+//                                  const std::vector<int> &histpl, 
+//                                  const std::vector<double> &loEdges, 
+//                                  const double factor, 
+//                                  std::vector<double> &vect)
+void GrbGlobalData::powerLawIndex(HepRandomEngine *engine, 
+const std::vector<int> &histpl, const double factor, std::vector<double> &vect)
 {
     std::vector<long>  intgplawdist;
     GRBobsUtilities::cumulativeSum(histpl, intgplawdist);
@@ -250,10 +250,10 @@ void GrbGlobalData::powerLawIndex(HepRandomEngine *engine,
     long diff = intgplawdist[intgplawdist.size()-1] - intgplawdist[0];
     
     // Code for NEW LAT/GBM
-    //std::vector<int>::size_type sz = histpl.size();
-    //std::vector<double> loEdges(sz+1);
-    //for (int i=0; i<=sz; ++i)
-    //    loEdges[i] = factor - i*0.1;
+    std::vector<int>::size_type sz = histpl.size();
+    std::vector<double> loEdges(sz+1);
+    for (int i=0; i<=sz; ++i)
+        loEdges[i] = factor - i*0.1;
     
     for (long isim=0; isim<grbcst::nbsim; ++isim)
         vect.push_back(evaluate(engine, diff, intgplawdist[0], intgplawdist, loEdges));
@@ -269,24 +269,24 @@ void GrbGlobalData::powerLawIndex(HepRandomEngine *engine,
 void GrbGlobalData::getPowerLawIndex(HepRandomEngine *engine)
 {
     // Code for OLD LAT
-    std::vector<double>  loEdges  = GRBsimvecCreator::instance()->pl_loEdge();
-    std::vector<int>     histpl = GRBsimvecCreator::instance()->pl_histplaw();
-    m_beta.reserve(grbcst::nbsim);
-    powerLawIndex(engine, histpl, loEdges, 7.2, m_beta);
+    //std::vector<double>  loEdges  = GRBsimvecCreator::instance()->pl_loEdge();
+    //std::vector<int>     histpl = GRBsimvecCreator::instance()->pl_histplaw();
+    //m_beta.reserve(grbcst::nbsim);
+    //powerLawIndex(engine, histpl, loEdges, 7.2, m_beta);
     
     // Code for NEW LAT/GBM
-    //std::vector<int>  histpl = GRBsimvecCreator::instance()->pl_histbeta();
-    //m_beta.reserve(grbcst::nbsim);
-    //powerLawIndex(engine, histpl, 7.2, m_beta);
+    std::vector<int>  histpl = GRBsimvecCreator::instance()->pl_histbeta();
+    m_beta.reserve(grbcst::nbsim);
+    powerLawIndex(engine, histpl, 7.2, m_beta);
     
     // Determine alpha
-    //histpl = GRBsimvecCreator::instance()->pl_histalpha();
-    //m_alpha.reserve(grbcst::nbsim);
-    //powerLawIndex(engine, histpl, 2.5, m_alpha);
+    histpl = GRBsimvecCreator::instance()->pl_histalpha();
+    m_alpha.reserve(grbcst::nbsim);
+    powerLawIndex(engine, histpl, 2.5, m_alpha);
     
     // Determine epeak
-    //m_epeak.resize(grbcst::nbsim,0);
-    //std::transform(m_epeak.begin(), m_epeak.end(), m_epeak.begin(), calcEpeak(engine));
+    m_epeak.resize(grbcst::nbsim,0);
+    std::transform(m_epeak.begin(), m_epeak.end(), m_epeak.begin(), calcEpeak(engine));
 }
 
 

@@ -45,13 +45,13 @@ long LatGrb::calcNphoton(HepRandomEngine *engine)
 {
     calcSpecnorm(engine);
     
-    //std::cout << "m_specnorm: " << m_specnorm.back() << " dur: " << 
-    //    m_globalData->duration() << std::endl;
-    //std::cout << "nphoton: " << 
-    //    long(m_specnorm.back() * m_globalData->duration() * latGeoArea/denom) <<
-    //    std::endl;
-    //std::cout << "alpha: " << m_globalData->alpha() << " beta: " << 
-    //    m_globalData->beta() << " epeak: " << m_globalData->epeak() << std::endl;
+    std::cout << "m_specnorm: " << m_specnorm.back() << " dur: " << 
+        m_globalData->duration() << std::endl;
+    std::cout << "nphoton: " << 
+        long(m_specnorm.back() * m_globalData->duration() * latGeoArea/denom) <<
+        std::endl;
+    std::cout << "alpha: " << m_globalData->alpha() << " beta: " << 
+        m_globalData->beta() << " epeak: " << m_globalData->epeak() << std::endl;
     return long(m_specnorm.back() * m_globalData->duration() * 282743/7.0);
 }
 
@@ -86,16 +86,16 @@ long LatGrb::calcNphoton(HepRandomEngine *engine)
 void LatGrb::calcSpecnorm(HepRandomEngine *engine)
 {
     // Code for NEW LAT/GBM
-    //double specnorm = 3.0 * pow((grbcst::ethresLAT*1000.), (-m_globalData->beta() + 1.0)) * pow(m_globalData->fraction(), 1.15);
-    //specnorm *= (pow(10., (- grbcst::logdyn * engine->flat())));
-    //std::cout << "specnorm: " << specnorm << std::endl;
+    double specnorm = 3.0 * pow((grbcst::ethresLAT*1000.), (-m_globalData->beta() + 1.0)) * pow(m_globalData->fraction(), 1.15);
+    specnorm *= (pow(10., (- grbcst::logdyn * engine->flat())));
+    std::cout << "specnorm: " << specnorm << std::endl;
     
     
     // Code for OLD LAT
-    double specnorm = 3.0 * pow((grbcst::ethresLAT*1000.), -1) * 
-        pow(m_globalData->fraction(), 1.5);
-    specnorm *= (25.0 / exp(m_globalData->beta()));
-    specnorm *= (pow(10., (- grbcst::logdyn * engine->flat())));
+    //double specnorm = 3.0 * pow((grbcst::ethresLAT*1000.), -1) * 
+    //    pow(m_globalData->fraction(), 1.5);
+    //specnorm *= (25.0 / exp(m_globalData->beta()));
+    //specnorm *= (pow(10., (- grbcst::logdyn * engine->flat())));
     
     m_specnorm.push_back(specnorm);
 }
