@@ -5,6 +5,9 @@
   @verbatim
   $Id$
 
+  11-Oct-04 v0r1p1  JC    removed use of iterators in TransientTemplate
+                          since it was causing mysterious seg faults
+                          for zero flux entries in template file
   13-Aug-04 v0r1    JC    removed dependence on Likelihood
   29-Jun-04 v0      JC    initial version
  
