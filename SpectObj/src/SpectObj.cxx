@@ -12,6 +12,8 @@ const double erg2meV      = 624151.0;
 SpectObj::SpectObj(const TH2D* In_Nv, int type)
 {
   m_AreaDetector=1.0;
+  PeriodicSpectrumIsComputed = false;
+	    
   //  AreaDetector = EventSource::totalArea()
   Nv   = (TH2D*)In_Nv->Clone(); // ph/kev/s/m²
   std::string name;
@@ -19,11 +21,10 @@ SpectObj::SpectObj(const TH2D* In_Nv, int type)
   gDirectory->Delete(name.c_str());
   Nv->SetName(name.c_str());
   sourceType = type;
-  //  if(DEBUG) 
-  std::cout<<type<<" ->SpectObj<-  "<<name<<std::endl;
+  if(DEBUG) std::cout<<type<<" ->SpectObj<-  "<<name<<std::endl;
   m_SpRandGen = new TRandom();
   sourceType = type; //Max
-
+  
   ne   = Nv->GetNbinsY();
   double* en   = new double[ne+1];
   emin = Nv->GetYaxis()->GetXmin();
@@ -90,7 +91,7 @@ SpectObj::SpectObj(const TH2D* In_Nv, int type)
 
 void SpectObj::SetAreaDetector(double AreaDetector)
 {
-  std::cout<<"Set the generation area to "<<AreaDetector<<" m2"<<std::endl;
+  if(DEBUG)  std::cout<<"Set the generation area to "<<AreaDetector<<" m2"<<std::endl;
   Nv->Scale(AreaDetector/m_AreaDetector); // ph
   m_AreaDetector = AreaDetector;
 }
@@ -265,8 +266,6 @@ TH1D *SpectObj::ComputeProbability(double enph)
     {
       P->SetBinContent(ti,Integral_T(pt,0,ti)); //ph
     }
-  //  std::cout<<"delete pt "<<std::endl;
-
   delete pt;
   return P; //ph
 }
@@ -288,7 +287,6 @@ photon SpectObj::GetPhoton(double t0, double enph)
 	{
 	  ph.time   = time;
 	  ph.energy = energy;
-	  //	  std::cout<< " ! time =  " << ph.time << " Energy  (KeV) " << ph.energy << std::endl;
   	  return ph;
 	}
       
@@ -357,12 +355,12 @@ else if (sourceType == 1) //Periodic //Max
 	if (((Probability->GetBinContent(nt) - Probability->GetBinContent(Nv->GetXaxis()->FindBin(InternalTime))) < 1.0 ))
 	  {
 	    TimeToFirstPeriod = m_Tmax - InternalTime;
-	    // std::cout << "Time to first period " << TimeToFirstPeriod << std::endl;
 	  }
 	else
 	  {
 	    TimeToFirstPeriod = 0.0;
-	    std::cout << "Next Photon comes within the same period " << std::endl;
+	    if(DEBUG)
+	      std::cout << "Next Photon comes within the same period " << std::endl;
 	  }
 
 	// If not, proceed to find the integer number of period required to have Prob = 1
