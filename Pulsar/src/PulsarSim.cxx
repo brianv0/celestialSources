@@ -325,7 +325,7 @@ TH2D* PulsarSim::PSRPhenom(double par1, double par2, double par3, double par4)
  
       for (unsigned int i =0; i < timeCounts.size()-1; i++)
 	{
-	  TempProfile.SetBinContent(i+1,timeCounts[i]);
+	  TempProfile.SetBinContent(i,timeCounts[i]);
 	}
       TimeProfileLightCurve = TempProfile;
       m_Tbin = TimeProfileLightCurve.GetNbinsX();
