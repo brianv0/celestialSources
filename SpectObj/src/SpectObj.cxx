@@ -340,11 +340,6 @@ photon SpectObj::GetPhoton(double t0, double enph)
       if (!PeriodicSpectrumIsComputed)
 	{
 	  PeriodicSpectrum = Integral_T(1,nt,ei);
-	  /*	  for(int i = ei; i<=ne; i++)
-		  {
-		  PeriodicSpectrum->SetBinContent(i,Nv->Integral(1,nt,i,i));
-		  }	  
-	  */
 	  PeriodicSpectrumIsComputed = true;
 	}
       
@@ -375,7 +370,7 @@ photon SpectObj::GetPhoton(double t0, double enph)
 	  IntNumPer = floor(ProbRest/Ptot);
 	  if (IntNumPer*m_Tmax > 3.15e8)
 	    {
-	      IntNumPer = -1.0;//0.0;//3e8/m_Tmax;
+	      IntNumPer = -1.0;
 	      if (DEBUG)
 		{		
 		  std::cout << " Warning! No photons within the mission lifetime ! " << std::endl;
