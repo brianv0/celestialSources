@@ -87,7 +87,12 @@ void ClusterData::calcUseDistance()
     
     else
     {
-        std::copy(&m_useDist[lattrigcst::nmove], m_useDist.end(), m_useDist.begin());
+		//td::vector<double>::size_type sz = m_useDist.end();
+		//int j=0;
+		//for (std::vector<std::vector<double> >::size_type i=lattrigcst::nmove; i<sz; ++i)
+		//	m_useDist[j++] = m_useDist[i];
+        //std::copy(&m_useDist[lattrigcst::nmove], m_useDist.end(), m_useDist.begin());
+        std::copy(&m_useDist[lattrigcst::nmove], &m_useDist[m_useDist.size()-1], m_useDist.begin());
         
         // replace first "nmove" elements of the first (nrange-nmove) rows
         long nrows = lattrigcst::nrange - lattrigcst::nmove;
@@ -259,7 +264,7 @@ const double ClusterData::jointLikelihood() const
     double denom = 0.52 * pow(0.30, -0.93) + 0.063;
     
     --sz;
-    long i;
+    std::vector<ClusterData>::size_type i;
     for (i=0; i<sz; ++i)
     {
         pdist += (log10(pdistValue(m_extractedClusterData[i].dist())));
