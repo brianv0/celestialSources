@@ -4,6 +4,7 @@
 
   @verbatim
   $Id$
+  07-Feb-05 v0r3p6   JC    genericSources v1r2; GRB v4r1p2
   07-Feb-05 v0r3p5   JC    genericSources v1r1; Pulsar v1r0p3
   15-Jan-05 v0r3p3   HMK   May I never touch this package again...updated Pulsar
   14-Jan-05 v0r3p2   HMK   Use any ROOT in GRB
