@@ -1,6 +1,7 @@
 #include <vector>
 #include <iostream>
 #include <fstream>
+#include <cmath>
 
 #include "GRBConstants.h"
 
@@ -20,9 +21,10 @@ void Parameters::SetGRBNumber(UInt_t GRBnumber)
 //////////////////////////////////////////////////
 double Parameters::GetBATSEFluence()
 {
+    using std::pow;
   if (m_InitialSeparation<pow(10.,9.))
-    return pow(10.0,rnd->Gaus(-6.3,0.57)); //erg/cm^2 (Short Bursts)
-  return pow(10.0,rnd->Gaus(-5.4,0.62)); //erg/cm^2 (Long Burst)
+    return pow(10.0,(double)rnd->Gaus(-6.3,0.57)); //erg/cm^2 (Short Bursts)
+  return pow(10.0,(double)rnd->Gaus(-5.4,0.62)); //erg/cm^2 (Long Burst)
 
 }
 
@@ -53,7 +55,7 @@ void Parameters::SetNshell(int nshell)
   else
     {
       m_Fluence = fluence;
-      rnd->Uniform;
+      rnd->Uniform();  //THB: this needed parentheses
     }
 }
 
@@ -154,6 +156,7 @@ void Parameters::ReadParametersFromFile(std::string paramFile, int NGRB)
 
 void Parameters::ComputeParametersFromFile(std::string paramFile, int NGRB)
 {
+    using std::pow;
   std::ifstream f1(paramFile.c_str());
   if (!f1.is_open()) 
     {
@@ -206,7 +209,7 @@ void Parameters::ComputeParametersFromFile(std::string paramFile, int NGRB)
   double Ep100 = ep/100.0/(gmax_gmin*gmax_gmin);
   r0    = cst::c * tv;
   double G100 = 3.0;
-  dr0   =  1.647e9*E52 * cst::ab * pow(cst::ae,4.0)/(pow(Ep100,2.0)*pow(tv,2.0)*pow(G100,4.0));//*pow(gmax_gmin,2.0);
+  dr0   =  1.647e9*E52 * cst::ab * pow((double)cst::ae,4.0)/(pow(Ep100,2.0)*pow(tv,2.0)*pow(G100,4.0));//*pow(gmax_gmin,2.0);
   //  double gmax_gmin = tau;
   double G = G100*100.0;
 

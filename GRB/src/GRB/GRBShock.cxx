@@ -6,7 +6,7 @@
 
 #include "GRBShock.h"
 #include "GRBShell.h"
-
+#include <cmath> // for fabs
 #define DEBUG 0 
 
 #define PulseShape 0 
@@ -118,7 +118,7 @@ void GRBShock::SetTime(double time)
 }
 
 Double_t GRBShock::Peak(Double_t time,Double_t energy)
-{
+{    using std::fabs;    using std::pow;
   
   Double_t to  = time-tsh;   // oss
   if(PulseShape==0)
@@ -144,7 +144,7 @@ Double_t GRBShock::Peak(Double_t time,Double_t energy)
   if(PulseShape==1)
     {
       if(to <= tc)
-	return  eff*exp(-pow(fabs(to-tc)/rise,1.0));
+          return  eff*exp(-pow(fabs(to-tc)/rise,1.0));
       return  eff*exp(-pow(fabs(to-tc)/decay,1.0));
     }
   
