@@ -1,11 +1,12 @@
 // FILE: GRBobsUtilities.cxx
 
-#include "GRBobsUtilities.h"
 #include <fstream>
 #include <iomanip>
-#include "GRBsimvecCreator.h"
 #include <algorithm>  // for transform
 #include <numeric>  // for accumulate
+
+#include "GRBobsUtilities.h"
+#include "GRBsimvecCreator.h"
 #include "CLHEP/Random/Random.h"
 
 using namespace grbobstypes;
@@ -25,7 +26,7 @@ using namespace grbobstypes;
 //		value						:	interpolated value generated from hi and lo
 //
 // Calls:
-//		engine->flat				:	returns a random number between [0,1)
+//		engine->flat
 //
 // Caller:
 //		GRBmaker::computeFlux
@@ -33,7 +34,7 @@ using namespace grbobstypes;
 
 double GRBobsUtilities::result(HepRandomEngine *engine, const double lo, const double hi, const double p)
 {
-	return lo * pow((1.0 - engine->flat() * (1.0 - pow((hi/lo), -p))), (-1/p));
+    return lo * pow((1.0 - engine->flat() * (1.0 - pow((hi/lo), -p))), (-1/p));
 }
 
 
@@ -59,7 +60,7 @@ double GRBobsUtilities::result(HepRandomEngine *engine, const double lo, const d
 
 double GRBobsUtilities::multiplier::operator () (double x)
 {
-	return x * m_value;
+    return x * m_value;
 }
 
 
@@ -76,7 +77,7 @@ double GRBobsUtilities::multiplier::operator () (double x)
 //		value						:	random number in [0,1)
 //
 // Calls:
-//		engine->flat					:	returns a random number between [0,1)
+//		engine->flat
 //
 // Caller:
 //		GRBpulse::getAmplitude
@@ -84,7 +85,7 @@ double GRBobsUtilities::multiplier::operator () (double x)
 
 double GRBobsUtilities::randGen::operator () (double x)
 {
-	return m_engine->flat();
+    return m_engine->flat();
 }
 
 
@@ -110,19 +111,19 @@ double GRBobsUtilities::randGen::operator () (double x)
 
 // This version is quite slow - but ok for small vectors like the one used by GRBmaker.
 void GRBobsUtilities::sortVector(const long index, const std::vector<double> &in, const std::vector<double> &sorted, 
-						  std::vector<double> &out) 
+                                 std::vector<double> &out) 
 {
-	DoubleSize sz = in.size();
-
-	std::vector<double> temp(out);
-
-	for (long i=0; i<sz; ++i)
-	{
-		DoubleConstIter it = std::find(sorted.begin(), sorted.end(), in[i]);
-
-		DoubleIter it_out = out.begin();
-		std::advance(it_out, std::distance(sorted.begin(), it));
-
-		*(it_out+index) = temp[i+index];
-	}
+    DoubleSize sz = in.size();
+    
+    std::vector<double> temp(out);
+    
+    for (long i=0; i<sz; ++i)
+    {
+        DoubleConstIter it = std::find(sorted.begin(), sorted.end(), in[i]);
+        
+        DoubleIter it_out = out.begin();
+        std::advance(it_out, std::distance(sorted.begin(), it));
+        
+        *(it_out+index) = temp[i+index];
+    }
 }
