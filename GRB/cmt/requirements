@@ -59,8 +59,6 @@ macro GRB_extrastamps "$(GRBDir)/GRB_lib.stamp"
 # this executable provides visualization with ROOT at runtime
 #
 application test_GRBROOT  test/other/GRBROOTtest.cxx $(libs)
-#public set JOBOPTIONS ${GRBROOT}/src/test/jobOptions.txt
 
 apply_pattern package_test
-set TESTJOBOPTIONS #include ${GRBROOT}/src/test/test_jobOptions.txt
-
+public set JOBOPTIONS ${GRBROOT}/src/test/jobOptions.txt

@@ -3,9 +3,6 @@
 // Job options file for GRB test program
 //
 //==================================================
-// This will call GRBtestAlg		
-//#include "$GRBROOT/src/test/GRBtestAlgOptions.txt"
-
 // This will test the algorithms that reads from the TDS...
 #include "$GRBROOT/src/test/TDSreadFluxOptions.txt"
 
