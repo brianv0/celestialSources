@@ -85,8 +85,13 @@ TH2D* GRBSim::Fireball()
   m_tfinal = Shocks.back()->GetTime() + meanDuration + shift + max_tqg;
 
   Tbin     = TMath::Max(10,int(m_tfinal/MinDT));
-  //  Tbin     = TMath::Min(10000,Tbin);  
-
+  if(!m_params->GenerateGBM())
+    {
+      Tbin     = TMath::Max(10,int(50*m_tfinal));
+      Tbin     = TMath::Min(5000,Tbin);  
+    }
+  if(DEBUG)  
+    std::cout<<"Tbin = "<<Tbin<<std::endl;
   gDirectory->Delete("Nv");
   m_Nv = new TH2D("Nv","Nv",Tbin,0.,m_tfinal,Ebin, e);
   double dt = m_Nv->GetBinWidth(1);
@@ -111,7 +116,7 @@ TH2D* GRBSim::Fireball()
 	  // [ph/(cm² s keV)]
 	}
     }
-
+  
   TH2D *nph = Nph(m_Nv); //ph/cm²
   
   int ei1 = nph->GetYaxis()->FindBin(BATSE1);

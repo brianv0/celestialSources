@@ -53,7 +53,7 @@ void Parameters::SetNshell(int nshell)
     if (m_Type==1)    
       m_Nshell = int(2+rnd->Integer(2));
     else
-      m_Nshell = int(10+rnd->Integer(70));
+      m_Nshell = int(10+rnd->Integer(100));
   else
     m_Nshell = nshell;
 }
@@ -73,21 +73,6 @@ void Parameters::SetEtot(double etot)
 {
   m_Etot = (etot>0.0) ? etot : pow(10.0,rnd->Gaus(51.,0.5)); //erg
 }
-
-/*
-  void Parameters::SetEpeak(double epeak)
-{
-  if(epeak<=0)
-    {
-      if (m_Type==1)
-	m_Ep = pow(10.0,(double)rnd->Gaus(2.0,0.5)); //erg/cm^2 (Short Bursts)
-      else
-	m_Ep = pow(10.0,(double)rnd->Gaus(2.5,0.5)); //erg/cm^2 (Long Burst)
-    }
-  else 
-    m_Ep =  epeak;
-}
-*/
 
 void Parameters::SetInitialSeparation(double initialSeparation)
 {
@@ -125,7 +110,7 @@ void Parameters::ReadParametersFromFile(std::string paramFile, int NGRB)
       std::cout<<"GRBConstants: Error Opening paramFile!! \n";
       exit(1);
     }
-  int    nshell;
+  int    nshell=0;
   double fluence,etot,r0,dr0;
   double gmin,gmax,ic;
 
@@ -182,20 +167,21 @@ void Parameters::ComputeParametersFromFile(std::string paramFile, int NGRB)
       std::cout<<"GRBConstants: Error Opening paramFile\n";
       exit(1);
     }
-  int    nshell;
+  int    nshell=0;
   double fluence,r0,dr0;
   double gmin,gmax,etot,ic;
   double tv,ep,Eco;
+  char type;
   
   int GBM;
   
   char buf[200];
   f1.getline(buf,100);
   
-   int i=1;
+  int i=1;
   while(i<=NGRB && f1.getline(buf,100))
     {
-      if(sscanf(buf,"%lf %d %lf %lf %lf %lf %d",&fluence,&nshell,&tv,&Eco,&ep,&ic,&GBM)<=0) break;
+      if(sscanf(buf,"%lf %s %lf %lf %lf %d",&fluence,&type,&Eco,&ep,&ic,&GBM)<=0) break;
       i++;
     } 
   i--;
@@ -209,7 +195,7 @@ void Parameters::ComputeParametersFromFile(std::string paramFile, int NGRB)
       for(int j = 1; j<=(NGRB %i);j++)
 	{
 	  f2.getline(buf,100);
-	  if(sscanf(buf,"%lf %d %lf %lf %lf %lf %d",&fluence,&nshell,&tv,&Eco,&ep,&ic,&GBM)<=0);
+	  if(sscanf(buf,"%lf %s %lf %lf %lf %d",&fluence,&type,&Eco,&ep,&ic,&GBM)<=0);
 	}
       f2.close();
     }
@@ -219,85 +205,129 @@ void Parameters::ComputeParametersFromFile(std::string paramFile, int NGRB)
     SetGBMOutput(true);
     
   SetGRBNumber(UInt_t(65540+NGRB));  
-
-  if(tv<=0.0)
+  if(type=='S' || type =='s')
+    m_Type=1;
+  else if(type=='L' || type =='l')
+    m_Type=2;
+  else
+    m_Type=((rnd->Uniform()<0.3) ? 1 : 2);
+  
+  
+  
+  /*
+    if(tv<=0.0)
     {
-      if(nshell>1 && nshell<4)
-	tv= -2;
-      else if(nshell>4)
-	tv= -1;
+    if(nshell>1 && nshell<4)
+    tv= -2;
+    else if(nshell>4)
+    tv= -1;
     }
-  if(tv==0)   // both
+    
+    if(tv==0)   // both
     {
-      tv=((rnd->Uniform()<0.3) ? -2 : -1);
-      m_Type = 0;
+    tv=((rnd->Uniform()<0.3) ? -2 : -1);
+    }
+    
+    if(tv==-2)
+    {
+    m_Type=1;
+    }
+    else if(tv==-1)
+    {
+    m_Type=2;
     }
   
-  if(tv==-2)
-    {
-      tv     = pow(10.0,rnd->Gaus(-1.0,0.1)); // short bursts
-      m_Type=1;
-    }
-  else if(tv==-1)
-    {
-      tv   = pow(10.0,rnd->Gaus(0.0,0.5)); //long burts
-      m_Type=2;
-    }
+  */
   
-  //  if(ep==0) SetEpeak(ep);
-  //  m_Ep=ep;
   double gmax_gmin=2;  
   double E52   = 1.0;
-  double Ep100 = ep/100.0;///pow(gmax_gmin,2.);
+  double Ep100 = TMath::Max(1.0,ep/100.0);
   double ae3   = cst::ae * 3.;
   double ab3   = cst::ab * 3.;
-  double g100,d7;
-  r0    =  2.0 * cst::c * tv;
-  double r10 = r0 * 1.0e-10;
-  
+  double g100=0;
+  double r10=0;
   double G=0.0;
+  double d7=0;
+  bool EcoFlag = (Eco<=2.0) ? true : false;
   
-  if(Ep100==0)
+  while(G<80.0 || d7 <= 0.01 || Ep100 < 1.0) 
     {
-      if(Eco==0)
+      Ep100 = TMath::Max(1.0,ep/100.0);
+      if(m_Type==1)
 	{
-	  g100 = 1.0;
-	  d7   = 1.0;
-	  G=100.0*g100;
-	  dr0=1e7*d7;
+	  tv     = pow(10.0,rnd->Gaus(-1.,0.5)); // short bursts
+	  if(Ep100==0) Ep100 = 7.0;
 	}
       else
 	{
-	  G = 40.5 * Eco;
-	  g100=G/100.0;
-	  d7   = 1.0;
-	  dr0=1e7*d7;
+	  tv   = pow(10.0,rnd->Gaus(1.5,0.5)); //long burts
+	  if(Ep100==0) Ep100 = 3.0;
 	}
+      r0    =  2.0 * cst::c * tv;
+      r10   =   r0 * 1.0e-10;
+
+      if(EcoFlag) Eco = rnd->Uniform(2.0,10.0);
+      
+      G   =  40.5 * Eco;
+      d7  =  13.6 * E52 * ab3 * pow(ae3,4.0)/(pow(Eco,4.0)*pow(Ep100*tv,2.0));
+      dr0 =   1e7 * d7;
+      g100=G/100.0;  
+
+      Ep100 = 3.63*sqrt(E52*ab3/d7)*pow(ae3,2.)/(r10*pow(g100,2));    
+      if(DEBUG) std::cout<<G<<" "<<d7<<" "<<Ep100<<" "<<Eco<<std::endl;
+           
     }
-  else
+  ep = 100.0*Ep100;
+
+  /*
+    if(Ep100==0)
     {
-      if(Eco==0)
-	{
-	  d7   = 1.0;
-	  dr0=1e7*d7;
-	  
-	  G = 77.8 * pow(E52*ab3/d7,1./4.)*ae3/sqrt(Ep100*tv);
-	  g100=G/100.0;
-	}
-      else
-	{
-	  G = 40.5 * Eco;
-	  d7=13.6*E52*ab3*pow(ae3,4.0)/(pow(Eco,4.0)*pow(Ep100*tv,2.0));
-	  dr0=1e7*d7;
-	  g100=G/100.0;
-	}
+    if(Eco==0)
+    {
+    g100 = rnd->Uniform(1.0,2.0);
+    d7   = rnd->Uniform(0.0,1.0);
+    G=100.0*g100;
+    dr0=1e7*d7;
     }
+    else
+    {
+    G = 40.5 * Eco;
+    g100=G/100.0;
+    d7   = rnd->Uniform(0.0,1.0);
+    dr0=1e7*d7;
+    }
+    }
+    else
+    {
+    if(Eco==0)
+    {
+    d7   = rnd->Uniform(0.0,1.0);
+    dr0=1e7*d7;
+    
+    G = 77.8 * pow(E52*ab3/d7,1./4.)*ae3/sqrt(Ep100*tv);
+    g100=G/100.0;
+    }
+    else
+    {
+    G = 40.5 * Eco;
+    d7=13.6*E52*ab3*pow(ae3,4.0)/(pow(Eco,4.0)*pow(Ep100*tv,2.0));
+    dr0=1e7*d7;
+    g100=G/100.0;
+    }
+    }
+  G = 40.5 * Eco;
+  d7=13.6*E52*ab3*pow(ae3,4.0)/(pow(Eco,4.0)*pow(Ep100*tv,2.0));
+  dr0=1e7*d7;
+  g100=G/100.0;  
   
   Ep100=3.63*sqrt(E52*ab3/d7)*pow(ae3,2.)/(r10*pow(g100,2));
   ep = 100.0*Ep100;
+
+  */  
+  
   
   if(DEBUG) 
-    std::cout<<"Expected Ep= "<<ep<<" Gamma = "<<G<<" Ecut-off : "<<G/40.5<<" GeV, Rsh = "<<r0*G<<" tv "<<tv<<std::endl;
+    std::cout<<"Expected Ep= "<<ep<<" Gamma = "<<G<<" Ecut-off : "<<G/40.5<<" GeV, Rsh = "<<r0*G*G<<" tv "<<tv<<std::endl;
   ////////////////////////////////////////////////// 
   etot = 1e52*E52;
   gmin = 2.*G/(gmax_gmin + 1.);

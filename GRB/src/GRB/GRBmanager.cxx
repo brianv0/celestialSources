@@ -63,7 +63,7 @@ TString GRBmanager::GetGRBname(double time)
   int An,Me,Gio;
   m_Rest=((int) m_startTime % 86400) + m_startTime - floor(m_startTime);
   m_Frac=(m_Rest/86400.);
-  int FracI=(int)(m_Frac*100.0);
+  int FracI=(int)(m_Frac*1000.0);
   double utc;
   JD.getGregorianDate(An,Me,Gio,utc);
 
@@ -98,20 +98,21 @@ TString GRBmanager::GetGRBname(double time)
     {
       GRBname+=Gio;
     }
-  
-  if(FracI==100) 
-    GRBname+=FracI;
-  else if (FracI>10) 
+
+
+  if (FracI<10)
+    {
+      GRBname+="00";
+      GRBname+=FracI;
+    }
+  else if(FracI<100) 
     {
       GRBname+="0";
       GRBname+=FracI;
     }
   else 
-    {
-      GRBname+="00";
-      GRBname+=FracI;
-    }
-  
+    GRBname+=FracI;
+    
   //std::cout<<"GENERATE GRB ("<<GRBname<<")"<<std::endl;
   
   //..................................................  //
@@ -159,15 +160,22 @@ void GRBmanager::GenerateGRB()
     name+=GRBname; 
     name+="_PAR.txt";
   */
-  
+
   std::ofstream os;
   if(m_Nbursts==1) 
-    os.open("grb_generated.txt",std::ios::out);
+    {
+      os.open("grb_generated.txt",std::ios::out);
+      os<<"m_GRBnumber   GRBname   m_startTime   m_endTime   m_ra   m_dec   m_l    m_b   m_theta   m_phi   m_fluence  m_ic"<<std::endl;
+    }
   else 
     os.open("grb_generated.txt",std::ios::app);
   
-  os<<m_GRBnumber<<" "<<GRBname<<" "<<m_startTime<<" "<<m_endTime<<" "<<m_l<<" "<<m_b<<" "<<m_theta<<" "<<m_phi<<" "<<m_fluence<<" "<<std::endl;
+  os<<m_GRBnumber<<" "<<GRBname<<" "<<m_startTime<<" "<<m_endTime;
+  os<<" "<<m_ra<<" "<<m_dec<<" "<<m_l<<" "<<m_b<<" "<<m_theta<<" "<<m_phi;
+  os<<" "<<m_fluence<<" "<<m_par->GetInverseCompton()<<std::endl;
+
   os.close();
+
   std::cout<<"Physical Model GRB"<<GRBname<<" t start "<<m_startTime<<", tend "<<m_endTime
 	   <<" l,b = "<<m_l<<", "<<m_b<<" elevation,phi(deg) = "<<m_theta<<", "<<m_phi<<" Fluence = "<<m_fluence<<std::endl;
   
