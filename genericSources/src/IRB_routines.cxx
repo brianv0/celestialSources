@@ -39,7 +39,8 @@
 //-------------------------------------------------------------------
 
 #include <fstream>
-#include <math.h>
+//#include <math.h>
+#include <cmath>
 #include <iostream>
 using namespace std;
 
@@ -82,7 +83,7 @@ float calcSJ1(float energy, float redshift){
     //add polynomial terms to get optical density
     logtau += coeff[i]*pow((log10(energy)+2),i);
   }
-  return pow(10,logtau);  //return tau not log10(tau)
+  return pow(static_cast<float>(10.), static_cast<float>(logtau));  //return tau not log10(tau)
 }
 
 float calcSJ2(float energy, float redshift){
@@ -118,7 +119,7 @@ float calcSJ2(float energy, float redshift){
     //add polynomial terms to get optical density
     logtau += coeff[i]*pow((log10(energy)+2),i);
   }
-  return pow(10,logtau);  //return tau not log10(tau)
+  return pow(static_cast<float>(10.),static_cast<float>(logtau));  //return tau not log10(tau)
 }
 
 float calcPrimack(float energy, float redshift){

@@ -20,7 +20,7 @@ private
 
 macro genericSources_cppflags "" \
       Linux "-I ../src  -DTRAP_FPE" \
-      WIN32 '/I..\src /wd4290'
+      WIN32 '/I..\src /wd4290 /wd4305 '
 
 macro source *.cxx WIN32 "*.h *.cxx"
 
