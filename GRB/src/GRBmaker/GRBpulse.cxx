@@ -121,7 +121,7 @@ long GRBpulse::index(HepRandomEngine *engine, const long diff, const long minval
 {
     bool found=0;
     long i;
-    static long sz = in.size();
+    long sz = in.size();
     
     while (!found)
     {
@@ -174,17 +174,16 @@ void GRBpulse::universalWidth(HepRandomEngine *engine, const double ethres,
 
 
 
-// pickWidth(HepRandomEngine *engine, const double ethres, const double duration)
+// pickWidth(HepRandomEngine *engine, bool first, double ethres, double duration)
 // Chooses a universal width for the pulses within a given burst.
-void GRBpulse::pickWidth(HepRandomEngine *engine, const double ethres, 
-                         const double duration)
+void GRBpulse::pickWidth(HepRandomEngine *engine, bool first, double ethres, double duration)
 {
     static std::vector<double> logwidth;
     static std::vector<long> ngtwid;
     static long minNgtwid;
     static long diff;
     
-    if (ngtwid.empty())
+    if (first)
     {
         int sz = grbcst::nbins + 1;
         
@@ -335,15 +334,15 @@ void GRBpulse::getPulse(const int npuls)
 
 
 
-// data(HepRandomEngine *engine, const double ethres, const long nphoton, const int npuls, const double duration)
+// data(HepRandomEngine *engine, bool first, double ethres, long nphoton, int npuls, double duration)
 // Returns pulse data needed in the
-long GRBpulse::data(HepRandomEngine *engine, const double ethres, 
-                    const long nphoton, const int npuls, const double duration)
+long GRBpulse::data(HepRandomEngine *engine, bool first, double ethres, long nphoton, 
+					int npuls, double duration)
 {
     getAmplitude(engine, npuls);
     getTmax(engine, npuls, duration);
     
-    pickWidth(engine, ethres, duration);
+    pickWidth(engine, first, ethres, duration);
     long deltbinsleft = createSigmaTdiff(engine);
     getPulse(npuls);
     

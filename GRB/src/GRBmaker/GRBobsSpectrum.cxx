@@ -12,7 +12,8 @@
 #include "flux/SpectrumFactory.h"
 #include "CLHEP/Random/RandFlat.h"
 
-
+const double INVTIME=1.0e+6;
+const double INVENERGY=-1;
 
 
 // Constructors
@@ -131,8 +132,15 @@ double GRBobsSpectrum::interval(double time)
     
     
     nextPTime = nextTime();
-    intv = nextPTime - currentPTime;
-    currentPTime = nextPTime;
+
+	if (nextPTime != INVTIME)
+	{
+	    intv = nextPTime - currentPTime;
+		currentPTime = nextPTime;
+	}
+
+	else
+		currentPTime = 0.0;
     
     return intv;
 }
@@ -149,12 +157,22 @@ float GRBobsSpectrum::operator () (float randomNumber) const
 // expects to be called once per time - so iterator should never become invalid before times run out
 double GRBobsSpectrum::nextEnergy() const
 {
+	static bool qNew=true;
     static std::vector<TimeEnergy>::iterator it = m_grb->photonlist().begin();
+
+	if (qNew)
+	{
+		qNew = false;
+	    it = m_grb->photonlist().begin();
+	}
     
     if (it != m_grb->photonlist().end())
         return (*it++).energy();
     else
-        return -1;
+ 	{
+		qNew = true;
+        return INVENERGY;
+	}
 }
 
 
@@ -168,12 +186,22 @@ double GRBobsSpectrum::energy(double time)
 // returns next available time
 double GRBobsSpectrum::nextTime() const
 {
-    static std::vector<TimeEnergy>::iterator it = m_grb->photonlist().begin();
+	static bool qNew=true;
+	static std::vector<TimeEnergy>::iterator it;
+
+	if (qNew)
+	{
+		qNew = false;
+	    it = m_grb->photonlist().begin();
+	}
     
     if (it != m_grb->photonlist().end())
         return (*it++).time();
     else
-        return 1.0e+6;
+	{
+		qNew = true;
+        return INVTIME;
+	}
 }
 
 

@@ -39,9 +39,9 @@ LatGrb::LatGrb(HepRandomEngine *engine, const double duration, const int npuls,
 
 
 
-// calcNphoton(HepRandomEngine *engine)
+// calcNphoton(HepRandomEngine *engine, long)
 // Returns number of photons in the current burst
-long LatGrb::calcNphoton(HepRandomEngine *engine)
+long LatGrb::calcNphoton(HepRandomEngine *engine, long)
 {
     calcSpecnorm(engine);
     
@@ -132,15 +132,15 @@ void LatGrb::makeEnergies(HepRandomEngine *engine)
 
 
 
-// makeGRB(engine)
+// makeGRB(engine, first)
 // Calls modules which compute energies and times for photons in the current burst.
-void LatGrb::makeGRB(HepRandomEngine *engine)
+void LatGrb::makeGRB(HepRandomEngine *engine, bool first)
 {
     m_photonlist.resize(m_nphoton);
     
     makeEnergies(engine);
     
-    makeTimes(engine, grbcst::ethresLAT);
+    makeTimes(engine, first, grbcst::ethresLAT);
     
     std::sort(m_photonlist.begin(), m_photonlist.end(), timeCmp());
 }

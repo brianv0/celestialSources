@@ -45,8 +45,8 @@ public:
     /*!
      * \brief Return pulse data.
      */
-    long data(HepRandomEngine *engine, const double ethres, const long nphoton, 
-        const int npuls, const double duration);
+    long data(HepRandomEngine *engine, bool first, double ethres, long nphoton, int npuls, 
+		double duration);
     
 private:
     
@@ -113,8 +113,7 @@ private:
     /*! 
      * \brief Choose a universal width for the pulses in the given burst.
      */
-    void pickWidth(HepRandomEngine *engine, const double ethres, 
-        const double duration);
+    void pickWidth(HepRandomEngine *engine, bool first, double ethres, double duration);
     
     /*!
      * \brief Calculate the universal width for the pulses in the given burst.

@@ -42,11 +42,11 @@ GbmGrb::GbmGrb(HepRandomEngine *engine, const double duration, const int npuls,
 
 
 
-// calcNphoton(HepRandomEngine *engine)
+// calcNphoton(HepRandomEngine *engine, long isim)
 // Returns number of photons in the current burst.
-long GbmGrb::calcNphoton(HepRandomEngine *engine)
+long GbmGrb::calcNphoton(HepRandomEngine *engine, long isim)
 {
-    static long isim=0;
+    //static long isim=0;
     
     
     //std::cout << "m_specnorm: " << m_specnorm[isim] << " dur: " << 
@@ -85,7 +85,8 @@ long GbmGrb::calcNphoton(HepRandomEngine *engine)
     //    duration * gbmGeoArea/denom) << std::endl;
     //exit(0);
     
-    return long(factBrkplaw * m_specnorm[isim++] * duration * gbmGeoArea/denom);
+    //return long(factBrkplaw * m_specnorm[isim++] * duration * gbmGeoArea/denom);
+    return long(factBrkplaw * m_specnorm[isim] * duration * gbmGeoArea/denom);
 }
 
 
@@ -143,15 +144,15 @@ void GbmGrb::makeEnergies(HepRandomEngine *engine)
 
 
 
-// makeGRB(engine)
+// makeGRB(engine, first)
 // Calls modules which compute energies and times for photons in the current burst.
-void GbmGrb::makeGRB(HepRandomEngine *engine)
+void GbmGrb::makeGRB(HepRandomEngine *engine, bool first)
 {
     m_photonlist.resize(m_nphoton);
     
     makeEnergies(engine);
     
-    makeTimes(engine, grbcst::ethresGBM);
+    makeTimes(engine, first, grbcst::ethresGBM);
     
     std::sort(m_photonlist.begin(), m_photonlist.end(), timeCmp());
 }
