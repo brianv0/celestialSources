@@ -21,7 +21,6 @@ class SpectObj
       delete spec;
       delete times;
       delete Nv;
-      delete en;
     }
   TH1D *Integral_E(double e1, double e2);
   TH1D *Integral_E(int ei1, int ei2); 
@@ -52,7 +51,6 @@ class SpectObj
  private:
   TH2D* Nv;
   int ne,nt;
-  double *en;
   double emin,emax;
   double tmin,tmax,deltat;
   TH1D *spec,*times;

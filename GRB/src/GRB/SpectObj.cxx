@@ -12,7 +12,7 @@ SpectObj::SpectObj(const TH2D* In_Nv)
   Nv   = (TH2D*)In_Nv->Clone(); // ph/kev/s/m²
   Nv->SetName("newNv");
   ne   = Nv->GetNbinsY();
-  en   = new double[ne+1];
+  double* en   = new double[ne+1];
   emin = Nv->GetYaxis()->GetXmin();
   emax = Nv->GetYaxis()->GetXmax();
   
@@ -40,6 +40,7 @@ SpectObj::SpectObj(const TH2D* In_Nv)
   gDirectory->Delete("times");
   spec  = new TH1D("spec","spec",ne,en);
   times = new TH1D("times","times",nt+1,tmin-deltat/2.,tmax+deltat/2.);
+  delete en;
 
   std::cout<<" GRB SpectObj initialized !"<<std::endl;
   //////////////////////////////////////////////////

@@ -88,6 +88,7 @@ std::vector<GRBShock*> GRBengine::CreateShocksVector()
       GRBShock *ashock = new GRBShock(sh1,sh2,tobs);
       theShocks.push_back(ashock);	 
       GRBShell *Ms = ashock->MergedShell();
+      delete theShells[FirstShell];
       theShells[FirstShell] = Ms;
       std::vector<GRBShell*>::iterator pos = theShells.begin();
       for (int i = 0;i<FirstShell+1;i++) pos++;
