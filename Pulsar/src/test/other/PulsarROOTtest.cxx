@@ -303,6 +303,8 @@ int main(int argc, char** argv)
       current_arg++;
     }
   TApplication theApp("App",0,0);
+
+  /*
   double Period  = 0.089; // s
   double Fluence = 9e-6; // ph/cm2/s
   int npeaks = 2;
@@ -310,6 +312,41 @@ int main(int argc, char** argv)
   double ppar2 = 8e6;
   double ppar3 = -1.62;
   double ppar4 = 1.7;
+  */
+
+  
+  //Crab Polar Cap vs Outer Gap
+  double Period  = 0.033; // s
+  double Fluence = 2.3e-6; // ph/cm2/s
+  int npeaks = 2;
+  double ppar1 = 1e6;
+  double ppar2 = 30e6;
+  double ppar3 = -1.9;
+  double ppar4 = 0.29; // 1.0 for outer
+  
+
+  /*
+  //Vela Polar Cap vs Outer 
+  double Period  = 0.089; // s
+  double Fluence = 9e-6; // ph/cm2/s
+  int npeaks = 2;
+  double ppar1 = 1e6;
+  double ppar2 = 8e6;
+  double ppar3 = -1.62;
+  double ppar4 = 1.7; // for outer
+  //double ppar4 = 1.7; // for polar
+  */ 
+  /*
+  //Geminga Polar Cap vs Outer 
+  double Period  = 0.237; // s
+  double Fluence = 366e-6; // ph/cm2/s
+  int npeaks = 2;
+  double ppar1 = 1e6;
+  double ppar2 = 4.8e6;
+  double ppar3 = -1.56;
+  double ppar4 = 1.0; // 1.0 for outer
+ */
+
 
 
   std::cout << " --> Pulsar Sim init " << Fluence << " " << Period << std::endl; 
