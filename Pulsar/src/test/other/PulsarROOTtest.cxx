@@ -228,6 +228,7 @@ void PlotPulsar(double enph = 0,char name[100]="pulsar.root")
 	  Lc->Fill((time - (TMAX*int(time/TMAX))));       // ph
 	
 	  time+=Interval;
+
 	  /*
 	  std::cout<<" Time (s)  = "<<time
 		   << " within period = " << time - (TMAX*int(time/TMAX))
@@ -295,12 +296,12 @@ void PlotPulsar(double enph = 0,char name[100]="pulsar.root")
       std::cout<<" flux (exp)        : = "<<Counts->Integral(0,EBIN,"width")<<" keV/m^2"<<std::endl;
       std::cout<<" flux (exp)        : = "<<Counts->Integral(0,EBIN,"width")*1.0e-7/erg2meV<<" erg/cm^2"<<std::endl;
       Lct_LAT->Scale(nLoops*DT*6e4);
-      //Lct_LAT->Draw();          
+      Lct_LAT->Draw();          
       lcleg->AddEntry(Lc,"LAT extracted photons in ph/cm2/s (30 MeV-300GeV)","lp");
       Lc->SetLineColor(2);
       Lct_EXT->Scale(nLoops);
       //Lct_EXT->Draw("same");
-      Lc->Draw("ep");  
+      Lc->Draw("epsame");  
       std::cout << " Photon expecteed : " << Lct_EXT->Integral(0,TBIN) << " ph " << std::endl;  
 
     } 
@@ -350,9 +351,9 @@ int main(int argc, char** argv)
   
 
   
-  double Period  = 0.089; // s
+  double Period  = 0.02; // s
   double flux = 9e-6; // ph/cm2/s
-  int npeaks = 2;
+  int npeaks = 3;
   double ppar1 = 1e6;
   double ppar2 = 8e6;
   double ppar3 = -1.62;

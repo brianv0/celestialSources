@@ -144,16 +144,37 @@ double PulsarSpectrum::interval(double time)
   if ((int(time) % 10000) < 2)
     std::cout << "Time reached is: " << time << " seconds from Start " << std::endl;
 
-  time = (m_period/m_pdot)*log(1+(m_pdot/m_period)*timeTilde) + m_phi0*m_period; 
+
+  if (m_pdot == 0.0) // Case of periodic pulsar
+    {
+      time = timeTilde + m_phi0*m_period;
+    }
+  else
+    {
+      time = (m_period/m_pdot)*log(1+(m_pdot/m_period)*timeTilde) + m_phi0*m_period; 
+    }
+  
   double nextTime = time + m_spectrum->interval((time - m_period*int(time/m_period)),m_enphmin);
-  double nextTimeTilde = (m_period/m_pdot)*(exp((m_pdot/m_period)*(nextTime-m_phi0*m_period))-1);
+
+  double nextTimeTilde = 0.0;
+
+  if (m_pdot == 0.0) //Case of periodic pulsar
+    {
+      nextTimeTilde = nextTime - m_phi0*m_period;
+    }
+  else
+    {
+      nextTimeTilde = (m_period/m_pdot)*(exp((m_pdot/m_period)*(nextTime-m_phi0*m_period))-1);
+    }
 
   double ph =  m_phi0 + m_f0*(timeTilde) +0.5*m_f1*(timeTilde)*(timeTilde);
   double intph = 0;
 
+  
   if ((fabs(modf(ph,&intph) - ((time -m_period*int(time/m_period))/m_period)) > 2.5e-3)
       && (timeTilde - (StartMissionDateMJD - m_t0)*SecsOneDay > 0.0))
     {
+      
       std::cout << "\n****t0~ = " << timeTilde  << " (RefStart="
 		<< timeTilde - (StartMissionDateMJD - m_t0)*SecsOneDay  << ")" << std::endl;
       std::cout << " -->t0  = " << time << " (Fract = " << (time  -m_period*int(time/m_period)) << " ), phase " 
@@ -166,8 +187,14 @@ double PulsarSpectrum::interval(double time)
       
       std::cout << "\n\n** " <<  m_PSRname << " Warning: 2 Order Approx (LAT-ST pulsePhase):  ph0 " 
 		<< ph <<  " " << modf(ph,&intph) << std::endl;
-      std::cout << "**          Phase difference : " 
+      std::cout << "**          Phase difference : ph0 " 
 		<< fabs(modf(ph,&intph) - ((time -m_period*int(time/m_period))/m_period)) << std::endl;
+
+      double ph =  m_phi0 + m_f0*(nextTimeTilde) +0.5*m_f1*(nextTimeTilde)*(nextTimeTilde);
+      std::cout << "**          Phase difference : ph1 " 
+		<< fabs(modf(ph,&intph) - ((nextTime -m_period*int(nextTime/m_period))/m_period)) << std::endl;
+
+
     }
 
 

@@ -19,7 +19,7 @@
 namespace cst
 {
   const double EnNormMin = 1e5; // KeV (100 MeV) //Normalization Interval
-  const double EnNormMax = 1e7; // KeV (10 GeV)
+  const double EnNormMax = 3e7; // KeV (30 GeV)
   
   const    int Ebin =  50 ; // Energy bins 
   const    int Tbin =  200; // Time bins 
