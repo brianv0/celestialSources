@@ -20,6 +20,7 @@ SpectObj::SpectObj(const TH2D* In_Nv, int type)
   Nv->SetName(name.c_str());
   
   if(DEBUG) std::cout<<type<<" ->SpectObj<-  "<<name<<std::endl;
+  counts=0;
   m_SpRandGen = new TRandom();
   sourceType = type; //Max
   
@@ -272,6 +273,7 @@ void SpectObj::ComputeProbability(double enph)
 //////////////////////////////////////////////////
 photon SpectObj::GetPhoton(double t0, double enph)
 {
+  counts++;
   //  photon ph;
   int ei  = TMath::Max(1,Nv->GetYaxis()->FindBin(enph));
   
