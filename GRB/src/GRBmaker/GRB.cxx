@@ -12,7 +12,12 @@
 #include <fstream>
 #include <algorithm>              // for transform
 #include <numeric>                // for accumulate
+//#include <sstream>
+#ifdef WIN32
 #include <sstream>
+#else // gcc < 2.9.5.3 dosen't know <sstream>,stringstream
+#include <strstream>
+#endif
 
 #include "GRB.h"
 #include "GRBpulse.h"
@@ -414,12 +419,16 @@ std::string GRB::baseFilename(const std::string &prefix, const std::string &dir)
     
     else
         base = prefix + "_GRB_";
-    
+
+#ifdef WIN32    
     std::ostringstream ind;
 	ind << grbcst::nbsim;
-
-
     int i = strlen(ind.str().c_str());
+#else
+    char *ind = new char(80);
+    sprintf(ind, "%ld", grbcst::nbsim);
+    int i = strlen(ind);
+#endif
     
     for (int j=0; j<i; ++j)
         base += '0';
@@ -452,10 +461,16 @@ std::string GRB::outputFilename(const std::string &base, const long isim) const
     
     std::string fname = base;
     
+#ifdef WIN32
     std::ostringstream ind;
 	ind << isim;
-    
     fname.replace(baseSize-strlen(ind.str().c_str()), baseSize-1, ind.str());
+#else
+    char *ind = new char(80);
+    sprintf(ind, "%ld", isim);
+    fname.replace(baseSize-strlen(ind), baseSize-1, ind);
+#endif
+    
     fname += ".lis";
     
     return fname;
@@ -545,6 +560,7 @@ void GRB::getTimes(HepRandomEngine *engine, const double ethres, const long npho
         twidthscale  = photontime * efactor;
         
         m_photonlist[iphot+iphotoff].setTime(twidthscale + tmax + 0.5 * efactor * deltbinsleft * grbcst::timres);
+        //std::cout << "index: " << iphot+iphotoff << " time: " << m_photonlist[iphot+iphotoff].time() << std::endl;
     }
 }
 
@@ -728,18 +744,27 @@ std::ofstream &operator<<(std::ofstream &os, const GRB &grb)
         globalData->duration() << "   " << globalData->beta() << "   " << globalData->specnorm() << "   " << 
         globalData->npuls() << "  " << grb.univFWHM() << std::endl;
     
-    os << "ZenAng, AziAng = " << std::setw(12) << std::setiosflags(std::ios::fixed) << grbdir.first << "   " << grbdir.second << std::endl;
+    os << "ZenAng, AziAng = " << std::setw(12) << std::setiosflags(std::ios::fixed) << grbdir.first << "   " << 
+        grbdir.second << std::endl;
     
     os << "nphotons = " << grb.nphoton() << std::endl;
     
     os << "(Times, Energies) per photon:" << std::endl;
     
     
-    if (grb.nphoton() > 0)
+    long nphoton = grb.nphoton();
+    if (nphoton > 0)
     {
+        //os << "here\n";
         std::vector<TimeEnergy> photonlist = grb.photonlist();
-        for (long i=0; i<grb.nphoton(); ++i)
-            os << std::setw(12) << std::setiosflags(std::ios::fixed) << photonlist[i].time() << "   " << photonlist[i].energy() << std::endl;
+        //os << "photonlist.size: " << photonlist.size() << " nphoton: " << nphoton << std::endl;
+        for (long i=0; i<nphoton; ++i)
+        {
+            double time = photonlist[i].time();
+            //os << "i: " << i << " time: " << time << std::endl;
+            os << std::setw(12) << std::setiosflags(std::ios::fixed) << photonlist[i].time() << "   " << 
+            photonlist[i].energy() << std::endl;
+        }
     }
     
     return os;
