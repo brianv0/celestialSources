@@ -1,3 +1,14 @@
+/*!
+ *\class  GRBmanager
+ *
+ * Spectrum class for many GRBs inheriting from GRBSpectrum.
+ * This class concatenates several GRBSpectrum one after the other 
+ * for simulating a seriers of several GRBs.
+ *
+ * \author Nicola Omodei       nicola.omodei@pi.infn.it 
+ * \author Johann Cohen-Tanugi johann.cohen@pi.infn.it
+ *
+ */
 #ifndef GRBmanager_H
 #define GRBmanager_H
 
@@ -17,29 +28,43 @@ class GRBmanager : public ISpectrum
 {
 
  public:
-  
-  //! Constructor: takes a file with some parameters as argument.
-  /*! \param params file of parameters 
-   */
+  /* This initialize the simulation parseing the parameters.
+   * 
+   * \param params are set in the xml source library in xml directory.
+   * They are: 
+   * - The time of the first burst
+   * - The time to whait between the next burst
+   */ 
+
   GRBmanager(const std::string& params);
-  /*! Destructor
-   */
+  
   virtual  ~GRBmanager(); 
-  
-  double flux(double time)const; //{return m_GRB->flux(time);}
-  double interval(double time);//{return m_GRB->interval(time);}//const;
-  double solidAngle() const;//{return m_GRB->solidAngle();}
-  
+  /*! If a burst is shining it returns the GRBSpectrum::flux(time) method */
+  double flux(double time)const;
+  /* \brief Returns the time interval
+   *
+   * If a burst is shining it returns the GRBSpectrum::interval(time) method.
+   * If not it returns the time to whait for the first photon of the next burst.
+   */
+  double interval(double time);
+  //! \retval 1
+  double solidAngle() const;
+  //! direction, taken from GRBSim
   inline std::pair<double,double> 
     dir(double energy, HepRandomEngine* engine){return m_GRB->dir(energy, engine);} 
 
 
   float operator() (float u) const;
-  double energySrc(HepRandomEngine*, double /*time*/ );
-  //! inherited from Spectrum
+  double energySrc(HepRandomEngine*, double time);
+  
   std::string title() const {return "GRBmanager";} 
   const char * particleName() const {return "gamma";}
   const char * nameOf() const {return "GRBmanager";}
+  /*! This method is used to parse the parametyer list
+   * \param input is the string to parse
+   * \param index if the position of the parameter in the input list. 
+   * \retval output is the value of the parameter as float number.
+   */  
   float parseParamList(std::string input, int index);  
  private:
   

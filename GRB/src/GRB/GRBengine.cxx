@@ -13,14 +13,18 @@ GRBengine::GRBengine(GRBConstants *myParam)
     {
     case 1: 
       {
-	std::cout<<" CASE 1: no shell evolution, no collision, physical parameters "<<std::endl;  
+	std::cout<<
+	  " CASE 1: no shell evolution, no collision, physical parameters "
+		 <<std::endl;  
 	m_duration=0.0;
 	double BurstDuration     = myParam->Duration();
 	if (BurstDuration<=0) BurstDuration=getDurationFromBATSE();
 	int NumberOfShocks       = myParam->Nshock();
-	double timeBetweenShocks = 2.*BurstDuration/NumberOfShocks*RandFlat::shoot(1.0);
+	double timeBetweenShocks = 
+	  2.*BurstDuration/NumberOfShocks*RandFlat::shoot(1.0);
 	double ShockTime         = 0.;
-	double ei = myParam->Etot()/NumberOfShocks; // internal energy of the shocked material
+	// internal energy of the shocked material
+	double ei = myParam->Etot()/NumberOfShocks; 
 	int ns=0;
 	
 	while (ns < NumberOfShocks)

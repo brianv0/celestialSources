@@ -15,14 +15,14 @@ double Bfield(double Ub)
   return 1.0e+4*sqrt(200.0*M_PI*cst::mu0*Ub);
 }
 
-GRBShock::GRBShock(GRBShell Sh1) 
+GRBShock::GRBShock(GRBShell Shocked_Material) 
 {
-  m_mass      = Sh1.getMass();
+  m_mass      = Shocked_Material.getMass();
    
-  m_thickness = Sh1.getThickness();
-  m_volume    = Sh1.getVolCom(); // [cm^3]
-  m_gf        = Sh1.getGamma();
-  m_Eint      = Sh1.getEint();
+  m_thickness = Shocked_Material.getThickness();
+  m_volume    = Shocked_Material.getVolCom(); // [cm^3]
+  m_gf        = Shocked_Material.getGamma();
+  m_Eint      = Shocked_Material.getEint();
   
   m_partnumber  = m_mass*cst::c2/(cst::mpc2)*cst::erg2MeV;
   m_partdensity = m_partnumber/m_volume;

@@ -86,7 +86,6 @@ GRBTestAlg::GRBTestAlg(const std::string& name, ISvcLocator* pSvcLocator) :
 
 }
 
-
 //------------------------------------------------------------------------------
 /*! 
  * Initialize the algorithm, use the Job options service to set the 

@@ -1,14 +1,13 @@
 /*!
  * \class GRBShock
  *
- * \brief This class implements the shock between 2 shells.
+ * \brief This class implements the shock physics.
  * 
- * All the parameters that are needed to calculate the emission are 
- * calculated here. 
- * This class calculates the shell which is the result after the shock,
- * the magnetic field and the parameters that determine the distribution of the accelerated electrons.
- * Than it calculates the synchrotron and the inverse Compton emission.   
- *
+ * The input shell is the matherial already shocked, 
+ * that cantains an ecces of energy due to the inhelastic collision.
+ * This class calculates the magnetic field and the parameters to determine
+ * the distribution of the shocked accelerated electrons.
+ * 
  * \author Nicola Omodei       nicola.omodei@pi.infn.it 
  * \author Johann Cohen-Tanugi johann.cohen@pi.infn.it
  *
@@ -27,12 +26,12 @@ class GRBShock
  public:
 
   /*!
-   * \brief Constructor: computes the shocks physics in the Shocked region.
+   * Calculates the magnetic field and the particle acceleration 
+   * in the shocked material.
    *
-   * The GRBShell represents the shocked region. 
-   * The constructor calculate the magnetic field and the particle acceleration in this region.
+   * \param Shocked_Material represents the shocked region. 
    */
-  GRBShock(GRBShell);
+  GRBShock(GRBShell Shocked_Material);
 
   ~GRBShock() { } 
   

@@ -21,11 +21,15 @@ class GRBShell
   /*!
    * \brief Creation of a new shell.
    *
-   * \arg The Lorentz factor \c m_gamma is set by GRBengine). 
-   * \arg The mass of the shell is computed as: \f$\displaystyle{E\over \Gamma c^2}\f$.
-   * .
-   * \param E energy of the shell (in erg). In practice, all created shells share
-   * the same fraction of the total energy released by the inner engine. 
+   * \param gamma is the The Lorentz factor of the shell.
+   * \param mass is the mass of the shell is computed as: 
+   * \f$\displaystyle{E\over \Gamma c^2}\f$. 
+   * \param thickness is in cm.
+   * \param radius of the jet. In cm.
+   * \param distance of the Shell to the central engine. In cm.
+   * \param type indicates the type of geometry. 
+   * If "jet" the emission of shells frm the central engine is beamed.
+   *  Else is isotropic.  
    */
   GRBShell(double gamma, double mass,
 	   double thickness, double radius,double distance = 0.0,std::string type = "jet");
@@ -49,8 +53,8 @@ class GRBShell
   inline double getEint()      {return m_eint;}
   /*! Returns the comoving volume (in \f$cm^3\f$).
    * The comoving volume is defined as 
-   *\f$\Large{4\pi\times{thickness}\times{distance}^2}\f$ for isotropic shells,
-   *\f$\Large{\pi\times{thickness}\times{radius}^2}\f$ for jet shells.   
+   *\f$4\pi\times{thickness}\times{distance}^2\f$ for isotropic shells,
+   *\f$\pi\times{thickness}\times{radius}^2\f$ for jet shells.   
    */
   inline double getVolCom()    
     {
@@ -74,8 +78,7 @@ class GRBShell
   //Higher  level functions:
 
   /*! 
-   * \retval  beta = \f$\sqrt{1-{1\over\Gamma^2}}\f$
-   * \param gamma (Lorentz factor of the shell) \f$\Gamma\f$
+   * \retval  beta = \f$\sqrt{1-{1\over gamma^2}}\f$
    */
   double    beta(const double gamma);
 

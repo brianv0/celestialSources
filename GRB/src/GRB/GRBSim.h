@@ -48,50 +48,58 @@ class GRBSim
    * \param time is the time in which the spectrum is calculated.
    */
   std::vector<double> ComputeFlux(const double time);
-  //! Set the private data member m_spectrum to the \param value.
-  void setSpectrum(std::vector<double> value) {m_spectrum=value;}
+  //! Set the private data member m_spectrum to \e myspectrum.
+  inline void setSpectrum(std::vector<double> myspectrum) 
+    {m_spectrum=myspectrum;}
   //! The direction of the GRB is chosen randomly in the sky.
-  std::pair<float,float> GRBdir()       {return m_direction;}
+  inline std::pair<float,float> GRBdir()       {return m_direction;}
   //! The Spectrum() vector contains the flux \f$\phi\f$ in \f$ph/s/MeV/m^2\f$
-  std::vector<double>    Spectrum()     {return m_spectrum;}
+  inline std::vector<double>    Spectrum()     {return m_spectrum;}
   //! Is the vector that contains the energy bin,in \f$eV\f$, in wich the flux is evaluated.
-  std::vector<double>    Energy()       {return m_energy;}
+  inline std::vector<double>    Energy()       {return m_energy;}
   //! Is the energy bin size in \f$eV\f$ (the energy is in log scale!)
-  std::vector<double>    DeltaE()       {return m_de;}
+  inline std::vector<double>    DeltaE()       {return m_de;}
   
   //! It conresponds to the time (in the GLAST frame) in which the burst ends
-  double                 Tmax()         {return m_duration;}
+  inline double                 Tmax()         {return m_duration;}
   
   /*! Is the Area of sphere having as radius 
    * the distance of the source (in \f$m^2\f$)
    */ 
-  double                 Area()         {return m_area;}
+  inline double                 Area()         {return m_area;}
   
   //!  Return the value of the flux (\f$ph/s/MeV/m^2\f$)
-  double                 Flux(int en)   {return m_spectrum[en];}
+  inline double                 Flux(int en)   {return m_spectrum[en];}
   
   //! Return the \c en energy bin.
-  double                 Energy(int en) {return m_energy[en];}
+  inline double                 Energy(int en) {return m_energy[en];}
   
   /*! \brief Return the integrated flux (\f$eV/(m^2 s)\f$ for energy greather than \en enmin.
    *
    * It calculates the following integral:
-   * \f[ \int_{enmin}^{enmax} \phi(E) E dE\f]
-   * \param emin minimal energy below which no photon energy is drawn. This 
-   * is to avoid generation of low energy photons without interest to GLAST. 
+   * \f[ \int_{enmin}^{enmax} spctrmVec(E) E dE\f]
+   * \param spctrmVec is the vector of double that contains the spectrum 
+   * to be integrated.
+   * \param enmin minimal energy below which no photon energy is drawn. This 
+   * is to avoid generation of low energy photons without interest to GLAST.
+   * \param enmax upper limit of the integral. 
    */
-  double              IFlux( std::vector<double>,
+  
+  double              IFlux( std::vector<double> spctrmVec,
 			     double enmin=cst::enmin,
 			     double enmax=cst::enmax);
   
   /*! \brief Return the integrated photon rate (\f$ ph/(m^2 s)\f$) for energy greather than enmin.
    *
    * It calculates the following integral:
-   * \f[ \int_{enmin}^{enmax} \phi(E) dE\f]
-   * \param emin minimal energy below which no photon energy is drawn. This 
-   * is to avoid generation of low energy photons without interest to GLAST. 
+   * \f[ \int_{enmin}^{enmax} spctrmVec(E) dE\f]
+   * \param spctrmVec is the vector of double that contains the spectrum 
+   * to be integrated.
+   * \param enmin minimal energy below which no photon energy is drawn. This 
+   * is to avoid generation of low energy photons without interest to GLAST.
+   * \param enmax upper limit of the integral. 
    */
-  double              IRate(std::vector<double>,
+  double              IRate(std::vector<double> spctrmVec,
 			    double enmin=cst::enmin,
 			    double enmax=cst::enmax);
   /*!

@@ -1,8 +1,8 @@
 /*!
  *\class  GRBSpectrum
  *
- * Spectrum class for GRB Source Simulation.
- * Inherits from the Spectrum class.
+ * Spectrum class for GRB source physical simulation.
+ * Class interfacing the framework with the GRB generation.
  *
  * \author Nicola Omodei       nicola.omodei@pi.infn.it 
  * \author Johann Cohen-Tanugi johann.cohen@pi.infn.it
@@ -21,39 +21,33 @@
 #include "src/GPS.h"
 #include "CLHEP/Random/RandomEngine.h"
 #include "GRBSim.h"
-//#include "GRBmanager.h"
 
-//! Class interfacing the framework with the GRB generation.
 class GRBSpectrum : public ISpectrum
 {
   friend class GRBmanager;  
  public:
 
-  //! Constructor: takes a file with some parameters as argument.
-  /*! \param params file of parameters 
-   */
   GRBSpectrum(const std::string& params);
-  /*! Destructor
-   */
+ 
   virtual  ~GRBSpectrum()
     {
       delete m_grbsim;
     }  
   /*! Computes the flux, in \b photons/m^2/s, for a given time
-   *  time is actually not used bwcause the spectrum is already updated.
+   *  time is actually not used because the spectrum is already updated.
    */
-  double flux(double /*time*/)const;
+  double flux(double time)const;
   
   /*! \brief Returns the time interval
    *
    * Given \f$t_0\f$, it computes \f$t_1\f$ for which \f$\int_{t_0}^{t_1}1/Rate(t)dt=1\f$
    * and returns the time interval \f$t_1-t_0\f$
    */
-  double interval(double time);//const;
+  double interval(double time);
 
   //! Galactic direction 
   inline std::pair<double,double> 
-    dir(double /*energy*/, HepRandomEngine* /*engine*/){return m_grbsim->GRBdir();} 
+    dir(double energy, HepRandomEngine* engine){return m_grbsim->GRBdir();} 
 
   /*! \brief Draws from the current spectrum the energy of a sampled photon. 
    *  \param u uniform random number drawn in the method \c energySrc .  
@@ -67,12 +61,12 @@ class GRBSpectrum : public ISpectrum
    *  \param engine  random engine for uniform sampling;
    *  \param time    current time. 
    */
-  double energySrc(HepRandomEngine*, double /*time*/ );
-  //! inherited from Spectrum
+  double energySrc(HepRandomEngine*, double time);
+
   std::string title() const {return "GRBSpectrum";}
-  //! inherited from Spectrum
+
   const char * particleName() const {return "gamma";}
-  //! inherited from Spectrum
+
   const char * nameOf() const {return "GRBSpectrum";}
   
  private:

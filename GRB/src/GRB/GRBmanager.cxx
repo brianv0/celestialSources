@@ -9,10 +9,6 @@ GRBmanager::GRBmanager(const std::string& params)
   m_initialTime = m_FirstTime;
   m_GRB = new GRBSpectrum("temp.txt");
   m_endTime = m_FirstTime+m_GRB->m_grbsim->Tmax();
-  //std::cout<<m_FirstTime<<std::endl;
-  //std::cout<<m_timeToWait<<std::endl;
-  //std::cout<<m_initialTime<<std::endl;
-  //std::cout<<m_endTime<<std::endl;
 }
 
 GRBmanager::~GRBmanager() 
@@ -26,24 +22,17 @@ double GRBmanager::solidAngle() const
   return 1.0;
 }
 
-///return flux, given a time
+//return flux, given a time
 double GRBmanager::flux(double time) const
 {
   double flux;	  
   if(time < m_initialTime || (time > m_endTime)) flux = 1.;
  
   else flux = m_GRB->flux(time - m_initialTime);  
-  /*
-    std::cout<<"-----------------------------------"<<std::endl; 
-    std::cout<<" flux @ internal time "<<time - m_initialTime<<" = "<<flux<<std::endl;
-    std::cout<<"	time = "<<time<<std::endl;
-    std::cout<<"	Initial time = "<<m_initialTime<<std::endl;
-    std::cout<<"-----------------------------------"<<std::endl;
-  */
   return flux;
 }
 
-double GRBmanager::interval(double time)// const
+double GRBmanager::interval(double time)
 {  
  
   double inte;
