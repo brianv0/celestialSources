@@ -33,13 +33,16 @@
 
 namespace cst
 {
-  const double emin = 2e4;  // KeV (20 MeV)
-  const double emax = 4e8;  // KeV (400 GeV)
-  const double enph = 1e5;  // KeV (100 MeV) 
+  // const double emin = 2e4;  // KeV (20 MeV)
+  //const double emax = 1.8e8;  // KeV (400 GeV)
+  //const double enph = 1e5;  // KeV (100 MeV) 
+
+  const double EnNormMin = 1e5; // KeV (100 MeV) //Normalization Interval
+  const double EnNormMax = 1e7; // KeV (10 GeV)
   
   const    int Ebin =  50 ; // Energy bins 
   const    int Tbin =  200; // Time bins 
-  static const double de = pow(emax/emin,1.0/Ebin);
+  // static const double de = pow(emax/emin,1.0/Ebin);
   //  static const double dt   = tmax/(Tbin-1);
   const double erg2meV   = 624151.0;
 

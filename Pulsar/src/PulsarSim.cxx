@@ -15,11 +15,13 @@
 using namespace cst;
 
 //////////////////////////////////////////////////
-PulsarSim::PulsarSim(double flux,double period, int numpeaks)
+PulsarSim::PulsarSim(double flux, double enphmin, double enphmax, double period, int numpeaks)
 {
   m_flux = flux; //ph/cm2/s
   m_period  = period;
   m_numpeaks = numpeaks;
+  m_enphmin = enphmin;
+  m_enphmax = enphmax;
 }
 
 TH2D* PulsarSim::PSRPhenom(double par1, double par2, double par3, double par4)
@@ -41,16 +43,34 @@ TH2D* PulsarSim::PSRPhenom(double par1, double par2, double par3, double par4)
   double b =  par4;
   double K1 = 138e-8; //This is the constant, will be overwritten by normalization
 
+
   std::cout << "\n******** Pulsar Phenomenological Model ********" << std::endl;
   std::cout << "**  Spectrum parameters: " << std::endl;
   std::cout << "**           En = " << En  
 	    << " | E0 = " << E0 << std::endl;
   std::cout << "**           G1 = " << G1 
 	    << " | b  = "  << b << std::endl;
+  std::cout << "**  enphmin " << m_enphmin << " enphmax " << m_enphmax << std::endl; 
+
+  double LowEnBound = TMath::Min(cst::EnNormMin,m_enphmin); 
+  if (m_enphmax < cst::EnNormMax)
+    m_enphmax = cst::EnNormMax;
+  double HighEnBound = TMath::Max(cst::EnNormMax,m_enphmax); 
+  
+
+
+  std::cout << "**  Normalisation between " << cst::EnNormMin << " and " << cst::EnNormMax << " keV " << std::endl;
+  std::cout << "**  Photon extraction between " << m_enphmin << " and " << m_enphmax << " keV " << std::endl;
+  std::cout << "**  Spectrum calculated between " << LowEnBound << " and " << HighEnBound << " keV " << std::endl; 
+
+
+  double de = pow(HighEnBound/LowEnBound,1.0/Ebin);
+
+
 
  
   TF1 PulsarSpectralShape("PulsarSpectralShape", 
-			  "([0]*((x/[1])^[2])*exp(-1.0*((x/[3])^[4])))",cst::emin,cst::emax);
+			  "([0]*((x/[1])^[2])*exp(-1.0*((x/[3])^[4])))", LowEnBound, HighEnBound);
 
   PulsarSpectralShape.SetParameters(K1,En,G1,E0,b);
 
@@ -135,14 +155,14 @@ TH2D* PulsarSim::PSRPhenom(double par1, double par2, double par3, double par4)
   std::cout << "**  Lightcurve parameters: (midist= " << mindist  << " s.)" << std::endl;
   if (ampl1 !=0)
     {
-      std::cout << "**             Peak 1 t = " << peak1 << "(Ph.= " << peak1/m_period << " ) " 
+      std::cout << "**           Peak 1 t = " << peak1 << "(Ph.= " << peak1/m_period << " ) " 
 		<< " , FWHM " << fwhm1 << " ampl1 " << ampl1 << std::endl; 
     }
   if (ampl2 !=0)
     {
-      std::cout << "**             Peak 2 t = " << peak2 << "(Ph.= " << peak2/m_period << " ) " 
+      std::cout << "**           Peak 2 t = " << peak2 << "(Ph.= " << peak2/m_period << " ) " 
 		<< " , FWHM " << fwhm2 << " ampl2 " << ampl2 << std::endl; 
-      std::cout << "\n***********************************************" << std::endl;
+      std::cout << "***********************************************" << std::endl;
     }
 
   TF1 PulsarTimeCurve("PulsarTimeCurve",
@@ -155,7 +175,7 @@ TH2D* PulsarSim::PSRPhenom(double par1, double par2, double par3, double par4)
   double *e = new double[Ebin +1];
   for(int i = 0; i<=Ebin; i++)
     {
-      e[i] = emin*pow(de,1.0*i); //KeV
+      e[i] = LowEnBound*pow(de,1.0*i); //KeV
     }
 
 
@@ -191,8 +211,8 @@ TH2D* PulsarSim::PSRPhenom(double par1, double par2, double par3, double par4)
 
   TH2D *nph = Nph(m_Nv); //ph/m²
   
-  int ei2 = nph->GetYaxis()->FindBin(EGRET2);
-  int ei3 = nph->GetYaxis()->FindBin(EGRET3);
+  int ei2 = nph->GetYaxis()->FindBin(cst::EnNormMin);
+  int ei3 = nph->GetYaxis()->FindBin(cst::EnNormMax);
  
   //Normalisation factor according to band betwee 100MeV and 30 GeV
   //Integration is on a averaged flux over period

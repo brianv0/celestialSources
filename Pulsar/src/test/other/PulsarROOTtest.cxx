@@ -139,7 +139,7 @@ void PlotPulsar(double enph = 0,char name[100]="pulsar.root")
   TH1D *Lct_Pulsar = sp->Integral_E(EMIN,EMAX);  // ph
   Lct_Pulsar->Scale((1e-4)/(DT*AreaDetector)); //ph/cm2/s
   //Normalisation band
-  TH1D *Lct_NORM = sp->Integral_E(EGRET2,EGRET3);  // ph
+  TH1D *Lct_NORM = sp->Integral_E(EnNormMin,EnNormMax);  // ph
   Lct_NORM->Scale((1e-4)/(DT*AreaDetector)); //ph/cm2/s
   //EGRET band
   TH1D *Lct_EGRET = sp->Integral_E(EGRET1,EGRET3);  // ph
@@ -211,6 +211,7 @@ void PlotPulsar(double enph = 0,char name[100]="pulsar.root")
       double flux;
       int i = 0;
       time = sp->interval(0.0,enph); // s
+      std::cout << "Extracting photon above " << enph << std::endl;
       while(time < nLoops*TMAX && time>=0)
 	{
 	  Interval = sp->interval(time,enph); // s  
@@ -262,8 +263,21 @@ void PlotPulsar(double enph = 0,char name[100]="pulsar.root")
   clc->cd(2);
 
 
+  std::cout << "****-------------------------------------------------" <<std::endl;
+  std::cout << "Fluxes summary: " << std::endl;
+  std::cout << "       Normalisation:   (" << EnNormMin <<","<< EnNormMax <<")  = "
+	    << Lct_NORM->Integral(0,TBIN)/TBIN  << " ph/cm2/s" << std::endl;
+  std::cout << "       Total (" << EMIN<<","<<EMAX<<")  = "  
+	    << Lct_Pulsar->Integral(0,TBIN)/TBIN << " ph/cm2/s" << std::endl;
+  std::cout << "       EGRET band  (" << EGRET1 <<","<<EGRET3<<")  = "
+	    << Lct_EGRET->Integral(0,TBIN)/TBIN << " ph/cm2/s" << std::endl;
+
+
   if(ExtractPhotons)
     {
+      std::cout << "       LAT band (" << LAT1 <<","<<LAT2<<")  = " 
+		<< Lct_LAT->Integral(0,TBIN)/TBIN << " ph/cm2/s" << std::endl;
+
       Lc->SetMarkerStyle(20);
       Lc->SetMarkerSize(0.5);
       Lc->SetMarkerColor(6);
@@ -284,27 +298,17 @@ void PlotPulsar(double enph = 0,char name[100]="pulsar.root")
     } 
   else
     {
-
+      std::cout << "       LAT band (" << LAT1 <<","<<LAT2<<")  = " 
+		<< Lct_LAT->Integral(0,TBIN)/TBIN << " ph/cm2/s" << std::endl;
       Lct_Pulsar->Draw("l");
       Lct_LAT->Draw("lsame");
     }
 
   lcleg->Draw("lsame");
 
+
   std::cout << "****-------------------------------------------------" <<std::endl;
-  std::cout << "Fluxes summary: " << std::endl;
-  std::cout << "       Normalisation above 100MeV  (" << EGRET2 <<","<<EGRET3<<")  = "
-	    << Lct_NORM->Integral(0,TBIN)/TBIN  << " ph/cm2/s" << std::endl;
-  std::cout << "       Total (" << EMIN<<","<<EMAX<<")  = "  
-	    << Lct_Pulsar->Integral(0,TBIN)/TBIN << " ph/cm2/s" << std::endl;
-  std::cout << "       EGRET band  (" << EGRET1 <<","<<EGRET3<<")  = "
-	    << Lct_EGRET->Integral(0,TBIN)/TBIN << " ph/cm2/s" << std::endl;
-  std::cout << "       LAT band (" << LAT1 <<","<<LAT2<<")  = " 
-	    << Lct_LAT->Integral(0,TBIN)/TBIN << " ph/cm2/s" << std::endl;
-  std::cout << "****-------------------------------------------------" <<std::endl;
-
-
-
+  
 
 
   //  if(ExtractPhotons) std::cout<<" Flux[ erg/cm^2] EXT ("<<enph<<","<<EMAX<<")  = "<<Fv->Integral(iEXP,EBIN,"width")*1.0e-7/erg2meV<<" erg/cm^2"<<std::endl;
@@ -320,6 +324,9 @@ int main(int argc, char** argv)
   std::string arg_name("");
   int current_arg = 1;
   double enph=0.0;
+  double enphmin = 0.2e5;
+  double enphmax = 4e6;
+
   while(current_arg < argc)
     {
       arg_name = argv[current_arg];
@@ -327,6 +334,8 @@ int main(int argc, char** argv)
       if("-extract"==arg_name)
 	{
 	  enph  = atof(argv[++current_arg]);
+	  if (enph < enphmin) enph = enphmin; 
+	  std::cout << "Extracting photon above " << enph << std::endl;
 	}
       current_arg++;
     }
@@ -342,6 +351,7 @@ int main(int argc, char** argv)
   double ppar2 = 8e6;
   double ppar3 = -1.62;
   double ppar4 = 1.7;
+
   
 
   //Crab Polar Cap vs Outer Gap
@@ -377,7 +387,7 @@ int main(int argc, char** argv)
   double ppar4 = 1.0; // 1.0 for outer
  */
 
-  PulsarSim* m_pulsar = new PulsarSim(flux,Period, npeaks);
+  PulsarSim* m_pulsar = new PulsarSim(flux,enphmin, enphmax, Period, npeaks);
   m_pulsar->SaveNv((TH2D*)m_pulsar->PSRPhenom(ppar1,ppar2,ppar3,ppar4));
   char name[100];
   sprintf(name,"pulsar.root");

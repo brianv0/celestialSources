@@ -23,14 +23,18 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
   double ppar2 = parseParamList(params,6);
   double ppar3 = parseParamList(params,7);
   double ppar4 = parseParamList(params,8);
+  m_enphmin = parseParamList(params,9);
+  m_enphmax = parseParamList(params,10);
+
 
   std::cout << " \n*****\nPulsarSpectrum initialized ! " << std::endl;
   std::cout << " Flux above 100 MeV " << m_flux << " ph/cm2/s " 
 	    << " | " << m_numpeaks << " peaks " << std::endl;
   std::cout << " Period " << m_period << " s. " 
-	    << "  pDot " << m_pdot << std::endl;
+	    << "  pDot " << m_pdot 
+	    << " enphmin " << m_enphmin << " | enphmax " << m_enphmax << std::endl;
 
-  m_Pulsar   = new PulsarSim(m_flux,m_period,m_numpeaks);
+  m_Pulsar   = new PulsarSim(m_flux, m_enphmin, m_enphmax, m_period, m_numpeaks);
   m_spectrum = new SpectObj(m_Pulsar->PSRPhenom(ppar1,ppar2,ppar3,ppar4),1);
 
   JDStartMission = new astro::JulianDate(2001,1,1,0);
@@ -62,7 +66,7 @@ PulsarSpectrum::~PulsarSpectrum()
 double PulsarSpectrum::flux(double time) const
 {
   double flux;	  
-  flux = m_spectrum->flux(time,cst::enph);
+  flux = m_spectrum->flux(time,m_enphmin);
   return flux;
 }
 
@@ -72,7 +76,7 @@ double PulsarSpectrum::interval(double time)
   // Variable with suffix tilde are reffered to dilated system
   double timeTilde = time;
   time = timeTilde - timeTilde*m_pdot;
-  inte = m_spectrum->interval(time,cst::enph);
+  inte = m_spectrum->interval(time,m_enphmin);
   double nextTime = time + inte;
   double nextTimeTilde = nextTime + m_pdot*nextTime;
   inte = nextTimeTilde - timeTilde;
@@ -90,7 +94,7 @@ double PulsarSpectrum::interval(double time)
 
 double PulsarSpectrum::energy(double time)
 {
-  return m_spectrum->energy(time,cst::enph)*1.0e-3; //MeV
+  return m_spectrum->energy(time,m_enphmin)*1.0e-3; //MeV
 }
 
 double PulsarSpectrum::parseParamList(std::string input, int index)
