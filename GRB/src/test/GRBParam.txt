@@ -1,5 +1,5 @@
-10	        // Nshock
+20	        // Nshock
 1.0e+52		// Etot
-0.0             // Fluence
-5.0e+10		// initial separation
-1.0e+10		// initial Thickness
+0.0e-5          // Fluence
+1.0e+10		// initial separation
+5.0e+9		// initial Thickness

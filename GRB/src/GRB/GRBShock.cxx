@@ -10,11 +10,19 @@ using namespace cst;
 // S2 --> S1 ->
 GRBShock::GRBShock(GRBShell *S1, GRBShell *S2, double tshock)
 {
+  a = -2./3.; // +- 0.15
+  b = -2.5;  // +- 0.07
+  
+  // Qty, LESI, HESI
+  //  Ne   a     b
+  //  Fv   a+1   b+1
+  // vFv   a+2   b+2
+
   tsh = tshock;
   
   double g1 = S1->GetGamma();
   double g2 = S2->GetGamma();
-
+  
   //  double r1 = S1->GetRadius();
   double r2 = S2->GetRadius();
 
@@ -42,7 +50,7 @@ GRBShock::GRBShock(GRBShell *S1, GRBShell *S2, double tshock)
   // Internal : (obs) 
   eint_o = ei - ef;         //erg
   eint_c = (eint_o)/gf;     //erg
-
+  eff = eint_o/ei;
   // Radius of the shell:
   rf  = r2;
 
@@ -97,12 +105,6 @@ GRBShock::GRBShock(GRBShell *S1, GRBShell *S2, double tshock)
     std::cout<<gfs<<" "<<grs<<" "<<bfs<<std::endl;
   */
   
-  a = -2./3.; // +- 0.15
-  b = -2.5;  // +- 0.07
-  // Qty, LESI, HESI
-  //  Ne   a     b
-  //  Fv   a+1   b+1
-  // vFv   a+2   b+2
   
   //  double Ub  = ab*esh/erg2meV; //erg/cm^3
   //  double Ue  = ae*esh; //MeV/cm^3
@@ -125,7 +127,8 @@ GRBShock::GRBShock(GRBShell *S1, GRBShell *S2, double tshock)
 
   tc    =   drf/(2.*c);  // oss
   ta    =   rf/(2.*c*gf*gf);  // oss
-  //ts    =    
+  ts    =  2.9*pow(ae/csi,-1.)*pow(ab/0.1,-1.)*pow(e2/1e53,-1.)*pow(g1/100.0,7)*pow(tv,-3.)*(G*G/((G-y)*C1*C1))/(2*gf*gf);
+  cout<<ta<<" "<<tc<<" "<<ts<<" "<<sqrt(ta*ta+ts*ts)<<endl;
   
   //////////////////////////////////////////////////  
   /*
@@ -158,12 +161,13 @@ void GRBShock::SetTime(double time)
 Double_t GRBShock::Peak(Double_t time,Double_t energy)
 {
   
-  Double_t to = time-tsh;   // oss
-  //  Double_t ts = sqrt(energy/Esyn);
+  Double_t to  = time-tsh;   // oss
+  Double_t tts = ts*sqrt(Esyn/energy);
+  Double_t tta = sqrt(ta*ta+tts*tts);
   if(to<=0.0) return 0.0;
   
-  Double_t F1 = 1./pow(1.+       to/ta,2.);
-  Double_t F2 = 1./pow(1.+(to - tc)/ta,2.);
+  Double_t F1 = 1./pow(1.+       to/tta,2.);
+  Double_t F2 = 1./pow(1.+(to - tc)/tta,2.);
   const Double_t H = eint_o /1.0e52;
 
   if(to <= tc)

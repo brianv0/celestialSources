@@ -23,6 +23,16 @@
 <!--                  TEST SPECTRUMS                      -->
 <!-- The reference frame is galactic and a fixed direction is given to avoid the occlusion by the Earth. -->
 
+      <source name=" One_GRB_each_Minute ">
+          <spectrum escale="MeV"> <SpectrumClass name="GRBmanager" params="5,60"/>
+          <use_spectrum frame="galaxy"/> 
+     </spectrum> </source>
+
+      <source name=" One_GRB_each_10Minutes ">
+          <spectrum escale="MeV"> <SpectrumClass name="GRBmanager" params="5,600"/>
+          <use_spectrum frame="galaxy"/> 
+     </spectrum> </source>
+
       <source name=" One_GRB_each_Hour ">
           <spectrum escale="MeV"> <SpectrumClass name="GRBmanager" params="5,3600"/>
           <use_spectrum frame="galaxy"/> 
@@ -60,7 +70,7 @@
 	-->
 <!--GRB spectrum + diffuse -->
      <source name="GRB_DIFFUSE" >
-	<nestedSource sourceRef="One_GRB_each_Hour"/>
+	<nestedSource sourceRef="One_GRB_each_Minute"/>
 	<nestedSource sourceRef="diffuse"/>
      </source>
 

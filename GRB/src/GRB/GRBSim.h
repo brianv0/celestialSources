@@ -57,6 +57,7 @@ class GRBSim
   Parameters *m_params;
   GRBengine  *m_GRB;
   double m_tfinal;
+  double m_fluence;
   TH2D *m_Nv;
   //std::pair<float,float> m_direction;
   //data member

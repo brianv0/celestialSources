@@ -17,7 +17,7 @@ GRBSim::GRBSim(Parameters *params)
 TH2D* GRBSim::Fireball()
 {
   int    Nshell            = m_params->m_nshell;
-  double BATSE_fluence     = m_params->m_fluence;
+  m_fluence     = m_params->m_fluence;
   double Etot              = m_params->m_etot;
   double InitialSeparation = m_params->m_initialSeparation;
   double InitialThickness  = m_params->m_initialThickness;
@@ -34,13 +34,26 @@ TH2D* GRBSim::Fireball()
     m_GRB->CreateShocksVector(Nshell,InitialSeparation,InitialThickness,Etot);
   int nshocks = (int) Shocks.size();
   //  if(nshocks==0) return;
-  
-  m_tfinal = 1.5 * Shocks[nshocks-1]->GetTime();
+  int i=1;
+  while(Shocks[nshocks-i]->GetEfficiency()<1e-6)
+    { 
+      i++;
+    }
+  m_tfinal = 1.5 * Shocks[nshocks-i]->GetTime();
   double dt = m_tfinal/(Tbin-1);
   gDirectory->Delete("Nv");
   m_Nv = new TH2D("Nv","Nv",Tbin,0.,m_tfinal,Ebin, e);
   
   double t = 0.0;
+ for (int i = 0; i< nshocks; i++)
+   {
+     //      GRBShock *ashock = Shocks[i]
+     double alpha = m_params->GetLESI();
+     double beta = m_params->GetHESI();
+     cout<<alpha<<" "<<beta<<endl;
+     Shocks[i]->SetSpectralParameters(alpha,beta);
+   }
+
   for(int ti = 0; ti<Tbin; ti++)
     {
       t = ti*dt;
@@ -59,7 +72,7 @@ TH2D* GRBSim::Fireball()
   // Conersion 1/cm² -> 1/m²
   m_Nv->Scale(1.0e+4); // [ph/(m² s keV)]
   // double fluence = 1.0e-6; //erg/cm²
-  BATSE_fluence *= 1.0e+4;        //erg/m²
+  m_fluence *= 1.0e+4;        //erg/m²
   // nph = nv * dE * dt
   TH2D *nph = Nph(m_Nv); //ph/m²
   
@@ -68,7 +81,7 @@ TH2D* GRBSim::Fireball()
   double norm = nph->Integral(0,Tbin,ei1,ei2,"width")*(1.0e-3)/(dt*erg2meV); //erg/m²
   
   // IMPORTANT m_Nv has to  be in [ph/(m² s keV)]
-  m_Nv->Scale(BATSE_fluence/norm);  
+  m_Nv->Scale(m_fluence/norm);  
   /*
     nph = Nph(m_Nv); //ph/m²
     cout<<nph->Integral(0,Tbin,ei1,ei2,"width")*(1.0e-7)/(dt*erg2meV)<<endl; //erg/cm²
@@ -110,9 +123,13 @@ void GRBSim::SaveNv()
   m_Nv->GetXaxis()->CenterTitle();
   m_Nv->GetYaxis()->CenterTitle();
   m_Nv->GetZaxis()->CenterTitle();
-  
-  TFile *mod = new TFile("grb.root","RECREATE");
+  char root_name[100];
+  sprintf(root_name,"grb_%d.root",m_params->GetGRBNumber());
+  TFile *mod = new TFile(root_name,"RECREATE");
   m_Nv->Write();
   mod->Close();
+  std::ofstream os("grb_generated.txt",ios::app);
+  os<<m_params->GetGRBNumber()<<" "<<Tmax()<<" "<<m_fluence<<" "<<GRBdir().first<<" "<<GRBdir().second<<endl;
+  
 };
 

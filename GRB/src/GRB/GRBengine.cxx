@@ -107,6 +107,7 @@ std::vector<GRBShock*> GRBengine::CreateShocksVector(const int Nshell,
     {   
       std::cout<<"---- Shock N = "<<i
 	       <<" at tobs = "<<theShocks[i]->GetTime()
+	       <<" "<<theShocks[i]->GetEfficiency()
 	       <<std::endl;
       //      GRBShell *Ms = theShocks[i]->MergedShell();
     }

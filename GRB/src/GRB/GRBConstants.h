@@ -53,10 +53,10 @@ namespace cst
   
   const double emin =  1.0; //keV
   const double emax = 1e9;  //keV
-  const double enph = 5e4;  //keV 
+  const double enph = 1e5;  //keV (100 MeV) 
   
   const    int Ebin =  100; 
-  const    int Tbin =  500; 
+  const    int Tbin =  100; 
   static const double de   = pow(emax/emin,1.0/Ebin);
   //  static const double dt   = tmax/(Tbin-1);
   const double erg2meV   = 624151.0;
@@ -75,11 +75,15 @@ class Parameters
  public:
   Parameters();
   double GetBATSEFluence();
+  double GetLESI();
+  double GetHESI();
   void SetNshell(int nshell);
   void SetFluence(double fluence);
   void SetEtot(double etot);
   void SetInitialSeparation(double initialSeparation);
   void SetInitialThickness(double initialThickness);		  
+  //  void SetLESI(double beta);
+  //void SetHESI(double alpha);
   void ReadParametersFromFile(std::string paramFile);
   void PrintParameters();
   inline long GetGRBNumber(){return m_GRBnumber;}
@@ -87,12 +91,15 @@ class Parameters
     {
       m_GRBnumber = GRBnumber;
       rnd->SetSeed(m_GRBnumber);
+      rnd->Uniform();
     }
   
   TRandom *rnd;
   int    m_nshell;
   long m_GRBnumber;
   double m_fluence,m_etot,m_initialSeparation,m_initialThickness;
+  //  double m_alpha,m_beta;
+  
 };
 
 #endif

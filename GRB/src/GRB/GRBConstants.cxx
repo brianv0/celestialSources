@@ -5,16 +5,29 @@ Parameters::Parameters()
   rnd = new TRandom();
   SetGRBNumber((long) rnd->GetSeed());
 }
-
+//////////////////////////////////////////////////
 double Parameters::GetBATSEFluence()
 {
   return pow(10.0,rnd->Gaus(-6.00,0.5)); //erg/cm^2
 }
 
+double Parameters::GetLESI()
+{
+  //alpha 
+  return rnd->Gaus(-1.0,0.5); 
+}
+
+double Parameters::GetHESI()
+{
+  // beta 
+  return rnd->Gaus(-2.5,0.5); 
+}
+//////////////////////////////////////////////////
 void Parameters::SetNshell(int nshell)
 {
   m_nshell = (nshell>0) ? nshell : 10;
 }
+
 void Parameters::SetFluence(double fluence)
 {
   m_fluence = (fluence>0.0) ? fluence : GetBATSEFluence();
@@ -25,16 +38,28 @@ void Parameters::SetEtot(double etot)
   m_etot = (etot>0.0) ? etot : pow(10.0,rnd->Gaus(50.,53.0)); //erg
 }
 
-
 void Parameters::SetInitialSeparation(double initialSeparation)
 {
   m_initialSeparation = (initialSeparation>0.0) ? initialSeparation : 1.0e10;
 }
+
 void Parameters::SetInitialThickness(double initialThickness)
 {
   m_initialThickness = (initialThickness>0.0) ? initialThickness : 1.0e10;
 }
 
+/*
+  void Parameters::SetLESI(double alpha)
+  {
+  m_alpha = (alpha>0.0) ? alpha : GetLESI();
+  }
+  
+  void Parameters::SetHESI(double beta)
+  {
+  m_beta = (beta>0.0) ? beta : GetHESI();
+  }
+*/
+//..................................................
 void Parameters::ReadParametersFromFile(std::string paramFile)
 {
   char buf[50];
@@ -47,7 +72,8 @@ void Parameters::ReadParametersFromFile(std::string paramFile)
   SetGRBNumber((long)GetGRBNumber()+1);
 
   int    nshell;
-  double fluence,etot,initialSeparation,initialThickness;  
+  double fluence,etot,initialSeparation,initialThickness;//,alpha,beta;  
+
   f1.getline(buf,50);
   sscanf(buf,"%d",&nshell);
 
@@ -62,12 +88,23 @@ void Parameters::ReadParametersFromFile(std::string paramFile)
 
   f1.getline(buf,50);
   sscanf(buf,"%lf",&initialThickness);
+
+  /*
+    f1.getline(buf,50);
+    sscanf(buf,"%lf",&alpha);
+    
+    f1.getline(buf,50);
+    sscanf(buf,"%lf",&beta);
+  */
   //cout<<nshell<<" "<<etot<<" "<<fluence<<" "<<initialSeparation<<" "<<initialThickness<<endl;
   SetNshell(nshell);
   SetEtot(etot);
   SetFluence(fluence);
   SetInitialSeparation(initialSeparation);
   SetInitialThickness(initialThickness);		
+  //SetLESI(alpha);
+  //SetHESI(beta);
+
 }
 
 void Parameters::PrintParameters()
@@ -77,5 +114,8 @@ void Parameters::PrintParameters()
   std::cout<<" Etot                        = "<<m_etot<<" Erg "<<std::endl;
   std::cout<<" Fluence in the Batse Range  = "<<m_fluence<<std::endl;
   std::cout<<" Initial Separation          = "<<m_initialSeparation<<std::endl;
-  std::cout<<" Initial Thickness          = "<<m_initialThickness<<std::endl;
+  std::cout<<" Initial Thickness           = "<<m_initialThickness<<std::endl;
+  //  std::cout<<" Low Energy Spectral Index (a) = "<<m_alpha<<std::endl;
+  //  std::cout<<" High Energy Spectral Index(b) = "<<m_beta<<std::endl;
+  
 }

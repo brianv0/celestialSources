@@ -26,19 +26,26 @@ class GRBShock
   ~GRBShock(){;}
   GRBShell *MergedShell() {return MS;}
   void SetTime(double time);
+  inline void SetSpectralParameters(double alpha, double beta)
+    {
+      a = alpha;
+      b = beta;
+    }
   double GetTime(){return tsh;}
+  double GetEfficiency(){return eff;}
   double Peak(double time, double energy);
   double SynSpectrum(double energy);
   double ICSpectrum(double energy);
   double ComputeFlux(double time, double energy);
-  
  private:
   GRBShell *MS; 
   double tsh;
+  double eff;
   double gf,ei,ef,mf, eint_o,eint_c,rf,drf;
-  double ta,tc;
+  double ta,tc,ts;
   double Esyn,Eic;
-  float a,b;
+  double a,b;
+    
 };
 
 //////////////////////////////////////////////////

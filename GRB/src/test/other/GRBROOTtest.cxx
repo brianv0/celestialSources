@@ -40,9 +40,9 @@ double Band(double *var, double *par)
   return C* NT * pow(E/100.,b); // ph cm^(-2) s^(-1) keV^(-1)
 }
 
-TH2D *Load()
+TH2D *Load(char name[100]="grb_65540.root")
 {
-  TFile *mod = new TFile("grb.root");
+  TFile *mod = new TFile(name);
   TH2D *Nv = (TH2D*) mod->Get("Nv"); //ph m^(-2) s^(-1) keV^(-1)
     
   TMIN = Nv->GetXaxis()->GetXmin();
@@ -77,7 +77,7 @@ void MakeGRB()
 }
 
 
-void PlotGRB(double enph = 0)
+void PlotGRB(double enph = 0,char name[100]="grb_65540.root")
 {
   gStyle->SetCanvasColor(10);
 
@@ -85,7 +85,7 @@ void PlotGRB(double enph = 0)
   cNv->SetLogy();
   cNv->SetLogz();
   
-  TH2D *Nv = Load();
+  TH2D *Nv = Load(name);
 
   // Ne =  [ph/keV/s/m²]
   gDirectory->Delete("Ne");
@@ -183,15 +183,15 @@ void PlotGRB(double enph = 0)
   vFv->SetMinimum(.1);
   vFv->Draw("al");
   Fv->Draw("samel");
-  //  Ne->Draw("samel");
+  Ne->Draw("samel");
 
-  TF1 *band = new TF1("band",Band,EMIN,1e5,4); 
-  band->SetParNames("a","b","Log(E0)","Log(Const)");
+  TF1 *band = new TF1("band",Band,EMIN,1e4,4); 
+  band->SetParNames("a","b","Log10(E0)","Log10(Const)");
   band->SetLineStyle(2);
-  band->SetParameters(-1./3.,-2.,2.0,4.0);
+  band->SetParameters(-0.3,-2.,1.0,4.0);
   //band->Draw("same");
-  Ne->Fit("band","","lsame");
-
+  Fv->Fit("band","","lsame");
+  
   TLegend *leg = new TLegend(0.11,0.12,0.37,0.25);
   leg->SetFillStyle(0);
   leg->AddEntry(Ne," Ne  [ph/keV/m^2] ","lp");
@@ -342,8 +342,9 @@ int main(int argc, char** argv)
   GRBSim* m_grb = new GRBSim(params);
   m_grb->Fireball();
   m_grb->SaveNv();
-
-  PlotGRB(enph);
+  char name[100];
+  sprintf(name,"grb_%d.root",params->GetGRBNumber());
+  PlotGRB(enph,name);
   
   theApp.Run();
 }
