@@ -12,9 +12,7 @@
 #include "TLegend.h"
 #include "TGaxis.h"
 
-#include "facilities/Util.h"
 
-//#include "../src/GRB/SpectObj.h"
 #include "../../GRB/SpectObj.h"
 #include "../../GRB/GRBSim.h"
 #include "../../GRB/GRBConstants.h"
@@ -59,7 +57,7 @@ TH2D *Load(char name[100]="grb_65540.root")
   
   Nv->SetXTitle("Time [s]");
   Nv->SetYTitle("Energy [keV]");
-  Nv->SetZTitle("N_{v} [ph/m^2/s/keV]");
+  Nv->SetZTitle("N_{v} [ph/m^{2}/s/keV]");
   Nv->GetXaxis()->SetTitleOffset(1.5);
   Nv->GetYaxis()->SetTitleOffset(1.5);
   Nv->GetZaxis()->SetTitleOffset(1.2);
@@ -68,12 +66,6 @@ TH2D *Load(char name[100]="grb_65540.root")
   Nv->GetZaxis()->CenterTitle();
   
   return Nv;
-}
-
-
-
-void MakeGRB()
-{
 }
 
 
@@ -92,19 +84,19 @@ void PlotGRB(double enph = 0,char name[100]="grb_65540.root")
   Nv->ProjectionY("Ne");
   TH1D *Ne = (TH1D*) gDirectory->Get("Ne");
   Ne->Scale(DT);
-  Ne->SetYTitle("Ne [ph/keV/m^2]");
+  Ne->SetYTitle("Ne [ph/keV/m^{2}]");
   Ne->SetXTitle(" Energy[keV] ");
   // Fv = Ne * de: [ph/s/m^2]
   TH1D *Fv = (TH1D*) Ne->Clone();
   Fv->SetTitle("Fv");
   Fv->SetName("Fv");
-  Fv->SetYTitle("Fv [keV/keV/m^2]");
+  Fv->SetYTitle("Fv [keV/keV/m^{2}]");
   
   // vFv = e * Ne * de: [keV/s/m^2]
   TH1D *vFv = (TH1D*) Ne->Clone();
-  vFv->SetTitle("vFv");
+  vFv->SetTitle("Fluxes");
   vFv->SetName("vFv");
-
+  
   vFv->SetYTitle(" Flux ");
   vFv->SetStats(0);
 
@@ -126,10 +118,42 @@ void PlotGRB(double enph = 0,char name[100]="grb_65540.root")
       vFv->SetBinContent(i+1,e*de*ne);
     }
   
+  TCanvas *animatedCanvas = new TCanvas("animatedCanvas","animatedCanvas",500,500);
+  animatedCanvas->SetLeftMargin(0.15);
+  animatedCanvas->SetLogx();
+  animatedCanvas->SetLogy();
+  int i1=0;
+  int i2;
+  for(int i=0; i < TBIN; i++)
+    {
+      i2=i;
+      if(i%5==0)
+	{
+	  TH1D *AnimatedSpectrum =   Nv->ProjectionY("Animated",i1,i2);
+	  AnimatedSpectrum->GetXaxis()->SetTitle("Energy [keV]");
+	  AnimatedSpectrum->GetYaxis()->SetTitle("#nu F_{#nu} [keV/m^{2}/s]");
+	  AnimatedSpectrum->GetXaxis()->SetTitleOffset(1.1);
+	  AnimatedSpectrum->GetYaxis()->SetTitleOffset(1.5);
+	  for(int j=0; j < EBIN; j++)
+	    {
+	      double ne = AnimatedSpectrum->GetBinContent(j+1);
+	      double de = AnimatedSpectrum->GetBinWidth(j+1);//GetBinCenter(i+1);
+	      double e = AnimatedSpectrum->GetBinCenter(j+1);
+	      //	      AnimatedSpectrum->SetBinContent(i+1,de*ne);
+	      AnimatedSpectrum->SetBinContent(j+1,e*de*ne);
+	    }  
+	  AnimatedSpectrum->SetMaximum(1e10);
+	  AnimatedSpectrum->SetMinimum(1e0);
+	  AnimatedSpectrum->Draw("l");
+	  animatedCanvas->Update();
+	  i1=i;
+	}
+    }
+  
   
 
   //////////////////////////////////////////////////
-  
+  cNv->cd();
   Nv->Draw("surf");
   
   bool ExtractPhotons = true;
@@ -141,7 +165,7 @@ void PlotGRB(double enph = 0,char name[100]="grb_65540.root")
   
   std::pair<float,float> dir = std::make_pair((float)0.0,(float)0.0);
   
-  sp->SaveParameters(0.0,dir);
+  //  sp->SaveParameters(0.0,dir);
   
   //////////////////////////////////////////////////
   TCanvas *clc = new TCanvas("clc","clc",600,800);
@@ -160,11 +184,15 @@ void PlotGRB(double enph = 0,char name[100]="grb_65540.root")
   Lct_GRB->SetStats(0);
   Lct_LAT->SetStats(0);
   
-  Lct_GBM->SetTitle("flux [ph]");
-  Lct_GBM->SetXTitle("Time (s)");
-  Lct_GBM->SetYTitle("photons/m^2");
+  Lct_GRB->SetNameTitle("flux [ph]","flux [ph]");
+  Lct_GRB->SetXTitle("Time (s)");
+  Lct_GRB->SetYTitle("photons/m^{2}");
+
+  Lct_LAT->SetNameTitle("flux [ph]","flux [ph]");
+  Lct_LAT->SetXTitle("Time (s)");
+  Lct_LAT->SetYTitle("photons/m^{2}");
     
-  Lct_GRB->SetName("flux GRB [ph]");
+  //  Lct_GRB->SetName("flux GRB [ph]");
   Lct_GBM->SetName("flux GBM [ph]");
   Lct_LAT->SetName("flux LAT [ph]"); 
   Lct_EXT->SetName("flux EXT [ph]"); 
@@ -185,33 +213,37 @@ void PlotGRB(double enph = 0,char name[100]="grb_65540.root")
   Fv->Draw("samel");
   Ne->Draw("samel");
   //  gDirectory->Delete("band");
-  TF1 band("grb_f",Band,EMIN,1.0e+3,4); 
-  //  band.SetParNames("a","b","Log10(E0)","Log10(Const)");
-  band.SetLineStyle(2);
-  band.SetParameters(-1.0,-2.5,1.0,4.0);
-  band.SetParLimits(0,-2.0,0.0);
-  band.SetParLimits(1,-4.0,-1.0);
-  band.SetParLimits(2,1.0,3.0);
-  band.SetParLimits(3,0.0,10.0);
-  //  band.Draw("lsame");
-  Ne->Fit("grb_f","v","lsame");
-  std::cout<<"--------------------------------------------------"<<std::endl;
-  std::cout<<" a     = "<<band.GetParameter(0)<<std::endl;
-  std::cout<<" b     = "<<band.GetParameter(1)<<std::endl;
-  std::cout<<" E0    = "<<pow(10.,band.GetParameter(2))<<std::endl;
-  std::cout<<" Const = "<<pow(10.,band.GetParameter(3))<<std::endl;
-  std::cout<<"--------------------------------------------------"<<std::endl;
+  /*
+    TF1 band("grb_f",Band,EMIN,1.0e+3,4); 
+    //  band.SetParNames("a","b","Log10(E0)","Log10(Const)");
+    band.SetLineStyle(2);
+    band.SetParameters(-1.0,-2.5,1.0,4.0);
+    band.SetParLimits(0,-2.0,0.0);
+    band.SetParLimits(1,-4.0,-1.0);
+    band.SetParLimits(2,1.0,3.0);
+    band.SetParLimits(3,0.0,10.0);
+    //  band.Draw("lsame");
+    //  Ne->Fit("grb_f","v","lsame");
+    std::cout<<"--------------------------------------------------"<<std::endl;
+    std::cout<<" a     = "<<band.GetParameter(0)<<std::endl;
+    std::cout<<" b     = "<<band.GetParameter(1)<<std::endl;
+    std::cout<<" E0    = "<<pow(10.,band.GetParameter(2))<<std::endl;
+    std::cout<<" Const = "<<pow(10.,band.GetParameter(3))<<std::endl;
+    std::cout<<"--------------------------------------------------"<<std::endl;
+  */ 
   TLegend *leg = new TLegend(0.11,0.12,0.37,0.25);
   leg->SetFillStyle(0);
-  leg->AddEntry(Ne," Ne  [ph/keV/m^2] ","lp");
-  leg->AddEntry(Fv," Fv  [ph/m^2] ","lp");
-  leg->AddEntry(vFv," vFv [keV/m^2] ","lp");
+  leg->AddEntry(Ne," Ne  [ph/keV/m^{2}] ","lp");
+  leg->AddEntry(Fv," F_{#nu}  [ph/m^{2}] ","lp");
+  leg->AddEntry(vFv," #nu F_{#nu} [keV/m^{2}] ","lp");
   leg->Draw();
   
   TH1D *Counts   = sp->GetSpectrum(); //ph
   Counts->SetName("Counts");
   TH1D *Lc = sp->GetTimes();  
-  Lc->SetName("Counts[ph]");
+  Lc->SetNameTitle("Counts[ph]","Counts[ph]");
+  Lc->SetXTitle("Time (s)");
+  Lc->SetYTitle("photons/m^{2}");
 
   TF1  *f1 = new TF1("f1","[0]*1./x"); 
   TF1  *f2 = new TF1("f2","[0]*1./x^2");   
@@ -304,6 +336,8 @@ void PlotGRB(double enph = 0,char name[100]="grb_65540.root")
   if(ExtractPhotons) std::cout<<" Nph EXT ("<<enph<<","<<EMAX<<")  = "<<sp->Integral_T(Lct_EXT,0.0,TMAX)<<std::endl;
   std::cout<<" -------------------------------------------------- "<<std::endl;
   
+  int iBATSE1 = Ne->FindBin(BATSE1);
+  int iBATSE2 = Ne->FindBin(BATSE2);
   int iGBM1 = Ne->FindBin(GBM1);
   int iGBM2 = Ne->FindBin(GBM2);
   int iLAT1 = Ne->FindBin(LAT1);
@@ -311,19 +345,48 @@ void PlotGRB(double enph = 0,char name[100]="grb_65540.root")
   int iEXP = Ne->FindBin(enph);
   
   std::cout<<" Flux[ erg/cm^2] GRB ("<<EMIN<<","<<EMAX<<")  = "<<Fv->Integral(0,EBIN,"width")*1.0e-7/erg2meV<<" erg/cm^2"<<std::endl;
+std::cout<<" Flux[ erg/cm^2] BATSE ("<<BATSE1<<","<<BATSE2<<")  = "<<Fv->Integral(iBATSE1,iBATSE2,"width")*1.0e-7/erg2meV<<" erg/cm^2"<<std::endl;
   std::cout<<" Flux[ erg/cm^2] GBM ("<<GBM1<<","<<GBM2<<")  = "<<Fv->Integral(iGBM1,iGBM2,"width")*1.0e-7/erg2meV<<" erg/cm^2"<<std::endl;
   std::cout<<" Flux[ erg/cm^2] LAT ("<<LAT1<<","<<LAT2<<")  = "<<Fv->Integral(iLAT1,iLAT2,"width")*1.0e-7/erg2meV<<" erg/cm^2"<<std::endl;
   if(ExtractPhotons) std::cout<<" Flux[ erg/cm^2] EXT ("<<enph<<","<<EMAX<<")  = "<<Fv->Integral(iEXP,EBIN,"width")*1.0e-7/erg2meV<<" erg/cm^2"<<std::endl;
   
 }
 
-int main(int argc, char** argv)
+
+void MakeGRB(long seed, double enph)
 {
   
   std::cout<<" ****** GRB and ROOT test ****** "<<std::endl;
+  
+  std::string path = ::getenv("GRBROOT");
+  //std::string paramFile = "../../test/GRBParam.txt";
+  std::string paramFile = path+"/src/test/GRBParam.txt";
+  //  facilities::Util::expandEnvVar(&paramFile);
+  
+  params = new Parameters();  
+
+  long seedN = params->GetGRBNumber();
+  if(seed>=1) params->SetGRBNumber(seedN+seed);
+  //////////////////////////////////////////////////
+  params->ReadParametersFromFile(paramFile,seed);
+  params->PrintParameters();
+  GRBSim* m_grb = new GRBSim(params);
+  TH2D *matrix = m_grb->Fireball();
+  m_grb->SaveNv(matrix);
+  delete m_grb;
+  char name[100];
+  sprintf(name,"grb_%d.root",params->GetGRBNumber());
+  PlotGRB(enph,name);
+ }
+
+
+
+int main(int argc, char** argv)
+{
+  
   std::string arg_name("");
   int current_arg = 1;
-  long seed=-1;
+  long seed=1;
   double enph=0.0;
   while(current_arg < argc)
     {
@@ -339,23 +402,8 @@ int main(int argc, char** argv)
 	}
       current_arg++;
     }
+
   TApplication theApp("App",0,0);
-  std::string paramFile = "$(GRBROOT)/src/test/GRBParam.txt";
-  facilities::Util::expandEnvVar(&paramFile);
-  
-  params = new Parameters();  
-  long seedN = params->GetGRBNumber();
-  //  if(seed>=0) params->SetGRBNumber(seedN+seed);
-  if(seed<1) seed=1;
-  //////////////////////////////////////////////////
-  params->ReadParametersFromFile(paramFile,seed);
-  params->PrintParameters();
-  GRBSim* m_grb = new GRBSim(params);
-  //  m_grb->Fireball();
-  m_grb->SaveNv((TH2D*)m_grb->Fireball());
-  char name[100];
-  sprintf(name,"grb_%d.root",params->GetGRBNumber());
-  PlotGRB(enph,name);
-  
+  MakeGRB(seed,enph);
   theApp.Run();
 }

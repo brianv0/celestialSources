@@ -38,24 +38,36 @@ class GRBShock
   inline   void SetICComponent(double ic){m_IC = ic;}
   
   double GetTime(){return tsh;}
-  double GetDuration(){return sqrt(ta*ta+tc*tc+ts*ts);}
+  double GetDuration(){return sqrt(ta*ta + tc*tc + ts*ts);}
   double GetEfficiency(){return eff;}
   double Peak(double time, double energy);
-  double SynSpectrum(double energy);
-  double ICSpectrum(double energy);
+  double SynSpectrum(double time, double energy);
+  double ICSpectrum(double time, double energy);
   double ComputeFlux(double time, double energy);
   void Print();
-
+  inline double GetEintO(){return eint_o;}
+  inline double GetEintC(){return eint_c;}
+  inline double GetGammaf(){return gf;}
+  inline double GetEshock(){return nsh* gsh* cst::mpc2;}
+  inline double GetEsyn(){return Es0;}
+  inline double GetPeak()
+    {
+      if(gec/tc > gem) return Es0*gec*gec/(tc*tc);
+      return Es0*gem*gem;
+    }
+  
  private:
   GRBShell *MS; 
   double tsh;
   double eff;
   double gf,ei,ef,mf, eint_o,eint_c,rf,drf;
+  double nsh,gsh,B;
   double ta,tc,ts;
-  double Esyn,Eic;
-  double a,b;
+  double Es0;
+  double gem,gec,geM;
+  double a,b,p;
   double m_IC;
-    
+  
 };
 
 //////////////////////////////////////////////////

@@ -20,8 +20,7 @@ GRBmanager::GRBmanager(const std::string& params)
   m_timeToWait  = TMath::Max(0.,parseParamList(params,1));
   m_par = new Parameters();
   //////////////////////////////////////////////////
-  m_par->ReadParametersFromFile(paramFile,1);
-  
+  m_par->ReadParametersFromFile(paramFile,1); 
   m_par->PrintParameters();
   m_GRB      = new  GRBSim(m_par);
   m_spectrum = new  SpectObj(m_GRB->Fireball());

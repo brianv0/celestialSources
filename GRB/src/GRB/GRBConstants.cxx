@@ -18,13 +18,13 @@ double Parameters::GetBATSEFluence()
 double Parameters::GetLESI()
 {
   //alpha 
-  return rnd->Gaus(-1.0,0.5); 
+  return -0.3;//rnd->Gaus(-1.0,0.5); 
 }
 
 double Parameters::GetHESI()
 {
   // beta 
-  return rnd->Gaus(-2.5,0.5); 
+  return -2.1;//rnd->Gaus(-2.5,-0.5); 
 }
 //////////////////////////////////////////////////
 void Parameters::SetGalDir(double l, double b)
@@ -32,7 +32,7 @@ void Parameters::SetGalDir(double l, double b)
   double ll,bb;
   
   ll = (l<=180.0 && l>=-180.0) ? l : rnd->Uniform(-180.0,180.0);
-  bb = (b<=90.0 && b>=-90.0) ? b : rnd->Uniform(-90.0,90.0);
+  bb = (b<=90.0 && b>=-90.0)   ? b : rnd->Uniform(-90.0,90.0);
   
   m_GalDir=std::make_pair(ll,bb);
 }
@@ -85,7 +85,7 @@ int Parameters::ReadParametersFromFile(std::string paramFile, int NGRB)
   std::ifstream f1(paramFile.c_str());
   if (!f1.is_open()) 
     {
-      std::cout<<"Error Opening paramFile\n";
+      std::cout<<"GRBConstants: Error Opening paramFile\n";
       exit(1);
     }
   int    nshell, seed;

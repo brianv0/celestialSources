@@ -50,11 +50,11 @@ namespace cst
   //  const double tmax = 10;
   
   const double emin =  1.0; //keV
-  const double emax = 1e9;  //keV
+  const double emax = 1e8;  //keV
   const double enph = 1e5;  //keV (100 MeV) 
   
   const    int Ebin =  50; 
-  const    int Tbin =  500; 
+  const    int Tbin =  1000; 
   static const double de   = pow(emax/emin,1.0/Ebin);
   //  static const double dt   = tmax/(Tbin-1);
   const double erg2meV   = 624151.0;

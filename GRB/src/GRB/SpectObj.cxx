@@ -40,8 +40,10 @@ SpectObj::SpectObj(const TH2D* In_Nv)
   gDirectory->Delete("times");
   spec  = new TH1D("spec","spec",ne,en);
   times = new TH1D("times","times",nt+1,tmin-deltat/2.,tmax+deltat/2.);
-  delete [] en;
+  delete en;
 
+  std::cout<<" GRB SpectObj initialized !"<<std::endl;
+  //////////////////////////////////////////////////
 }
 //////////////////////////////////////////////////
 TH1D *SpectObj::GetSpectrum(double t)
@@ -267,7 +269,7 @@ double SpectObj::flux(double time, double enph)
 
   TH1D* fl = GetSpectrum(time);    //ph/m²
   double integral = Integral_E(fl,enph,emax)/deltat; //ph/m²/s
-  delete fl;
+  //  delete fl;
   return integral;//ph/m²/s
 }
 
@@ -313,7 +315,7 @@ void SpectObj::SaveParameters(double tstart, std::pair<double,double> direction)
     ofstream f1( "GRBData.txt",ios::app);
     if (! f1.is_open()) 
     {
-    std::std::cout<<"Error Opening output file"<<std::endl;
+    std::cout<<"Error Opening output file"<<std::endl;
     exit(1);
     }
     f1<<tstart<<" "<<T95-T05<<" "<<direction.first<<" "<<direction.second<<std::endl;

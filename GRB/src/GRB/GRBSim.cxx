@@ -1,4 +1,5 @@
 #include <fstream>
+#include <iostream>
 
 #include "GRBConstants.h"
 #include "GRBShell.h"
@@ -16,6 +17,7 @@ GRBSim::GRBSim(Parameters *params)
 {
   m_GRBengine = new GRBengine(params);
   m_fluence                = m_params->GetFluence(); 
+
 }
 
 TH2D* GRBSim::Fireball()
@@ -32,7 +34,7 @@ TH2D* GRBSim::Fireball()
     m_GRBengine->CreateShocksVector();
   int nshocks = (int) Shocks.size();
   int i=1;
-  while(Shocks[nshocks-i]->GetEfficiency()<1e-4)
+  while(Shocks[nshocks-i]->GetEfficiency()<1.0e-3)
     { 
       i++;
     }
@@ -42,14 +44,13 @@ TH2D* GRBSim::Fireball()
   m_Nv = new TH2D("Nv","Nv",Tbin,0.,m_tfinal,Ebin, e);
   
   double t = 0.0;
+  
   for (int i = 0; i< nshocks; i++)
     {
-      double alpha = m_params->GetLESI();
-      double beta  = m_params->GetHESI();
-      Shocks[i]->SetSpectralParameters(alpha,beta);
       Shocks[i]->SetICComponent(m_params->GetInverseCompton());
-      //     Shocks[i]->Print();
+      Shocks[i]->Print();
     }
+
   
   for(int ti = 0; ti<Tbin; ti++)
     {
