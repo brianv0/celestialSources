@@ -2,6 +2,7 @@
 #include <iostream>
 
 #include "flux/SpectrumFactory.h" 
+
 ISpectrumFactory &GRBmanagerFactory() 
  {
    static SpectrumFactory<GRBmanager> myFactory;

@@ -8,10 +8,9 @@ author Nicola Omodei<nicola.omodei@pi.infn.it> Johann Cohen-Tanugi <johann.cohen
 use flux       v8r*
 use ROOT       v2r*  IExternal
 
-macro_prepend includes " -I$(GRBROOT)/src/ "
+#==================================================	
 
-macro GRB_linkopts " -L $(GRB_root)/$(BINDIR) -lGRBLib " \
-                       WIN32 ""
+macro_prepend includes " -I$(GRBROOT)/src/ "
 
 macro_append ROOT_linkopts " $(ROOT_GUI_libs) "
 
@@ -27,19 +26,21 @@ private
 apply_pattern package_headers
 
 apply_pattern package_stamps
-macro_append GRB_stamps " $(GRB_root)/$(BINDIR)/GRBLib.stamp"
+macro_append GRB_stamps " $(GRB_root)/$(BINDIR)/GRB.stamp"
+macro_append GRB_stamps " $(GRB_root)/$(BINDIR)/GRB.shstamp"
 
 macro source "*.cxx" WIN32 "*.cxx *.h"
 
-library GRBLib -no_share $(source) \
+library GRB         $(source)\
      -s=GRB         $(source)\
      -s=GRBmaker    $(source)\
      -s=LatGRBAlert $(source)
 
 macro libs    ""   \
-        WIN32 " $(GRB_root)/$(BINDIR)/GRBLib.lib "
+        WIN32 " $(GRB_root)/$(BINDIR)/GRB.lib "
 
 apply_pattern ld_library_path
+apply_pattern shared_library
 
 application test_GRB      test/testMgr.cxx $(libs)
 application test_GRBROOT  test/other/GRBROOTtest.cxx $(libs)

@@ -14,12 +14,12 @@
 #include "CLHEP/Random/RandFlat.h"
 
 #include "flux/SpectrumFactory.h"
+
 ISpectrumFactory &GRBobsFactory() 
  {
    static SpectrumFactory<GRBobsSpectrum> myFactory;
    return myFactory;
  }
-
 
 namespace {
         const double INVTIME=1.0e8;

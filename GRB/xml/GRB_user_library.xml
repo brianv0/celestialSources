@@ -9,7 +9,7 @@
     <!-- - The second parameter is the time to wait for the next burst (1hour = 3600 seconds., 1day = 86400 seconds.) -->     
     <source name="GRB">
       <spectrum escale="MeV"> 
-        <SpectrumClass name="GRBmanager" params="0,4000"/>
+        <SpectrumClass name="GRBmanager" params="10,86400"/>
         <use_spectrum frame="galaxy"/> 
       </spectrum> 
     </source>
