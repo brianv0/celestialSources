@@ -165,8 +165,18 @@
 
    <source name="spectral_transient">
       <spectrum escale="MeV">
+<!-- 
+     mean flux = 0.1 (1e4/m^2/s) 
+     start time = 0 (MET s)
+     stop time = 1e4 (MET s)
+     template file name = $(GENERICSOURCESROOT)/data/testTemplate.dat
+     emin = 20 (MeV, this is the default)
+     emax = 2e5 (MeV, default)
+     lc # (in FITS file) = 0 (default)
+     z (redshift) = 0 (default)
+--!>
           <SpectrumClass name="SpectralTransient"
-          params="1e-1, 0., 1e4, $(GENERICSOURCESROOT)/data/testTemplate.dat"/>
+          params="1e-1, 0., 1e4, $(GENERICSOURCESROOT)/data/testTemplate.dat,20,2e5,0,0"/>
           <celestial_dir ra="193.4" dec="-5.82"/>
       </spectrum>
    </source>
