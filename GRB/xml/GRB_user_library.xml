@@ -9,7 +9,7 @@
     <!-- - The second parameter is the time to wait for the next burst (1hour = 3600 seconds., 1day = 86400 seconds.) -->     
     <source name="GRB">
       <spectrum escale="MeV"> 
-        <SpectrumClass name="GRBmanager" params="0.001,4000"/>
+        <SpectrumClass name="GRBmanager" params="0,4000"/>
         <use_spectrum frame="galaxy"/> 
       </spectrum> 
     </source>
@@ -68,18 +68,18 @@
           <spectrum escale="MeV"> <SpectrumClass name="GRBmanager" params="3000,4000"/>
           <direction theta="30" phi="45" />
       </spectrum> </source>
-
-      <!--GRB spectrum + diffuse -->
       <!-- diffuse extraglactic from 100 MeV: see flux package, from which it is stolen-->
-      <source name="diffuse" flux="0.145">
+      <source name="grb_diffuse" flux="0.145">
         <spectrum escale="GeV">
           <particle name="gamma">  <power_law emin="0.1" gamma="2.1"/></particle>
           <solid_angle mincos="-0.4" maxcos="1.0"/>
         </spectrum>
       </source>
+
+      <!--GRB spectrum + diffuse -->
       <source name="GRB_DIFFUSE" >
         <nestedSource sourceRef="One_GRB_each_Minute"/>
-        <nestedSource sourceRef="diffuse"/>
+        <nestedSource sourceRef="grb_diffuse"/>
       </source>
 
 </source_library>

@@ -63,7 +63,7 @@ double GRBmanager::interval(double time)
       delete m_spectrum;
       
       m_startTime = m_nextBurst;
-      std::cout<<" GRB N "<<m_Nbursts<<" at TIME "<<m_startTime<<std::endl;
+      std::cout<<" GRB N "<<m_Nbursts+1<<" at TIME "<<m_startTime<<std::endl;
       //////////////////////////////////////////////////
       m_Nbursts++;
       m_par->ReadParametersFromFile(paramFile,m_Nbursts);
