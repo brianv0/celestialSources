@@ -14,8 +14,6 @@
 
 
 
-static std::ofstream os("gleam.lis");
-
 
 // Constructors
 
