@@ -18,7 +18,7 @@
 #include <map>
 #include <cmath>
 #include "flux/ISpectrum.h"
-//#include "facilities/Observer.h"
+#include "flux/EventSource.h"
 #include "GRBobsSim.h"
 #include "SpectObj/SpectObj.h"
 

@@ -1,4 +1,4 @@
-# echo "Setting GRBobs v0 in /data0/glast/GRBSimul/celestialSources"
+# echo "Setting GRBobs v0p1 in /data0/glast/GRBSimul/celestialSources"
 
 if test "${CMTROOT}" = ""; then
   CMTROOT=/data0/glast/extlib/CMT/v1r14p20031120; export CMTROOT
@@ -7,6 +7,6 @@ fi
 
 tempfile=`${CMTROOT}/mgr/cmt build temporary_name -quiet`
 if test ! $? = 0 ; then tempfile=/tmp/cmt.$$; fi
-${CMTROOT}/mgr/cmt -quiet setup -sh -pack=GRBobs -version=v0 -path=/data0/glast/GRBSimul/celestialSources  $* >${tempfile}; . ${tempfile}
+${CMTROOT}/mgr/cmt -quiet setup -sh -pack=GRBobs -version=v0p1 -path=/data0/glast/GRBSimul/celestialSources  $* >${tempfile}; . ${tempfile}
 /bin/rm -f ${tempfile}
 

@@ -4,6 +4,7 @@
 
 #include "../GRBobs/GRBobsConstants.h"
 using namespace ObsCst;
+
 GRBobsParameters::GRBobsParameters()
 {
   rnd = new TRandom();
@@ -19,6 +20,7 @@ double GRBobsParameters::GetBATSEFluence()
   //return pow(10.0,rnd->Gaus(-6.3,0.57); //erg/cm^2 (Short Bursts)
 }
 //////////////////////////////////////////////////
+
 void GRBobsParameters::SetGRBNumber(long GRBnumber)
 {
   m_GRBnumber = GRBnumber;
@@ -114,7 +116,7 @@ void GRBobsParameters::ReadParametersFromFile(std::string paramFile, int NGRB)
   std::ifstream f1(paramFile.c_str());
   if (!f1.is_open()) 
     {
-      std::cout<<"GRBConstants: Error Opening paramFile\n";
+      std::cout<<"GRBobsConstants: Error Opening paramFile\n";
       exit(1);
     }
   

@@ -4,16 +4,15 @@
 #include "GRBobs/GRBobsengine.h"
 #include "GRBobs/GRBobsPulse.h"
 
+#define DEBUG 0 
+
 using namespace ObsCst;
 
 GRBobsengine::GRBobsengine(GRBobsParameters *params)
   : m_params(params)
 {
-  m_dir = m_params->GetGalDir();
-  
-  std::cout<<" Create new GRBobs : "<<std::endl;
-  std::cout<<" Seed           = "<<m_params->GetGRBNumber()<<std::endl;
-  std::cout<<" Position    : l="<<m_dir.first<<", b = "<<m_dir.second<<std::endl;
+  m_dir = m_params->GetGalDir(); 
+  std::cout<<" Create new GRBobs (N= "<<m_params->GetGRBNumber()<<") at Position : l,b= "<<m_dir.first<<", "<<m_dir.second<<std::endl;
 }
 
 std::vector<GRBobsPulse*> GRBobsengine::CreatePulsesVector()
@@ -26,7 +25,7 @@ std::vector<GRBobsPulse*> GRBobsengine::CreatePulsesVector()
   GRBobsPulse *aPulse;
 
   m_params->GenerateParameters();
-  m_params->PrintParameters();
+  if(DEBUG) m_params->PrintParameters();
   
   tau = m_params->GetPulseSeparation();
   rt  = m_params->GetRiseTime();
@@ -44,7 +43,7 @@ std::vector<GRBobsPulse*> GRBobsengine::CreatePulsesVector()
   for(int i = 0;i<Npulses-1;i++)
     {
       m_params->GenerateParameters();
-      m_params->PrintParameters();
+      if(DEBUG) m_params->PrintParameters();
 
       tau = m_params->GetPulseSeparation();
       rt  = m_params->GetRiseTime();

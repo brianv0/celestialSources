@@ -1,18 +1,17 @@
 #ifndef GRBOBSCONSTANT_HH
 #define GRBOBSCONSTANT_HH 1
 
-/*! 
- * \class GRBobsConstants
- * \brief Class instantiated to access general parameters and constants.
- *  
- */
-
 #include <vector> 
 #include <string>
 #include "TRandom.h"
 #include "TF1.h"
 
-
+/*! 
+ * \namespace ObsCst
+ * \brief Namespace containing the constants of the model such as the binning in tiime and energy
+ 
+ * \author Nicola Omodei       nicola.omodei@pi.infn.it 
+ */
 namespace ObsCst
 {
   const double emin = 10.0; //keV
@@ -37,9 +36,18 @@ namespace ObsCst
   //////////////////////////////////////////////////
 };
 
+/*! 
+ * \class GRBobsParameters
+ * \brief Class instantiated to access general parameters and constants.
+ 
+ * \author Nicola Omodei       nicola.omodei@pi.infn.it 
+ */
+
+
 class GRBobsParameters
 {
  public:
+  
   GRBobsParameters();
   ~GRBobsParameters()
     { 
