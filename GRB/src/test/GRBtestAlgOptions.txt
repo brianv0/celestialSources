@@ -31,10 +31,10 @@ FluxSvc.source_lib += {"$(GRBROOT)/xml/GRB_user_library.xml"};
 //GRBTestAlg.source_name="GRBspectrum_Gal";  
 //GRBTestAlg.source_name="GRBspectrum_Test"; // with fixed direcion
 
-//GRBTestAlg.source_name="GRBobsspectrum_Gal";
+GRBTestAlg.source_name="GRBobsSpectrum_Gal";
 //GRBTestAlg.source_name="GRBobsspectrum_Test"; // with fixed direcion
 
-GRBTestAlg.source_name="GRBmanager_Gal";
+//GRBTestAlg.source_name="GRBmanager_Gal";
 
 //------------------------------------------------------------
 // Background source name
