@@ -82,4 +82,22 @@
        </spectrum> 
     </source>
 
+<!-- All EGRET Pulsars in Polar Cap or Outer Gap -->
+    <source name="AllEGRETPulsarsPolar" >
+       <nestedSource sourceRef="PSRCrabPolarPhen" />
+       <nestedSource sourceRef="PSRVelaPolarPhen" />
+       <nestedSource sourceRef="PSRGemingaPolarPhen" />
+       <nestedSource sourceRef="PSR1706-44PolarPhen" />
+       <nestedSource sourceRef="PSR1055-52PolarPhen" />
+    </source>
+
+    <source name=" AllEGRETPulsarsOuter " >
+       <nestedSource sourceRef="PSRCrabOuterPhen" />
+       <nestedSource sourceRef="PSRVelaOuterPhen" />
+       <nestedSource sourceRef="PSRGemingaOuterPhen" />
+       <nestedSource sourceRef="PSR1706-44OuterPhen" />
+       <nestedSource sourceRef="PSR1055-52OuterPhen" />
+    </source>
+
+
 </source_library>

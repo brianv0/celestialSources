@@ -7,39 +7,63 @@
  *  
  * The namespace cst contains all the constant needed to the simulation.
  *
- * \author Nicola Omodei       nicola.omodei@pi.infn.it 
- * \author Massimiliano Razzano massimilia.razzano@pi.infn.it
+ *
+ * \author Nicola Omodei        nicola.omodei@pi.infn.it 
+ * \author Massimiliano Razzano massimiliano.razzano@pi.infn.it
  */
 
 #include <vector> 
 #include <string>
 #include "TRandom.h"
 
-
+//! Namespace containing general parameters and constants
 namespace cst
 {
-  const double EnNormMin = 1e5; // KeV (100 MeV) // Normalization Interval, according to EGRET (E>100MeV)
-  const double EnNormMax = 3e7; // KeV (30 GeV)
-  
-  const    int Ebin =  50 ; // Energy bins 
-  const    int Tbin =  200; // Time bins 
+  //! Lower Extremum of the normalization band,espressed in keV (100MeV) 
+  const double EnNormMin = 1e5;  
 
+  //! Upper Extremum of the normalization band,espressed in keV (30GeV) 
+  const double EnNormMax = 3e7;  
+  
+  //! Number of energy bins used in the TH2D histogram
+  const    int Ebin =  50 ; 
+
+  //! Number of time bins used in the TH2D histogram
+  const    int Tbin =  200; 
+
+  //! Conversion erg-->MeV
   const double erg2meV   = 624151.0;
 
-  const double GBM1=10.0;                     // 10 keV 
-  const double GBM2=25.0e3;                   // 25 MeV 
-  const double LAT1=30e3;                     // 30 MeV 
-  const double LAT2=3.0e8;                    // 300 GeV 
-  const double EGRET1=3.0e4;                 // 30 MeV
-  const double EGRET2=1.0e5;                  // 100MeV
-  const double EGRET3=3.0e7;                  // 10 GeV
-
-  const double StartMissionDateMJD = 51910.0; //Start Date: 1 Jan 2001, 00:00.00
-  const double JDminusMJD = 2400000.5; //Difference between JD and MJD
-  const int SecsOneDay = 86400; //seconds in one day
-
-  //////////////////////////////////////////////////
+  //! Lower energy of GBM band, expressed in keV (10keV)
+  const double GBM1=10.0;                     
   
+  //! Upper energy of GBM band, expressed in keV (25MeV)
+  const double GBM2=2.5e4;                   
+
+  //! Lower energy of LAT band, expressed in keV (30MeV)
+  const double LAT1=3.0e4;                     
+
+  //! Upper energy of LAT band, expressed in keV (300GeV) 
+  const double LAT2=3.0e8;                     
+
+  //! Lower energy of EGRET band, expressed in keV (30MeV)
+  const double EGRET1=3.0e4;                 
+
+  //! Mid energy of EGRET band, expressed in keV (100MeV)
+  const double EGRET2=1.0e5;                  
+
+  //! Upper energy of EGRET band, expressed in keV (30GeV)
+  const double EGRET3=3.0e7;                  
+
+  //! Start Mission Date, expressed in MJD (Jan,1 2001, 00:00:00)
+  const double StartMissionDateMJD = 51910.0; 
+
+  //! Difference between JD and MJD
+  const double JDminusMJD = 2400000.5; 
+
+  //! Seconds in one day
+  const int SecsOneDay = 86400; 
+
 };
 
 #endif

@@ -5,31 +5,45 @@
 #ifndef PulsarSIM_H
 #define PulsarSIM_H 
 
+/*! 
+* \class PulsarSim
+* \brief Class that contains the generation of the TH2D ROOT Histogram for Pulsar flux according to a selected model.
+*  
+* \author Nicola Omodei        nicola.omodei@pi.infn.it 
+* \author Massimiliano Razzano massimiliano.razzano@pi.infn.it
+ *
+ * This class creates the TH2D ROOT histogram that contains the differential photon flux (dN/dE/dt/dA) of the simulated
+ * pulsar espressed in ph/keV/s/m2.
+ * The user can specify the emission model.Now the default model is a phenomenological one thata cna simulate the emissione
+ * from Polar Cap or Outer Gap.
+*/
+
 class PulsarSim 
 {
  public:
   
-  //! The simulation can be initialized by setting the seed of the Random engine generator. If seed is 0, a Random Pulsar is computed.
+  //! Constructor of PulsarSim
   PulsarSim(std::string name, int seed, double flux, double enphmin, double enphmax, double period, int numpeaks);
-  //! destructor
+
+  //! Destructor of PulsarSim
   ~PulsarSim()
     {
       delete m_Nv;
     }
   
-  /*!
-   * \brief Starts the Pulsar simulation
-   *
-   * Initialize the simulation
-   */
+  //! Method that creates the TH2D histogram according to the phenomenological model.
   TH2D* PSRPhenom(double par1, double par2, double par3, double par4);
 
-  /*! Compute the Flux, as a function of time. It returns a matrix.
-   * \param time is the time in which the spectrum is calculated.
-   */
+  // Returns a TH2D ROOT matrix that contains in every bin Nv*dE*dT*Aeff
   TH2D *PulsarSim::Nph(const TH2D *Nv);
+
+  //! Returns the period of the pulsar 
   inline double Period(){return m_period;}
+
+  //! Save a ROOT file with the TH2D ROOT histogram
   void SaveNv(TH2D *Nv);
+
+  //! Save a TXT file with the Pulsar rime profile
   void SaveTimeProfile(TH2D *Nv);
   
  private:

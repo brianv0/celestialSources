@@ -15,8 +15,19 @@
 using namespace cst;
 
 //////////////////////////////////////////////////
+/*!
+ * \param name Name of the pulsar 
+ * \param seed Seed of the random generator
+ * \param flux Flux of the pulsar in ph/cm2/s 
+ * \param enphmin Minimun energy of the extracted photons
+ * \param enphmax Maximum energy of the extracted photons
+ * \param period Period of the pulsar
+ * \param numpeaks Number of peaks
+ * 
+ */
 PulsarSim::PulsarSim(std::string name, int seed, double flux, double enphmin, double enphmax, double period, int numpeaks)
 {
+
   m_flux = flux; //ph/cm2/s
   m_period  = period;
   m_numpeaks = numpeaks;
@@ -26,6 +37,16 @@ PulsarSim::PulsarSim(std::string name, int seed, double flux, double enphmin, do
   m_seed = seed;
 }
 
+//////////////////////////////////////////////////
+/*!
+ * \param par1 Parameter E0 expressed in GeV
+ * \param par2 Parameter En expressed in GeV
+ * \param par3 Parameter G 
+ * \param par4 Parameter b
+ *
+ * This method creates a ROOT TH2D histogram according to a phenomenological model. The 2d hist is 
+ * obtained by multiplying the lightcurve and the spectrum
+ */
 TH2D* PulsarSim::PSRPhenom(double par1, double par2, double par3, double par4)
 {
 
@@ -138,6 +159,10 @@ TH2D* PulsarSim::PSRPhenom(double par1, double par2, double par3, double par4)
 
   if ((m_numpeaks == 3 ) || (m_numpeaks == 4 ))
     {
+      //      for (int b=0; b < Tbin; b++)
+      //{
+      //  deltaFunction.SetBinContent(b+1, (ampl1+ampl2)/100);
+      //}
       deltaFunction.SetBinContent(int(peak1/dt),ampl1);
       deltaFunction.SetBinContent(int(peak2/dt),ampl2);
     } 

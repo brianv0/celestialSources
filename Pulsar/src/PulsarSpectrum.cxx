@@ -159,7 +159,7 @@ double PulsarSpectrum::interval(double time)
 
   double intPart; //Integer part
   double tStart = modf(initTurns,&intPart)*m_period; // Start time for interval
-  //std::cout << " 3 " << tStart << " " << m_enphmin << std::endl;
+  // std::cout << " 3 " << tStart << " " << m_enphmin << std::endl;
   
   double inte = m_spectrum->interval(tStart,m_enphmin); //deltaT (in system where Pdot = 0
   //std::cout << " 4 " << std::endl;
