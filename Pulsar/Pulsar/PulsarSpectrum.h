@@ -11,6 +11,7 @@
 #include "facilities/Util.h"
 #include "astro/JulianDate.h"
 #include "astro/EarthOrbit.h"
+#include "astro/SolarSystem.h"
 #include "PulsarConstants.h"
 #include "PulsarSim.h"
 #include "SpectObj/SpectObj.h"
@@ -52,9 +53,9 @@ class PulsarSpectrum : public ISpectrum
   //!Retrieve the nextTime from the number of turns to be completed
   double retrieveNextTimeTilde( double tTilde, double totalTurns, double err );
 
-  //!Apply the barycentric decorrections and returns arrival time in tt
-  double getBaryDeCorr( double tdbInput ); 
-  
+  //!Apply the barycentric corrections and returns arrival time in tdb
+  double getBaryCorr( double tdbInput ); 
+ 
   //! direction, taken from PulsarSim
   inline std::pair<double,double>
     dir(double energy) 
@@ -78,6 +79,7 @@ class PulsarSpectrum : public ISpectrum
   SpectObj  *m_spectrum;
   
   astro::EarthOrbit m_earthOrbit;
+  astro::SolarSystem m_solSys;
 
 
   ofstream BaryOutFile;
