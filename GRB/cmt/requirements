@@ -1,6 +1,6 @@
 package GRB
 package GRB
-version v4r0
+version v4r0p3
 author Nicola Omodei<nicola.omodei@pi.infn.it> Johann Cohen-Tanugi <johann.cohen@pi.infn.it> Sandhia Bansal <sandhiab@lheapop.gsfc.nasa.gov>
 
 # $Id$
