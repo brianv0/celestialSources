@@ -12,6 +12,7 @@ Parameters::Parameters()
   rnd = new TRandom();
   SetGRBNumber(UInt_t(rnd->GetSeed()));
   m_Type=0;
+  SetGBMOutput(false);
 }
 
 void Parameters::SetGRBNumber(UInt_t GRBnumber)
@@ -73,7 +74,8 @@ void Parameters::SetEtot(double etot)
   m_Etot = (etot>0.0) ? etot : pow(10.0,rnd->Gaus(51.,0.5)); //erg
 }
 
-void Parameters::SetEpeak(double epeak)
+/*
+  void Parameters::SetEpeak(double epeak)
 {
   if(epeak<=0)
     {
@@ -85,6 +87,7 @@ void Parameters::SetEpeak(double epeak)
   else 
     m_Ep =  epeak;
 }
+*/
 
 void Parameters::SetInitialSeparation(double initialSeparation)
 {
@@ -122,8 +125,8 @@ void Parameters::ReadParametersFromFile(std::string paramFile, int NGRB)
       std::cout<<"GRBConstants: Error Opening paramFile!! \n";
       exit(1);
     }
-  int    nshell, seed;
-  double fluence,etot,r0,dr0,l0,b0;
+  int    nshell;
+  double fluence,etot,r0,dr0;
   double gmin,gmax,ic;
 
   
@@ -134,8 +137,7 @@ void Parameters::ReadParametersFromFile(std::string paramFile, int NGRB)
   
   while(i<=NGRB && f1.getline(buf,200))
     {
-      if(sscanf(buf,"%d %lf %lf %lf %d %lf %lf %lf %lf %lf %lf",
-		&seed,&l0,&b0,&fluence,&nshell,&etot,&r0,&dr0,&gmin,&gmax,&ic)<=0) break;
+      if(sscanf(buf,"%lf %d %lf %lf %lf %lf %lf %lf",&fluence,&nshell,&etot,&r0,&dr0,&gmin,&gmax,&ic)<=0) break;
       i++;
     }
   i--;
@@ -151,23 +153,21 @@ void Parameters::ReadParametersFromFile(std::string paramFile, int NGRB)
       for(int j = 1; j<=nb;j++)
 	{
 	  f2.getline(buf,200);
-	  sscanf(buf,"%d %lf %lf %lf %d %lf %lf %lf %lf %lf %lf",
-		 &seed,&l0,&b0,&fluence,&nshell,&etot,&r0,&dr0,&gmin,&gmax,&ic);
+	  sscanf(buf,"%lf %d %lf %lf %lf %lf %lf %lf",&fluence,&nshell,&etot,&r0,&dr0,&gmin,&gmax,&ic);
 	}
       f2.close();
     }
+  SetParameters(fluence,nshell,etot,r0,dr0,gmin,gmax,ic);
+}
 
-  SetGRBNumber(UInt_t(65540+seed));  
-
-  
-  SetGalDir(l0,b0);
+void Parameters::SetParameters(double fluence, int nshell, double etot, double r0, double dr0, double gmin, double gmax, double ic)
+{
+  SetGalDir(-200,-200);
   SetEtot(etot);
   SetFluence(fluence);
   SetInitialSeparation(r0);
   SetInitialThickness(dr0);		
-
   SetNshell(nshell);
-
   SetGammaMin(gmin);
   SetGammaMax(gmax);
   SetInverseCompton(ic);
@@ -182,19 +182,20 @@ void Parameters::ComputeParametersFromFile(std::string paramFile, int NGRB)
       std::cout<<"GRBConstants: Error Opening paramFile\n";
       exit(1);
     }
-  int    nshell, seed;
-  double fluence,r0,dr0,l0,b0;
-  double gmin,ic;
+  int    nshell;
+  double fluence,r0,dr0;
+  double gmin,gmax,etot,ic;
   double tv,ep,Eco;
-
+  
+  int GBM;
+  
   char buf[200];
   f1.getline(buf,100);
   
    int i=1;
   while(i<=NGRB && f1.getline(buf,100))
     {
-      if(sscanf(buf,"%d %lf %lf %lf %d %lf %lf %lf %lf ",
-		&seed,&l0,&b0,&fluence,&nshell,&tv,&Eco,&ep,&ic)<=0) break;
+      if(sscanf(buf,"%lf %d %lf %lf %lf %lf %d",&fluence,&nshell,&tv,&Eco,&ep,&ic,&GBM)<=0) break;
       i++;
     } 
   i--;
@@ -208,17 +209,17 @@ void Parameters::ComputeParametersFromFile(std::string paramFile, int NGRB)
       for(int j = 1; j<=(NGRB %i);j++)
 	{
 	  f2.getline(buf,100);
-	  sscanf(buf,"%d %lf %lf %lf %d %lf %lf %lf %lf ",
-		 &seed,&l0,&b0,&fluence,&nshell,&tv,&Eco,&ep,&ic);
-	  
+	  if(sscanf(buf,"%lf %d %lf %lf %lf %lf %d",&fluence,&nshell,&tv,&Eco,&ep,&ic,&GBM)<=0);
 	}
-      seed=NGRB;
       f2.close();
     }
   //////////////////////////////////////////////////
   //  ep/=2.0;
-  
-  SetGRBNumber(UInt_t(65540+seed));  
+  if (GBM>0) 
+    SetGBMOutput(true);
+    
+  SetGRBNumber(UInt_t(65540+NGRB));  
+
   if(tv<=0.0)
     {
       if(nshell>1 && nshell<4)
@@ -244,11 +245,10 @@ void Parameters::ComputeParametersFromFile(std::string paramFile, int NGRB)
     }
   
   //  if(ep==0) SetEpeak(ep);
-  m_Ep=ep;
-  double gmax_gmin=2;
-  
+  //  m_Ep=ep;
+  double gmax_gmin=2;  
   double E52   = 1.0;
-  double Ep100 = m_Ep/100.0;///pow(gmax_gmin,2.);
+  double Ep100 = ep/100.0;///pow(gmax_gmin,2.);
   double ae3   = cst::ae * 3.;
   double ab3   = cst::ab * 3.;
   double g100,d7;
@@ -294,22 +294,25 @@ void Parameters::ComputeParametersFromFile(std::string paramFile, int NGRB)
     }
   
   Ep100=3.63*sqrt(E52*ab3/d7)*pow(ae3,2.)/(r10*pow(g100,2));
-  m_Ep = 100.0*Ep100;
+  ep = 100.0*Ep100;
   
   if(DEBUG) 
-    std::cout<<"Expected Ep= "<<m_Ep<<" Gamma = "<<G<<" Ecut-off : "<<G/40.5<<" GeV, Rsh = "<<r0*G<<" tv "<<tv<<std::endl;
+    std::cout<<"Expected Ep= "<<ep<<" Gamma = "<<G<<" Ecut-off : "<<G/40.5<<" GeV, Rsh = "<<r0*G<<" tv "<<tv<<std::endl;
   ////////////////////////////////////////////////// 
-  SetGalDir(l0,b0);  
-  SetEtot(1e52);
-  SetEpeak(Ep100*100.0);
-  SetFluence(fluence);
+  etot = 1e52*E52;
   gmin = 2.*G/(gmax_gmin + 1.);
-  SetGammaMin(gmin);
-  SetGammaMax(gmax_gmin*gmin);  
-  SetInitialSeparation(r0);
-  SetInitialThickness(dr0);
-  SetNshell(nshell);
-  SetInverseCompton(ic);
+  gmax = gmax_gmin*gmin;
+
+  //  SetEpeak(Ep100*100.0);
+  //  SetFluence(fluence);
+  //  SetGammaMin(gmin);
+  //  SetGammaMax(gmax_gmin*gmin);  
+  //  SetInitialSeparation(r0);
+  //  SetInitialThickness(dr0);
+  //  SetNshell(nshell);
+  //  SetInverseCompton(ic);
+  SetParameters(fluence,nshell,etot,r0,dr0,gmin,gmax,ic);
+
 }
 
 void Parameters::PrintParameters()
@@ -324,4 +327,6 @@ void Parameters::PrintParameters()
   std::cout<<" Minimum Lorentsz Factor     = "<<m_Gmin<<std::endl;
   std::cout<<" Maximum Lorentsz Factor     = "<<m_Gmax<<std::endl;
   std::cout<<" Inverse Compton Parameter   = "<<m_InverseCompton<<std::endl;
+  if(m_GBM) 
+    std::cout<<" for this bursts will be generated the GBM output "<<std::endl;
 }

@@ -655,14 +655,13 @@ void ScanParameters(int Ngrb)
 }
 
 
-void MakeGRB(int NGRB=1, UInt_t seed=1, double enph=0, bool gbm = false)
+void MakeGRB(int NGRB=1, double enph=0, bool gbm = false)
 {
   std::cout<<" ****** GRB and ROOT test ****** "<<std::endl;
   
   std::string path = ::getenv("GRBROOT");
   std::string paramFile = path+"/src/test/GRBParam.txt";
   Parameters *params = new Parameters();  
-  //  if (seed >= 1) params->SetGRBNumber(seed);
   //////////////////////////////////////////////////
   params->ComputeParametersFromFile(paramFile,NGRB);
   params->PrintParameters();
@@ -670,7 +669,10 @@ void MakeGRB(int NGRB=1, UInt_t seed=1, double enph=0, bool gbm = false)
   TH2D *matrix = m_grb->Fireball();
   m_grb->SaveNv();
   dist  = m_grb->GetDistance();
-  if(gbm) m_grb->GetGBMFlux();
+  char GRBname[100];
+  sprintf(GRBname,"%d",params->GetGRBNumber());
+  if (gbm)  
+    m_grb->GetGBMFlux(GRBname);
   delete m_grb;
   char name[100];
   sprintf(name,"grb_%d.root",params->GetGRBNumber());
@@ -686,7 +688,6 @@ int main(int argc, char** argv)
   
   std::string arg_name("");
   int current_arg = 1;
-  UInt_t seed = 1;
   int    ngrb = 1;
   double enph=0.0;
   int ngrbs=0;
@@ -699,10 +700,6 @@ int main(int argc, char** argv)
       if("-extract"==arg_name)
 	{
 	  enph  = atof(argv[++current_arg]);
-	}
-      else if("-seed"==arg_name)
-	{
-	  seed=atoi(argv[++current_arg]);
 	}
       else if("-grb"==arg_name)
 	{
@@ -749,7 +746,7 @@ int main(int argc, char** argv)
   else
     {
       TApplication theApp("App",0,0);
-      MakeGRB(ngrb,seed,enph,gbm);
+      MakeGRB(ngrb,enph,gbm);
       theApp.Run();
     }
 }
@@ -760,7 +757,6 @@ void help()
   std::cout<<"   GRB ROOT test program author: Nicola Omodei    "<<std::endl;
   std::cout<<"   Option are: "<<std::endl;
   std::cout<<"  -extract [enph] : etxtract photons above enph"<<std::endl;
-  std::cout<<"  -seed [seed]    : change the seed for random number"<<std::endl;
   std::cout<<"  -grb [N] processes the N grb in the $GRBROOT/src/test/GRBParam.txt file "<<std::endl;
   std::cout<<"  -scan [N] process N GRBs, starting from the first. No video out. "<<std::endl;
   std::cout<<"            It save a root file named GRBCatalog.root"<<std::endl;

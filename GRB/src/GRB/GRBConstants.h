@@ -69,17 +69,25 @@ class Parameters
   void SetNshell(int nshell);
   void SetFluence(double fluence);
   void SetEtot(double etot);
-  void SetEpeak(double epeak);
   void SetInitialSeparation(double initialSeparation);
   void SetInitialThickness(double initialThickness);		  
   void SetGammaMin(double gmin);
   void SetGammaMax(double gmax);
   void SetInverseCompton(double ic);
   void ReadParametersFromFile(std::string paramFile, int NGRB=1);
-
   void ComputeParametersFromFile(std::string paramFile, int NGRB=1);
-
+  void SetParameters(double fluence, 
+		     int nshell, 
+		     double etot, 
+		     double r0, 
+		     double dr0, 
+		     double gmin, 
+		     double gmax, 
+		     double ic);
   void PrintParameters();
+
+  inline bool GenerateGBM(){return m_GBM;}
+  inline void SetGBMOutput(bool flag){m_GBM=flag;}
   inline UInt_t GetGRBNumber(){return m_GRBnumber;}
   inline std::pair<double,double> GetGalDir(){return m_GalDir;}
   inline double GetGamma(double gmin=0,double gmax=0)
@@ -96,6 +104,7 @@ class Parameters
 
  private:
 
+  bool m_GBM;
   UInt_t m_GRBnumber;
   int m_Type;
   int    m_Nshell;

@@ -6,8 +6,9 @@ author Nicola Omodei<nicola.omodei@pi.infn.it> Johann Cohen-Tanugi <johann.cohen
 
 
 use flux       v8r*
+use astro      v*
 use ROOT       v*  IExternal 
-use SpectObj   v0* celestialSources
+use SpectObj   v* celestialSources
 
 macro_append ROOT_libs " -lHist -lGraf "\
                  WIN32 " libHist.lib libGraf.lib " 

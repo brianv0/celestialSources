@@ -17,7 +17,7 @@
   \author Johann Cohen-Tanugi johann.cohen@pi.infn.it
  
 */
-
+#include "TString.h"
 #include "GRBShock.h"
 #include "GRBConstants.h"
 #include "GRBengine.h"
@@ -64,7 +64,9 @@ class GRBSim
   inline double GetFluence(){return m_fluence;} //erg/cm^2
   inline UInt_t GetGRBNumber(){return m_params->GetGRBNumber();} //erg/cm^2
   void SaveNv();
-  void GetGBMFlux();
+  void GetGBMFlux(TString GRBname);
+  void SaveGBMDefinition(TString GRBname, double ra, double dec, double theta, double phi, double tstart);
+
  private:
   
   //! Gathers all relevant constants for the simulation 

@@ -13,6 +13,8 @@
 #define GRBmanager_H
 #include "GRBConstants.h"
 
+#include "TString.h"
+
 #include <vector>
 #include <string>
 #include <cmath>
@@ -62,18 +64,19 @@ class GRBmanager : public ISpectrum
   double interval(double time);
   
   //! direction, taken from GRBSim
-  inline std::pair<double,double>
-    dir(double energy) 
+  inline std::pair<double,double> dir(double energy) 
     {
-      return m_GRB->GRBdir();
+      return m_GalDir;
     } 
   //! calls GRBSpectrum::energySrc
   double energy(double time);
-  
+
   std::string title() const {return "GRBmanager";} 
   const char * particleName() const {return "gamma";}
   const char * nameOf() const {return "GRBmanager";}
-  
+  TString GetGRBname(double time);
+  void GenerateGRB();
+ 
   /*! 
     This method parses the parameter list
     \param input is the string to parse
@@ -83,7 +86,15 @@ class GRBmanager : public ISpectrum
   double parseParamList(std::string input, int index);  
   
  private:
-
+  double m_Rest;
+  double m_Frac;
+  double m_ra;
+  double m_dec;
+  double m_l;
+  double m_b;
+  double m_theta;
+  double m_phi;
+  
   GRBSim   *m_GRB;
   SpectObj *m_spectrum;
   Parameters *m_par;
@@ -100,7 +111,7 @@ class GRBmanager : public ISpectrum
 
   double m_nextBurst;
   int    m_Nbursts;
-  std::pair<double,double> m_GRBdir;
-  
+  std::pair<double,double> m_GalDir;
+  bool m_GenerateGBMOutputs;
 };
 #endif
