@@ -52,7 +52,7 @@ SpectObj::SpectObj(const TH2D* In_Nv, int type)
   gDirectory->Delete("spec");
   gDirectory->Delete("times");
   spec  = new TH1D("spec","spec",ne,en);
-  times = new TH1D("times","times",nt+1,m_Tmin-m_TimeBinWidth/2.,m_Tmax+m_TimeBinWidth/2.);
+  times = new TH1D("times","times",nt,m_Tmin,m_Tmax);
     //times = new TH1D("times","times",nt,m_Tmin,m_Tmax);
   GetUniqueName(spec ,name);
   gDirectory->Delete(name.c_str());
@@ -101,16 +101,34 @@ TH1D *SpectObj::GetSpectrum(double t)
 {
   if (t == 0.0) return spec;
   int ti = Nv->GetXaxis()->FindBin(t);
-
+  double dt0 = t - (Nv->GetXaxis()->GetBinCenter(ti));
   TH1D *sp = CloneSpectrum();
   double sp0,sp1,sp2;
-  for(int ei = 1; ei <= ne; ei++)
+  if(dt0>0 && ti<nt)
     {
-      sp1 = (ti==1) ? 0 : Nv->GetBinContent(ti-1,ei);
-      sp2 = Nv->GetBinContent(ti,ei);
-      sp0 = (sp2-sp1)/m_TimeBinWidth * (t - Nv->GetBinCenter(ti-1)) + sp1;
-      sp->SetBinContent(ei,sp0);
+      for(int ei = 1; ei <= ne; ei++)
+	{
+	  sp1 = Nv->GetBinContent(ti,ei);
+	  sp2 = Nv->GetBinContent(ti+1,ei);
+	  sp0 = (sp2-sp1)/m_TimeBinWidth * dt0 + sp1;
+	  sp->SetBinContent(ei,sp0);
+	}
     }
+  else if(dt0<0 && ti>1)
+    {
+      for(int ei = 1; ei <= ne; ei++)
+	{
+	  sp1 = Nv->GetBinContent(ti-1,ei);
+	  sp2 = Nv->GetBinContent(ti,ei);
+	  sp0 = (sp2-sp1)/m_TimeBinWidth * dt0 + sp2;
+	  sp->SetBinContent(ei,sp0);
+	}
+    } 
+  else 
+    for(int ei = 1; ei <= ne; ei++)
+      {
+	sp->SetBinContent(ei,Nv->GetBinContent(ti,ei));
+      }
   return sp; //ph
 }
 
@@ -226,6 +244,7 @@ TH1D *SpectObj::ComputeProbability(double enph)
 photon SpectObj::GetPhoton(double t0, double enph)
 {
   //  photon ph;
+  int ei  = TMath::Max(1,Nv->GetYaxis()->FindBin(enph));
   
   if (sourceType == 0 ) // Transient
     {
@@ -241,23 +260,39 @@ photon SpectObj::GetPhoton(double t0, double enph)
 	}
       
       TH1D *P = ComputeProbability(enph); //ph
-
+      
       int t1 = P->FindBin(t0);
       int t2 = t1;
-      int ei  = TMath::Max(1,Nv->GetYaxis()->FindBin(enph));
-      
-      while(P->GetBinContent(t2) - P->GetBinContent(t1) < 1.0 && t2 < nt)
+      double dt0 = t0 - P->GetBinCenter(t1);
+      double dP0 = 0;
+
+      if(dt0>0 && t1<nt)
+	{
+	  dP0 = (P->GetBinContent(t1+1) - P->GetBinContent(t1))*dt0/m_TimeBinWidth;
+	}
+      else if(dt0<0 && t1>1)
+	{
+	  dP0 = (P->GetBinContent(t1) - P->GetBinContent(t1-1))*dt0/m_TimeBinWidth;
+	}
+      double P0  = P->GetBinContent(t1) + dP0;
+
+      while(P->GetBinContent(t2) < P0 + 1.0 && t2 < nt)
 	{
 	  t2++;
 	}
       
-      double dp1 = P->GetBinContent(t2) - P->GetBinContent(t2-1);
-      double dp2 = 1.0 + P->GetBinContent(t1) - P->GetBinContent(t2-1);
-      double Dt = P->GetBinCenter(t2-1)- P->GetBinCenter(t1);
-      
+      if(DEBUG)
+	{
+	  std::cout<<P->GetBinCenter(t1)<<" "<<P->GetBinCenter(t2-1)<<" "<<P->GetBinCenter(t2)<<" , "
+		   <<P->GetBinContent(t2-1)- P->GetBinContent(t1)<<" "
+		   <<P->GetBinContent(t2) - P->GetBinContent(t1)<<std::endl;
+	}
+
       if(t2 < nt) // the burst has finished  dp < 1 or dp >=1
 	{
-	  time    = t0 + Dt + dp2/dp1*m_TimeBinWidth; // * 2.0 * m_SpRandGen->Uniform();
+	  double dtf = (P0 + 1.0 - P->GetBinContent(t2-1))/ 
+	    (P->GetBinContent(t2) - P->GetBinContent(t2-1))*m_TimeBinWidth;
+      	  time    = P->GetBinCenter(t2-1) + dtf;
 	  energy  = Integral_T(t1,t2,ei)->GetRandom();
 	}
       
@@ -276,7 +311,6 @@ else if (sourceType == 1) //Periodic //Max
 	double InternalTime = t0 - Int_t(t0/m_Tmax)*m_Tmax; // InternalTime is t0 reduced to a period
 	TH1D *P = ComputeProbability(enph); //ph/m² 
 	double Ptot = P->GetBinContent(nt) - P->GetBinContent(1); //Total proability in a period 
-	int ei  = TMath::Max(1,Nv->GetYaxis()->FindBin(enph));
 
         //First checks if next photon lies in the same period
 	if (((P->GetBinContent(nt) - P->GetBinContent(Nv->GetXaxis()->FindBin(InternalTime))) < 1.0 ))
@@ -414,7 +448,7 @@ double SpectObj::flux(double time, double enph)
 double SpectObj::interval(double time, double enph)
 {
   
-  return GetPhoton(time,enph).time - time;
+  return  GetPhoton(time,enph).time - time;
 }
 
 double SpectObj::energy(double time, double enph)
