@@ -264,17 +264,22 @@ double PulsarSpectrum::interval(double time)
 
   double timeTildeDecorr = time + (StartMissionDateMJD)*SecsOneDay;
   double timeTilde = timeTildeDecorr + getBaryCorr(timeTildeDecorr);
-
+  /*
 //Timing the baryCorr 
   clock_t barySt,baryEnd,bary1,bary2,bary3;
+  
   barySt = clock();
-  for (int i=0; i < 1000; i++)
+  for (int i=0; i < 2000; i++)
     {
-      double bc = getBaryCorr(timeTildeDecorr);
+
+      //double bc  = getBaryCorr(timeTildeDecorr);
+      double nextTimeTilde = retrieveNextTimeTilde(timeTilde, totTurns, (1e-6/m_period));
+      
     }
   baryEnd = clock();
-  std::cout << "\n\n\ @@@timing of BaryCorr : " << (baryEnd-barySt) << " cycles " <<  " s " << (baryEnd-barySt)/1e8 << std::endl;
-
+  std::cout << "\n\n\n\n\n\n\n\@@@@@@@@@@@@@222 @@@timing of Ephem Corr : " 
+	    << (baryEnd-barySt)/2000 << " cycles " <<  " s " << (baryEnd-barySt)/2e9 << std::endl;
+  */
 
 
 
@@ -294,12 +299,38 @@ double PulsarSpectrum::interval(double time)
   double inte = m_spectrum->interval(tStart,m_enphmin); //deltaT (in system where Pdot = 0
   double inteTurns = inte/m_period; // conversion to # of turns
   double totTurns = initTurns + inteTurns; //Total turns at the nextTimeTilde
-  double finPh =  modf(initTurns,&intPart);
-  finPh = modf(finPh + inteTurns,&intPart); //finPh is the expected phase corresponding to the nextTimeTilde
+  //double finPh =  modf(initTurns,&intPart);
+  //finPh = modf(finPh + inteTurns,&intPart); //finPh is the expected phase corresponding to the nextTimeTilde
   //std::cout << "2" << std::endl;
   double nextTimeTilde = retrieveNextTimeTilde(timeTilde, totTurns, (1e-6/m_period));
   //std::cout << "3" << std::endl;
   // std::cout << " corr " << getBaryCorr(nextTimeTilde) << std::endl;  
+
+
+
+//Timing the baryCorr 
+  clock_t barySt,baryEnd,bary1,bary2,bary3;
+  
+  barySt = clock();
+  for (int i=0; i < 2000; i++)
+    {
+
+      //double bc  = getBaryCorr(timeTildeDecorr);
+      double nextTimeTilde = retrieveNextTimeTilde(timeTilde, totTurns, (1e-6/m_period));
+    }
+  baryEnd = clock();
+  std::cout << "\n\n\n\n\n\n\n\@@@@@@@@@@@@@222 @@@timing of Ephem Correct : " 
+	    << (baryEnd-barySt)/2000 << " cycles " <<  " s " << (baryEnd-barySt)/2e9 << std::endl;
+
+
+
+
+
+
+
+
+
+
 
 
   //Find the TT from TDB. Bisection method.
@@ -311,7 +342,7 @@ double PulsarSpectrum::interval(double time)
   double ttMid = (ttUp + ttDown)/2;
 
   int i = 0;
-
+  
   double hMid = 1e30;
   while (fabs(hMid)>err )
     {
@@ -319,11 +350,11 @@ double PulsarSpectrum::interval(double time)
       double hDown = (nextTimeTilde - (ttDown + getBaryCorr(ttDown)));
       hMid = (nextTimeTilde - (ttMid + getBaryCorr(ttMid)));
 
-      /*    
-      std::cout << std::setprecision(30) 
-		<< "\n" << i << "**ttUp " << ttUp << " ttDown " << ttDown << " mid " << ttMid << std::endl;
-      std::cout << "  hUp " << hUp << " hDown " << hDown << " hMid " << hMid << std::endl;
-      */
+          
+      // std::cout << std::setprecision(30) 
+	//	<< "\n" << i << "**ttUp " << ttUp << " ttDown " << ttDown << " mid " << ttMid << std::endl;
+      //std::cout << "  hUp " << hUp << " hDown " << hDown << " hMid " << hMid << std::endl;
+      
 
       if (fabs(hMid) < err) break;
       if ((hDown*hMid)>0)
@@ -336,10 +367,11 @@ double PulsarSpectrum::interval(double time)
 	  ttUp = ttMid;
 	  ttMid = (ttUp+ttDown)/2;
 	}
-      i++;
+       i++;
     }
+
   /*
-  std::cout << i << " Diff is " << std::setprecision(30) << " TDB " << nextTimeTilde/SecsOneDay 
+   std::cout << i << " Diff is " << std::setprecision(30) << " TDB " << nextTimeTilde/SecsOneDay 
 	    << " TDB computed " << (ttMid + getBaryCorr(ttMid)/SecsOneDay)/SecsOneDay 
 	    << " corr " << getBaryCorr(ttMid) 
 	     << " -->Diff " << (nextTimeTilde-(ttMid + (getBaryCorr(ttMid)/SecsOneDay))) <<std::endl; 
@@ -360,8 +392,8 @@ double PulsarSpectrum::interval(double time)
   }
   
    intEnd = clock();   
-   printf("^^^^^^^^^^^^^Interval -  CPU Time = %.i c\n",(intEnd-intStart));
-   std::cout << "EEE" << (intEnd-intStart)/1e6 << std::endl;
+   //   printf("^^^^^^^^^^^^^Interval -  CPU Time = %.i c\n",(intEnd-intStart));
+   //std::cout << "EEE" << (intEnd-intStart)/1e6 << std::endl;
 
    //   std::cout << "\n\n OCCKIO " << std::endl;
    //std::cout << getBaryCorr(timeTilde) << std::endl;
@@ -405,97 +437,79 @@ double PulsarSpectrum::getTurns( double time )
 /*!
  * \param tTilde Time from where retrieve the nextTime;
  * \param totalTurns Number of turns completed by the pulsar at nextTime;
- * \param err Tolerance between totalTurns and the number of turns at nextTime
+ * \param err Phase tolerance between totalTurns and the number of turns at nextTime
  *
  * <br>In this method a recursive way is used to find the <i>nextTime</i>. Starting at <i>tTilde</i>, the method returns 
  * nextTime, the time where the number of turns completed by the pulsar is equal to totalTurns.  
  */
 double PulsarSpectrum::retrieveNextTimeTilde( double tTilde, double totalTurns, double err )
 {
-  time_t retStart,retEnd;
-  retStart = clock();
 
-  //err = 1e-6;
-  double tStep = m_period;
-  double tempTurns = 0.0;
-  double tTildeHigh = 0.0;
-  double tTildeLow = tTilde;
- 
-  //std::cout << std::setprecision(30) << " tTilde " << tTilde << " totalTurns " << totalTurns << " err " << err << std::endl;
-
-  //First part to find Extrema...
-  while (tempTurns < totalTurns)
+  double tTildeUp = tTilde;
+  double tTildeDown = tTilde;  
+  double NTdown = totalTurns - getTurns(tTildeDown); 
+  double NTup = totalTurns - getTurns(tTildeUp);
+  int u = 0;
+  while ((NTdown*NTup)>0)
     {
-      tTilde = tTilde + tStep;
-      tempTurns = getTurns(tTilde);
+      u++;
+      tTildeUp = tTilde+m_period*pow(2.0,u); 
+      NTdown = totalTurns - getTurns(tTildeDown); 
+      NTup = totalTurns - getTurns(tTildeUp);
     }
-  tTildeHigh = tTilde;
   
-  //Iterative procedure to find the correct nextTime
-  tStep = (tTildeHigh-tTildeLow)/2;
-  
-  int nIter = 0;
-  
-  while (fabs(tempTurns - totalTurns ) > err)
-    {
+  double tTildeMid = (tTildeDown+tTildeUp)/2.0;
+  double NTmid = totalTurns - getTurns(tTildeMid);
 
-      tTilde = tTildeLow+tStep;
-      tempTurns = getTurns(tTilde);
-      if ((tempTurns-totalTurns) > 0.0)
+  while(fabs(NTmid) > err )
+    { 
+      if (fabs(NTmid) < err) break;
+      NTmid = totalTurns - getTurns(tTildeMid);
+      NTdown = totalTurns - getTurns(tTildeDown); 
+      if ((NTmid*NTdown)>0)
 	{
-	  tTildeHigh = tTilde;
-	}
+	  tTildeDown = tTildeMid;
+	  tTildeMid = (tTildeDown+tTildeUp)/2.0;
+	} 
       else 
 	{
-	  tTildeLow = tTilde;
-	}
-      tStep = tStep/2;
-      nIter++;
-
-      //If the procedure not converge within the err,  the tolerance is amplyfied.
-      if (nIter == 30)
-	{
-	  //	  	  std::cout << std::setprecision(30) << " Warning!! Amplifying tolerance for convergence at time " 
-	  //		    << tTilde - (StartMissionDateMJD)*SecsOneDay << std::endl;
- 	  //	  std::cout <<  std::setprecision(30) << " Low is " << tTildeLow << " High is " << tTildeHigh 
-	  //    << " -->turns " << tempTurns << "(total " << totalTurns << " ) " << std::endl;
-	  //std::cout << "    diff " << fabs(tempTurns-totalTurns) << " , err " << err << std::endl;
-	  //std::cout << " Error from " << err ; 
-	  err = err*5.0;
-	  //std::cout << " to " << err << " diff " << fabs(tempTurns-totalTurns) <<std::endl;
-	  nIter = 0;
+	  tTildeUp = tTildeMid;
+	  tTildeMid = (tTildeDown+tTildeUp)/2.0;
 	}
     }
-  retEnd = clock();
-  printf("Retrieve - CPU Time = %.i c\n",(retEnd-retStart));
+  if (DEBUG)
+    {
+      std::cout << "**  RetrieveNextTimeTilde " << std::endl;
+      std::cout << std::setprecision(30) << "  Stop up is " << tTildeUp << " NT " << NTup << std::endl;
+      std::cout << std::setprecision(30) << "        down is " << tTildeDown << " NT " << NTdown << " u= " << u << std::endl;
+      std::cout << std::setprecision(30) << "        mid is " << tTildeMid << " NT " << NTmid << " u= " << u << std::endl;
+      std::cout << "     nextTimeTilde is " << tTildeMid << std::endl;
+    }
 
-
-  return tTilde;
+  return tTildeMid;
 }
 
 /////////////////////////////////////////////
 /*!
- * \param ttInput Photon arrival time Terrestrial Time
+ * \param ttInput Photon arrival time Terrestrial Time (expressed in MJD converted in seconds)
  *
- * <br>This method performs the compute the barycentric corrections and returns the time in Solar System Barycentric Time
- *. The corrections  now taken into account are:
+ * <br>This method computes the barycentric corrections for the photon arrival time at spacecraft and returns 
+ * the time in Solar System Barycentric Time. The corrections implemented at the moment are:
  * <ul>
  *  <li> Conversion from TT to TDB;
- *  <li> Geometric Time Delay due to light propagation;
+ *  <li> Geometric Time Delay due to light propagation in Solar System;
  *  <li> Relativistic Shapiro delay;
  * </ul>   
  */
 double PulsarSpectrum::getBaryCorr( double ttInput )
 {
-
-  //Timing 
-  //  clock_t barySt,baryEnd,bary1,bary2,bary3;
-  //  barySt = clock();
-
-
   //Start Date;
   astro::JulianDate ttJD(2007, 1, 1, 0.0);
-  //  std::cout << std::setprecision(30) << "Barycentric Corrections for time " << ttJD + (ttInput/SecsOneDay) << " (JD)" << std::endl;
+  if (DEBUG)
+    {
+      std::cout << std::setprecision(30) << "Barycentric Corrections for time " 
+		<< ttJD + (ttInput/SecsOneDay) << " (JD)" << std::endl;
+    }
 
 
   ttJD = ttJD+(ttInput - (StartMissionDateMJD)*SecsOneDay)/86400.;
@@ -503,52 +517,25 @@ double PulsarSpectrum::getBaryCorr( double ttInput )
   // Conversion TT to TDB, from JDMissionStart (that glbary uses as MJDref)
   double tdb_min_tt = m_earthOrbit.tdb_minus_tt(ttJD);
 
-  //  bary1 = clock();
-
   //Correction due to geometric time delay of light propagation 
   Hep3Vector GeomVect = (m_earthOrbit.position(ttJD)/clight) - m_solSys.getBarycenter(ttJD);
   double GeomCorr = GeomVect.dot(m_PulsarVectDir);
 
-  // bary2 = clock();
   //Correction due to Shapiro delay.
+  Hep3Vector sunV = m_solSys.getSolarVector(ttJD);
 
-
-
-  //double ShapiroCorr = -1.0*m_earthOrbit.calcShapiroDelay(ttJD,m_PulsarDir);
-  //std::cout << std::setprecision(30) << "Shapiro-astro " << ShapiroCorr << std::endl;
-
-  Hep3Vector sun2 = m_solSys.getSolarVector(ttJD);
-  // std::cout << " pulsar x " << sun2.x() << "y " << sun2.y() << " z" << sun2.z() << std::endl;
   // Angle of source-sun-observer
-   double costheta = - sun2.dot(m_PulsarVectDir) / ( sun2.mag() * m_PulsarVectDir.mag() );
-   //std::cout << "costheta-Pulsar " << costheta << std::endl;
-   //std::cout << " pulsar dir  - x " << m_PulsarVectDir.x() << " y " << m_PulsarVectDir.y() << " z " << m_PulsarVectDir.z() << std::endl;
-   double m = 4.9271e-6;
-   double ShapiroCorr = 2 * m * log(1+costheta);
-   //std::cout << std::setprecision(30) << "Shapiro-Pulsa " << ShapiroCorr << std::endl;
+  double costheta = - sunV.dot(m_PulsarVectDir) / ( sunV.mag() * m_PulsarVectDir.mag() );
+  double m = 4.9271e-6; // m = G * Msun / c^3
+  double ShapiroCorr = 2.0 * m * log(1+costheta);
 
-
-
-
-   //bary3 = clock();
   if (DEBUG)
   {
-    std::cout << "Barycentric Corrections for time " << ttJD/SecsOneDay << " (MJD)" << std::endl;
     std::cout << std::setprecision(15) << "** --> TDB-TT = " << tdb_min_tt << std::endl;
     std::cout << std::setprecision(15) << "** --> Geom. delay = " << GeomCorr << std::endl;
     std::cout << std::setprecision(15) << "** --> Shapiro delay = " << ShapiroCorr << std::endl;
     std::cout << std::setprecision(15) << "** ====> Total= " << tdb_min_tt + GeomCorr + ShapiroCorr  << std::endl;
   }  
-
-  //
-  //  baryEnd = clock();
-
-  //  printf("@@@@@@@@@@@@@222Bary - CPU Time = 1 - %.i cycl\n",(bary1-barySt));
-  //printf("@@@@@@@@@@@@@222Bary - CPU Time = 2 - %.i cycl\n",(bary2-bary1));
-  //printf("@@@@@@@@@@@@@222Bary - CPU Time = 3 - %.i cycl\n",(bary3-bary2));
-  //printf("@@@@@@@@@@@@@222Bary - CPU Time = %.i cycl\n",(baryEnd-barySt));
-
-  
 
   return tdb_min_tt + GeomCorr + ShapiroCorr; //seconds
 
