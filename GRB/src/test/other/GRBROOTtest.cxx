@@ -191,15 +191,16 @@ void Burst(int argc, char** argv)
       double fluence4=0.0;
       double fluence5=0.0;
       std::vector<double> m_time;
-      
-      for (int t=0;t<cst::nstep;t++)
+      int t;
+      int en;
+      for (t=0;t<cst::nstep;t++)
 	{
 	  m_time.push_back(t*m_dt);
 	  // Compute the flux @ time
 	  spectrum.clear();
 	  spectrum=_myGRB->ComputeFlux(m_time[t]); // is in photons/s/MeV/m^2
 	  //	  _myGRB->setSpectrum(spectrum);
-	  for (int en=0;en<cst::enstep;en++)
+	  for (en=0;en<cst::enstep;en++)
 	    {
 	      m_flux[en][t]=spectrum[en]*energy[en]/(cst::erg2MeV*1.0e+6);  
 	      // m_flux is in erg/s/MeV/m^2
@@ -207,7 +208,7 @@ void Burst(int argc, char** argv)
 	  
 	  if (video_out) 
 	    {
-	      for (int en=0;en<cst::enstep;en++)
+	      for (en=0;en<cst::enstep;en++)
 		{
 		  h1->SetBinContent(en+1,m_flux[en][t]*1.0e-4); //erg/cm^2/s/MeV
 		  //h1->SetBinContent(energy[en],m_flux[en][t]*1.0e-4); //erg/cm^2/s/MeV
@@ -258,7 +259,7 @@ void Burst(int argc, char** argv)
 	  facilities::Util::expandEnvVar(&paramFile);
 	  
 	  //ofstream f1(paramFile.c_str(),ios::app);
-	  ofstream f2(paramFile.c_str(),ios::app);
+	  std::ofstream f2(paramFile.c_str(),ios::app);
 	  /*
 	  if (! f1.is_open()) 
 	    {
@@ -293,11 +294,11 @@ void Burst(int argc, char** argv)
       
       if(video_out)
 	{
-	  for (int t=0;t<cst::nstep;t++)
+	  for (t=0;t<cst::nstep;t++)
 	    {
 	      timex[t]=m_time[t];
 	    }
-	  for (int en=0;en<=cst::enstep;en++)
+	  for (en=0;en<=cst::enstep;en++)
 	    {
 	      energyx[en]=energy[en];
 	    }
@@ -341,7 +342,7 @@ void Burst(int argc, char** argv)
 	  double ch3[cst::nstep];
 	  double ch4[cst::nstep];
 	  
-	  for (int t=0;t<cst::nstep;t++)
+	  for (t=0;t<cst::nstep;t++)
 	    {
 	      ch1[t]=0.0;
 	      ch2[t]=0.0;
@@ -350,12 +351,12 @@ void Burst(int argc, char** argv)
 	      lct[t]=0.0;
 	    }
 	  double loge[cst::enstep];
-	  for (int en=0;en<cst::enstep;en++)
+	  for (en=0;en<cst::enstep;en++)
 	    {
 	      Fv[en]=0.0;
 	      ph_m2[en]=0.0;
 	      loge[en]=log10(energyx[en]);    
-	      for (int t=0;t<cst::nstep;t++) 
+	      for (t=0;t<cst::nstep;t++) 
 		{
 		  m_flux[en][t]<=1e-25?(m_flux[en][t]=1.0e-25):(m_flux[en][t]);
 		  // m_flux is in erg/s/MeV/m^2

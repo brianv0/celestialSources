@@ -1,6 +1,6 @@
 package GRB
 
-use FluxSvc 
+use FluxSvc
 use ROOT
 use RootIo
 use GlastSvc
@@ -26,19 +26,23 @@ apply_pattern package_headers
 
 macro_append GRB_headers "" WIN32 "../xml/*.xml test/*.xml GRBmaker/*.h LatGRBAlert/*.h GRB/*.h"
 
-library GRB *.cxx GRB/*.cxx Dll/*.cxx GRBmaker/*.cxx  LatGRBAlert/*.cxx ${GRB_headers}
+#library GRB *.cxx GRB/*.cxx Dll/*.cxx GRBmaker/*.cxx  LatGRBAlert/*.cxx ${GRB_headers}
 
-macro GRB_lib "-L${GRBROOT}/${CMTCONFIG} -lGRB "\
-        WIN32 "${GRBROOT}/${BINDIR}/GRB.lib "
+library GRB_lib -no_share *.cxx GRB/*.cxx GRBmaker/*.cxx  LatGRBAlert/*.cxx ${GRB_headers}
 
-#non-share test program for development
+macro libs ""   WIN32   "$(GRBDir)/GRB_lib.lib"
 
-application test_GRBROOT  test/other/GRBROOTtest.cxx
+macro GRB_linkopts "-L $(GRBDir) -lGRB_lib" \
+                       WIN32 ""
 
-macro_append test_GRBROOTlinkopts  "${GRB_lib} -L${FLUXSVCROOT}/${CMTCONFIG} -lFluxSvc -lHist  -lMatrix -lGraf -lGraf3d -lGpad "\
-      WIN32 " ${GRB_lib} -L${FLUXSVCROOT}/${BINDIR}/FluxSvc.lib "
+macro_append ROOT_linkopts " -lHist  -lMatrix -lGraf -lGraf3d -lGpad " \
+       WIN32 " $(ROOT_PATH)/lib/libHist.lib $(ROOT_PATH)/lib/libMatrix.lib $(ROOT_PATH)/lib/libGraf.lib $(ROOT_PATH)/lib/libGraf3d.lib $(ROOT_PATH)/lib/libGpad.lib "
 
-application grbObsTester   test/other/GRBobsTester.cxx
+library GRB  Dll/*.cxx $(libs)
+
+application test_GRBROOT  test/other/GRBROOTtest.cxx $(libs)
+
+application grbObsTester   test/other/GRBobsTester.cxx $(libs)
 
 macro_append grbObsTesterlinkopts  "${GRB_lib} -L${FLUXSVCROOT}/${CMTCONFIG} -lFluxSvc "\
       WIN32 " ${GRB_lib} -L${FLUXSVCROOT}/${BINDIR}/FluxSvc.lib "
@@ -50,5 +54,3 @@ public set JOBOPTIONS ${GRBROOT}/src/test/jobOptions.txt
 apply_pattern package_test
 set TESTJOBOPTIONS ${GRBROOT}/src/test/test_jobOptions.txt
 set TESTJOBOPTIONS ${GRBROOT}/src/test/jobOptions.txt
-
-
