@@ -178,6 +178,7 @@ TH1D *SpectObj::ComputeProbability(double enph)
 photon SpectObj::GetPhoton(double t0, double enph)
 {
   photon ph;
+  std::cout << "$$$ DEBUG time t0 is " << t0 << std::endl;
 
   if (sourceType == 0 ) // Transient
     {
@@ -216,30 +217,90 @@ photon SpectObj::GetPhoton(double t0, double enph)
     } else if (sourceType == 1) //Periodic //Max
       {
 	std::cout << "#### Using Periodic Source " << std::endl;
+	
+	double InternalTime = t0 - Int_t(t0/tmax)*tmax; // InternalTime is t0 reduced to a period
+	TH1D *P = ComputeProbability(enph); //ph/m² 
+	double Ptot = P->GetBinContent(nt) - P->GetBinContent(1); //Total proability in a period 	
+	int IntNumPer = Int_t(1.0/Ptot); // Int number of period such that Ptot*NumPerPeriod <= 1
+	double ProbRest = 1 - IntNumPer*Ptot; //Probability rest after NumPerPeriod periods 
+
+
+	std::cout << " ## DeBUG - " << std::endl;
+	std::cout << " Total Probablity in 1 Per " << Ptot 
+		  << " Int # of Per " << IntNumPer << " Prest " << ProbRest << std::endl;
+
+
+	int tBinStart = Nv->GetXaxis()->FindBin(InternalTime);
+	if (tBinStart == 0) tBinStart = 1;
+	// if(tBinStart>=nt)  { tBinStart = 1;};
+	int t2 = tBinStart;
+	int t3 = tBinStart;
+	double CumulativeProb = 0.0; // Cumulative Probability
+	int ei  = TMath::Max(1,Nv->GetYaxis()->FindBin(enph));
+	double dp=0;
+	int tBinCurr = tBinStart+1;
+	int ElapsedPeriods = 0; //Complete Pulsar Periods elapsed after t0 
+	std::cout << "$$$$$$ DEBUGGING...  " << " Total bins " << nt << std::endl;
+	std::cout << "$$$$$$ t0 " << t0 
+		  << " | InternalTime " << InternalTime 
+		  << " | tBinStart " << tBinStart << std::endl;
+	std::cout << "$$$$$$ Ptot " << Ptot << " | ProbRest " << ProbRest 
+		  << " | NumPerProb " << IntNumPer << std::endl;
+	std::cout << "$$$$$$ t1 " << tBinStart << " | t2 " << t2 << " | t3 " << t3 << std::endl;
+	
+	while (CumulativeProb < 1.0)
+	  {
+	    if (tBinCurr == (nt+1)) 
+	      {
+		tBinCurr = 1;
+		ElapsedPeriods++;
+	      }
+	    CumulativeProb += (P->GetBinContent(tBinCurr) - P->GetBinContent(tBinCurr-1));
+	    //if ((tBinCurr % (nt) ) == 0) 	    
+	    //std::cout << "tBinCurr " << tBinCurr << " CumulProb " << CumulativeProb << std::endl;
+	    tBinCurr++;
+	  }
+	
+	double timeToFirstPeriodEnd = tmax - InternalTime; //Time from Internal Time to End of Period
+	double timeFromLastPeriodStart = Nv->GetXaxis()->GetBinCenter(tBinCurr);
+	double dt = 0.0;
+	dt = timeToFirstPeriodEnd + timeFromLastPeriodStart + tmax*ElapsedPeriods;
+	
+	std::cout << " #########STOP " << std::endl;
+	std::cout << "tBinCurr " << tBinCurr << " CumulProb " << CumulativeProb << std::endl;
+	std::cout << "ElapsedPeriods " << ElapsedPeriods << std::endl;
+	std::cout << " timeToFirstPeriodEnd " << timeToFirstPeriodEnd <<std::endl;
+	std::cout << " timeFromLastPeriodStart " << timeFromLastPeriodStart <<std::endl;
+	std::cout << "---> dT " << dt << std::endl;
+	
+	
+	//La parte dell'energia rimane da calcolare, e da mettere il Pdot
+	
+	/* Da qui in giu' parte vecchia da levare.
 	double InternalTime = t0 - Int_t(t0/tmax)*tmax;
-	TH1D *P = ComputeProbability(enph); //ph/m²
+ 	TH1D *P = ComputeProbability(enph); //ph/m²
 	int t1 = Nv->GetXaxis()->FindBin(InternalTime);
 	if(t1>=nt)t1=1;
 	int t2 = t1;
 	int t3 = t1;
 	double Ptot = P->GetBinContent(nt) - P->GetBinContent(1);
 	int ei  = TMath::Max(1,Nv->GetYaxis()->FindBin(enph));
-	double dp=0;
+ 	double dp=0;
 	int Mperiod = Int_t(1.0/Ptot);
 	double tperiods = Ptot*tmax;
 	double Mrest = 1 - Mperiod*Ptot;
-	/*
+	
 	  std::cout << "DEBUG Period pTot " << Ptot 
 	  << " Mperiod " << Mperiod 
 	  << "M*ptot < " << Mperiod*Ptot 
 	  << " Mrest " << Mrest << std::endl;
-	*/
+	
 	while(dp < 1.0 - Mperiod*Ptot)
 	  {
 	    t2++;
-	    //      t3++;
+	     //      t3++;
 	    if(t2>nt) t2=1;
-	    double P0  = P->GetBinContent(t2)-P->GetBinContent(t1);
+	      double P0  = P->GetBinContent(t2)-P->GetBinContent(t1);
 	    double P1 = P->GetBinContent(nt)-P->GetBinContent(t1);
 	    double P2 = P->GetBinContent(t2)-P->GetBinContent(1);
 	    // std::cout << " P1 " << P1 << " P2 " << P2 << std::endl;
@@ -262,20 +323,23 @@ photon SpectObj::GetPhoton(double t0, double enph)
 	else if(t1>t2) 
 	  {
 	    Sp = Integral_T(t1,t2,ei);
-	    Sp->Scale(-1);
+ 	     Sp->Scale(-1);
 	    Sp->Add(Integral_T(1,nt,ei),Int_t(t3/nt));
 	  }
 	else 
 	  {
 	    Sp = Integral_T(1,nt,ei);
-	  }
+	    }
 	
-	ph.time   = dt/(dp+Mperiod*Ptot) + t0;
-	ph.energy = Sp->GetRandom();
+          */
+
+	ph.time   = t0 + dt;//dt/(dp+Mperiod*Ptot) + t0;
+	ph.energy = 1e5;//Sp->GetRandom();
 	std::cout<< "Delta t " << ph.time << " Energy  (KeV) " << ph.energy << std::endl;
 	delete P;
       }
 
+  std::cout << "$$$ DEBUG NextTime is " << ph.time << std::endl;
 
   return ph;
 }
