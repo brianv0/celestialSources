@@ -12,6 +12,10 @@
 
 #include "flux/Spectrum.h"
 
+namespace IRB {
+   class EblAtten;
+}
+
 /**
  * @class SpectralTransient
  *
@@ -66,7 +70,10 @@ private:
    double m_tstop;
    double m_emin;
    double m_emax;
-   int m_nspec;
+   int m_lc;
+   float m_z;
+
+   IRB::EblAtten * m_tau;
 
    double m_currentEnergy;
 

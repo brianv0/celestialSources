@@ -26,6 +26,7 @@
 
 #include "Util.h"
 #include "FitsImage.h"
+#include "genericSources/EblAtten.h"
 #include "genericSources/SpectralTransient.h"
 
 ISpectrumFactory & SpectralTransientFactory() {
@@ -34,7 +35,7 @@ ISpectrumFactory & SpectralTransientFactory() {
 }
 
 SpectralTransient::SpectralTransient(const std::string & paramString) 
-   : m_emin(20.), m_emax(2e5), m_nspec(0) {
+   : m_emin(20.), m_emax(2e5), m_lc(0), m_z(0), m_tau(0) {
    std::vector<std::string> params;
    facilities::Util::stringTokenize(paramString, ", ", params);
 
@@ -44,7 +45,11 @@ SpectralTransient::SpectralTransient(const std::string & paramString)
    std::string templateFile = params[3];
    if (params.size() > 4) m_emin = std::atof(params[4].c_str());
    if (params.size() > 5) m_emax = std::atof(params[5].c_str());
-   if (params.size() > 6) m_nspec = std::atoi(params[6].c_str());
+   if (params.size() > 6) m_lc = std::atoi(params[6].c_str());
+   if (params.size() > 7) {
+      m_z = std::atof(params[7].c_str());
+      m_tau = new IRB::EblAtten(IRB::Primack99);
+   }      
 
    createEvents(templateFile);
 }
@@ -95,7 +100,11 @@ void SpectralTransient::createEvents(std::string templateFile) {
    m_events.clear();
    m_events.reserve(nevts);
    for (long i = 0; i < nevts; i++) {
-      m_events.push_back(drawEvent(integralDist));
+      std::pair<double, double> my_event = drawEvent(integralDist);
+      if (m_z == 0 || m_tau == 0 ||
+          RandFlat::shoot() < std::exp(-(*m_tau)(m_z, my_event.second))) {
+         m_events.push_back(drawEvent(integralDist));
+      }
    }
    std::stable_sort(m_events.begin(), m_events.end(), compareEventTime);
 }
@@ -128,13 +137,13 @@ readFitsLightCurve(const std::string & templateFile) {
    genericSources::FitsImage::fitsReportError(status, routineName);
 
    std::vector<double> flux, gamma1, gamma2, ebreak;
-   genericSources::FitsImage::readRowVector(fptr, "Flux", m_nspec,
+   genericSources::FitsImage::readRowVector(fptr, "Flux", m_lc,
                                             nelements, flux);
-   genericSources::FitsImage::readRowVector(fptr, "Gamma1", m_nspec,
+   genericSources::FitsImage::readRowVector(fptr, "Gamma1", m_lc,
                                             nelements, gamma1);
-   genericSources::FitsImage::readRowVector(fptr, "Gamma2", m_nspec,
+   genericSources::FitsImage::readRowVector(fptr, "Gamma2", m_lc,
                                             nelements, gamma2);
-   genericSources::FitsImage::readRowVector(fptr, "Ebreak", m_nspec,
+   genericSources::FitsImage::readRowVector(fptr, "Ebreak", m_lc,
                                             nelements, ebreak);
    m_lightCurve.clear();
    m_lightCurve.reserve(nelements);
