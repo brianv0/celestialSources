@@ -17,7 +17,7 @@
 
 /* #include <math.h> */
 #include <vector> 
-/* #include <string> */
+#include <string>
 /* #include <algorithm> */
 /* #include <cmath> */
 /* #include "stdio.h" */
