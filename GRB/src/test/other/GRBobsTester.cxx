@@ -49,32 +49,27 @@
 //#define DLL_DECL_SPECTRUM(x)   extern const ISpectrumFactory& x##Factory; x##Factory.addRef();
 
 //void flux_load() {
-    
-    // these are the spectra that we want to make available
+
+// these are the spectra that we want to make available
 //    DLL_DECL_SPECTRUM( CHIMESpectrum);
 //    DLL_DECL_SPECTRUM( AlbedoPSpectrum);
 //    DLL_DECL_SPECTRUM( HeSpectrum);
 //    DLL_DECL_SPECTRUM( GalElSpectrum);
 //    DLL_DECL_SPECTRUM( CrElectron);
 //    DLL_DECL_SPECTRUM( CrProton);
-    //  DLL_DECL_SPECTRUM( CREMESpectrum);
+//  DLL_DECL_SPECTRUM( CREMESpectrum);
 //}
 
 //int main(int argn, char * argc[]) {
 int main()
 {
-  GRBmaker grbMaker1(36.804426, 18, 9.843296, 0.199746, 2.850374, 1);
-  
-  std::vector<std::string> fileList;
-  std::string fname1="./";
-  fileList.push_back(fname1);  
-  GRBmaker grbMaker2(fileList); // creates the list of GRBs
-  std::string fname2="GRB_000.lis";
-  fileList.push_back(fname2);
-  GRBmaker grbMaker3(fileList); // reads the first GRB
+    GRBmaker *grbMaker(new GRBmaker);
+    grbMaker->create(36.804426, 18, 9.843296, 0.199746, 0.564782, 2.07933, 2.40867, 0.000351, 1);
 
-
-  return 0;
+    delete grbMaker;
+    
+    
+    return 0;
 }
 
 void WARNING (const char * text ){  std::cerr << "WARNING: " << text << '\n';}
