@@ -179,7 +179,7 @@ photon SpectObj::GetPhoton(double t0, double enph)
 {
   photon ph;
 
-  if (sourceType == 0 ) // Periodic  //Max 
+  if (sourceType == 0 ) // Transient
     {
       double time   = 1.0e8; // > 1 year!
       double energy =  enph;
@@ -199,13 +199,15 @@ photon SpectObj::GetPhoton(double t0, double enph)
 	{
 	  t2++;
 	} 
-      double dp = P->GetBinContent(t2) - P->GetBinContent(t1);
-      double dt = Nv->GetXaxis()->GetBinCenter(t2) - Nv->GetXaxis()->GetBinCenter(t1);
+      double dp1 = P->GetBinContent(t2) - P->GetBinContent(t2-1);
+      double dp2 = 1.0 + P->GetBinContent(t1) - P->GetBinContent(t2-1);
+      double dt = Nv->GetXaxis()->GetBinWidth(t2);
+      double Dt = Nv->GetXaxis()->GetBinCenter(t2-1)- Nv->GetXaxis()->GetBinCenter(t1);
       
       if(t2 <= nt) // the burst has finished  dp < 1 or dp >=1
 	{
 	  TH1D* Sp = Integral_T(t1,t2,ei); //ph/m²
-	  time    = dt/dp + t0;       
+	  time    = t0 + Dt + dp2/dp1*dt;//dt/dp + t0;       
 	  energy  = Sp->GetRandom();
 	}
       ph.time   = time;
