@@ -1,6 +1,6 @@
 package GRB
 
-use FluxSvc v5r10
+use FluxSvc 
 use ROOT
 use RootIo
 use GlastSvc

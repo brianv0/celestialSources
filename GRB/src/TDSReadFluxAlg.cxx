@@ -24,6 +24,7 @@
 //#include <map>
 #include <vector>
 #include <fstream>
+#include "CLHEP/Vector/Rotation.h"
 /** @class TDSReadFluxAlg
  * @brief Takes the data relatives to the incoming particle from the TDS
  * and write a simple Root Tree. 
@@ -75,7 +76,7 @@ public:
         
 private:
     IFluxSvc* m_fsvc; // pointer to the flux Service
-    Rotation Glast2Gal;  
+    HepRotation Glast2Gal;  
     HepVector3D dir,GalDirVec;
     StatusCode readTDSData();
 
