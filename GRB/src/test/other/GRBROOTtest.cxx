@@ -322,7 +322,7 @@ void Burst(int argc, char** argv)
 	  facilities::Util::expandEnvVar(&paramFile);
 	  
 	  //ofstream f1(paramFile.c_str(),ios::app);
-	  ofstream f2(paramFile.c_str(),ios::app);
+	  std::ofstream f2(paramFile.c_str(),ios::app);
 	  /*
 	  if (! f1.is_open()) 
 	    {
@@ -358,7 +358,7 @@ void Burst(int argc, char** argv)
       
       if(video_out)
 	{
-	  for (int t=0;t<cst::nstep;t++)
+	  for (t=0;t<cst::nstep;t++)
 	    {
 	      timex[t]=m_time[t];
 	    }
@@ -398,7 +398,7 @@ void Burst(int argc, char** argv)
 	  double ch3[cst::nstep];
 	  double ch4[cst::nstep];
 	  
-	  for (int t=0;t<cst::nstep;t++)
+	  for (t=0;t<cst::nstep;t++)
 	    {
 	      ch1[t]=0.0;
 	      ch2[t]=0.0;
@@ -408,7 +408,7 @@ void Burst(int argc, char** argv)
 	    }
 	  double loge[cst::enstep];
 	  double de;
-	  for (int en=0;en<cst::enstep;en++)
+	  for (en=0;en<cst::enstep;en++)
 	    {
 	      Fv[en]=0.0;
 	      vFv[en]=0.0;
@@ -416,7 +416,7 @@ void Burst(int argc, char** argv)
 	      loge[en]=log10(energyx[en]);
 	      de=(energyx[en+1]-energyx[en]);
 
-	      for (int t=0;t<cst::nstep;t++) 
+	      for (t=0;t<cst::nstep;t++) 
 		{
 		  // m_flux is in erg/s/MeV/m^2
 		  Fv[en]+=(m_flux[en][t])*m_dt;  // is in erg/m^2/MeV
@@ -459,7 +459,7 @@ void Burst(int argc, char** argv)
 		  h2->SetBinContent(en+1,t+1,m_flux[en][t]);
 		}
 	    }
-	  for (int en=0;en<cst::enstep;en++)
+	  for (en=0;en<cst::enstep;en++)
 	    {
 	      //	      fl->SetBinContent(en+1,Fv[en]); 
 	      fl->SetBinContent(en+1,vFv[en]); 

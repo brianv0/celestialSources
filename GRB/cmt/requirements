@@ -44,11 +44,6 @@ macro GRB_extrastamps "$(GRBDir)/GRB_lib.stamp"
 
 application test_GRBROOT  test/other/GRBROOTtest.cxx $(libs)
 
-application grbObsTester   test/other/GRBobsTester.cxx $(libs)
-
-macro_append grbObsTesterlinkopts  "${GRB_lib} -L${FLUXSVCROOT}/${CMTCONFIG} -lFluxSvc "\
-      WIN32 " ${GRB_lib} -L${FLUXSVCROOT}/${BINDIR}/FluxSvc.lib "
-
 # test program, using local joboptions
 
 public set JOBOPTIONS ${GRBROOT}/src/test/jobOptions.txt
