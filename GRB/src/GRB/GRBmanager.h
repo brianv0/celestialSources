@@ -15,7 +15,6 @@
 
 #include <vector>
 #include <string>
-#include <map>
 #include <cmath>
 #include "flux/ISpectrum.h"
 #include "flux/EventSource.h"
@@ -37,6 +36,7 @@ class GRBmanager : public ISpectrum
     They are: 
     - The time of the first burst
     - The time to wait before the next burst
+    - The Minimum photon energy
     
     An example the xml source declaration for this spectrum should appears:
     \verbatim
@@ -83,7 +83,7 @@ class GRBmanager : public ISpectrum
   double parseParamList(std::string input, int index);  
   
  private:
-  
+
   GRBSim   *m_GRB;
   SpectObj *m_spectrum;
   Parameters *m_par;
@@ -92,10 +92,15 @@ class GRBmanager : public ISpectrum
   std::string paramFile;
 
   double m_timeToWait;
-
   double m_startTime;
+  double m_fluence;
+  UInt_t m_GRBnumber;
+  double m_enph;
   double m_endTime;
+
   double m_nextBurst;
   int    m_Nbursts;
+  std::pair<double,double> m_GRBdir;
+  
 };
 #endif

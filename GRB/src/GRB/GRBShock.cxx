@@ -7,7 +7,7 @@
 #include "GRBShock.h"
 #include "GRBShell.h"
 
-#define DEBUG 1 
+#define DEBUG 0
 
 #define PulseShape 0 
 
@@ -16,29 +16,29 @@
 
 using namespace cst;
 //////////////////////////////////////////////////
-// S2 --> S1 ->
-GRBShock::GRBShock(GRBShell *S1, GRBShell *S2, double tshock, double p)
+// BS --> S1 ->
+GRBShock::GRBShock(GRBShell *FS, GRBShell *BS, double tshock, double p)
 {
   m_p = p;
   m_IC =  1.0;
+    
+  double g1 = FS->GetGamma();
+  double g2 = BS->GetGamma();
   
-  tsh = tshock;
-  
-  double g1 = S1->GetGamma();
-  double g2 = S2->GetGamma();
-  
-  double r1 = S1->GetRadius();
-  double r2 = S2->GetRadius();
+  double r1 = FS->GetRadius(tshock);
+  double r2 = BS->GetRadius(tshock);
 
-  double dr1 = S1->GetThickness();
-  double dr2 = S2->GetThickness();
+  double dr1 = FS->GetThickness();
+  double dr2 = BS->GetThickness();
 
-  double m1 = S1->GetMass();
-  double m2 = S2->GetMass();
+  double m1 = FS->GetMass();
+  double m2 = BS->GetMass();
   
-  double e1 = S1->GetEnergy();
-  double e2 = S2->GetEnergy();
+  double e1 = FS->GetEnergy();
+  double e2 = BS->GetEnergy();
   
+  tsh = tshock - r2/c;
+
   
   double M,b12,b1,b2,nc,Psyn;
   
@@ -65,10 +65,10 @@ GRBShock::GRBShock(GRBShell *S1, GRBShell *S2, double tshock, double p)
 
   // Thickness of the final shell
   drf = (dr2 + dr1)/2.;//cm
-  MS = new GRBShell(gf,rf,drf,ef);
+  MS = new GRBShell(gf,rf,drf,ef,tshock);
   
-  b1  = S1->GetBeta();
-  b2  = S2->GetBeta();
+  b1  = FS->GetBeta();
+  b2  = BS->GetBeta();
   // relative velocity:
   b12 = (b1-b2)/(1.0-b1*b2);
     
@@ -76,8 +76,8 @@ GRBShock::GRBShock(GRBShell *S1, GRBShell *S2, double tshock, double p)
   double g12 = 1.0/sqrt(1.0 - b12*b12);
   int i=0;
   
-  double n1  = S1->GetComPartDens(); //1/cm^3
-  double n2  = S2->GetComPartDens(); //1/cm^3
+  double n1  = FS->GetComPartDens(tshock); //1/cm^3
+  double n2  = BS->GetComPartDens(tshock); //1/cm^3
   double x = n1/n2;
 
   // Lorentz factor of the shock in the comoving frame of the unshocked fluid

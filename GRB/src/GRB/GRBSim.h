@@ -39,6 +39,7 @@ class GRBSim
   //! destructor
   ~GRBSim()
     {
+      //      std::cout<<" ~GRBSim() "<<std::endl;
       delete m_GRBengine;
       delete m_Nv;
       //      delete m_params;
@@ -58,9 +59,10 @@ class GRBSim
    */
   TH2D *GRBSim::Nph(const TH2D *Nv);
   inline std::pair<double,double> GRBdir(){return m_GRBengine->GetDirection();}
+  inline double GetDistance(){return m_GRBengine->GetDistance();}
   inline double Tmax(){return m_tfinal;}
   inline double GetFluence(){return m_fluence;} //erg/cm^2
-  inline double GetGRBNumber(){return m_params->GetGRBNumber();} //erg/cm^2
+  inline UInt_t GetGRBNumber(){return m_params->GetGRBNumber();} //erg/cm^2
   void SaveNv();
   void GetGBMFlux();
  private:

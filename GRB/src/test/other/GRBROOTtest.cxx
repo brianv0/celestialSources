@@ -22,13 +22,17 @@
 using namespace cst;
 double EMIN, EMAX, TMIN, TMAX, DT;
 int    TBIN, EBIN;
+double dist;
 // options 
 bool video_out=true;
 bool gbm = false;
 bool savePlots = false;
+int frame=10;
 bool movie     = false;
 bool bandFit     = false;
 bool powerlawFit = false;
+bool scaled=false;
+bool QG=true;
 TString extension;
 //////////////////////////////////////////////////
 
@@ -41,7 +45,7 @@ void ScanParameters(int Ngrb);
 
 #define DEBUG 0
 
-#define GenerationArea 6.0
+#define GenerationArea 1.21
 
 
 double Band(double *var, double *par)
@@ -172,33 +176,39 @@ void PlotGRB(double enph = 0,char name[100]="grb_65540.root",TString name2="GRB_
       for(int i=0; i < TBIN; i++)
 	{
 	  i2=i;
-	  TString Name="Plot/frame";
-	  AnimatedSpectrum =   Nv->ProjectionY("Animated",i1,i2);
-	  AnimatedSpectrum->GetXaxis()->SetTitle("Energy [keV]");
-	  AnimatedSpectrum->GetYaxis()->SetTitle("e^{2} N(e) [erg/cm^{2}/s]");
-	  AnimatedSpectrum->GetXaxis()->SetTitleOffset(1.1);
-	  AnimatedSpectrum->GetYaxis()->SetTitleOffset(1.5);
-	  AnimatedSpectrum->SetLineColor(2);
-	  AnimatedSpectrum->SetLineWidth(2);
-	  for(int j=0; j < EBIN; j++)
+	  if(i%frame==0)
 	    {
-	      double ne = AnimatedSpectrum->GetBinContent(j+1);
-	      double ee = AnimatedSpectrum->GetBinCenter(j+1);
-	      AnimatedSpectrum->SetBinContent(j+1,ee*ee*ne/624151.0*1e-7);
-	    }  
-	  AnimatedSpectrum->SetMaximum(1e-3);
-	  AnimatedSpectrum->SetMinimum(1e-10);
-	  AnimatedSpectrum->Draw("l");
-	  animatedCanvas->Update();
-	  if(savePlots)
-	    {
-	      Name+=l;
-	      Name+=extension;
-	      Name+=".gif";
-	      animatedCanvas->Print(Name);
-	      l++;
+	      TString Name="Plot/frame";
+	      AnimatedSpectrum =   Nv->ProjectionY("Animated",i1,i2);
+	      AnimatedSpectrum->GetXaxis()->SetTitle("Energy [keV]");
+	      AnimatedSpectrum->GetYaxis()->SetTitle("e^{2} N(e) [erg/cm^{2}/s]");
+	      AnimatedSpectrum->GetXaxis()->SetTitleOffset(1.1);
+	      AnimatedSpectrum->GetYaxis()->SetTitleOffset(1.5);
+	      AnimatedSpectrum->SetLineColor(2);
+	      AnimatedSpectrum->SetLineWidth(2);
+	      for(int j=0; j < EBIN; j++)
+		{
+		  double ne = AnimatedSpectrum->GetBinContent(j+1);
+		  double ee = AnimatedSpectrum->GetBinCenter(j+1);
+		  AnimatedSpectrum->SetBinContent(j+1,ee*ee*ne/624151.0*1e-7);
+		}  
+	      AnimatedSpectrum->SetMaximum(1e-3);
+	      AnimatedSpectrum->SetMinimum(1e-10);
+	      if(l==1)	      
+		AnimatedSpectrum->Draw("l");
+	      else
+		AnimatedSpectrum->DrawCopy("lsame");
+	      animatedCanvas->Update();
+	      if(savePlots)
+		{
+		  Name+=l;
+		  Name+=extension;
+		  Name+=".gif";
+		  animatedCanvas->Print(Name);
+		  l++;
+		}
+	      i1=i;
 	    }
-	  i1=i;
 	}
     }
 
@@ -220,12 +230,21 @@ void PlotGRB(double enph = 0,char name[100]="grb_65540.root",TString name2="GRB_
   csp->SetLogy();
   
   clc->Divide(1,2);
+  
   TH1D *Lct_GBM = sp->Integral_E(GBM1,GBM2);  // ph
+  
+  /*
+    TH1D *Lct_BATSE1 = sp->Integral_E(10.,30.);  // ph
+    TH1D *Lct_BATSE2 = sp->Integral_E(1.0e2,3.0e2);  // ph
+    TH1D *Lct_BATSE3 = sp->Integral_E(1.0e4,3e4);  // ph
+    TH1D *Lct_BATSE4 = sp->Integral_E(1.0e6,3e6);  // ph
+  */
+    
   TH1D *Lct_BATSE1 = sp->Integral_E(BATSE1,BATSE2);  // ph
   TH1D *Lct_BATSE2 = sp->Integral_E(BATSE2,BATSE3);  // ph
   TH1D *Lct_BATSE3 = sp->Integral_E(BATSE3,BATSE4);  // ph
   TH1D *Lct_BATSE4 = sp->Integral_E(BATSE4,BATSE5);  // ph
- 
+    
   TH1D *Lct_LAT = sp->Integral_E(LAT1,LAT2);  // ph
   TH1D *Lct_EXT = sp->Integral_E(enph,EMAX);  // ph
   
@@ -338,14 +357,13 @@ void PlotGRB(double enph = 0,char name[100]="grb_65540.root",TString name2="GRB_
   
   TH1D *Counts   = sp->CloneSpectrum(); //ph
   TH1D *Lc = sp->CloneTimes();  
-  Lc->SetTitle("Counts[ph]");
+  TString title = "Photons over ";
+  title+=GenerationArea;
+  title+=" m^{2}";
+  Lc->SetTitle(title);
   Lc->SetXTitle("Time (s)");
   Lc->SetYTitle("photons");
 
-  TF1  *f1 = new TF1("f1","[0]*1./x"); 
-  TF1  *f2 = new TF1("f2","[0]*1./x^2");   
-  
-  
   if(ExtractPhotons)
     {  
       double time = 0.0;
@@ -353,26 +371,26 @@ void PlotGRB(double enph = 0,char name[100]="grb_65540.root",TString name2="GRB_
       double energy;
       double flux;
       int i = 0; 
+      
       Interval = sp->interval(time,enph); // s
       time+=Interval;
+      
       while(time < TMAX && time>=0)
 	{
 	  energy   = sp->energy(time,enph);   // keV
 	  flux     = sp->flux(time,enph);     // ph/s/m2
 	  Counts->Fill(energy); // ph
 	  Lc->Fill(time);       // ph
-	  Interval = sp->interval(time,enph); // s  
-	  std::cout<<" Time (s)  = "<<time
+	  Interval = sp->interval(time,enph); // s
+      	  std::cout<<" Time (s)  = "<<time
 		   <<" Flux (ph/s/m^2)  = "<<flux
 		   <<" energy (MeV) = "<<energy*1e-3
 		   <<" Interval (s) = "<<Interval<<std::endl;
 	  time+=Interval;	  
-	  
 	  i++;
 	} 
-      
     }
-
+  
   if(Counts->GetEntries() == 0 && ExtractPhotons) 
     {
       std::cout<<" sorry, no extracted photons for t <= "<<TMAX<<std::endl;
@@ -393,9 +411,22 @@ void PlotGRB(double enph = 0,char name[100]="grb_65540.root",TString name2="GRB_
   double LowEnergyMax  = 1.05*Lct_GBM->GetMaximum();
   double HighEnergyMax = Lct_LAT->GetMaximum();
   double tmax = Lct_GBM->GetXaxis()->GetXmax();
-  double tmin = Lct_GBM->GetXaxis()->GetXmin();
-  
+  double tmin = Lct_GBM->GetXaxis()->GetXmin();  
   clc->cd(1);
+  if(scaled)
+    {
+      double MaxGBM = Lct_GBM->GetMaximum();
+      double Max1   = Lct_BATSE1->GetMaximum();
+      double Max2   = Lct_BATSE2->GetMaximum();
+      double Max3   = Lct_BATSE3->GetMaximum();
+      double Max4   = Lct_BATSE4->GetMaximum();
+      
+      Lct_GBM->Scale(1./MaxGBM);
+      Lct_BATSE1->Scale(1./Max1);
+      Lct_BATSE2->Scale(1./Max2);
+      Lct_BATSE3->Scale(1./Max3);
+      Lct_BATSE4->Scale(1./Max4);
+    }
   Lct_GBM->Draw("l");
   Lct_BATSE1->Draw("lsame");
   Lct_BATSE2->Draw("lsame");
@@ -571,9 +602,9 @@ void ScanParameters(int Ngrb)
 	  //if(en*de*ne > FEp && en < 1e4) Ep=e;
 	}
       Ep = log10(e2Ne->GetBinCenter(e2Ne->GetMaximumBin()));
-      
+      std::cout<<"qui"<<std::endl;
       SpectObj *sp = new SpectObj(Nv,0);              //ph
-
+      std::cout<<"qui"<<std::endl;
       
       TH1D *Lct_TOT   = sp->Integral_E(EMIN,EMAX);  // ph
       TH1D *Lct_BATSE = sp->Integral_E(BATSE1,BATSE5);  // ph
@@ -619,9 +650,12 @@ void ScanParameters(int Ngrb)
 	  TFile aFile("GRBCatalogueFile.root","RECREATE");
 	  GRBTree->Write();
 	}
+      delete sp;
     }
   TFile aFile("GRBCatalogueFile.root","RECREATE");
   GRBTree->Write();
+  delete params;
+  
 }
 
 
@@ -641,6 +675,7 @@ void MakeGRB(int NGRB=1, UInt_t seed=1, double enph=0, bool gbm = false)
   GRBSim* m_grb = new GRBSim(params);
   TH2D *matrix = m_grb->Fireball();
   m_grb->SaveNv();
+  dist  = m_grb->GetDistance();
   if(gbm) m_grb->GetGBMFlux();
   delete m_grb;
   char name[100];
@@ -686,6 +721,28 @@ int main(int argc, char** argv)
 	{
 	  gbm=true;
 	}
+      else if("-movie"==arg_name)
+	{
+	  movie=true;
+	}
+      else if("-save"==arg_name)
+	{
+	  savePlots=true;
+	  frame=atoi(argv[++current_arg]);
+	}
+      else if("-band"==arg_name)
+	{
+	  bandFit=true;
+	}
+      else if("-powerLaw"==arg_name)
+	{
+	  powerlawFit=true;
+	}
+      else if("-scaled"==arg_name)
+	{
+	  scaled=true;
+	}
+      
       current_arg++;
     }
   

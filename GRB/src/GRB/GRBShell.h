@@ -16,22 +16,25 @@
 class GRBShell
 {
  public:
-  GRBShell(double g, double r, double d, double e);
-  GRBShell(double g, double r, double d, double e, double m);
+  GRBShell(double g, double r, double d, double e,double t);
+  GRBShell(double g, double r, double d, double e, double m, double t);
   ~GRBShell(){;}
   
   void Evolve(double dt);
-  double GetBeta()  {return sqrt(1.0 - 1.0/(m_g*m_g));}
-  double GetRadius(){return m_r;}
+  double GetBeta()  {return m_b;}
+  double GetRadius(double time){return m_r + m_b * cst::c * (time-m_t);}
+  void   SetRadius(double r){m_r=r;}
+  double GetTime(){return m_t;}
+  void   SetTime(double t){m_t=t;}
   double GetGamma(){return m_g;}
   double GetThickness(){return m_dr;}
   double GetMass(){return m_m;} //
   double GetEnergy(){return m_e;}
-  double GetVolume(){return 4.*cst::pi*m_r*m_r*m_dr;}  // cm^3 return 4./3.*cst::pi*(pow(m_r+m_dr,3.)-pow(m_r,3.));}  // cm^3
-  double GetComovingVolume(){return GetVolume()*m_g;} // cm^3
-  double GetComPartDens() {return (m_e * cst::erg2meV)/(m_g*cst::mpc2)/(4.0*cst::pi*pow(m_r,2.0)*m_dr*m_g);} //1/cm^3
-  private:
-  double m_g, m_r,m_dr,m_e, m_m;
+  double GetVolume(double time);
+  double GetComovingVolume(double time){return GetVolume(time)*m_g;} // cm^3
+  double GetComPartDens(double time);
+ private:
+  double m_g, m_r,m_dr,m_e, m_m, m_t, m_b;
   
 };
 //////////////////////////////////////////////////

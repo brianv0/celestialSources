@@ -5,10 +5,12 @@
 
 #include "GRBConstants.h"
 
+#define DEBUG  0
+
 Parameters::Parameters()
 {
   rnd = new TRandom();
-  SetGRBNumber((long) rnd->GetSeed());
+  SetGRBNumber(UInt_t(rnd->GetSeed()));
   m_Type=0;
 }
 
@@ -16,7 +18,7 @@ void Parameters::SetGRBNumber(UInt_t GRBnumber)
 {
   m_GRBnumber = GRBnumber;
   rnd->SetSeed(m_GRBnumber);
-  rnd->Uniform();
+  double tmp = rnd->Uniform();
 }
 
 //////////////////////////////////////////////////
@@ -41,12 +43,16 @@ void Parameters::SetGalDir(double l, double b)
 
 void Parameters::SetNshell(int nshell)
 {
+  if(nshell>1 && nshell<4)
+    m_Type=1;
+  else if(nshell>4)
+    m_Type=2;
   
   if (nshell<1)
     if (m_Type==1)    
       m_Nshell = int(2+rnd->Integer(2));
     else
-      m_Nshell = int(10+rnd->Integer(100));
+      m_Nshell = int(10+rnd->Integer(70));
   else
     m_Nshell = nshell;
 }
@@ -58,13 +64,26 @@ void Parameters::SetFluence(double fluence)
   else
     {
       m_Fluence = fluence;
-      rnd->Uniform();  //THB: this needed parentheses
+      double tmp = rnd->Uniform();//THB: this needed parentheses
     }
 }
 
 void Parameters::SetEtot(double etot)
 {
   m_Etot = (etot>0.0) ? etot : pow(10.0,rnd->Gaus(51.,0.5)); //erg
+}
+
+void Parameters::SetEpeak(double epeak)
+{
+  if(epeak<=0)
+    {
+      if (m_Type==1)
+	m_Ep = pow(10.0,(double)rnd->Gaus(2.0,0.5)); //erg/cm^2 (Short Bursts)
+      else
+	m_Ep = pow(10.0,(double)rnd->Gaus(2.5,0.5)); //erg/cm^2 (Long Burst)
+    }
+  else 
+    m_Ep =  epeak;
 }
 
 void Parameters::SetInitialSeparation(double initialSeparation)
@@ -100,7 +119,7 @@ void Parameters::ReadParametersFromFile(std::string paramFile, int NGRB)
   std::ifstream f1(paramFile.c_str());
   if (!f1.is_open()) 
     {
-      std::cout<<"GRBConstants: Error Opening paramFile\n";
+      std::cout<<"GRBConstants: Error Opening paramFile!! \n";
       exit(1);
     }
   int    nshell, seed;
@@ -138,7 +157,7 @@ void Parameters::ReadParametersFromFile(std::string paramFile, int NGRB)
       f2.close();
     }
 
-  SetGRBNumber(65540+ (long) seed);  
+  SetGRBNumber(UInt_t(65540+seed));  
 
   
   SetGalDir(l0,b0);
@@ -165,8 +184,8 @@ void Parameters::ComputeParametersFromFile(std::string paramFile, int NGRB)
     }
   int    nshell, seed;
   double fluence,r0,dr0,l0,b0;
-  double gmin,gmax,ic;
-  double gmax_gmin,tv,ep;
+  double gmin,ic;
+  double tv,ep,Eco;
 
   char buf[200];
   f1.getline(buf,100);
@@ -197,10 +216,16 @@ void Parameters::ComputeParametersFromFile(std::string paramFile, int NGRB)
       f2.close();
     }
   //////////////////////////////////////////////////
-  ep/=2.0;
+  //  ep/=2.0;
   
-  SetGRBNumber(65540+ (long) seed);  
-  
+  SetGRBNumber(UInt_t(65540+seed));  
+  if(tv<=0.0)
+    {
+      if(nshell>1 && nshell<4)
+	tv= -2;
+      else if(nshell>4)
+	tv= -1;
+    }
   if(tv==0)   // both
     {
       tv=((rnd->Uniform()<0.3) ? -2 : -1);
@@ -209,7 +234,7 @@ void Parameters::ComputeParametersFromFile(std::string paramFile, int NGRB)
   
   if(tv==-2)
     {
-      tv     = pow(10.0,rnd->Gaus(-2.0,0.5)); // short bursts
+      tv     = pow(10.0,rnd->Gaus(-1.0,0.1)); // short bursts
       m_Type=1;
     }
   else if(tv==-1)
@@ -217,38 +242,62 @@ void Parameters::ComputeParametersFromFile(std::string paramFile, int NGRB)
       tv   = pow(10.0,rnd->Gaus(0.0,0.5)); //long burts
       m_Type=2;
     }
-
-  SetEpeak(ep);
-    
+  
+  //  if(ep==0) SetEpeak(ep);
+  m_Ep=ep;
   double gmax_gmin=2;
   
   double E52   = 1.0;
   double Ep100 = m_Ep/100.0;///pow(gmax_gmin,2.);
   double ae3   = cst::ae * 3.;
   double ab3   = cst::ab * 3.;
-  
+  double g100,d7;
   r0    =  2.0 * cst::c * tv;
+  double r10 = r0 * 1.0e-10;
+  
   double G=0.0;
-
+  
   if(Ep100==0)
     {
-      double g100 = 1.0;
-      double d7   = 1.0;
-      G=100.0*g100;
-      dr0=1e7*d7;
-      Ep100=0.405*sqrt(E52*ab3/d7)*pow(ae3,3.)/(tv*pow(g100,2));
-      m_Ep = 100.0*Ep100;
+      if(Eco==0)
+	{
+	  g100 = 1.0;
+	  d7   = 1.0;
+	  G=100.0*g100;
+	  dr0=1e7*d7;
+	}
+      else
+	{
+	  G = 40.5 * Eco;
+	  g100=G/100.0;
+	  d7   = 1.0;
+	  dr0=1e7*d7;
+	}
     }
-  if(Eco==0) 
+  else
     {
-      double d7 = 1.0;
-      dr0=1e7*d7;
-      G = 63.6*pow(E52*ab3/d7,1./4.)*ae3/sqrt(Ep100*tv);
-      Eco = 1.6*G/100.0;
+      if(Eco==0)
+	{
+	  d7   = 1.0;
+	  dr0=1e7*d7;
+	  
+	  G = 77.8 * pow(E52*ab3/d7,1./4.)*ae3/sqrt(Ep100*tv);
+	  g100=G/100.0;
+	}
+      else
+	{
+	  G = 40.5 * Eco;
+	  d7=13.6*E52*ab3*pow(ae3,4.0)/(pow(Eco,4.0)*pow(Ep100*tv,2.0));
+	  dr0=1e7*d7;
+	  g100=G/100.0;
+	}
     }
-  // 1)
-  dr0   =  1.2e7*E52*ab3*pow(ae3,4.0)/(pow(Eco,4.0)*pow(Ep100*tv,2.0));
-  G     = 60.0*Eco;
+  
+  Ep100=3.63*sqrt(E52*ab3/d7)*pow(ae3,2.)/(r10*pow(g100,2));
+  m_Ep = 100.0*Ep100;
+  
+  if(DEBUG) 
+    std::cout<<"Expected Ep= "<<m_Ep<<" Gamma = "<<G<<" Ecut-off : "<<G/40.5<<" GeV, Rsh = "<<r0*G<<" tv "<<tv<<std::endl;
   ////////////////////////////////////////////////// 
   SetGalDir(l0,b0);  
   SetEtot(1e52);

@@ -30,9 +30,9 @@ namespace cst
 
   const double emin =  10.0; //keV
   const double emax = 1e9;  //keV
-  const double enph = 1.0e+5;  //keV (30 MeV) 
+  const double enph = 3.0e+4;  //keV (30 MeV) 
   
-  const    int Ebin =  50; 
+  const    int Ebin =  100; 
   const    int Tbin =  500; 
   static const double de   = pow(emax/emin,1.0/Ebin);
   const double erg2meV   = 624151.0;
@@ -69,6 +69,7 @@ class Parameters
   void SetNshell(int nshell);
   void SetFluence(double fluence);
   void SetEtot(double etot);
+  void SetEpeak(double epeak);
   void SetInitialSeparation(double initialSeparation);
   void SetInitialThickness(double initialThickness);		  
   void SetGammaMin(double gmin);

@@ -12,8 +12,9 @@
 #include "TCanvas.h"
 #include "TF1.h"
 #include "TH1D.h"
+#define QG false
 
-#define DEBUG 0 
+#define DEBUG 0
 
 using namespace cst;
 
@@ -33,6 +34,8 @@ void GRBSim::GetUniqueName(const void *ptr, std::string & name)
   std::ostringstream my_name;
   my_name << reinterpret_cast<int> (ptr);
   name = my_name.str();
+  gDirectory->Delete(name.c_str());
+
 }
 
 
@@ -46,14 +49,19 @@ TH2D* GRBSim::Fireball()
   
   //////////////////////////////////////////////////  
   
-  std::vector<GRBShock*> Shocks = 
-    m_GRBengine->CreateShocksVector();
-
-  double meanDuration = 0;
-  int nshocks = (int) Shocks.size();
-  
+  std::vector<GRBShock*> Shocks = m_GRBengine->CreateShocksVector();
   std::vector<GRBShock*>::iterator pos;
-  for (pos=Shocks.begin();pos!=Shocks.end();++pos)
+  int nshocks = (int) Shocks.size();
+  if(DEBUG)
+    {
+      std::cout<<"Shock vector size: "<<nshocks<<std::endl;
+      for (pos=Shocks.begin();pos!=Shocks.end(); pos++)
+	{
+	  (*pos)->Print();
+	}
+    }
+  double meanDuration = 0;
+  for (pos=Shocks.begin(); pos!=Shocks.end(); pos++)
     {
       (*pos)->SetICComponent(m_params->GetInverseCompton());
       if(DEBUG) (*pos)->Print();
@@ -61,21 +69,28 @@ TH2D* GRBSim::Fireball()
     }
   meanDuration/=nshocks;
   
+  //////////////////////////////////////////////////
+  double dtqg=0.0;
+  double max_tqg=0.0;
+  if(QG)
+    {
+      double dist = GetDistance();
+      double Ep = 1e19 * 1e6; //keV;
+      dtqg = dist/cst::c/Ep;
+      max_tqg = dtqg * 1e7;
+    }
+
   //  int i=1;
   double shift =0.0;// Shocks.front()->GetTime() + 2.0*meanDuration;//3.*Shocks.front()->GetDuration();
-  m_tfinal = Shocks.back()->GetTime() + meanDuration + shift;
-  if(DEBUG) 
-    std::cout<<shift<<" "<<m_tfinal<<" "<<meanDuration<<std::endl;
+  m_tfinal = Shocks.back()->GetTime() + meanDuration + shift + max_tqg;
   double dt = m_tfinal/(Tbin-1);
-  
+  gDirectory->Delete("Nv");
   m_Nv = new TH2D("Nv","Nv",Tbin,0.,m_tfinal,Ebin, e);
   std::string name;
   GetUniqueName(m_Nv,name);
-  gDirectory->Delete(name.c_str());
   m_Nv->SetName(name.c_str());
   
   double t = 0.0;
-  
   for(int ti = 0; ti<Tbin; ti++)
     {
       t = ti*dt;
@@ -85,13 +100,14 @@ TH2D* GRBSim::Fireball()
 	  for (int i = 0; i< nshocks; i++)
 	    {
 	      GRBShock *ashock = Shocks[i];
-	      nv += ashock->ComputeFlux(t-shift,e[ei]);
+	      double energy = m_params->rnd->Uniform(e[ei],e[ei+1]);
+	      nv += ashock->ComputeFlux(t-shift-energy* dtqg,energy);
 	    }
 	  m_Nv->SetBinContent(ti+1, ei+1, nv);
 	  // [ph/(cm² s keV)]
 	}
     }
- // Conersion 1/cm² -> 1/m²
+  // Conersion 1/cm² -> 1/m²
   //  m_Nv->Scale(1.0e+4); // [ph/(m² s keV)]
   // double fluence = 1.0e-6; //erg/cm²
   // nph = nv * dE * TimeBinWidth
@@ -123,13 +139,12 @@ TH2D* GRBSim::Fireball()
   //         IMPORTANT m_Nv has to  be in [ph/(m² s keV)]    //
   //////////////////////////////////////////////////
   m_Nv->Scale(1.0e4 * m_fluence/norm);
-  Shocks.erase(Shocks.begin(), Shocks.end());
-  
   if(DEBUG) 
     m_params->PrintParameters();
-
+  
   delete[] e;
   delete nph;
+ 
   return m_Nv;
 }
 //////////////////////////////////////////////////
@@ -138,7 +153,6 @@ TH2D *GRBSim::Nph(const TH2D *Nv)
   TH2D *Nph = (TH2D*) Nv->Clone(); // [ph/(m² s keV)]  
   std::string name;
   GetUniqueName(Nph,name);
-  gDirectory->Delete(name.c_str());
   Nph->SetName(name.c_str());
 
   double dei;
