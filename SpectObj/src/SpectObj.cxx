@@ -330,14 +330,8 @@ else if (sourceType == 1) //Periodic //Max
 	
 	// Now evaluate the Spectrum Histogram
 
- 	TH1D* Sp;
-	Sp = Integral_T(1,nt,ei);
-	Sp->Scale(IntNumPer*1.0);
-	Sp->Add(Sp,Integral_T(Nv->GetXaxis()->FindBin(TimeToFirstPeriod),nt,ei));	
-	Sp->Add(Sp,Integral_T(1,Nv->GetXaxis()->FindBin(TimeFromLastPeriod),ei));
 	ph.time   = t0 + TimeToFirstPeriod + IntNumPer*m_Tmax +TimeFromLastPeriod;
- 	ph.energy = Sp->GetRandom();
-	delete Sp;
+ 	ph.energy = Integral_T(1,nt,ei)->GetRandom();
 	delete P;
 
 	if (((ph.time - 1000*Int_t(ph.time/1000)) > 0) 
