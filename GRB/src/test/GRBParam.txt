@@ -1,7 +1,7 @@
 5	        // Nshock
 1.0e+53		// Etot
 1.0		// Redshift
-1.0e+4          // Minimum Energy Extracted
+1.0e+7          // Minimum Energy Extracted
 Shell  type = 1 // 1= jet, 0 = spherical 
 ## If Shell == 1 : Jet Shells
 1.0e+18	  	// Radius of the jet [cm]

@@ -35,7 +35,7 @@ TDSReadFluxAlg.savefile+={"root"};
 // ------------------------------------------------------------
 
 MessageSvc.OutputLevel=2;
-ApplicationMgr.EvtMax = 1000;
+ApplicationMgr.EvtMax = 10000;
 
 //==============================================================
 //
