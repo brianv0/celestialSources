@@ -98,26 +98,26 @@ int Parameters::ReadParametersFromFile(std::string paramFile, int NGRB)
 
   int i=1;
 
-  while(i<NGRB && f1.getline(buf,100))
+  while(i<=NGRB && f1.getline(buf,100))
     {
+      if(sscanf(buf,"%d %lf %lf %lf %d %lf %lf %lf %lf %lf %lf",
+		&seed,&l0,&b0,&fluence,&nshell,&etot,&r0,&dr0,&gmin,&gmax,&ic)<=0) break;
       i++;
     }
   i--;
-    
-  f1>>seed>>l0>>b0>>fluence>>nshell>>etot>>r0>>dr0>>gmin>>gmax>>ic;
-  
-  if(nshell>1000)
+
+  if(i<NGRB)
     {
       f1.close();
       f1.open(paramFile.c_str());
-
       f1.getline(buf,100);
-      for(int j = 0; j< (NGRB %i);j++)
+
+      for(int j = 1; j<=(NGRB %i);j++)
 	{
 	  f1.getline(buf,100);
+	  sscanf(buf,"%d %lf %lf %lf %d %lf %lf %lf %lf %lf %lf",
+		 &seed,&l0,&b0,&fluence,&nshell,&etot,&r0,&dr0,&gmin,&gmax,&ic);
 	}
-      
-      f1>>seed>>l0>>b0>>fluence>>nshell>>etot>>r0>>dr0>>gmin>>gmax>>ic;    
     }
     
   SetGalDir(l0,b0);
