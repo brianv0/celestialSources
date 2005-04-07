@@ -615,6 +615,9 @@ void ScanParameters(int Ngrb)
       nLAT   = log10(sp->Integral_T(Lct_LAT,0.0,TMAX));
       double Ep = e2Ne->GetBinCenter(e2Ne->GetMaximumBin());
       std::cout<<"* Theoretical values:  *****************************"<<std::endl;
+#ifdef WIN32
+      std::cout<<" (not available in windows)" << std::endl;
+#else
       std::cout<<" T90 = "<<pow(10,T90)<<" Epeak = "<<Ep<<std::endl;
       std::cout<<" log TOT   flux ("<< emin <<","<< emax <<") = "<<fTOT<<" erg/cm^2"<<std::endl;
       std::cout<<" BASTE flux (ch1) ("<<BATSE1<<","<<BATSE2<<") = "<<pow(10,fBATSE1)<<" erg/cm^2"<<std::endl;
@@ -628,6 +631,7 @@ void ScanParameters(int Ngrb)
       std::cout<<"  Nph BATSE  ("<<BATSE1<<","<<BATSE5<<") = "<<pow(10,nBATSE)<<std::endl;
       std::cout<<"  Nph GBM    ("<<GBM1<<","<<GBM2<<")  = "<<pow(10,nGBM)<<std::endl;
       std::cout<<"  Nph LAT    ("<<LAT1<<","<<LAT2<<")  = "<<pow(10,nLAT)<<std::endl;
+#endif
       //	  if(output) delete sp;
       GRBTree->Fill();
       if(grbn%10==0)
