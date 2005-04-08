@@ -2,11 +2,12 @@
 *   Package GRB
 *   Managers:  <a href="mailto:nicola.omodei@pi.infn.it">Nicola Omodei</a>,
 *              <a href="mailto:johann.cohen@pi.infn.it">Johann Cohen-Tanugi</a>,
-*              <a href="mailto:sandhiab@lheapop.gsfc.nasa.gov">Sandhia Bansal</a>
 *
 *   $Header$
 *@verbatim
 *
+*   v4r1p6 06-Apr-2005 THB Add comment out use of TCanvas in generation for windows only
+*   ...(unknown updates)
 *   v4r1p1 17-Jan-2005 THB Add cmath to get fabs
 *   v4r1p0 14-Jan-2005 HMK Use any version of ROOT
 *   v4r1
