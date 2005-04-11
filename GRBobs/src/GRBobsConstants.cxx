@@ -97,7 +97,8 @@ void GRBobsParameters::ReadParametersFromFile(std::string paramFile, int NGRB)
     }
   double tstart;
   int NumberOfPulses;
-  double l0,b0,fluence,alpha,beta;
+  //  double l0,b0;
+  double fluence,alpha,beta;
   
   char buf[100];
   f1.getline(buf,100);
