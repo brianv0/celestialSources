@@ -5,7 +5,7 @@
 
 #include "GRBConstants.h"
 
-#define DEBUG  1
+#define DEBUG  0
 
 Parameters::Parameters()
 {
@@ -37,8 +37,8 @@ double Parameters::GetBATSEDuration()
 {
   using std::pow;
   if (m_Type==1)
-    return pow(10.0,(double)rnd->Gaus(-0.2,0.55)); //erg/cm^2 (Short Bursts)
-  return pow(10.0,(double)rnd->Gaus(1.46,0.49)); //erg/cm^2 (Long Burst)
+    return pow(10.0,(double)rnd->Gaus(-0.2,0.55)); // (Short Bursts)
+  return pow(10.0,(double)rnd->Gaus(1.46,0.49)); // (Long Burst)
 }
 
 
@@ -224,7 +224,7 @@ void Parameters::ComputeParametersFromFile(std::string paramFile, int NGRB)
   else if(type=='L' || type =='l')
     m_Type=2;
   else
-    m_Type=((rnd->Uniform()<0.3) ? 1 : 2);
+    m_Type=((rnd->Uniform()<=0.25) ? 1 : 2);
   
   m_Duration = GetBATSEDuration();
 

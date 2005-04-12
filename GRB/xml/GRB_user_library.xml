@@ -31,17 +31,6 @@
     </spectrum> </source>
 
 
-    <!-- 2) GRBobsSpectrum: the phenomenological model of GRB. -->
-    <!-- The high energy part is extrapolated from the BATSE data. The reference frame is galactic. -->
-
-    <source name=" GRBobsSpectrum_Gal" >
-        <!-- <spectrum escale="GeV"> <SpectrumClass name="GRBobsSpectrum" params="$(GRBROOT)/GRBmakerOutput/GRB_001.lis"/>     -->
-        <spectrum escale="GeV"> <SpectrumClass name="GRBobsSpectrum" params="$(GRBROOT)/GRBmakerOutput/"  />    
-        <!--  <spectrum escale="GeV"> <SpectrumClass name="GRBobsSpectrum"/>  -->
-        <use_spectrum frame="galaxy"/>
-    </spectrum> </source>
-
-
       <!--                  TEST SPECTRUMS                      -->
       <!-- The reference frame is galactic and a fixed direction is given to avoid the occlusion by the Earth. -->
 
