@@ -502,11 +502,10 @@ void MakeGRB(int NGRB=1, double enph=0, bool gbm=false)
   GRBobsParameters *params = new GRBobsParameters();  
   //////////////////////////////////////////////////
   params->ReadParametersFromFile(paramFile,NGRB);
-  
   GRBobsSim* m_grb = new GRBobsSim(params);
   m_grb->MakeGRB();
   m_grb->SaveNv();
-
+  
   char GRBname[100];
   sprintf(GRBname,"%d",(int) params->GetGRBNumber());
   if (gbm)  m_grb->GetGBMFlux(GRBname);
@@ -561,7 +560,6 @@ void ScanParameters(int Ngrb)
     {
       std::cout<<" GRBOBS number : "<<grbn<<" / "<<Ngrb<<std::endl;
       params->ReadParametersFromFile(paramFile,grbn);
-      params->PrintParameters();
       GRBobsSim m_grb(params);
       TH2D *Nv = m_grb.MakeGRB();
       
@@ -692,6 +690,10 @@ int main(int argc, char** argv)
       else if("-scaled"==arg_name)
 	{
 	  scaled=true;
+	}
+      else if("-movie"==arg_name)
+	{
+	  movie=true;
 	}
       
       current_arg++;

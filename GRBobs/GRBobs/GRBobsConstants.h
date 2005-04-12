@@ -15,9 +15,14 @@
 namespace ObsCst
 {
   const double emin = 10.0; //keV
-  const double emax = 1e9;  //keV
+  const double emax = 3e8;  //keV
   const double enph = 3e4;  //keV (30 MeV) 
-  
+  //////////////////////////////////////////////////
+  const double E0           = 20.0;  //reference energy for the Universal Width (keV)
+  const double We           = 0.33; //power law  index for W(e) relation: W(e)=W0*pow(e/20,-We)
+  const double deltaTPeak   = 0.5;  //for the displacements between peaks
+
+
   const    int Ebin =  50; 
   const    double  TimeBinWidth   =  0.016; //s
   static const double de   = pow(emax/emin,1.0/Ebin);
@@ -63,29 +68,29 @@ class GRBobsParameters
   inline  double GetLowEnergy()      {return m_LowEnergy;}
   inline  double GetHighEnergy()     {return m_HighEnergy;}
   inline  long   GetGRBNumber()      {return m_GRBnumber;}
-  inline  int    GetNumberOfPulses() {return m_numberOfPulses;}
+  inline  double GetDuration()       {return m_duration;}
   
   inline std::pair<double,double> GetGalDir(){return m_GalDir;}
   //////////////////////////////////////////////////
   void   SetGRBNumber(long);
   void   SetFluence(double);
-  void   SetNumberOfPulses(int);
+  void   SetDuration(double);
   inline void   SetAlphaBeta(double alpha, double beta)
     {
       m_LowEnergy       = alpha;
       m_HighEnergy      = beta;
       while (m_LowEnergy<-3.0 || m_LowEnergy>1.0) m_LowEnergy    = rnd->Gaus(-1.0,0.4);
       while(m_HighEnergy >= m_LowEnergy || m_HighEnergy >= -1.0)         m_HighEnergy  = rnd->Gaus(-2.25,0.4);
-      m_LowEnergy       += 0.4;
-      m_HighEnergy      += 0.4;
+      m_LowEnergy       += ObsCst::We;
+      m_HighEnergy      += ObsCst::We;
     } 
   void   SetMinPhotonEnergy(double);
   void   SetGalDir(double, double);  
 
   double GetBATSEFluence();
-
+  double GetBATSEDuration();  
   void GenerateParameters();
-
+  
   void ReadParametersFromFile(std::string paramFile, int NGRB=1);
 
   void PrintParameters();
@@ -93,12 +98,13 @@ class GRBobsParameters
   TRandom *rnd;
  
  private:
+  int m_Type;
   double  m_Peakedness;
   double  m_FWHM;
   double  m_Epeak;
   double m_LowEnergy,m_HighEnergy;
   double m_fluence;
-  int m_numberOfPulses;
+  double m_duration;
   double m_riseTime;
   double m_decayTime;
   double m_pulseHeight;

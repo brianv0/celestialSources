@@ -62,7 +62,7 @@ class GRBobsmanager : public ISpectrum
   double interval(double time);
   
   //! direction, taken from GRBobsSim
-  inline std::pair<double,double> dir(double energy) 
+  inline std::pair<double,double> dir(double) 
     {
       (void)(energy);//energy is not used here
       return m_GalDir;

@@ -26,8 +26,8 @@ GRBobsmanager::GRBobsmanager(const std::string& params)
   facilities::Util::expandEnvVar(&paramFile);  
   
   m_startTime       = parseParamList(params,0);
-  m_fluence         = parseParamList(params,1);
-  m_Npulses         = (int) parseParamList(params,2);
+  double duration   = parseParamList(params,1);
+  m_fluence         = parseParamList(params,2);
   m_alpha           = parseParamList(params,3);
   m_beta            = parseParamList(params,4);
   m_MinPhotonEnergy = parseParamList(params,5)*1.0e3; //MeV
@@ -40,10 +40,9 @@ GRBobsmanager::GRBobsmanager(const std::string& params)
   m_GRBnumber = (long) floor(65540+m_startTime);
 
   m_par->SetGRBNumber(m_GRBnumber);
-  m_par->SetNumberOfPulses(m_Npulses);
-  m_par->SetAlphaBeta(m_alpha,m_beta);
+  m_par->SetDuration(duration);
   m_par->SetFluence(m_fluence);
-
+  m_par->SetAlphaBeta(m_alpha,m_beta);
   m_par->SetMinPhotonEnergy(m_MinPhotonEnergy); //keV
   
   m_theta = -90.0;
@@ -252,7 +251,7 @@ double GRBobsmanager::parseParamList(std::string input, unsigned int index)
     i=input.find_first_of(",");
     input= input.substr(i+1);
   } 
-  if(index>=output.size()) return 0.0;
+  if(index>=(int)output.size()) return 0.0;
   return output[index];
 }
 
