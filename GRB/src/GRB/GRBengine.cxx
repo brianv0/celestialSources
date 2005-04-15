@@ -33,6 +33,7 @@ std::vector<GRBShock*> GRBengine::CreateShocksVector()
   double tshock,rshock,betaSlow;
   int i=0;
   double Gmean=0.0;
+  
   while(tobs < BurstDuration)
     {
       double G1 = m_params->rnd->Uniform(Gmin,Gmax); // lorentz factor;
@@ -64,20 +65,20 @@ std::vector<GRBShock*> GRBengine::CreateShocksVector()
       std::sort(theShocks.begin(), theShocks.end(), ShockCmp());
       tobs=theShocks[0]->GetTime()+theShocks.back()->GetTime()+2.0*theShocks.back()->GetDuration();
       
-      double d7    = InitialThickness*1.0e-7;
-      double r10   = rshock*1e-10;
-      double g100  = GammaMean/100.0;
-      double rsh14 = rshock * 1.0e-14; 
-      double E52   = Etot * 1e-52;
-      double n1    = (Etot * erg2meV)/(GammaMean * mpc2 * 4.0 *pi *rshock * rshock * InitialThickness * GammaMean);
-      
-      double Ep  = 363.742   * sqrt(E52/d7 * ab*3.0)*pow(ae*3.,2.)/rsh14;
-      double B   = 5.13809e6 * sqrt(E52/d7 * ab*3.0)              /(rsh14*g100); 
-      
-      std::cout<<E52<<" "<<d7<<" "<<rsh14<<" "<<Ep<<" "<<B<<" "<<n1<<std::endl;
       
       if(DEBUG) 
 	{
+	  
+	  double d7    = InitialThickness*1.0e-7;
+	  double r10   = rshock*1e-10;
+	  double g100  = GammaMean/100.0;
+	  double rsh14 = rshock * 1.0e-14; 
+	  double E52   = Etot * 1e-52;
+	  double n1    = (Etot * erg2meV)/(GammaMean * mpc2 * 4.0 *pi *rshock * rshock * InitialThickness * GammaMean);
+	  
+	  double Ep  = 363.742   * sqrt(E52/d7 * ab*3.0)*pow(ae*3.,2.)/rsh14;
+	  double B   = 5.13809e6 * sqrt(E52/d7 * ab*3.0)              /(rsh14*g100); 
+	  
 	  std::cout<<" Shock: GRB time = "<<
 	    tshock<<" Obs time ="<<ashock->GetTime()<<" radius = "<<ashock->GetRadius()<<" "<<rshock<<" efficiency : "<<ashock->GetEfficiency()<<" Ep = "<<Ep<<std::endl;
 	  std::cout<<" Shocks size = "<<theShocks.size()<<std::endl;	    

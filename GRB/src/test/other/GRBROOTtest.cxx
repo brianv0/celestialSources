@@ -625,19 +625,19 @@ void ScanParameters(int Ngrb)
       nLAT   = log10(sp->Integral_T(Lct_LAT,0.0,TMAX));
       
       std::cout<<"* Theoretical values:  *****************************"<<std::endl;
-      std::cout<<" T90 = "<<pow(10,T90)<<" Epeak = "<<pow(10,Ep)<<std::endl;
+      std::cout<<" T90 = "<<pow(10.,T90)<<" Epeak = "<<pow(10.,Ep)<<std::endl;
       std::cout<<" log TOT   flux ("<< emin <<","<< emax <<") = "<<fTOT<<" erg/cm^2"<<std::endl;
-      std::cout<<" BASTE flux (ch1) ("<<BATSE1<<","<<BATSE2<<") = "<<pow(10,fBATSE1)<<" erg/cm^2"<<std::endl;
-      std::cout<<" BASTE flux (ch2) ("<<BATSE2<<","<<BATSE3<<") = "<<pow(10,fBATSE2)<<" erg/cm^2"<<std::endl;
-      std::cout<<" BASTE flux (ch3) ("<<BATSE3<<","<<BATSE4<<") = "<<pow(10,fBATSE3)<<" erg/cm^2"<<std::endl;
-      std::cout<<" BASTE flux (ch4) ("<<BATSE4<<","<<BATSE5<<") = "<<pow(10,fBATSE4)<<" erg/cm^2"<<std::endl;
-      std::cout<<" BASTE flux (tot) ("<<BATSE1<<","<<BATSE5<<") = "<<pow(10,fBATSE)<<" erg/cm^2"<<std::endl;
+      std::cout<<" BASTE flux (ch1) ("<<BATSE1<<","<<BATSE2<<") = "<<pow(10.,fBATSE1)<<" erg/cm^2"<<std::endl;
+      std::cout<<" BASTE flux (ch2) ("<<BATSE2<<","<<BATSE3<<") = "<<pow(10.,fBATSE2)<<" erg/cm^2"<<std::endl;
+      std::cout<<" BASTE flux (ch3) ("<<BATSE3<<","<<BATSE4<<") = "<<pow(10.,fBATSE3)<<" erg/cm^2"<<std::endl;
+      std::cout<<" BASTE flux (ch4) ("<<BATSE4<<","<<BATSE5<<") = "<<pow(10.,fBATSE4)<<" erg/cm^2"<<std::endl;
+      std::cout<<" BASTE flux (tot) ("<<BATSE1<<","<<BATSE5<<") = "<<pow(10.,fBATSE)<<" erg/cm^2"<<std::endl;
       std::cout<<" GBM   flux ("<< GBM1 <<","<< GBM2 <<") = "<<fGBM<<" erg/cm^2"<<std::endl;
-      std::cout<<"  LAT   flux ("<< LAT1 <<","<< LAT2 <<") = "<<pow(10,fLAT)<<" erg/cm^2"<<std::endl;
-      std::cout<<"  Nph TOT    ("<<EMIN<<","<<EMAX<<")  = "<<pow(10,nTOT)<<std::endl;
-      std::cout<<"  Nph BATSE  ("<<BATSE1<<","<<BATSE5<<") = "<<pow(10,nBATSE)<<std::endl;
-      std::cout<<"  Nph GBM    ("<<GBM1<<","<<GBM2<<")  = "<<pow(10,nGBM)<<std::endl;
-      std::cout<<"  Nph LAT    ("<<LAT1<<","<<LAT2<<")  = "<<pow(10,nLAT)<<std::endl;
+      std::cout<<"  LAT   flux ("<< LAT1 <<","<< LAT2 <<") = "<<pow(10.,fLAT)<<" erg/cm^2"<<std::endl;
+      std::cout<<"  Nph TOT    ("<<EMIN<<","<<EMAX<<")  = "<<pow(10.,nTOT)<<std::endl;
+      std::cout<<"  Nph BATSE  ("<<BATSE1<<","<<BATSE5<<") = "<<pow(10.,nBATSE)<<std::endl;
+      std::cout<<"  Nph GBM    ("<<GBM1<<","<<GBM2<<")  = "<<pow(10.,nGBM)<<std::endl;
+      std::cout<<"  Nph LAT    ("<<LAT1<<","<<LAT2<<")  = "<<pow(10.,nLAT)<<std::endl;
       //	  if(output) delete sp;
       GRBTree->Fill();
       if(grbn%10==0)

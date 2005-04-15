@@ -53,23 +53,8 @@ void Parameters::SetGalDir(double l, double b)
   m_GalDir=std::make_pair(ll,bb);
 }
 
-/*
-  void Parameters::SetNshell(int nshell)
-  {
-  if(nshell>1 && nshell<4)
-  m_Type=1;
-  else if(nshell>4)
-  m_Type=2;
-  
-  if (nshell<1)
-  if (m_Type==1)    
-  m_Nshell = int(2+rnd->Integer(2));
-  else
-  m_Nshell = int(10+rnd->Integer(100));
-  else
-  m_Nshell = nshell;
-  }
-*/
+//////////////////////////////////////////////////
+
 void Parameters::SetFluence(double fluence)
 {
   if(fluence == 0)  
@@ -114,52 +99,6 @@ void Parameters::SetInverseCompton(double ic)
 
 //..................................................
 
-/*
-  void Parameters::ReadParametersFromFile(std::string paramFile, int NGRB)
-  {
-  
-  std::ifstream f1(paramFile.c_str());
-  if (!f1.is_open()) 
-  {
-  std::cout<<"GRBConstants: Error Opening paramFile!! \n";
-  exit(1);
-  }
-  //  int    nshell=0;
-  double fluence,etot,r0,dr0;
-  double gmin,gmax,ic;
-  
-  
-  char buf[200];
-  f1.getline(buf,200);
-  
-  int i=1;
-  
-  while(i<=NGRB && f1.getline(buf,200))
-  {
-  if(sscanf(buf,"%lf %d %lf %lf %lf %lf %lf %lf",&fluence,&nshell,&etot,&r0,&dr0,&gmin,&gmax,&ic)<=0) break;
-  i++;
-  }
-  i--;
-  f1.close();
-  
-  if(i<NGRB)
-  {    
-      std::ifstream f2(paramFile.c_str());
-      f2.getline(buf,200);
-      int nb;
-      if((NGRB % i)==0) nb=3;
-      else nb=(NGRB % i);
-      for(int j = 1; j<=nb;j++)
-      {
-      f2.getline(buf,200);
-      sscanf(buf,"%lf %d %lf %lf %lf %lf %lf %lf",&fluence,&nshell,&etot,&r0,&dr0,&gmin,&gmax,&ic);
-      }
-      f2.close();
-      }
-      SetParameters(fluence,nshell,etot,r0,dr0,gmin,gmax,ic);
-      }
-*/
-
 void Parameters::SetParameters(double fluence, double etot, double r0, double dr0, double gmin, double gmax, double ic)
 {
   SetGalDir(-200,-200);
@@ -181,7 +120,6 @@ void Parameters::ComputeParametersFromFile(std::string paramFile, int NGRB)
       std::cout<<"GRBConstants: Error Opening paramFile\n";
       exit(1);
     }
-  //  int    nshell=0;
   double fluence,r0,dr0;
   double gmin,gmax,etot,ic;
   double ep,Eco;
@@ -191,7 +129,7 @@ void Parameters::ComputeParametersFromFile(std::string paramFile, int NGRB)
   
   char buf[200];
   f1.getline(buf,100);
-  
+  /// First the parameter file is read
   int i=1;
   while(i<=NGRB && f1.getline(buf,100))
     {
@@ -214,16 +152,17 @@ void Parameters::ComputeParametersFromFile(std::string paramFile, int NGRB)
       f2.close();
     }
   //////////////////////////////////////////////////
-  //  ep/=2.0;
+  /// Sets the bolean flag for GBM output
   if (GBM>0) 
     SetGBMOutput(true);
-  
+  /// Set the type: m_Type=1 for Short bursts, 2 for longs
+  /// If type is not decleared, it is extracted randomly
   SetGRBNumber(UInt_t(65540+NGRB));  
   if(type=='S' || type =='s')
     m_Type=1;
   else if(type=='L' || type =='l')
     m_Type=2;
-  else
+  else 
     m_Type=((rnd->Uniform()<=0.25) ? 1 : 2);
   
   m_Duration = GetBATSEDuration();
@@ -238,21 +177,18 @@ void Parameters::ComputeParametersFromFile(std::string paramFile, int NGRB)
   double G=0.0;
   double d7=0.0;
   double tv=0.0;
-
+  
   if (Eco<=2.0) Eco = rnd->Uniform(3.0,10.0);
-  if(m_Type==1) 
+  if(m_Type==1) // SHORT BURSTS
     {
       tv  = m_Duration;
       if(ep==0) ep = pow(10.,log10(235.0)+log10(1.75) * rnd->Gaus());
     }
-  else          
+  else // LONG BURSTS
     {
-      //tv = rnd->Uniform(GetDuration()/50.0,GetDuration()/2.0);
       tv  = TMath::Max(m_Duration/50.0,pow(10.0,rnd->Gaus(0.0,0.5))); ///FWHM @ 20ke
       if(ep==0) ep = 0.5 * pow(10.,log10(235.0)+log10(1.75) * rnd->Gaus());
     }
-  
-  //  if(ep==0) ep = pow(10.,log10(235.0)+log10(1.75) * rnd->Gaus());
   //////////////////////////////////////////////////
   G   =  40.5 * Eco;
   g100=G/100.0;
@@ -265,43 +201,6 @@ void Parameters::ComputeParametersFromFile(std::string paramFile, int NGRB)
   r10   =   r0 * 1.0e-10;
   
   //////////////////////////////////////////////////
-  /*
-    bool EcoFlag = (Eco<=2.0) ? true : false;
-    
-    double Ep100 = ep/100.0;
-    
-    while(G<80.0 || d7 <= 0.1 || Ep100 < 1.0) 
-    {
-    double Ep100 = ep/100.0;
-    tv     = pow(10.0,rnd->Gaus(-1.0,0.5)); ///FWHM @ 20keV 
-    //      ep     = log10(235.0)+log10(1.75) * rnd->Gaus();
-    if(Ep100==0) Ep100 = 2.35; //short
-
-    if(m_Type==1)
-    {
-    if(Ep100==0) Ep100 = 2.35; //short
-    }
-    else
-    {
-    if(Ep100==0) Ep100 = 3.0; // long
-    }
-    
-    
-    r0    =  2.0 * cst::c * tv;
-    r10   =   r0 * 1.0e-10;
-    
-    if(EcoFlag) Eco = rnd->Uniform(2.0,10.0);
-    
-    G   =  40.5 * Eco;
-    d7  =  13.6 * E52 * ab3 * pow(ae3,4.0)/(pow(Eco,4.0)*pow(Ep100*tv,2.0));
-    dr0 =   1e7 * d7;
-    g100=G/100.0;  
-    
-    
-    Ep100 = 3.63*sqrt(E52*ab3/d7)*pow(ae3,2.)/(r10*pow(g100,2));    
-    
-    }
-  */
   ep = 100.0*Ep100;
   
   if(DEBUG) 
@@ -311,14 +210,6 @@ void Parameters::ComputeParametersFromFile(std::string paramFile, int NGRB)
   gmin = 2.*G/(gmax_gmin + 1.);
   gmax = gmax_gmin*gmin;
 
-  //  SetEpeak(Ep100*100.0);
-  //  SetFluence(fluence);
-  //  SetGammaMin(gmin);
-  //  SetGammaMax(gmax_gmin*gmin);  
-  //  SetInitialSeparation(r0);
-  //  SetInitialThickness(dr0);
-  //  SetNshell(nshell);
-  //  SetInverseCompton(ic);
   SetParameters(fluence,etot,r0,dr0,gmin,gmax,ic);
 
 }
