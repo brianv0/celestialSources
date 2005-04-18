@@ -32,7 +32,6 @@ GRBShell::GRBShell(double g, double r, double dr, double e, double m)
 void GRBShell::Evolve(double t)
 {
   m_r  += c * GetBeta() * t;
-  //  m_dr += c * GetBeta() * t;
 }
 //////////////////////////////////////////////////
 double GRBShell::GetVolume()
