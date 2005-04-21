@@ -37,34 +37,31 @@ ISpectrumFactory &MapSourceFactory() {
 MapSource::MapSource(const std::string &paramString) 
    : m_flux(1.), m_gamma(2), m_emin(30.), m_emax(1e5) {
 
-  std::string fitsFile;
+   std::string fitsFile;
 
-  //for backward compatibility, allow for the param string to be formatted
-  // as "flux_value,index_value,..."
-  if(paramString.find("=")==std::string::npos)
-    {
+   // for backward compatibility, allow for the param string to be formatted
+   // as "flux_value,index_value,..."
+   if (paramString.find("=") == std::string::npos) {
       std::vector<std::string> params;
       facilities::Util::stringTokenize(paramString, ", ", params);
-
+      
       m_flux = std::atof(params[0].c_str());
       m_gamma = std::atof(params[1].c_str());
       fitsFile = params[2];
       if (params.size() > 3) m_emin = std::atof(params[3].c_str());
       if (params.size() > 4) m_emax = std::atof(params[4].c_str());
-    }
-  else
-    //add the capability to format the string so as to create a map out of it:
-    // as in "flux=flux_value,index=index_value,...."
-    {
+   } else {
+      // add the capability to format the string so as to create a map out of
+      // it: as in "flux=flux_value,index=index_value,...."
       std::map<std::string,std::string> parmap;
       facilities::Util::keyValueTokenize(paramString, ", ", parmap);
-
+      
       m_flux = std::atof(parmap["flux"].c_str());
       m_gamma = std::atof(parmap["gamma"].c_str());
       fitsFile = parmap["fitsFile"];
       if (parmap.size() > 3) m_emin = std::atof(parmap["emin"].c_str());
       if (parmap.size() > 4) m_emax = std::atof(parmap["emax"].c_str());
-    }
+   }
    readFitsFile(fitsFile);
    makeIntegralDistribution(m_image);
 

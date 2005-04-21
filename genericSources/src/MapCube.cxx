@@ -37,17 +37,14 @@ ISpectrumFactory &MapCubeFactory() {
 
 MapCube::MapCube(const std::string &paramString) : MapSource() {
 
-  std::string fitsFile;
-  if(paramString.find("=")==std::string::npos)
-    {
+   std::string fitsFile;
+   if (paramString.find("=") == std::string::npos) {
       std::vector<std::string> params;
       facilities::Util::stringTokenize(paramString, ", ", params);
-
+      
       m_flux = std::atof(params[0].c_str());
-      std::string fitsFile = params[1];
-    }
-  else
-    {
+      fitsFile = params[1];
+   } else {
       std::map<std::string,std::string> params;
       facilities::Util::keyValueTokenize(paramString, ", ", params);
       

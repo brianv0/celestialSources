@@ -1,5 +1,20 @@
 <source_library>
 <!-- MapSource version of the Galactic Diffuse model -->
+   <source name="Galactic_diffuse_0">
+      <spectrum escale="MeV">
+<!-- Total photon flux from the map (#/m^2/s) = 17.
+     Photon spectral index = 2.1
+     Fits file (plate-carree only) = $(FLUXROOT)/sources/gas_gal.fits
+     Minimum photon energy (MeV) = 30.
+     Maximum photon energy (MeV) = 2e5
+-->
+         <SpectrumClass name="MapSource"
+          params="flux=17.,gamma=2.1,fitsFile=$(FLUXROOT)/sources/gas_gal.fits,emin=30.,emax=2e5"/>
+         <use_spectrum frame="galaxy"/>
+      </spectrum>
+   </source>
+
+<!-- MapSource version of the Galactic Diffuse model -->
    <source name="Galactic_diffuse">
       <spectrum escale="MeV">
 <!-- Total photon flux from the map (#/m^2/s) = 17.
@@ -15,6 +30,17 @@
    </source>
 
 <!-- Map with spectral variation -->
+   <source name="map_cube_source_0">
+      <spectrum escale="MeV">
+<!-- Total photon flux from the map (#/m^2/s) = 1.
+     Fits file (plate-carree only) = test_image.fits
+-->
+         <SpectrumClass name="MapCube"
+          params="flux=1.,fitsFile=$(GENERICSOURCESROOT)/data/test_image.fits"/>
+         <use_spectrum frame="galaxy"/>
+      </spectrum>
+   </source>
+
    <source name="map_cube_source">
       <spectrum escale="MeV">
 <!-- Total photon flux from the map (#/m^2/s) = 1.

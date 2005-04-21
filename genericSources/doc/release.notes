@@ -5,6 +5,8 @@
   @verbatim
   $Id$
 
+  20-Apr-05 v1r3    JC    use keyValueTokenize in MapCube and MapSource 
+                          constructors, update test and xml entries
   29-Mar-05 v1r2p3  JC    remove extraneous "!" from comment in
                           source_library.xml
   24-Mar-05 v1r2p2  JC    use v* 

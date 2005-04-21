@@ -107,6 +107,7 @@ void TestApp::parseCommandLine(int iargc, char * argv[]) {
 
 void TestApp::setSources() {
    char * srcNames[] = {"Galactic_diffuse",
+                        "Galactic_diffuse_0",
                         "simple_transient",
                         "transient_template",
                         "_3C279_June1991_flare",
@@ -116,8 +117,9 @@ void TestApp::setSources() {
                         "Geminga_Pulsar",
                         "gaussian_source",
                         "Extragalactic_diffuse",
-                        "map_cube_source"};
-   std::vector<std::string> sourceNames(srcNames, srcNames+11);
+                        "map_cube_source",
+                        "map_cube_source_0"};
+   std::vector<std::string> sourceNames(srcNames, srcNames+13);
 
    m_compositeSource = new CompositeSource();
    unsigned long nsrcs(0);
