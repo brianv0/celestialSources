@@ -7,11 +7,19 @@ version v0r5
 # Container package for astrophysical sources to be used by Gleam and
 # observationSim
 
-#use flux v*
-
-#use genericSources v1r2p3 celestialSources
-#use SpectObj v0r1p4 celestialSources
-#use GRB v4r1p5 celestialSources
-#use GRBobs v0r3 celestialSources
-#use Pulsar v1r0p6 celestialSources
+use genericSources v* celestialSources
+use SpectObj v* celestialSources
+use GRB v* celestialSources
+use GRBobs v* celestialSources
+use Pulsar v* celestialSources
 #use DarkMatter JCT celestialSources
+
+apply_pattern package_include
+apply_pattern package_linkopts
+apply_pattern package_stamps
+
+macro source *.cxx WIN32 "*.h *.cxx"
+
+library celestialSources -no_share $(source) *.c
+
+application test_celestialSources test/*.cxx
