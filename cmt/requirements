@@ -1,6 +1,6 @@
 package celestialSources
 
-version v1
+version v1r0p1
 
 # $Header$
 #
@@ -23,3 +23,7 @@ macro source *.cxx WIN32 "*.h *.cxx"
 library celestialSources -no_share $(source) *.c
 
 application test_celestialSources test/*.cxx
+
+macro celestialSources_cppflags "" \
+      Linux "-I ../src " \
+      WIN32 '/I..\src /wd4290'
