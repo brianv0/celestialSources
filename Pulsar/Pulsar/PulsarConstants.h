@@ -66,7 +66,7 @@ namespace cst
   const double ephemCorrTol = 1e-6;
 
   //! Tolerance for the barycentri decorrection (in us.)
-  const double baryCorrTol = 5e-6;
+  const double baryCorrTol = 1e-5;
 
   //! Difference between JD and MJD
   const double JDminusMJD = 2400000.5; 

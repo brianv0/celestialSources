@@ -58,9 +58,9 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
   m_model = 0;
   m_seed = 0;
 
-  char* pulsar_root = ::getenv("PULSARROOT");
-  char sourceFileName[80];
-  std::ifstream PulsarDataTXT;
+  // char* pulsar_root = ::getenv("PULSARROOT");
+  // char sourceFileName[80];
+  // std::ifstream PulsarDataTXT;
 
   //Read from XML file
   m_PSRname    = parseParamList(params,0).c_str();            // Pulsar name
@@ -77,6 +77,9 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
   double ppar3 = std::atof(parseParamList(params,8).c_str());
   double ppar4 = std::atof(parseParamList(params,9).c_str());
 
+
+
+  /*
   //Read from PulsarDataList.txt and find the data correspondind go choosen pulsar
   sprintf(sourceFileName,"%s/data/PulsarDataList.txt",pulsar_root);  
   if (DEBUG)
@@ -115,6 +118,18 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
       exit(1);
     }
   
+
+  */
+
+  int Retrieved = getPulsarFromDataList();
+
+  if (Retrieved == 0 )
+    {
+      std::cout << "Error: Pulsar not found " << std::endl;
+      exit(1);
+    }
+
+
   m_f0 = 1.0/m_period;
   m_f1 = -m_pdot/(m_period*m_period);
   m_f2 = 2*pow((m_pdot/m_period),2.0)/m_period - m_p2dot/(m_period*m_period);
@@ -450,6 +465,57 @@ double PulsarSpectrum::getBaryCorr( double ttInput )
 
   return tdb_min_tt + GeomCorr + ShapiroCorr; //seconds
 
+}
+
+/////////////////////////////////////////////
+int PulsarSpectrum::getPulsarFromDataList()
+{
+  int Status = 1;
+
+  char* pulsar_root = ::getenv("PULSARROOT");
+  char sourceFileName[80];
+  std::ifstream PulsarDataTXT;
+  //Read from PulsarDataList.txt and find the data correspondind go choosen pulsar
+
+  sprintf(sourceFileName,"%s/data/PulsarDataList.txt",pulsar_root);  
+  if (DEBUG)
+    {
+      std::cout << "\nOpening Pulsar Datalist File : " << sourceFileName << std::endl;
+    }
+  PulsarDataTXT.open(sourceFileName, std::ios::in);
+  
+  if (! PulsarDataTXT.is_open()) 
+    {
+      std::cout << "Error opening Datalist file " << sourceFileName  
+		<< " (check whether $PULSARROOT is set" << std::endl; 
+      Status = 0;
+      exit(1);
+    }
+  
+  char aLine[200];  
+  PulsarDataTXT.getline(aLine,200); 
+
+  char tempName[15] = "";
+  
+  while ((std::string(tempName) != m_PSRname) && ( PulsarDataTXT.eof() != 1))
+    {
+      PulsarDataTXT >> tempName >> m_RA >> m_dec >> m_l >> m_b >> m_flux >> m_period >> m_pdot >> m_p2dot >> m_t0 >> m_phi0;
+    } 
+  
+  if (std::string(tempName) == m_PSRname)
+    {
+      if (DEBUG)
+	{
+	  std::cout << "Pulsar " << m_PSRname << " found in Datalist file! " << std::endl;
+	}    
+    }
+  else
+    {
+      std::cout << "ERROR! Pulsar " << m_PSRname << " NOT found in Datalist.File...Exit. " << std::endl;
+      Status = 0;
+    }
+
+  return Status;
 }
 
 /////////////////////////////////////////////
