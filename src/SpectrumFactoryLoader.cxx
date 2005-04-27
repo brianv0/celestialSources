@@ -41,8 +41,8 @@ SpectrumFactoryLoader::SpectrumFactoryLoader()
    factories.push_back(&TransientTemplateFactory());
    factories.push_back(&PulsarSpectrumFactory());
 
-//    std::vector<ISpectrumFactory *>::const_iterator factory;
-//    for (factory = factories.begin(); factory != factories.end(); ++factory){
-//       m_names.push_back(factory->name());
-//    }
+   std::vector<ISpectrumFactory *>::const_iterator factory;
+   for (factory = factories.begin(); factory != factories.end(); ++factory) {
+      m_names.push_back((*factory)->name());
+   }
 }
