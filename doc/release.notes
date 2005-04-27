@@ -4,6 +4,7 @@
 
   @verbatim
   $Id$
+  27-Apr-05 v1r0p1   THB   add header files to project on Windows, enable creation of names
   26-Apr-05 v1r0p1   JC    add cppflags for package includes on Windows
   26-Apr-05 v1       JC    Add SpectrumFactoryLoader class used to create
                            SpectrumFactory objects found in celestialSources

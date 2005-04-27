@@ -26,23 +26,21 @@ ISpectrumFactory & TransientTemplateFactory();
 
 SpectrumFactoryLoader::SpectrumFactoryLoader()
 {
-   std::vector<ISpectrumFactory *> factories;
-
-   factories.push_back(&GRBmanagerFactory());
-   factories.push_back(&GRBobsFactory());
-   factories.push_back(&GaussianSourceFactory());
-   factories.push_back(&IsotropicFactory());
-   factories.push_back(&MapSourceFactory());
-   factories.push_back(&MapCubeFactory());
-   factories.push_back(&PeriodicSourceFactory());
-   factories.push_back(&PulsarFactory());
-   factories.push_back(&SimpleTransientFactory());
-   factories.push_back(&SpectralTransientFactory());
-   factories.push_back(&TransientTemplateFactory());
-   factories.push_back(&PulsarSpectrumFactory());
-
-   std::vector<ISpectrumFactory *>::const_iterator factory;
-   for (factory = factories.begin(); factory != factories.end(); ++factory) {
-      m_names.push_back((*factory)->name());
-   }
+   load(GRBmanagerFactory());
+   load(GRBobsFactory());
+   load(GaussianSourceFactory());
+   load(IsotropicFactory());
+   load(MapSourceFactory());
+   load(MapCubeFactory());
+   load(PeriodicSourceFactory());
+   load(PulsarFactory());
+   load(SimpleTransientFactory());
+   load(SpectralTransientFactory());
+   load(TransientTemplateFactory());
+   load(PulsarSpectrumFactory());
 }
+void SpectrumFactoryLoader::load(ISpectrumFactory& factory)
+{
+       m_names.push_back( factory.name() );
+}
+

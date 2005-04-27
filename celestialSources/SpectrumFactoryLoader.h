@@ -11,6 +11,8 @@
 #include <vector>
 #include <string>
 
+class ISpectrumFactory;
+
 class SpectrumFactoryLoader {
 public:
     /// ctor does the work
@@ -18,6 +20,7 @@ public:
     /// access to a list of the names that were loaded
     std::vector<std::string> names()const{return m_names;}
 private:
+    void load(ISpectrumFactory&);
     std::vector<std::string> m_names;
 };
 
