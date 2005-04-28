@@ -27,7 +27,6 @@ ISpectrumFactory & TransientTemplateFactory();
 SpectrumFactoryLoader::SpectrumFactoryLoader()
 {
    load(GRBmanagerFactory());
-   load(GRBobsFactory());
    load(GaussianSourceFactory());
    load(IsotropicFactory());
    load(MapSourceFactory());
