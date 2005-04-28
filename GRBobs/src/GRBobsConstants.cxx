@@ -1,9 +1,12 @@
 #include <vector>
 #include <iostream>
 #include <fstream>
+#include <cmath>
 
 #include "../GRBobs/GRBobsConstants.h"
+
 using namespace ObsCst;
+using std::pow;
 
 GRBobsParameters::GRBobsParameters()
 {
@@ -16,7 +19,6 @@ GRBobsParameters::GRBobsParameters()
 // Relevant BATSE distributions
 double GRBobsParameters::GetBATSEDuration()
 {
-  using std::pow;
   if (m_Type==1)
     return pow(10.0,(double)rnd->Gaus(-0.2,0.55)); //erg/cm^2 (Short Bursts)
   return pow(10.0,(double)rnd->Gaus(1.46,0.49)); //erg/cm^2 (Long Burst)
@@ -24,7 +26,6 @@ double GRBobsParameters::GetBATSEDuration()
 
 double GRBobsParameters::GetBATSEFluence()
 {
-  using std::pow;
   if (m_Type==1)
     return pow(10.0,(double)rnd->Gaus(-6.3,0.57)); //erg/cm^2 (Short Bursts)
   return pow(10.0,(double)rnd->Gaus(-5.4,0.62)); //erg/cm^2 (Long Burst)

@@ -1,9 +1,9 @@
 #include "GRBobs/GRBobsPulse.h"
 #include "GRBobs/GRBobsConstants.h"
 #include <iostream>
+#include <cmath>
 
 #define DEBUG 0  
-
 
 using std::fabs; using std::pow;
 
