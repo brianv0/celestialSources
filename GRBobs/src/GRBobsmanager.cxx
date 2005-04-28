@@ -161,7 +161,7 @@ void GRBobsmanager::GenerateGRB()
   name+="_PAR.txt";
   
   std::ofstream os(name,std::ios::out);
-  os<<m_startTime<<" "<<m_endTime<<" "<<m_l<<" "<<m_b<<" "<<m_theta<<" "<<m_phi<<" "<<m_fluence<<" "<<m_Npulses<<" "<<m_alpha<<" "<<m_beta<<std::endl;
+  os<<m_startTime<<" "<<m_endTime<<" "<<m_l<<" "<<m_b<<" "<<m_theta<<" "<<m_phi<<" "<<m_fluence<<" "<<" "<<m_alpha<<" "<<m_beta<<std::endl;
   os.close();
   std::cout<<"Phenomen. Model GRB"<<GRBname<<" t start "<<m_startTime<<", tend "<<m_endTime
 	   <<" l,b = "<<m_l<<", "<<m_b<<" elevation,phi(deg) = "<<m_theta<<", "<<m_phi<<" Fluence = "<<m_fluence<<std::endl;

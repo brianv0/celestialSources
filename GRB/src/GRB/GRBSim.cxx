@@ -232,18 +232,9 @@ double LogFB(double *var, double *par)
   double LogH,LogC; 
   if((a-b)<=0) std::cout<<"WARNING"<<std::endl;
   
-  //  if((a-b)>=1.0e-4)
-  //    {
   LogH   = log10(a-b) + LogE0;  
   LogC   = (a-b) * (LogH-2.0)-loge*pow(10.0,LogH-LogE0);
-  //    }
-  //  else
-  //    {
-  //      a=b+1.0e-4;
-  //      LogH  = -4.0 + LogE0;  
-  //      LogC  = 1.0e-4 * ((LogH-2.0)- loge);
-  //    }
-  
+
   if(LogE <= LogH) 
     return      LogNT + a * (LogE-2.0) - pow(10.0,LogE-LogE0)*loge; 
   return LogC + LogNT + b * (LogE-2.0); // cm^(-2) s^(-1) keV^(-1) 
@@ -253,11 +244,6 @@ double LogFB(double *var, double *par)
 
 void GRBSim::GetGBMFlux(TString GRBname)
 {
-  //  double *e = new double[Ebin +1];
-  //  for(int i = 0; i<=Ebin; i++)
-  //    {
-  //      e[i] = emin*pow(de,1.0*i); //keV
-  //    }
   //////////////////////////////////////////////////
   // GBM Spectrum:
   TF1 band("grb_f",LogFB,log10(emin), 4.0, 4); 
@@ -266,8 +252,7 @@ void GRBSim::GetGBMFlux(TString GRBname)
   band.SetParLimits(0,-2.0 , 2.0); // a
   band.SetParLimits(1,-3.0 , -0.001); // b-a; b < a -> b-a < 0 !
   band.SetParLimits(2,log10(emin),4.0);
-  //  band.SetParLimits(3,-3.,3.);
-
+  
   double a,b,E0,Const;
   TH1D GBM("GBM","GBM",Ebin,log10(emin),log10(emax));
   GBM.SetMinimum(5);

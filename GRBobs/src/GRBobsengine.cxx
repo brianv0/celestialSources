@@ -17,8 +17,6 @@ GRBobsengine::GRBobsengine(GRBobsParameters *params)
 std::vector<GRBobsPulse*> GRBobsengine::CreatePulsesVector()
 {
   //////////////////////////////////////////////////
-  //  const   int    Npulses            = m_params->GetNumberOfPulses();
-  std::cout<<"--------------------------------------------------"<<std::endl;
   std::vector<GRBobsPulse*> thePulses;
   double tau, pt1,pt,rt, dt, ph, nu, ep, a, b,duration,startTime,endTime,BurstEndTime;
 

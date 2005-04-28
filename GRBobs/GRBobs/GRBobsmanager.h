@@ -108,7 +108,6 @@ class GRBobsmanager : public ISpectrum
   double m_l;
   double m_b;
   double m_fluence;
-  int    m_Npulses;
   long   m_GRBnumber;
   double m_alpha;
   double m_beta;

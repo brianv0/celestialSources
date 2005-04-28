@@ -46,12 +46,9 @@ double GRBmanager::flux(double time) const
 {
 
 
-  double flux;	  
   if(time <= m_startTime || (time > m_endTime)) 
-    flux = 0.0;
-  else 
-    flux = m_spectrum->flux(time-m_startTime,m_enph);
-  return flux;
+    return 0.0;
+  return m_spectrum->flux(time-m_startTime,m_enph);
 }
 
 TString GRBmanager::GetGRBname(double time)
@@ -201,16 +198,12 @@ double GRBmanager::interval(double time)
       GenerateGRB(); 
       inte = m_startTime-time + m_spectrum->interval(0.0,m_enph);
     }
-  inte = TMath::Min(inte,m_nextBurst-time);
-  //  std::cout<<"GRBmanager interval : "<<time<<" "<<m_startTime<<" "<<m_endTime<<" "<<inte<<std::endl;
-  return inte;
+  return TMath::Min(inte,m_nextBurst-time);
 }
 
 double GRBmanager::energy(double time)
 {
-  double energy=m_spectrum->energy(time-m_startTime,m_enph)*1.0e-3; //MeV
-  //  std::cout<<"GRBmanager energy "<<energy<<std::endl;
-  return energy;
+  return m_spectrum->energy(time-m_startTime,m_enph)*1.0e-3; //MeV
 }
 
 double GRBmanager::parseParamList(std::string input, int index)

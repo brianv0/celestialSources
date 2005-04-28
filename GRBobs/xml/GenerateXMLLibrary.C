@@ -3,9 +3,9 @@ void GenerateXMLLibrary(int N=100)
 {
   TRandom *rnd = new TRandom();
   double MinExtractedPhotonEnergy = 30.0; //MeV
-  double FirstBurstTime  =      10000;
-  double AverageInterval = 86400.0; //s
-  bool  GenerateFluence  =   true;
+  double FirstBurstTime  =      1000; //1e4
+  double AverageInterval = 2000;//86400.0; //s
+  bool  GenerateFluence  =   false;
   double Fluence = 1.0e-5;
   double Duration;
   int BURSTtype = 0; // 1->S, 2->L, else S+L
@@ -51,8 +51,8 @@ void GenerateXMLLibrary(int N=100)
 
       theta = 0.0;//10.0*(i%8);
       phi   = 0.0;//10.0*(i%37);
-      alpha= -1.0*rnd->Uniform(0.0, 1.5);
-      beta = -1.0*rnd->Uniform(2.0, 2.5);
+      alpha= -1.0;//*rnd->Uniform(0.0, 1.5);
+      beta = -2.25;//-1.0*rnd->Uniform(2.0, 2.5);
       os<<""<<std::endl;
       if(i<10) os<<"<source name=\" GRB_0000"<<i<<" \">"<<std::endl;
       else if(i<100) os<<"<source name=\" GRB_000"<<i<<" \">"<<std::endl;

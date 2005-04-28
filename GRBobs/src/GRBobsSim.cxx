@@ -234,7 +234,7 @@ void GRBobsSim::GetGBMFlux(TString GRBname)
   os<<"Sample Spectrum File "<<std::endl;
   os<<tbin<<" bins"<<std::endl;
   os<<"Norm   alf   beta  E_p "<<std::endl;
-  
+#ifndef WIN32 // THB: Avoid need to link TCanvas on windows 
   if(DEBUG)
     {
       TCanvas *GBMCanvas;
@@ -243,7 +243,7 @@ void GRBobsSim::GetGBMFlux(TString GRBname)
       GBM.Draw();
       
     }
-  
+#endif 
   a =  -1.00;
   b =  -2.25;
   

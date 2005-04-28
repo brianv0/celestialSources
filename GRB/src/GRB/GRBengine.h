@@ -20,7 +20,7 @@ class GRBengine
 {
   
  public:
-  /// Constructor. Get the galactic coordinates.
+  /// Constructor. Get the Parameters class as input configuration.
   GRBengine(Parameters *params);
   ///  Default destructor
   ~GRBengine(){;}
@@ -38,7 +38,7 @@ class GRBengine
     is used only for computing the Quantum Gravity effect.
  */
   double GetDistance();
- 
+  /// Returns the galastic (l,b) position of the burst
   inline std::pair<double,double> GetDirection(){return m_dir;}
  private:
   std::pair<double,double> m_dir;

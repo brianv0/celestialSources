@@ -70,14 +70,16 @@ void GRBobsParameters::SetGalDir(double l, double b)
 
 void GRBobsParameters::GenerateParameters()
 {
+  m_RD=0.0;
   m_Peakedness      = 1.5;//pow(10.0,rnd->Gaus(0.16,0.3));
   m_FWHM            = (m_Type==1) ? rnd->Uniform()*m_duration : pow(10.0,rnd->Gaus(-0.1,0.5)); //FWHM @ 20keV 
   m_pulseSeparation = pow(10.0,rnd->Gaus(0.13,0.4)); // double distribution, to be done...
-  m_decayTime       = 0.75*pow(0.69,-1./m_Peakedness)*m_FWHM;
-  m_riseTime        = 0.25*pow(0.69,-1./m_Peakedness)*m_FWHM;
+  while(m_RD<=0) m_RD = rnd->Gaus(0.4,0.1);
+  m_decayTime       = 1.00/(1.0+m_RD)*pow(0.69,-1./m_Peakedness)*m_FWHM;
+  m_riseTime        = m_RD/(1.0+m_RD)*pow(0.69,-1./m_Peakedness)*m_FWHM;
   m_pulseHeight     = rnd->Uniform();
-  m_Epeak           = pow(10.,rnd->Gaus(log10(235.0),log10(1.75))); //S
-  if(m_Type==2) m_Epeak/=2.0; //L
+  m_Epeak           = pow(10.,rnd->Gaus(log10(235.0),log10(1.75))); //Short
+  if(m_Type==2) m_Epeak/=2.0; //Long
 }
 
 void GRBobsParameters::PrintParameters()
@@ -100,7 +102,6 @@ void GRBobsParameters::ReadParametersFromFile(std::string paramFile, int NGRB)
     }
   double tstart;
   double duration;
-  //int NumberOfPulses;
   double fluence,alpha,beta;
   
   char buf[100];

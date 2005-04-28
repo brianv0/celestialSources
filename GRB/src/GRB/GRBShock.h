@@ -65,6 +65,7 @@ class GRBShock
     Represents the pulse shape as a function of:
     \param time in the observed frame
     \param energy in the emitter frame
+    
   */
   double Peak(double time, double energy);
   /*!
