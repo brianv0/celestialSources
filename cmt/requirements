@@ -1,6 +1,6 @@
 package celestialSources
 
-version v1r0p3
+version v1r0p4
 
 # $Header$
 #
@@ -10,10 +10,8 @@ version v1r0p3
 use genericSources v* celestialSources
 use SpectObj v* celestialSources
 use GRB v* celestialSources
-## does not build on Windows
-#  use GRBobs v* celestialSources
+use GRBobs v* celestialSources
 use Pulsar v* celestialSources
-#use DarkMatter JCT celestialSources
 
 apply_pattern package_include
 apply_pattern package_linkopts
