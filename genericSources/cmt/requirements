@@ -1,5 +1,5 @@
 package genericSources
-version v1r3
+version v1r3p1
 
 author James Chiang <jchiang@slac.stanford.edu>
 
@@ -27,10 +27,3 @@ macro source *.cxx WIN32 "*.h *.cxx"
 library genericSources -no_share $(source)
 
 application test_genericSources test/test.cxx
-
-use SwigPolicy v*
-
-path_remove PYTHONPATH genericSources
-path_append PYTHONPATH $(GENERICSOURCESROOT)/$(BINDIR)
-
-apply_pattern swig_module name="sources"

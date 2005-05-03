@@ -5,6 +5,8 @@
   @verbatim
   $Id$
 
+  03-May-05 v1r3p1  JC    remove Swig-dependent lines from req file
+                          (SWIG builds now in celestialSources/pySources)
   20-Apr-05 v1r3    JC    use keyValueTokenize in MapCube and MapSource 
                           constructors, update test and xml entries
   29-Mar-05 v1r2p3  JC    remove extraneous "!" from comment in
