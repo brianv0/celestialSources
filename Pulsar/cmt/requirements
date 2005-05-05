@@ -7,10 +7,6 @@ use flux       v8r*
 use ROOT       v*  IExternal
 use SpectObj   v* celestialSources
 use astro v*
-use st_facilities *
-use xmlBase v*
-use pulsarDb v*
-
 
 macro_append ROOT_libs " -lHist -lGraf "\
                  WIN32 " libHist.lib libGraf.lib " 
