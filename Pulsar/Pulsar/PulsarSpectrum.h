@@ -98,9 +98,10 @@ class PulsarSpectrum : public ISpectrum
   //double m_JDStartMission = 2453569.5; //corresponding to  2005,7,18,0.0
 
   double m_RA, m_dec, m_l, m_b;  
-  double m_period, m_pdot, m_p2dot, m_t0, m_phi0, m_f0, m_f1, m_f2;
+  double m_period, m_pdot, m_p2dot, m_t0, m_t0Init, m_t0End, m_phi0, m_f0, m_f1, m_f2;
   int m_numpeaks;
   int m_model;
+  int m_MultEph;
   double m_flux, m_enphmin, m_enphmax;
   int m_seed;
 

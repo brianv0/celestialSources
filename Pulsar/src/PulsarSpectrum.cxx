@@ -113,6 +113,7 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
 		<< ") ; (l,b)=(" << m_l << "," << m_b << ")" << std::endl; 
       std::cout << "**   Flux above 100 MeV : " << m_flux << " ph/cm2/s " << std::endl;
       std::cout << "**   Number of peaks : " << m_numpeaks << std::endl;
+      std::cout << "**   Ephemerides valid from " << m_t0Init << " to " << m_t0End << " (MJD)" << std::endl;
       std::cout << "**   Epoch (MJD) :  " << m_t0 << std::endl;
       std::cout << "**   Phi0 (at Epoch t0) : " << m_phi0 << std::endl;
       std::cout << "**   Period : " << m_period << " s. | f0: " << m_f0 << std::endl;
@@ -146,6 +147,7 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
 	    << ") ; (l,b)=(" << m_l << "," << m_b << ")" << std::endl; 
   PulsarLog << "**   Flux above 100 MeV : " << m_flux << " ph/cm2/s " << std::endl;
   PulsarLog << "**   Number of peaks : " << m_numpeaks << std::endl;
+  PulsarLog << "**   Ephemerides valid from " << m_t0Init << " to " << m_t0End << " (MJD)" << std::endl;
   PulsarLog << "**   Epoch (MJD) :  " << m_t0 << std::endl;
   PulsarLog << "**   Phi0 (at Epoch t0) : " << m_phi0 << std::endl;
   PulsarLog << "**   Period : " << m_period << " s. | f0: " << m_f0 << std::endl;
@@ -463,7 +465,7 @@ int PulsarSpectrum::getPulsarFromDataList()
   
   while ((std::string(tempName) != m_PSRname) && ( PulsarDataTXT.eof() != 1))
     {
-      PulsarDataTXT >> tempName >> v1 >> v2 >> m_l >> m_b >> m_flux >> m_period >> m_pdot >> m_p2dot >> m_t0 >> m_phi0;
+      PulsarDataTXT >> tempName >> m_flux >> m_period >> m_pdot >> m_p2dot >> m_t0Init >> m_t0 >> m_t0End  >> m_phi0 >> m_MultEph;
     } 
   
   if (std::string(tempName) == m_PSRname)
