@@ -16,6 +16,8 @@
 #include "PulsarSim.h"
 #include "SpectObj/SpectObj.h"
 #include "CLHEP/Vector/ThreeVector.h"
+#include "pulsarDb/PulsarDb.h"
+#include "st_facilities/Env.h"
 
 
 /*! 
@@ -58,12 +60,12 @@ class PulsarSpectrum : public ISpectrum
 
   //! get the pulsar ephemerides and data from the DataList
   int getPulsarFromDataList();
- 
+
   //! direction, taken from PulsarSim
   inline std::pair<double,double>
     dir(double energy) 
     {
-      return std::make_pair(1,1);
+      return m_GalDir;
     } 
 
   //! calls PulsarSpectrum::energySrc
@@ -87,6 +89,7 @@ class PulsarSpectrum : public ISpectrum
 
   astro::SkyDir m_PulsarDir;
   Hep3Vector m_PulsarVectDir;
+  std::pair<double,double> m_GalDir;
   
   const std::string& m_params; 
   
