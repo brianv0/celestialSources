@@ -16,8 +16,6 @@
 #include "PulsarSim.h"
 #include "SpectObj/SpectObj.h"
 #include "CLHEP/Vector/ThreeVector.h"
-#include "pulsarDb/PulsarDb.h"
-#include "st_facilities/Env.h"
 
 
 /*! 
@@ -99,6 +97,7 @@ class PulsarSpectrum : public ISpectrum
 
   double m_RA, m_dec, m_l, m_b;  
   double m_period, m_pdot, m_p2dot, m_t0, m_t0Init, m_t0End, m_phi0, m_f0, m_f1, m_f2;
+  
   int m_numpeaks;
   int m_model;
   int m_MultEph;

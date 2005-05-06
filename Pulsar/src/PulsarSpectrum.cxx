@@ -87,7 +87,6 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
       exit(1);
     }
 
-
   //Init SolarSystem stuffs useful for barycentric decorrections
 
   astro::JulianDate JDStart(2007, 1, 1, 0.0);
@@ -461,8 +460,6 @@ int PulsarSpectrum::getPulsarFromDataList()
 
   char tempName[15] = "";
 
-  double v1,v2;
-  
   while ((std::string(tempName) != m_PSRname) && ( PulsarDataTXT.eof() != 1))
     {
       PulsarDataTXT >> tempName >> m_flux >> m_period >> m_pdot >> m_p2dot >> m_t0Init >> m_t0 >> m_t0End  >> m_phi0 >> m_MultEph;
@@ -474,6 +471,7 @@ int PulsarSpectrum::getPulsarFromDataList()
 	{
 	  std::cout << "Pulsar " << m_PSRname << " found in Datalist file! " << std::endl;
 	}    
+
     }
   else
     {
