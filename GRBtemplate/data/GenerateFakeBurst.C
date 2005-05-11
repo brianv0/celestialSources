@@ -25,7 +25,7 @@ void GenerateFakeBurst(int NumberOfPhotonsAbove100MeV = 10)
   double e2 = MaximumEnergy;
 
 
-  double Const = 2.0*pow(t0,2.)*(e2-e1)*(pow(e1,1.-a) - pow(e2,1.-a))/(e1-a*e1-e2+a*e2);
+  double Const = 1e4*2.0*pow(t0,2.)*(e2-e1)*(pow(e1,1.-a) - pow(e2,1.-a))/(e1-a*e1-e2+a*e2);
 
   for(int ti=0; ti<TimeBins;ti++)
     {

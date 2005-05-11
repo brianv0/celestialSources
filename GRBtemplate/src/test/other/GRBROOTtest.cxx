@@ -495,7 +495,8 @@ void MakeGRB(double enph=0, bool gbm=false)
   std::cout<<" ****** GRB TEMPLATE and ROOT test ****** "<<std::endl;
   
   std::string path = ::getenv("GRBTEMPLATEROOT");
-  std::string paramFile = path+"/data/GRBTMP000000.dat";
+  //  std::string paramFile = path+"/data/GRBTMP000000.dat";
+  std::string paramFile = path+"/data/pulse_002.dat";
 
   GRBtemplateSim* m_grb = new GRBtemplateSim(paramFile);
   m_grb->MakeGRB();

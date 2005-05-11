@@ -65,7 +65,7 @@ TH2D* GRBtemplateSim::MakeGRB()
 	{
 	  double nv;
 	  iFile>>nv;
-	  m_Nv->SetBinContent(ti+1, ei+1, nv);// [ph/(cm² s keV)]
+	  m_Nv->SetBinContent(ti+1, ei+1, nv*1e4);// [ph/(cm² s keV)]
 	}
     }
 
