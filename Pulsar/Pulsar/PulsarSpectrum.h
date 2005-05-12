@@ -97,10 +97,10 @@ class PulsarSpectrum : public ISpectrum
 
   double m_RA, m_dec, m_l, m_b;  
   double m_period, m_pdot, m_p2dot, m_t0, m_t0Init, m_t0End, m_phi0, m_f0, m_f1, m_f2;
+  std::vector<double> m_periodVect, m_pdotVect, m_p2dotVect, m_phi0Vect, m_t0Vect, m_t0InitVect, m_t0EndVect;
   
   int m_numpeaks;
   int m_model;
-  int m_MultEph;
   double m_flux, m_enphmin, m_enphmax;
   int m_seed;
 

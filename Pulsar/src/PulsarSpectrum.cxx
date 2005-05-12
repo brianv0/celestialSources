@@ -80,12 +80,28 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
 
 
   int Retrieved = getPulsarFromDataList();
-
-  if (Retrieved == 0 )
+  
+  if (DEBUG==0)
     {
-      std::cout << "Error: Pulsar not found in DataList " << std::endl;
-      exit(1);
+      if (Retrieved == 1)
+	{
+	  std::cout << "Pulsar " << m_PSRname << " found in Datalist file! " << std::endl;
+	} 
+      else
+	{
+	  std::cout << "ERROR! Pulsar " << m_PSRname << " NOT found in Datalist.File...Exit. " << std::endl;
+	  exit(1);	
+	}
     }
+
+  m_period = m_periodVect[0];
+  m_pdot = m_pdotVect[0];
+  m_p2dot = m_p2dotVect[0];
+  m_phi0 = m_phi0Vect[0];
+  m_t0Init = m_t0InitVect[0];
+  m_t0 = m_t0Vect[0];
+  m_t0End = m_t0EndVect[0];
+
 
   //Init SolarSystem stuffs useful for barycentric decorrections
 
@@ -99,10 +115,6 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
   m_l = m_GalDir.first;
   m_b = m_GalDir.second;
 
-  m_f0 = 1.0/m_period;
-  m_f1 = -m_pdot/(m_period*m_period);
-  m_f2 = 2*pow((m_pdot/m_period),2.0)/m_period - m_p2dot/(m_period*m_period);
-
   if (DEBUG)
     {
       //Writes out Pulsar Info
@@ -111,14 +123,25 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
       std::cout << "**   Position : (RA,Dec)=(" << m_RA << "," << m_dec 
 		<< ") ; (l,b)=(" << m_l << "," << m_b << ")" << std::endl; 
       std::cout << "**   Flux above 100 MeV : " << m_flux << " ph/cm2/s " << std::endl;
-      std::cout << "**   Number of peaks : " << m_numpeaks << std::endl;
-      std::cout << "**   Ephemerides valid from " << m_t0Init << " to " << m_t0End << " (MJD)" << std::endl;
-      std::cout << "**   Epoch (MJD) :  " << m_t0 << std::endl;
-      std::cout << "**   Phi0 (at Epoch t0) : " << m_phi0 << std::endl;
-      std::cout << "**   Period : " << m_period << " s. | f0: " << m_f0 << std::endl;
-      std::cout << "**   Pdot : " <<  m_pdot  << " | f1: " << m_f1 << std::endl; 
-      std::cout << "**   P2dot : " <<  m_p2dot  << " | f2: " << m_f2 << std::endl; 
-      std::cout << "**   Enphmin : " << m_enphmin << " keV | Enphmax: " << m_enphmax << " keV" << std::endl;
+      
+      for (unsigned int n=0; n < m_periodVect.size(); n++)
+	{
+
+	  m_f0 = 1.0/m_periodVect[n];
+	  m_f1 = -m_pdot/(m_periodVect[n]*m_periodVect[n]);
+	  m_f2 = 2*pow((m_pdotVect[n]/m_periodVect[n]),2.0)/m_periodVect[n] - m_p2dotVect[n]/(m_periodVect[n]*m_periodVect[n]);
+
+	  std::cout << "**   Ephemerides valid from " << m_t0InitVect[n] 
+		    << " to " << m_t0EndVect[n] << " (MJD): " << std::endl;
+	  std::cout << "**     Epoch (MJD) :  " << m_t0Vect[n] << std::endl;
+	  std::cout << "**     Phi0 (at Epoch t0) : " << m_phi0Vect[n] << std::endl;
+	  std::cout << "**     Period : " << m_periodVect[n] << " s. | f0: " << m_f0 << std::endl;
+	  std::cout << "**     Pdot : " <<  m_pdotVect[n]  << " | f1: " << m_f1 << std::endl; 
+	  std::cout << "**     P2dot : " <<  m_p2dotVect[n]  << " | f2: " << m_f2 << std::endl; 
+	}
+
+
+      std::cout << "**\n**   Enphmin : " << m_enphmin << " keV | Enphmax: " << m_enphmax << " keV" << std::endl;
       std::cout << "**   Mission started at (MJD) : " << StartMissionDateMJD << " (" 
 		<< std::setprecision(12) << (StartMissionDateMJD+JDminusMJD)*SecsOneDay 
 		<< " sec.) - Jan,1 2007 00:00.00 (TT)" << std::endl;
@@ -145,19 +168,34 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
   PulsarLog << "**   Position : (RA,Dec)=(" << m_RA << "," << m_dec 
 	    << ") ; (l,b)=(" << m_l << "," << m_b << ")" << std::endl; 
   PulsarLog << "**   Flux above 100 MeV : " << m_flux << " ph/cm2/s " << std::endl;
-  PulsarLog << "**   Number of peaks : " << m_numpeaks << std::endl;
-  PulsarLog << "**   Ephemerides valid from " << m_t0Init << " to " << m_t0End << " (MJD)" << std::endl;
-  PulsarLog << "**   Epoch (MJD) :  " << m_t0 << std::endl;
-  PulsarLog << "**   Phi0 (at Epoch t0) : " << m_phi0 << std::endl;
-  PulsarLog << "**   Period : " << m_period << " s. | f0: " << m_f0 << std::endl;
-  PulsarLog << "**   Pdot : " <<  m_pdot  << " | f1: " << m_f1 << std::endl; 
-  PulsarLog << "**   P2dot : " <<  m_p2dot  << " | f2: " << m_f2 << std::endl; 
-  PulsarLog << "**   Enphmin : " << m_enphmin << " keV | Enphmax: " << m_enphmax << " keV" << std::endl;
+
+  for (unsigned int n=0; n < m_periodVect.size(); n++)
+    {
+      
+      m_f0 = 1.0/m_periodVect[n];
+      m_f1 = -m_pdot/(m_periodVect[n]*m_periodVect[n]);
+      m_f2 = 2*pow((m_pdotVect[n]/m_periodVect[n]),2.0)/m_periodVect[n] - m_p2dotVect[n]/(m_periodVect[n]*m_periodVect[n]);
+      
+      PulsarLog << "**   Ephemerides valid from " << m_t0InitVect[n] 
+		<< " to " << m_t0EndVect[n] << " (MJD): " << std::endl;
+      PulsarLog << "**     Epoch (MJD) :  " << m_t0Vect[n] << std::endl;
+      PulsarLog << "**     Phi0 (at Epoch t0) : " << m_phi0Vect[n] << std::endl;
+      PulsarLog << "**     Period : " << m_periodVect[n] << " s. | f0: " << m_f0 << std::endl;
+      PulsarLog << "**     Pdot : " <<  m_pdotVect[n]  << " | f1: " << m_f1 << std::endl; 
+      PulsarLog << "**     P2dot : " <<  m_p2dotVect[n]  << " | f2: " << m_f2 << std::endl; 
+    }
+
+  PulsarLog << "**\n**   Enphmin : " << m_enphmin << " keV | Enphmax: " << m_enphmax << " keV" << std::endl;
   PulsarLog << "**   Mission started at (MJD) : " << StartMissionDateMJD << " (" 
 	    << std::setprecision(12) << (StartMissionDateMJD+JDminusMJD)*SecsOneDay 
 	    << " sec.) - Jan,1 2007 00:00.00 (TT)" << std::endl;
   PulsarLog << "**************************************************" << std::endl;
   PulsarLog << "**   Model chosen : " << m_model << " --> Using Phenomenological Pulsar Model " << std::endl;  
+
+
+  m_f0 = 1.0/m_periodVect[0];
+  m_f1 = -m_pdot/(m_periodVect[0]*m_periodVect[0]);
+  m_f2 = 2*pow((m_pdotVect[0]/m_periodVect[0]),2.0)/m_periodVect[0] - m_p2dotVect[0]/(m_periodVect[0]*m_periodVect[0]);
 
   //Instantiate an object of PulsarSim class
   m_Pulsar    = new PulsarSim(m_PSRname, m_seed, m_flux, m_enphmin, m_enphmax, m_period, m_numpeaks);
@@ -224,7 +262,40 @@ double PulsarSpectrum::flux(double time) const
  */
 double PulsarSpectrum::interval(double time)
 {  
-  double timeTildeDecorr = time + (StartMissionDateMJD)*SecsOneDay; //Arrivat time decorrected
+
+  double timeTildeDecorr = time + (StartMissionDateMJD)*SecsOneDay; //Arrival time decorrected
+
+  if (((timeTildeDecorr/SecsOneDay) < m_t0Init) || ((timeTildeDecorr/SecsOneDay) > m_t0End))
+    {
+      
+
+
+      for (unsigned int i=0; i < m_t0Vect.size(); i++)
+	{
+	  if (((timeTildeDecorr/SecsOneDay) > m_t0InitVect[i]) &&  ((timeTildeDecorr/SecsOneDay) < m_t0EndVect[i]))
+	    {
+	      m_t0 = m_t0Vect[i];
+	      m_t0Init = m_t0InitVect[i];
+	      m_t0End = m_t0EndVect[i];
+	      m_period = m_periodVect[i];
+	      m_pdot = m_pdotVect[i];
+	      m_p2dot = m_p2dotVect[i];
+	      m_phi0 = m_phi0Vect[i];
+
+	      if (DEBUG)
+		{
+		  std::cout << " Switching ephemerides.. at " << timeTildeDecorr/SecsOneDay << " MJD " << std::endl;	
+		  std::cout << " New ephemerides valid from " 
+			    << m_t0Init << " to " << m_t0End << " ( Ref.Epoch:  " << m_t0  << " ) " << std::endl;
+		}
+
+	    }
+	}
+      
+    }
+
+
+
   double timeTilde = timeTildeDecorr+ getBaryCorr(timeTildeDecorr); //should be corrected before applying ephem de-corrections
     if (DEBUG)
   {
@@ -460,23 +531,25 @@ int PulsarSpectrum::getPulsarFromDataList()
 
   char tempName[15] = "";
 
-  while ((std::string(tempName) != m_PSRname) && ( PulsarDataTXT.eof() != 1))
-    {
-      PulsarDataTXT >> tempName >> m_flux >> m_period >> m_pdot >> m_p2dot >> m_t0Init >> m_t0 >> m_t0End  >> m_phi0 >> m_MultEph;
-    } 
-  
-  if (std::string(tempName) == m_PSRname)
-    {
-      if (DEBUG)
-	{
-	  std::cout << "Pulsar " << m_PSRname << " found in Datalist file! " << std::endl;
-	}    
+  double flux, period, pdot, p2dot, t0Init, t0, t0End, phi0;
 
-    }
-  else
+  while ( PulsarDataTXT.eof() != 1)
     {
-      std::cout << "ERROR! Pulsar " << m_PSRname << " NOT found in Datalist.File...Exit. " << std::endl;
-      Status = 0;
+
+      PulsarDataTXT >> tempName >> flux >> period >> pdot >> p2dot >> t0Init >> t0 >> t0End  >> phi0;
+     
+      if (std::string(tempName) == m_PSRname)
+	{
+	  Status = 1;
+	  m_flux = flux;
+	  m_periodVect.push_back(period);
+	  m_pdotVect.push_back(pdot);
+	  m_p2dotVect.push_back(p2dot);
+	  m_t0InitVect.push_back(t0Init);
+	  m_t0Vect.push_back(t0);
+	  m_t0EndVect.push_back(t0End);
+	  m_phi0Vect.push_back(phi0);
+	}
     }
 
   return Status;

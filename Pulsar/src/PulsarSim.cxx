@@ -46,6 +46,7 @@ PulsarSim::PulsarSim(std::string name, int seed, double flux, double enphmin, do
   m_name = name;   
   m_seed = seed;
   m_Tbin = Tbin;        //If m_numpeaks==3 then m_Tbin depends upon the the bins contained in the txt file
+
 }
 
 //////////////////////////////////////////////////
@@ -124,7 +125,7 @@ TH2D* PulsarSim::PSRPhenom(double par1, double par2, double par3, double par4)
   //writes out an output log file fo rthe pulsar, instead of std::cout
   char logSimLabel[40];
 
-  for (unsigned int i=0; i< m_name.length()+1; i++)
+  for (unsigned int i=0; i< m_name.length(); i++)
     {
       logSimLabel[i] = m_name[i];
     }
@@ -284,16 +285,15 @@ TH2D* PulsarSim::PSRPhenom(double par1, double par2, double par3, double par4)
 
       //Look for NAMETimeProfile.txt in the data directory...
     
-
       char* pulsar_root = ::getenv("PULSARROOT");
       char TimeProfileFileName[100];
-      sprintf(logSimLabel," ");
-      for (unsigned int i=0; i< m_name.length()+1; i++)
-	{
-	  logSimLabel[i] = m_name[i];
-	}
+      char timeSimLabel[40];
 
-      sprintf(TimeProfileFileName,"%s/data/%sTimeProfile.txt",pulsar_root,logSimLabel);
+      for (unsigned int i=0; i< m_name.length(); i++)
+	{
+	  timeSimLabel[i] = m_name[i];
+	}
+      sprintf(TimeProfileFileName,"%s/data/%sTimeProfile.txt",pulsar_root,timeSimLabel);
       
       if (DEBUG)
 	{
