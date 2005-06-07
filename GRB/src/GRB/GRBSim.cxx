@@ -12,6 +12,7 @@
 #include "TCanvas.h"
 #include "TF1.h"
 #include "TH1D.h"
+
 #define QG false
 
 #define DEBUG 0
@@ -81,15 +82,12 @@ TH2D* GRBSim::Fireball()
     }
 
   //  int i=1;
-  static const double shift =0.0;// Shocks.front()->GetTime() + 2.0*meanDuration;//3.*Shocks.front()->GetDuration();
+  static const double shift =0.0;
   m_tfinal = Shocks.back()->GetTime() + meanDuration + shift + max_tqg;
-
-  Tbin     = TMath::Max(100,int(m_tfinal/MinDT));
-  if(!m_params->GenerateGBM())
-    {
-      Tbin     = TMath::Max(100,int(m_tfinal/MinDT));
-      Tbin     = TMath::Min(5000,Tbin);  
-    }
+  Tbin     = TMath::Max(10,int(m_tfinal/TimeBinWidth));
+  if(Tbin>10000) Tbin=int(m_tfinal/GBMTimeBinWidth);
+  //  Tbin     = TMath::Min(Tbin,10000);
+  
   if(DEBUG)  
     std::cout<<"Tbin = "<<Tbin<<std::endl;
   gDirectory->Delete("Nv");
@@ -108,14 +106,13 @@ TH2D* GRBSim::Fireball()
       for(int ei = 0; ei < Ebin; ei++)
 	{
 	  double nv = m_Nv->GetBinContent(ti+1, ei+1);
-	  energy = m_params->rnd->Uniform(e[ei],e[ei+1]);
+	  if(QG) energy = m_params->rnd->Uniform(e[ei],e[ei+1]);
+	  else energy = e[ei];
 	  tqg    = t-shift-energy*dtqg;
 	  
 	  for (int i = 0; i< nshocks; i++)
 	    {
 	      GRBShock *ashock = Shocks[i];
-	      //energy = m_params->rnd->Uniform(e[ei],e[ei+1]);
-	      //tqg = t-shift-energy*dtqg
 	      nv += ashock->ComputeFlux(tqg,energy);
 	    }
 	  m_Nv->SetBinContent(ti+1, ei+1, nv);
@@ -259,9 +256,15 @@ void GRBSim::GetGBMFlux(TString GRBname)
   GBM.SetMaximum(-5);
   
   double t    = 0;
+  double tfinal = m_Nv->GetXaxis()->GetXmax();
+  double dt   = m_Nv->GetXaxis()->GetBinWidth(1);
+  int tbin = (int) tfinal/GBMTimeBinWidth;
+  /*
+  double t    = 0;
   double dt   = m_Nv->GetXaxis()->GetBinWidth(1);
   double tbin = m_Nv->GetXaxis()->GetNbins();
-  
+  */
+
   TString name = "GRB_";
   name+=GRBname; 
   name+="_GBM.txt";
@@ -283,19 +286,23 @@ void GRBSim::GetGBMFlux(TString GRBname)
   b =  -2.25;
   
   
-  for(int ti = 0; ti<tbin; ti++)
+  while(t<tfinal)
     {
-      t = ti*dt;
+      double ResolRatio = GBMTimeBinWidth/dt;      
+      int ti = m_Nv->GetXaxis()->FindBin(t);
+      t += GBMTimeBinWidth; //s 16 musec
+      
       for(int ei = 0; ei < Ebin; ei++)
 	{
-	  //	  double en = pow(10.0,GBM.GetBinCenter(ei+1));
-	  // Notice that Nv is in [ph/(m² s keV)]; nv is in [(ph)/(cm² s keV)]
-	  double nv = TMath::Max(1e-10,m_Nv->GetBinContent(ti+1,ei+1)); // [ph/( m² s keV)]
+	  //  Notice that Nv is in [ph/(m² s keV)]; nv is in [(ph)/(cm² s keV)]
+	  double nv = 0.0;
+	  for(int ii=0;ii<ResolRatio;ii++)
+	    nv+=m_Nv->GetBinContent(ti+ii,ei+1);
+	  nv = TMath::Max(1e-10,nv/ResolRatio); // [ph/( m² s keV)]
 	  nv = log10(nv)-4.0;                                           // [ph/(cm² s keV)]
 	  GBM.SetBinContent(ei+1 , nv);                                 // [ph/(cm² s keV)]
 	  GBM.SetBinError(ei+1 , nv/100.0);                             // arbitrary small error (1%)
 	}
-      
       double LogC0  = GBM.GetBinContent(GBM.FindBin(2.0));
       double LogEp0 = 2.0;
 

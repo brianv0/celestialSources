@@ -480,6 +480,8 @@ void PlotGRB(double enph = 0,char name[100]="grb_65540.root",TString name2="GRB_
   double fBATSE3 = sp->GetFluence(BATSE3,BATSE4);
   double fBATSE4 = sp->GetFluence(BATSE4,BATSE5);
   double fBATSET = sp->GetFluence(BATSE1,BATSE5);
+  double fPeakFlux = sp->GetPeakFlux(BATSE2,BATSE4);
+  
   double fLAT   = sp->GetFluence(LAT1,LAT2);
   double fGBM   = sp->GetFluence(GBM1,GBM2);
   double fEXP   = sp->GetFluence(enph,emax);
@@ -493,6 +495,7 @@ void PlotGRB(double enph = 0,char name[100]="grb_65540.root",TString name2="GRB_
   std::cout<<" BASTE flux (ch3) ("<<BATSE3<<","<<BATSE4<<") = "<<fBATSE3<<" erg/cm^2"<<std::endl;
   std::cout<<" BASTE flux (ch4) ("<<BATSE4<<","<<BATSE5<<") = "<<fBATSE4<<" erg/cm^2"<<std::endl;
   std::cout<<" BASTE flux (tot) ("<<BATSE1<<","<<BATSE5<<") = "<<fBATSET<<" erg/cm^2"<<std::endl;
+  std::cout<<" BASTE Peakflux ("<<BATSE2<<","<<BATSE4<<") = "<<fPeakFlux<<" ph/cm^2/s"<<std::endl;
   std::cout<<" GBM   flux ("<< GBM1 <<","<< GBM2 <<") = "<<fGBM<<" erg/cm^2"<<std::endl;
   std::cout<<" LAT   flux ("<< LAT1 <<","<< LAT2 <<") = "<<fLAT<<" erg/cm^2"<<std::endl;
   if(ExtractPhotons) std::cout<<" EXP   flux ("<< enph <<","<< emax <<") = "<<fEXP<<" erg/cm^2"<<std::endl; 
@@ -522,6 +525,7 @@ void ScanParameters(int Ngrb)
   double Fluence,Etot,r0,dr0,gmin,gmax, ic;
   // OUTPUT
   double T90;
+  double fPeakFlux;
   double fBATSE1,fBATSE2,fBATSE3,fBATSE4;
   double fBATSE, fLAT,fGBM,fEXP,fTOT;
   double nBATSE,nLAT,nGBM,nEXP,nTOT,Ep;
@@ -544,6 +548,7 @@ void ScanParameters(int Ngrb)
   GRBTree->Branch("Logf2BATSE",&fBATSE2,"fBATSE2/D");
   GRBTree->Branch("Logf3BATSE",&fBATSE3,"fBATSE3/D");
   GRBTree->Branch("Logf4BATSE",&fBATSE4,"fBATSE4/D");
+  GRBTree->Branch("LogPeakFlux",&fPeakFlux,"fPeakFlux/D");
 
   GRBTree->Branch("LogfLAT",&fLAT,"LogfLAT/D");
   GRBTree->Branch("LogfGBM",&fGBM,"LogfGBM/D");
@@ -615,6 +620,8 @@ void ScanParameters(int Ngrb)
       fBATSE3 = log10(sp->GetFluence(BATSE3,BATSE4));
       fBATSE4 =log10( sp->GetFluence(BATSE4,BATSE5));
 
+      fPeakFlux = log10(sp->GetPeakFlux(BATSE2,BATSE4));
+
       fGBM   = log10(sp->GetFluence(GBM1,GBM2));
       fLAT   = log10(sp->GetFluence(LAT1,LAT2));
       fEXP   = log10(sp->GetFluence(enph,emax));
@@ -632,7 +639,7 @@ void ScanParameters(int Ngrb)
       std::cout<<" BASTE flux (ch3) ("<<BATSE3<<","<<BATSE4<<") = "<<pow(10.,fBATSE3)<<" erg/cm^2"<<std::endl;
       std::cout<<" BASTE flux (ch4) ("<<BATSE4<<","<<BATSE5<<") = "<<pow(10.,fBATSE4)<<" erg/cm^2"<<std::endl;
       std::cout<<" BASTE flux (tot) ("<<BATSE1<<","<<BATSE5<<") = "<<pow(10.,fBATSE)<<" erg/cm^2"<<std::endl;
-      std::cout<<" GBM   flux ("<< GBM1 <<","<< GBM2 <<") = "<<fGBM<<" erg/cm^2"<<std::endl;
+      std::cout<<" GBM   flux ("<< GBM1 <<","<< GBM2 <<") = "<<pow(10.,fGBM)<<" erg/cm^2"<<std::endl;
       std::cout<<"  LAT   flux ("<< LAT1 <<","<< LAT2 <<") = "<<pow(10.,fLAT)<<" erg/cm^2"<<std::endl;
       std::cout<<"  Nph TOT    ("<<EMIN<<","<<EMAX<<")  = "<<pow(10.,nTOT)<<std::endl;
       std::cout<<"  Nph BATSE  ("<<BATSE1<<","<<BATSE5<<") = "<<pow(10.,nBATSE)<<std::endl;

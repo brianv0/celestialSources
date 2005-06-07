@@ -40,7 +40,10 @@ namespace cst
   /// Number of energy bin (logarithically spaced)
   const    int Ebin  =  50; 
   /// Time resolution for the GBM spectra.
-  const double MinDT =  0.016; 
+/// Temporal resolution
+  const    double  TimeBinWidth   =  0.001; //s 1 msec
+  /// Time resolution for the GBM spectra.
+  const    double  GBMTimeBinWidth   =  0.016; //s 16 msec
   static const double de   = pow(emax/emin,1.0/Ebin);
   /// Bottom edge of the 1st channel of CGRO/BATSE 20 keV
   const double BATSE1=20.0;       
