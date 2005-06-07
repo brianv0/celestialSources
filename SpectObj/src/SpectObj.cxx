@@ -462,6 +462,22 @@ double SpectObj::GetFluence(double BL, double BH)
   //  return Nv->Integral(0,nt,ei1,ei2,"width")*1.0e-7/(m_TimeBinWidth*erg2meV)/m_AreaDetector; //erg/cm²
 }
 
+double SpectObj::GetPeakFlux(double BL, double BH)
+{
+  if(BH<=0) BH = emax;
+  int ei1 = Nv->GetYaxis()->FindBin(TMath::Max(emin,BL));
+  int ei2 = Nv->GetYaxis()->FindBin(TMath::Min(emax,BH));
+  double PF=0.0;
+  for (int ei = ei1; ei<=ei2; ei++)
+    {
+      for(int ti = 1; ti<=nt; ti++)
+	{
+	  PF= TMath::Max(PF,Nv->GetBinContent(ti, ei));//[ph]
+	}  
+    }
+  return PF*1e-4/(m_AreaDetector*m_TimeBinWidth); //ph/cm²/s
+}
+
 
 void SpectObj::ScaleAtBATSE(double fluence)
 {
