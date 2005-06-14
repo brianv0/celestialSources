@@ -37,15 +37,30 @@ ISpectrumFactory &MapCubeFactory() {
    return myFactory;
 }
 
-MapCube::MapCube(const std::string &paramString) : MapSource() {
+MapCube::MapCube(const std::string & paramString) : MapSource() {
 
    std::string fitsFile;
+   bool createSubMap(false);
+
    if (paramString.find("=") == std::string::npos) {
       std::vector<std::string> params;
       facilities::Util::stringTokenize(paramString, ", ", params);
       
       m_flux = std::atof(params[0].c_str());
       fitsFile = params[1];
+      if (params.size() > 2) {
+         try {
+            m_lonMin = std::atof(params.at(2).c_str());
+            m_lonMax = std::atof(params.at(3).c_str());
+            m_latMin = std::atof(params.at(4).c_str());
+            m_latMax = std::atof(params.at(5).c_str());
+            createSubMap = true;
+         } catch (...) {
+            throw std::runtime_error("Error reading sub-map bounds.\n"
+                                     "There must be precisely 4 parameters "
+                                     "to describe a sub-map.");
+         }
+      }
    } else {
       std::map<std::string, std::string> params;
       facilities::Util::keyValueTokenize(paramString, ", ", params);
@@ -54,11 +69,24 @@ MapCube::MapCube(const std::string &paramString) : MapSource() {
       
       m_flux = parmap.value("flux");
       fitsFile = parmap["fitsFile"];
+      if (parmap.size() > 2) {
+         try {
+            m_lonMin = parmap.value("lonMin");
+            m_lonMax = parmap.value("lonMax");
+            m_latMin = parmap.value("latMin");
+            m_latMax = parmap.value("latMax");
+            createSubMap = true;
+         } catch (...) {
+            throw std::runtime_error("Error reading sub-map bounds.\n"
+                                     "They must be specified with names "
+                                     "lonMin, lonMax, latMin, latMax.");
+         }
+      }
    }
 
    facilities::Util::expandEnvVar(&fitsFile);
 
-   readFitsFile(fitsFile);
+   readFitsFile(fitsFile, createSubMap);
    checkForNonPositivePixels();
    readEnergyVector(fitsFile);
    makeCumulativeSpectra();

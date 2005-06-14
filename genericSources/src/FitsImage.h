@@ -42,8 +42,11 @@ public:
    virtual ~FitsImage() {}
 
    /// @return The image value at the SkyDir location. Zero if outside
-   ///         the domain of the map.
-   double operator()(const astro::SkyDir & dir) const;
+   ///         the domain of the map.  
+   /// @param dir The sky location for which the map value is returned.
+   /// @param iz For 3D images, this is the index of the image plane
+   ///        to be sampled.  Ignored for 2D maps.
+   double operator()(const astro::SkyDir & dir, size_t iz=0) const;
 
    /// A vector of the image axes dimensions
    virtual void getAxisDims(std::vector<int> & axisDims);
@@ -179,10 +182,19 @@ FitsImage FitsImage::sampledImage(const Functor & image,
    my_image.m_axisVectors.push_back(longitudes);
    my_image.m_axisVectors.push_back(latitudes);
 
-   for (size_t j = 0; j < latitudes.size(); j++) {
-      for (size_t i = 0; i < longitudes.size(); i++) {
-         astro::SkyDir dir(longitudes.at(i), latitudes.at(j), coordSys);
-         my_image.m_image.push_back(image(dir));
+   size_t nz(1);
+/// @bug Using image.m_axes and indexing over k breaks polymorphism.
+   if (image.m_axes.size() == 3) {
+      my_image.m_axes.push_back(image.m_axes.at(2));
+      my_image.m_axisVectors.push_back(image.m_axisVectors.at(2));
+      nz = my_image.m_axes.at(2).size;
+   }
+   for (size_t k = 0; k < nz; k++) {
+      for (size_t j = 0; j < latitudes.size(); j++) {
+         for (size_t i = 0; i < longitudes.size(); i++) {
+            astro::SkyDir dir(longitudes.at(i), latitudes.at(j), coordSys);
+            my_image.m_image.push_back(image(dir, k));
+         }
       }
    }
    return my_image;

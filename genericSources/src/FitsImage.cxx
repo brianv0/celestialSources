@@ -48,7 +48,7 @@ FitsImage::FitsImage(const std::string & filename) {
    }
 }
 
-double FitsImage::operator()(const astro::SkyDir & dir) const {
+double FitsImage::operator()(const astro::SkyDir & dir, size_t iz) const {
    double lon, lat;
    if (m_coordSys == astro::SkyDir::GALACTIC) {
       lon = dir.l();
@@ -72,7 +72,11 @@ double FitsImage::operator()(const astro::SkyDir & dir) const {
                                 m_axisVectors.at(1).end(), lat) - 
       m_axisVectors.at(1).begin();
    try {
-      return m_image.at(iy*m_axes.at(0).size + ix);
+      size_t offset(0);
+      if (m_axes.size() == 3) {
+         offset = iz*m_axes.at(0).size*m_axes.at(1).size;
+      }
+      return m_image.at(offset + iy*m_axes.at(0).size + ix);
    } catch (...) {
       return 0;
    }
@@ -163,9 +167,9 @@ double FitsImage::mapIntegral() const {
    return map_integral;
 }
 
-void FitsImage::read_fits_image(std::string &filename, 
-                                std::vector<AxisParams> &axes,
-                                std::vector<double> &image) {
+void FitsImage::read_fits_image(std::string & filename,
+                                std::vector<AxisParams> & axes,
+                                std::vector<double> & image) {
    s_fitsRoutine = "read_fits_image";
    fitsfile * fptr = 0;
    char *file = const_cast<char *>(filename.c_str());

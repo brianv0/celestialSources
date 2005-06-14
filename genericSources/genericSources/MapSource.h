@@ -97,12 +97,12 @@ protected:
    void makeIntegralDistribution(const std::vector<double> & pixelValues);
    void getSubMapAxes(const genericSources::FitsImage & fitsImage);
 
-private:
-
    double m_lonMin;
    double m_lonMax;
    double m_latMin;
    double m_latMax;
+
+private:
 
    double mapValue(unsigned int i, unsigned int j);
 
