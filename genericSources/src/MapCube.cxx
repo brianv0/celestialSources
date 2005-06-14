@@ -30,6 +30,8 @@
 
 #include "genericSources/MapCube.h"
 
+#include "ConstParMap.h"
+
 ISpectrumFactory &MapCubeFactory() {
    static SpectrumFactory<MapCube> myFactory;
    return myFactory;
@@ -45,12 +47,14 @@ MapCube::MapCube(const std::string &paramString) : MapSource() {
       m_flux = std::atof(params[0].c_str());
       fitsFile = params[1];
    } else {
-      std::map<std::string,std::string> params;
+      std::map<std::string, std::string> params;
       facilities::Util::keyValueTokenize(paramString, ", ", params);
       
-      m_flux = std::atof(params["flux"].c_str());
-      fitsFile = params["fitsFile"];
-    }
+      genericSources::ConstParMap parmap(params);
+      
+      m_flux = parmap.value("flux");
+      fitsFile = parmap["fitsFile"];
+   }
 
    facilities::Util::expandEnvVar(&fitsFile);
 

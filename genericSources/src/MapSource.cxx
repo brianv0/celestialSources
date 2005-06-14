@@ -29,25 +29,7 @@
 
 #include "genericSources/MapSource.h"
 
-namespace {
-   typedef std::map<std::string, std::string> ParMap_t;
-   class ConstParMap {
-   public:
-      ConstParMap(const ParMap_t & parmap) : m_parmap(parmap) {}
-      const std::string & operator[](const std::string & name) const {
-         ParMap_t::const_iterator item = m_parmap.find(name);
-         if (item == m_parmap.end()) {
-            throw std::runtime_error("Cannot find item named " + name);
-         }
-         return item->second;
-      }
-      size_t size() const {
-         return m_parmap.size();
-      }
-   private:
-      ParMap_t m_parmap;
-   };
-}
+#include "ConstParMap.h"
 
 ISpectrumFactory &MapSourceFactory() {
    static SpectrumFactory<MapSource> myFactory;
@@ -92,27 +74,27 @@ MapSource::MapSource(const std::string & paramString)
       std::map<std::string, std::string> my_parmap;
       facilities::Util::keyValueTokenize(paramString, ", ", my_parmap);
       
-      ::ConstParMap parmap(my_parmap);
-      m_flux = std::atof(parmap["flux"].c_str());
-      m_gamma = std::atof(parmap["gamma"].c_str());
+      genericSources::ConstParMap parmap(my_parmap);
+      m_flux = parmap.value("flux");
+      m_gamma = parmap.value("gamma");
       fitsFile = parmap["fitsFile"];
       if (parmap.size() > 3) {
-         m_emin = std::atof(parmap["emin"].c_str());
+         m_emin = parmap.value("emin");
       }
       if (parmap.size() > 4) {
-         m_emax = std::atof(parmap["emax"].c_str());
+         m_emax = parmap.value("emax");
       }
       if (parmap.size() > 5) {
          try {
-            m_lonMin = std::atof(parmap["lonMin"].c_str());
-            m_lonMax = std::atof(parmap["lonMax"].c_str());
-            m_latMin = std::atof(parmap["latMin"].c_str());
-            m_latMax = std::atof(parmap["latMax"].c_str());
+            m_lonMin = parmap.value("lonMin");
+            m_lonMax = parmap.value("lonMax");
+            m_latMin = parmap.value("latMin");
+            m_latMax = parmap.value("latMax");
             createSubMap = true;
          } catch (...) {
             throw std::runtime_error("Error reading sub-map bounds.\n"
-                                     "There must be precisely 4 parameters "
-                                     "to describe a sub-map.");
+                                     "They must be specified with names "
+                                     "lonMin, lonMax, latMin, latMax.");
          }
       }
    }
