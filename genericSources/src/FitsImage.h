@@ -54,7 +54,7 @@ public:
    /// Get a vector filled with axis abscissa points for the naxis-th
    /// coordinate.
    virtual void getAxisVector(unsigned int naxis, 
-                              std::vector<double> &axisVector);
+                              std::vector<double> &axisVector) const;
 
    /// This method computes arrays of longitude and latitude obtained
    /// by traversing the image plane by column number then row.
@@ -72,6 +72,12 @@ public:
    /// m_axis[1] represents a latitudinal coordinate.  The pixel values
    /// will be indexed by column then row, indx = i + j*NAXIS1.
    virtual void getSolidAngles(std::vector<double> &solidAngles);
+
+
+   /// @return The coordinate system used (Galactic or Equatorial)
+   astro::SkyDir::CoordSystem coordSys() const {
+      return m_coordSys;
+   }
 
    /// @return The HDU number of the specified extension.
    static int findHdu(const std::string & fitsFile,

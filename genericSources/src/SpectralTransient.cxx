@@ -24,6 +24,8 @@
 #include "flux/SpectrumFactory.h"
 #include "flux/EventSource.h"
 
+#include "fitsio.h"
+
 #include "Util.h"
 #include "FitsImage.h"
 #include "genericSources/EblAtten.h"

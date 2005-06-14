@@ -18,6 +18,12 @@
 #include "Util.h"
 #include "FitsImage.h"
 
+namespace {
+   bool withinBounds(double value, std::vector<double> array) {
+      return ((array.front() < value && value < array.back()) || 
+              (array.back() < value && value < array.front()));
+   }
+}
 namespace genericSources {
 
 #include "fitsio.h"
@@ -53,6 +59,12 @@ double FitsImage::operator()(const astro::SkyDir & dir) const {
    } else {
       throw std::runtime_error("Unknown coordinate system in FitsImage");
    }
+// Kluge to account for maps spanning either (-180, 180) or (0, 360).
+   if (withinBounds(lon - 360., m_axisVectors.at(0))) {
+      lon -= 360.;
+   } else if (withinBounds(lon + 360., m_axisVectors.at(0))) {
+      lon += 360.;
+   }
    size_t ix = std::upper_bound(m_axisVectors.at(0).begin(),
                                 m_axisVectors.at(0).end(), lon) - 
       m_axisVectors.at(0).begin();
@@ -82,7 +94,7 @@ void FitsImage::getAxisNames(std::vector<std::string> &axisNames) {
 }
 
 void FitsImage::getAxisVector(unsigned int naxis,
-                              std::vector<double> &axisVector) {
+                              std::vector<double> &axisVector) const {
    if (naxis >= m_axes.size()) {
       std::ostringstream message;
       message << "FitsImage::getAxisVector: Invalid axis number " << naxis;
