@@ -46,33 +46,35 @@ public:
    double operator()(const astro::SkyDir & dir) const;
 
    /// A vector of the image axes dimensions
-   virtual void getAxisDims(std::vector<int> &axisDims);
+   virtual void getAxisDims(std::vector<int> & axisDims);
 
    /// The names (CTYPEs) of the image axes
-   virtual void getAxisNames(std::vector<std::string> &axisNames);
+   virtual void getAxisNames(std::vector<std::string> & axisNames);
 
    /// Get a vector filled with axis abscissa points for the naxis-th
    /// coordinate.
    virtual void getAxisVector(unsigned int naxis, 
-                              std::vector<double> &axisVector) const;
+                              std::vector<double> & axisVector) const;
 
    /// This method computes arrays of longitude and latitude obtained
    /// by traversing the image plane by column number then row.
-   virtual void getCelestialArrays(std::vector<double> &lonArray,
-                                   std::vector<double> &latArray);
+   virtual void getCelestialArrays(std::vector<double> & lonArray,
+                                   std::vector<double> & latArray);
    
    /// Get the pixel values.  They will be indexed by column, row,
    /// then plane, i.e., indx = i + j*NAXIS1 + k*NAXIS1*NAXIS2.  Note
    /// that each image plane is indexed starting at the lower left
    /// (South-East) corner.
-   virtual void getImageData(std::vector<double> &imageData);
+   virtual void getImageData(std::vector<double> & imageData);
 
    /// This returns the pixel solid angles.  Use of this method assumes
    /// that m_axis[0] represents a longitudinal coordinate and that
    /// m_axis[1] represents a latitudinal coordinate.  The pixel values
    /// will be indexed by column then row, indx = i + j*NAXIS1.
-   virtual void getSolidAngles(std::vector<double> &solidAngles);
+   virtual void getSolidAngles(std::vector<double> & solidAngles) const;
 
+   /// @return The integral over solid angle of the map.
+   double mapIntegral() const;
 
    /// @return The coordinate system used (Galactic or Equatorial)
    astro::SkyDir::CoordSystem coordSys() const {

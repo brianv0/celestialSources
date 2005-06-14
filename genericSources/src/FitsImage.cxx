@@ -117,7 +117,7 @@ void FitsImage::getCelestialArrays(std::vector<double> &lonArray,
    }
 }
          
-void FitsImage::getSolidAngles(std::vector<double> &solidAngles){
+void FitsImage::getSolidAngles(std::vector<double> &solidAngles) const {
 // This solid angle calculation *assumes* that m_axes[0] is a
 // longitudinal coordinate and that m_axes[1] is a latitudinal one.
 // Furthermore, the axis units are assumed to be degrees, while the
@@ -151,6 +151,16 @@ AxisParams::computeAxisVector(std::vector<double> &axisVector) {
       }
       axisVector.push_back(value);
    }
+}
+
+double FitsImage::mapIntegral() const {
+   std::vector<double> solidAngles;
+   getSolidAngles(solidAngles);
+   double map_integral(0);
+   for (unsigned int i = 1; i < solidAngles.size(); i++) {
+      map_integral += solidAngles.at(i)*m_image.at(i);
+   }
+   return map_integral;
 }
 
 void FitsImage::read_fits_image(std::string &filename, 

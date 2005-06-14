@@ -29,6 +29,26 @@
 
 #include "genericSources/MapSource.h"
 
+namespace {
+   typedef std::map<std::string, std::string> ParMap_t;
+   class ConstParMap {
+   public:
+      ConstParMap(const ParMap_t & parmap) : m_parmap(parmap) {}
+      const std::string & operator[](const std::string & name) const {
+         ParMap_t::const_iterator item = m_parmap.find(name);
+         if (item == m_parmap.end()) {
+            throw std::runtime_error("Cannot find item named " + name);
+         }
+         return item->second;
+      }
+      size_t size() const {
+         return m_parmap.size();
+      }
+   private:
+      ParMap_t m_parmap;
+   };
+}
+
 ISpectrumFactory &MapSourceFactory() {
    static SpectrumFactory<MapSource> myFactory;
    return myFactory;
@@ -56,10 +76,10 @@ MapSource::MapSource(const std::string & paramString)
       }
       if (params.size() > 5) {
          try {
-            m_lonMin = std::atof(params[5].c_str());
-            m_lonMax = std::atof(params[6].c_str());
-            m_latMin = std::atof(params[7].c_str());
-            m_latMax = std::atof(params[8].c_str());
+            m_lonMin = std::atof(params.at(5).c_str());
+            m_lonMax = std::atof(params.at(6).c_str());
+            m_latMin = std::atof(params.at(7).c_str());
+            m_latMax = std::atof(params.at(8).c_str());
             createSubMap = true;
          } catch (...) {
             throw std::runtime_error("Error reading sub-map bounds.\n"
@@ -69,9 +89,10 @@ MapSource::MapSource(const std::string & paramString)
       }
    } else {
 // use the map version
-      std::map<std::string,std::string> parmap;
-      facilities::Util::keyValueTokenize(paramString, ", ", parmap);
+      std::map<std::string, std::string> my_parmap;
+      facilities::Util::keyValueTokenize(paramString, ", ", my_parmap);
       
+      ::ConstParMap parmap(my_parmap);
       m_flux = std::atof(parmap["flux"].c_str());
       m_gamma = std::atof(parmap["gamma"].c_str());
       fitsFile = parmap["fitsFile"];
@@ -191,11 +212,18 @@ void MapSource::readFitsFile(std::string fitsFile, bool createSubMap) {
 
    genericSources::Util::file_ok(fitsFile);
    genericSources::FitsImage fitsImage(fitsFile);
-
+   
+   m_mapIntegral = fitsImage.mapIntegral();
+   
    if (createSubMap) {
       getSubMapAxes(fitsImage);
       fitsImage = genericSources::FitsImage::
          sampledImage(fitsImage, m_lon, m_lat, fitsImage.coordSys());
+
+// rescale the flux by the sub-map integral
+      double new_integral = fitsImage.mapIntegral();
+      m_flux *= new_integral/m_mapIntegral;
+      m_mapIntegral = new_integral;
    } else {
       fitsImage.getAxisVector(0, m_lon);
       fitsImage.getAxisVector(1, m_lat);
