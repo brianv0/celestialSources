@@ -21,6 +21,7 @@ ISpectrumFactory &GRBobsmanagerFactory()
 GRBobsmanager::GRBobsmanager(const std::string& params)
   : m_params(params)
 {
+    using astro::GPS;
   m_GenerateGBMOutputs = false;
 
   facilities::Util::expandEnvVar(&paramFile);  
