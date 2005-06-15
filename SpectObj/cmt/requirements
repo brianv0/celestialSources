@@ -1,12 +1,12 @@
 package SpectObj
 
-version v0
+version v0r1p5
 
 use GlastPolicy v6r*
 use ROOT v* IExternal
 
-macro_append ROOT_libs " -lHist -lGraf "\
-                 WIN32 " libHist.lib libGraf.lib "
+#macro_append ROOT_libs " -lHist -lGraf "\
+#                 WIN32 " libHist.lib libGraf.lib "
 
 apply_pattern package_include
 apply_pattern package_linkopts
