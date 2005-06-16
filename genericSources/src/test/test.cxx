@@ -175,8 +175,7 @@ void TestApp::load_sources() {
 }
 
 HepRotation TestApp::instrumentToCelestial(double time) {
-//   astro::GPS *gps = astro::GPS::instance();
-   GPS *gps = GPS::instance();
+   astro::GPS *gps = astro::GPS::instance();
    gps->getPointingCharacteristics(time);
    astro::SkyDir xAxis(gps->RAX(), gps->DECX());
    astro::SkyDir zAxis(gps->RAZ(), gps->DECZ());
