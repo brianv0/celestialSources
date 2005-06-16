@@ -1,5 +1,5 @@
 package GRB
-version v4r1p6
+version v4r1p9
 author Nicola Omodei<nicola.omodei@pi.infn.it> Johann Cohen-Tanugi <johann.cohen@pi.infn.it> Sandhia Bansal <sandhiab@lheapop.gsfc.nasa.gov>
 
 # $Id$
@@ -14,7 +14,7 @@ macro_append ROOT_libs " -lHist -lGraf "\
                  WIN32 " libHist.lib libGraf.lib " 
 
 
-apply_pattern package_include
+#apply_pattern package_include
 apply_pattern package_linkopts
 
 

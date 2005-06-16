@@ -55,6 +55,7 @@ void flux_load()
 }
 
 void galacticTest(FluxMgr* fm, std::string sourceName,double count){
+    using astro::GPS;
     EventSource* e = fm->source(sourceName);
     double time=fm->time();
     EventSource* f;

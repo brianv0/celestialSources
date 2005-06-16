@@ -6,6 +6,7 @@
 *   $Header$
 *@verbatim
 *
+*   v4r1p9 15-jun-2005 THB minor fix for GPS move to astro namespace
 *   v4r1p6 06-Apr-2005 THB Add comment out use of TCanvas in generation for windows only
 *   ...(unknown updates)
 *   v4r1p1 17-Jan-2005 THB Add cmath to get fabs

@@ -119,6 +119,7 @@ TString GRBmanager::GetGRBname(double time)
 
 void GRBmanager::GenerateGRB()
 {
+    using astro::GPS;
   TString GRBname = GetGRBname(m_startTime);
   //////////////////////////////////////////////////
   m_Nbursts++;
