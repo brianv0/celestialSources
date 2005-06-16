@@ -5,6 +5,7 @@
   @verbatim
   $Id$
 
+  16-Jun-05 v1r4p1  JC    change GPS to astro::GPS for astro v1r10p1
   14-Jun-05 v1r4    JC    Sub-map implementations for MapSource and MapCube
   03-May-05 v1r3p1  JC    remove Swig-dependent lines from req file
                           (SWIG builds now in celestialSources/pySources)
