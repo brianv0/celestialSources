@@ -130,6 +130,7 @@ TH2D* PulsarSim::PSRPhenom(double par1, double par2, double par3, double par4)
       logSimLabel[i] = m_name[i];
     }
 
+
   sprintf(logSimLabel,"%sLog.txt",logSimLabel);
   ofstream PulsarLogSim;
   PulsarLogSim.open(logSimLabel,std::ios::app);
@@ -154,6 +155,7 @@ TH2D* PulsarSim::PSRPhenom(double par1, double par2, double par3, double par4)
 
   //Create the spetrum profile
    double de = pow(HighEnBound/LowEnBound,1.0/Ebin);
+
  
   TF1 PulsarSpectralShape("PulsarSpectralShape", 
 			  "([0]*((x/[1])^[2])*exp(-1.0*((x/[3])^[4])))", LowEnBound, HighEnBound);
@@ -334,6 +336,7 @@ TH2D* PulsarSim::PSRPhenom(double par1, double par2, double par3, double par4)
 
   // Part 3 - Combination of Spectrum and lightCurve and filling of TH2D
 
+
   double *e = new double[Ebin +1];
   for(int i = 0; i<=Ebin; i++)
     {
@@ -437,16 +440,9 @@ void PulsarSim::SaveNv(TH2D *Nv)
   Nv->GetYaxis()->CenterTitle();
   Nv->GetZaxis()->CenterTitle();
   
-  char root_name[100];
-
-  for (unsigned int i=0; i< m_name.length()+1; i++)
-    {
-      root_name[i] = m_name[i];
-    }
-
-  sprintf(root_name,"%sroot.root",root_name);
+  std::string root_name = m_name + "root.root";
   
-  TFile mod(root_name,"RECREATE");
+  TFile mod(root_name.c_str(),"RECREATE");
   Nv->Write();
   mod.Close();
   
@@ -466,15 +462,9 @@ void PulsarSim::SaveNv(TH2D *Nv)
 void PulsarSim::SaveTimeProfile(TH2D *Nv)
 {
 
-  char temp[30];
+  std::string nameProfile = m_name + "TimeProfile.txt";
 
-  for (unsigned int i=0; i< m_name.length()+1; i++)
-    {
-      temp[i] = m_name[i];
-    }
-
-  sprintf(temp,"%sTimeProfile.txt",temp);
-  ofstream OutTimeProf(temp);
+  ofstream OutTimeProf(nameProfile.c_str());
 
   int ei2 = Nv->GetYaxis()->FindBin(m_enphmin);
   int ei3 = Nv->GetYaxis()->FindBin(m_enphmax);
@@ -486,6 +476,7 @@ void PulsarSim::SaveTimeProfile(TH2D *Nv)
 
   OutTimeProf.close();
 
+ 
 };
 
 

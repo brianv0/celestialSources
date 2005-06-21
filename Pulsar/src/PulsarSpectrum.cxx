@@ -151,16 +151,11 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
 
   //writes out an output log file
 
-  char logLabel[40];
+  std::string logLabel = m_PSRname + "Log.txt";
 
-  for (unsigned int i=0; i< m_PSRname.length()+1; i++)
-    {
-      logLabel[i] = m_PSRname[i];
-    }
-
-  sprintf(logLabel,"%sLog.txt",logLabel);
-  ofstream PulsarLog;
-  PulsarLog.open(logLabel);
+  ofstream PulsarLog(logLabel.c_str());
+ 
+  //  PulsarLog.open(logLabel);
 
   
   PulsarLog << "\n********   PulsarSpectrum Log for pulsar" << m_PSRname << std::endl;
@@ -171,11 +166,13 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
 
   for (unsigned int n=0; n < m_periodVect.size(); n++)
     {
-      
+     
+  
       m_f0 = 1.0/m_periodVect[n];
       m_f1 = -m_pdot/(m_periodVect[n]*m_periodVect[n]);
       m_f2 = 2*pow((m_pdotVect[n]/m_periodVect[n]),2.0)/m_periodVect[n] - m_p2dotVect[n]/(m_periodVect[n]*m_periodVect[n]);
-      
+  
+
       PulsarLog << "**   Ephemerides valid from " << m_t0InitVect[n] 
 		<< " to " << m_t0EndVect[n] << " (MJD): " << std::endl;
       PulsarLog << "**     Epoch (MJD) :  " << m_t0Vect[n] << std::endl;
@@ -199,13 +196,15 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
 
   //Instantiate an object of PulsarSim class
   m_Pulsar    = new PulsarSim(m_PSRname, m_seed, m_flux, m_enphmin, m_enphmax, m_period, m_numpeaks);
-
+ 
   //Instantiate an object of SpectObj class
   if (m_model == 1)
     {
+  
       m_spectrum = new SpectObj(m_Pulsar->PSRPhenom(ppar1,ppar2,ppar3,ppar4),1);
+  
       m_spectrum->SetAreaDetector(EventSource::totalArea());
-      
+  
 
       
       PulsarLog << "**   Effective Area set to : " << m_spectrum->GetAreaDetector() << " m2 " << std::endl; 

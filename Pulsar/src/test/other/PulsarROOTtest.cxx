@@ -399,7 +399,7 @@ int main(int argc, char** argv)
   
   double Period  = 0.089; // s
   double flux = 2e-6; // ph/cm2/s
-  int npeaks = 3;
+  int npeaks = 2;
   double ppar1 = 1e6;
   double ppar2 = 8e6;
   double ppar3 = -1.62;
@@ -443,10 +443,10 @@ int main(int argc, char** argv)
 
 
 
-  PulsarSim* m_pulsar = new PulsarSim("PSRMURO",seed,flux,enphmin, enphmax, Period, npeaks);
+  PulsarSim* m_pulsar = new PulsarSim("PSRVELA",seed,flux,enphmin, enphmax, Period, npeaks);
   m_pulsar->SaveNv((TH2D*)m_pulsar->PSRPhenom(ppar1,ppar2,ppar3,ppar4));
   char name[100];
-  sprintf(name,"PSRMUROroot.root");
+  sprintf(name,"PSRVELAroot.root");
 
   std::cout << "**  Total time for simulation " << Period*nLoops << " s. " << std::endl;
   PlotPulsar(enph,name);  
