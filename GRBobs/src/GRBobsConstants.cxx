@@ -38,7 +38,6 @@ void GRBobsParameters::SetPeakFlux(double peakflux)
   double b = -0.722;
   double c = 1.47;
   m_Stretch =  TMath::Max(1.0, a * lpf*lpf + b * lpf + c);
-  std::cout<<m_Stretch<<std::endl;
 }
 
 void GRBobsParameters::SetGRBNumber(long GRBnumber)
