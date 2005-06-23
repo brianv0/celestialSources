@@ -21,6 +21,8 @@ ISpectrumFactory &GRBtemplateManagerFactory()
 GRBtemplateManager::GRBtemplateManager(const std::string& params)
   : m_params(params)
 {
+  using astro::GPS;
+
   m_rnd = new TRandom();
   m_GenerateGBMOutputs = false;
 

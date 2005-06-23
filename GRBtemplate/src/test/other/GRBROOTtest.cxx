@@ -25,7 +25,7 @@ bool movie       = false;
 bool bandFit     = false;
 bool powerlawFit = false;
 bool scaled      = false;
-TString extension;
+int extension;
 
 double Band(double *var, double *par);
 void help();
