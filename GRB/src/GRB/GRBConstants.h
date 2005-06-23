@@ -41,7 +41,7 @@ namespace cst
   const    int Ebin  =  50; 
   /// Time resolution for the GBM spectra.
 /// Temporal resolution
-  const    double  TimeBinWidth   =  0.001; //s 1 msec
+  const    double  TimeBinWidth   =  0.016; //s 1 msec
   /// Time resolution for the GBM spectra.
   const    double  GBMTimeBinWidth   =  0.016; //s 16 msec
   static const double de   = pow(emax/emin,1.0/Ebin);

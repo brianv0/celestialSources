@@ -32,7 +32,7 @@ bool movie     = false;
 bool bandFit     = false;
 bool powerlawFit = false;
 bool scaled=false;
-TString extension;
+int  extension;
 //////////////////////////////////////////////////
 
 
@@ -422,6 +422,8 @@ void PlotGRB(double enph = 0,char name[100]="grb_65540.root",TString name2="GRB_
       Lct_BATSE3->Scale(1./Max3);
       Lct_BATSE4->Scale(1./Max4);
     }
+  Lct_GBM->SetMinimum(-Lct_GBM->GetMaximum()/10.);
+  Lct_LAT->SetMinimum(-Lct_LAT->GetMaximum()/10.);
   Lct_GBM->Draw("l");
   Lct_BATSE1->Draw("lsame");
   Lct_BATSE2->Draw("lsame");

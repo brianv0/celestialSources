@@ -332,10 +332,10 @@ void GRBSim::GetGBMFlux(TString GRBname)
 	  //gPad->SetLogx();
 	  //gPad->SetLogy();
 	  gPad->Update();
-	  //	  TString gbmFlux= "GBMFlux";
-	  //	  gbmFlux+=ti;
-	  //	  gbmFlux+=".gif";
-	  //	  if(ti%10==0) gPad->Print(gbmFlux);
+	  TString gbmFlux= "GBMFlux";
+	  gbmFlux+=ti;
+	  gbmFlux+=".gif";
+	  if(ti%10==0) gPad->Print(gbmFlux);
 	}
     }   
   os.close();
