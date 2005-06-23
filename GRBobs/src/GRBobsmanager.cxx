@@ -10,7 +10,7 @@
 #include "astro/EarthOrbit.h"
 
 
-#define DEBUG 1 
+#define DEBUG 0 
 
 ISpectrumFactory &GRBobsmanagerFactory() 
 {
