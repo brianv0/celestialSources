@@ -1,8 +1,3 @@
-#include <vector>
-#include <iostream>
-#include <fstream>
-#include <cmath>
-
 #include "../GRBobs/GRBobsConstants.h"
 
 using namespace ObsCst;
@@ -15,22 +10,36 @@ GRBobsParameters::GRBobsParameters()
   m_Type=0; //1->Short, 2->Long, 0->Both
   m_enph=emin;
 }
+
 //////////////////////////////////////////////////
-// Relevant BATSE distributions
-double GRBobsParameters::GetBATSEDuration()
+void GRBobsParameters::SetDuration(double duration)
 {
-  if (m_Type==1)
-    return pow(10.0,(double)rnd->Gaus(-0.2,0.55)); //erg/cm^2 (Short Bursts)
-  return pow(10.0,(double)rnd->Gaus(1.46,0.49)); //erg/cm^2 (Long Burst)
+  m_duration = duration;
+  if(m_duration<=2) 
+    m_Type = 1;
+  else 
+    {
+      m_Type = 2;
+      if(m_NormType==1)	m_duration*=TMath::Max(1.0,m_Stretch);
+    }
+
 }
 
-double GRBobsParameters::GetBATSEFluence()
+void GRBobsParameters::SetFluence(double fluence)
 {
-  if (m_Type==1)
-    return pow(10.0,(double)rnd->Gaus(-6.3,0.57)); //erg/cm^2 (Short Bursts)
-  return pow(10.0,(double)rnd->Gaus(-5.4,0.62)); //erg/cm^2 (Long Burst)
+  m_fluence = fluence;
 }
-//////////////////////////////////////////////////
+
+void GRBobsParameters::SetPeakFlux(double peakflux)
+{
+  m_peakFlux = peakflux;
+  double lpf = log10(m_peakFlux);
+  double a = 0.277;
+  double b = -0.722;
+  double c = 1.47;
+  m_Stretch =  TMath::Max(1.0, a * lpf*lpf + b * lpf + c);
+  std::cout<<m_Stretch<<std::endl;
+}
 
 void GRBobsParameters::SetGRBNumber(long GRBnumber)
 {
@@ -40,19 +49,15 @@ void GRBobsParameters::SetGRBNumber(long GRBnumber)
   tmp = rnd->Uniform();
 }
 
-void GRBobsParameters::SetFluence(double fluence)
+void GRBobsParameters::SetNormType(char NormType)
 {
-  m_fluence = fluence;
-  if(m_fluence<=0)  m_fluence = GetBATSEFluence();
+  if(NormType=='P')  m_NormType=1;
+  else  
+    {
+      m_NormType=0;
+    }
 }
 
-
-void GRBobsParameters::SetDuration(double duration)
-{
-  m_duration = duration;
-  if(m_duration<2.0) m_Type=1;
-  else m_Type=2;
-}
 
 void GRBobsParameters::SetMinPhotonEnergy(double enph)
 {
@@ -69,23 +74,68 @@ void GRBobsParameters::SetGalDir(double l, double b)
   m_GalDir=std::make_pair(ll,bb);
 }
 
+double GRBobsParameters::GetBATSEFWHM()
+{
+  double minwid = 0.01;
+  double maxwid = 10.;
+  double logfac0 = pow(maxwid / minwid,1./14.);
+  double *LogWidth = new double[15];
+  double Ngtwid[15]= {430,427,424,421,417,410,388,334,248,178,119, 81, 46, 15,  2};
+  for(int i=0;i<15;i++)
+    {
+      LogWidth[i]= minwid * pow(logfac0,i);      
+    }
+  double maxNgtwid = TMath::MaxElement(15,Ngtwid);
+  double minNgtwid = TMath::MinElement(15,Ngtwid);
+  double pickN= rnd->Uniform(minNgtwid,maxNgtwid);
+  int idx=0;
+  while(Ngtwid[idx] > pickN) idx++;
+  
+  double wid_lo = LogWidth[idx-1];
+  double wid_hi = LogWidth[idx];
+  double alpha;
+  if (wid_lo <= 0.10)
+    alpha = -0.1;
+  else if (wid_lo <= 0.25)
+    alpha = -1.5;
+  else if (wid_lo <= 0.40)
+    alpha = 0.25;
+  else alpha =  0.6;
+  return wid_lo * pow(1. - rnd->Uniform() *(1. - pow(wid_hi/wid_lo,-alpha)),-1./alpha);
+}
+
 void GRBobsParameters::GenerateParameters()
 {
-  m_RD=0.0;
-  m_Peakedness      = 1.5;//pow(10.0,rnd->Gaus(0.16,0.3));
-  m_FWHM            = (m_Type==1) ? rnd->Uniform()*m_duration : pow(10.0,rnd->Gaus(-0.1,0.5)); //FWHM @ 20keV 
-  m_pulseSeparation = pow(10.0,rnd->Gaus(0.13,0.4)); // double distribution, to be done...
-  while(m_RD<=0) m_RD = rnd->Gaus(0.4,0.1);
-  m_decayTime       = 1.00/(1.0+m_RD)*pow(0.69,-1./m_Peakedness)*m_FWHM;
-  m_riseTime        = m_RD/(1.0+m_RD)*pow(0.69,-1./m_Peakedness)*m_FWHM;
-  m_pulseHeight     = rnd->Uniform();
-  m_Epeak           = pow(10.,rnd->Gaus(log10(235.0),log10(1.75))); //Short
-  if(m_Type==2) m_Epeak/=2.0; //Long
+  m_RD                = RD_Ratio;
+  while(m_RD<=0) 
+    m_RD = rnd->Gaus(0.4,0.1);
+  
+  m_Peakedness        = Peakedness;
+  while (Peakedness==0) 
+    m_Peakedness = pow(10.0,rnd->Gaus(0.16,0.3));
+  
+  if(rnd->Uniform()<episode_pulses)
+    m_pulseSeparation = pow(10.0,rnd->Gaus(log10(pulse_mean_interval),logsigma));
+  else
+    m_pulseSeparation = pow(10.0,rnd->Gaus(log10(episode_mean_interval),logsigma));
+  
+  m_FWHM = GetBATSEFWHM();
+  
+  if(m_Type==1) m_FWHM/=10.0;
+
+  m_decayTime         = 1.00/(1.0+m_RD) / pow(log10(2.0),1./m_Peakedness) * m_FWHM;
+  m_riseTime          = m_RD/(1.0+m_RD) / pow(log10(2.0),1./m_Peakedness) * m_FWHM;
+  m_pulseHeight       = rnd->Uniform();
+  m_Epeak             = pow(10.,rnd->Gaus(log10(235.0),log10(1.75))); //Short
+  if(m_Type==2 && m_NormType==1) m_Epeak/=m_Stretch; //Long
 }
 
 void GRBobsParameters::PrintParameters()
 {
-  std::cout<<" Parameters: Duration = "<<m_duration<<" f = "<<m_fluence<<" dt = "<<m_decayTime<<" rt = "<<m_riseTime
+  std::cout<<" Parameters: Duration = "<<m_duration;
+  if(m_NormType==0) std::cout<<" FL = "<<m_fluence;
+  else std::cout<<" PF = "<<m_peakFlux;
+  std::cout<<" dt = "<<m_decayTime<<" rt = "<<m_riseTime
 	   <<" pe = "<<m_Peakedness<<" ph = "<<m_pulseHeight<<" tau = "<<m_pulseSeparation
 	   <<" ep = "<<m_Epeak<<" a = "<<m_LowEnergy<<" b = "<<m_HighEnergy<<std::endl;
 }
@@ -103,8 +153,10 @@ void GRBobsParameters::ReadParametersFromFile(std::string paramFile, int NGRB)
     }
   double tstart;
   double duration;
-  double fluence,alpha,beta;
-  
+  double fluence;  
+  double alpha;
+  double beta;
+
   char buf[100];
   f1.getline(buf,100);
   
@@ -130,11 +182,14 @@ void GRBobsParameters::ReadParametersFromFile(std::string paramFile, int NGRB)
 	}
       f2.close();
     }
-  SetGRBNumber(65540+ (long) floor(tstart));
-  SetDuration(duration); // This determines the type.
-  SetFluence(fluence);
-  SetAlphaBeta(alpha,beta);
   
+  SetGRBNumber(65540+ (long) floor(tstart));
+
+  SetNormType('P');  //Type (PeakFlux or Fluence)
+  SetFluence(fluence);
+  SetPeakFlux(fluence);
+  SetDuration(duration);
+  SetAlphaBeta(alpha,beta);
   SetMinPhotonEnergy(3e4); //keV (this is a defaul value)
   SetGalDir(-200,-200);
   SetGRBNumber(65540+ (long) floor(tstart));

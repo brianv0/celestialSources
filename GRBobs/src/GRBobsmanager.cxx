@@ -1,5 +1,6 @@
 #include "GRBobs/GRBobsmanager.h"
 #include <iostream>
+#include <ostream>
 #include <fstream>
 #include "flux/SpectrumFactory.h" 
 #include "astro/GPS.h"
@@ -9,7 +10,7 @@
 #include "astro/EarthOrbit.h"
 
 
-#define DEBUG 0 
+#define DEBUG 1 
 
 ISpectrumFactory &GRBobsmanagerFactory() 
 {
@@ -21,7 +22,7 @@ ISpectrumFactory &GRBobsmanagerFactory()
 GRBobsmanager::GRBobsmanager(const std::string& params)
   : m_params(params)
 {
-    using astro::GPS;
+  using astro::GPS;
   m_GenerateGBMOutputs = false;
 
   facilities::Util::expandEnvVar(&paramFile);  
@@ -41,8 +42,9 @@ GRBobsmanager::GRBobsmanager(const std::string& params)
   m_GRBnumber = (long) floor(65540+m_startTime);
 
   m_par->SetGRBNumber(m_GRBnumber);
-  m_par->SetDuration(duration);
   m_par->SetFluence(m_fluence);
+  m_par->SetPeakFlux(m_fluence);
+  m_par->SetDuration(duration);
   m_par->SetAlphaBeta(m_alpha,m_beta);
   m_par->SetMinPhotonEnergy(m_MinPhotonEnergy); //keV
   
@@ -71,12 +73,18 @@ GRBobsmanager::GRBobsmanager(const std::string& params)
   //////////////////////////////////////////////////
 }
 
-TString GRBobsmanager::GetGRBname(double time)
+TString GRBobsmanager::GetGRBname()
 {
   ////DATE AND GRBNAME
-  astro::EarthOrbit m_EarthOrbit;
-  using astro::JulianDate;
-  JulianDate  JD = m_EarthOrbit.dateFromSeconds(time);
+  /// Time from 2005 ,7,18,0.0:
+  //  astro::EarthOrbit m_EarthOrbit;
+  //  astro::JulianDate JD = m_EarthOrbit.dateFromSeconds(time);
+  //  else: 
+  astro::JulianDate JD(2007, 1, 1, 0.0); //DC2
+  astro::EarthOrbit m_EarthOrbit(JD);
+  //  astro::JulianDate JD = m_EarthOrbit.dateFromSeconds(static_cast<double>(mytime));
+  //  JD = m_EarthOrbit.mjdFromSeconds(m_startTime);
+  JD = m_EarthOrbit.dateFromSeconds(m_startTime);
   int An,Me,Gio;
   m_Rest=((int) m_startTime % 86400) + m_startTime - floor(m_startTime);
   m_Frac=(m_Rest/86400.);
@@ -149,7 +157,7 @@ void GRBobsmanager::GenerateGRB()
   m_spectrum->SetAreaDetector(EventSource::totalArea());
   //////////////////////////////////////////////////
   m_endTime   = m_startTime + m_GRB->Tmax();
-  TString GRBname = GetGRBname(m_startTime);
+  TString GRBname = GetGRBname();
 
   if(m_GenerateGBMOutputs)
     {

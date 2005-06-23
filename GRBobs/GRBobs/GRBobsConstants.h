@@ -1,11 +1,15 @@
 #ifndef GRBOBSCONSTANT_HH
 #define GRBOBSCONSTANT_HH 1
 
+#include <fstream>
+#include <iostream>
+#include <sstream>
 #include <vector> 
 #include <string>
+#include <cmath>
 #include "TRandom.h"
 #include "TF1.h"
-
+#include "TH1D.h"
 /*! 
  * \namespace ObsCst
  * \brief Namespace containing the constants of the model such as the binning in time and energy
@@ -21,16 +25,24 @@ namespace ObsCst
   /// default value for the minimum energy of the extracted photons -LAT photons- (keV)
   const double enph = 3e4; 
   //////////////////////////////////////////////////
+  
+  const double Peakedness   = 1.5;
+  const double RD_Ratio     = 0.0;
+  const double logsigma     = 0.35;
+  const double episode_mean_interval    = 10.;
+  const double pulse_mean_interval   = 1.;
+  const double episode_pulses        = 0.824;
+
   ///reference energy for the Universal Width (keV)
-  const double E0           = 20.0;  
+  const double E0           = 100.0;  
   /// power law  index for the full width at half maximum - energy relation: \f$ W(e)=W0 (e/E0)^{-We} \f$
   const double We           = 0.33;//0.33; 
   /// for the displacements between peaks
-  const double deltaTPeak   = 0.0;//0.5;  //for the displacements between peaks
+  const double deltaTPeak   = 0.5;//0.5;  //for the displacements between peaks
   /// Number of energy bins (logarithmically spaced)
   const    int Ebin =  50; 
   /// Time resolution for the GBM spectra.
-  const    double  TimeBinWidth   =  0.016; //s
+  const    double  TimeBinWidth   =  0.016; //s (16 ms)
   static const double de   = pow(emax/emin,1.0/Ebin);
   
   const double erg2meV   = 624151.0;
@@ -74,9 +86,13 @@ class GRBobsParameters
   ~GRBobsParameters()
     { 
       delete rnd;
+      gDirectory->Delete("PFlong");
+      gDirectory->Delete("PFshort");
     }
 
+  inline  int GetNormType()        {return m_NormType;}
   inline  double GetFluence()        {return m_fluence;}
+  inline  double GetPeakFlux()        {return m_peakFlux;}
   inline  double GetRiseTime()       {return m_riseTime;}
   inline  double GetDecayTime()      {return m_decayTime;}
   inline  double GetPulseHeight()    {return m_pulseHeight;}
@@ -89,10 +105,19 @@ class GRBobsParameters
   inline  double GetDuration()       {return m_duration;}
   
   inline std::pair<double,double> GetGalDir(){return m_GalDir;}
+  inline void GetUniqueName(const void *ptr, std::string & name)
+    {
+      std::ostringstream my_name;
+      my_name << reinterpret_cast<int> (ptr);
+      name = my_name.str();
+      gDirectory->Delete(name.c_str());
+    }
   //////////////////////////////////////////////////
-  void   SetGRBNumber(long);
-  void   SetFluence(double);
-  void   SetDuration(double);
+  void SetGRBNumber(long);
+  void SetDuration(double);
+  void SetFluence(double);
+  void SetPeakFlux(double);
+  void   SetNormType(char);
   /// Sets the low energy spectral index and the high energy spectral index.
   /// \param alpha low energy spectral index (\f$-3<\alpha<1\f$)
   /// \param beta high energy spectral index (\f$\beta>-1\f$,\f$\beta>\alpha\f$)
@@ -105,8 +130,8 @@ class GRBobsParameters
       m_LowEnergy       = alpha;
       m_HighEnergy      = beta;
       
-      while (m_LowEnergy<-3.0 || m_LowEnergy>1.0)                        m_LowEnergy  = rnd->Gaus(-1.0,0.4);
-      while(m_HighEnergy >= m_LowEnergy || m_HighEnergy >= -1.0)         m_HighEnergy = rnd->Gaus(-2.25,0.4);
+      while (m_LowEnergy<-3.0 || m_LowEnergy>1.0)                      m_LowEnergy  = rnd->Gaus(-1.0,0.4);
+      while(m_HighEnergy >= m_LowEnergy || m_HighEnergy >= -1.0)       m_HighEnergy = rnd->Gaus(-2.25,0.4);
       
       m_LowEnergy       += ObsCst::We;
       m_HighEnergy      += ObsCst::We;
@@ -128,6 +153,11 @@ class GRBobsParameters
   ///        for long  bursts: \f$\overline{\log(T_{90})}= -5.39\f$, \f$\sigma_{T_{90}}=0.62\f$.
   double GetBATSEDuration();  
   
+  double GetBATSEPeakFlux();
+
+  double GetBATSEFWHM();
+  
+
   /*!
     When it is called, It random generates a set of parameter, to be used with a GRBobsPulse.
     - The peakedness is set to 1.5
@@ -160,7 +190,10 @@ class GRBobsParameters
 
   double  m_Epeak;
   double m_LowEnergy,m_HighEnergy;
+  int m_NormType;
   double m_fluence;
+  double m_peakFlux;
+  double m_Stretch;
   double m_duration;
   double m_RD,m_riseTime,m_decayTime;
   double m_pulseHeight;
@@ -168,6 +201,9 @@ class GRBobsParameters
   long   m_GRBnumber;
   double m_enph;
   std::pair<double,double> m_GalDir;
+  
+  TH1D *PFshort;
+  TH1D *PFlong;
 };
 
 #endif

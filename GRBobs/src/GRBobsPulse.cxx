@@ -3,7 +3,7 @@
 #include <iostream>
 #include <cmath>
 
-#define DEBUG 0  
+#define DEBUG 0
 
 using std::fabs; using std::pow;
 

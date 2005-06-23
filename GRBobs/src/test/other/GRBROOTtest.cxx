@@ -26,7 +26,7 @@ bool movie       = false;
 bool bandFit     = false;
 bool powerlawFit = false;
 bool scaled      = false;
-TString extension;
+int extension;
 
 double Band(double *var, double *par);
 void help();
@@ -406,7 +406,11 @@ void PlotGRB(double enph = 0,char name[100]="grb_65540.root",TString name2="GRB_
       Lct_BATSE3->Scale(1./Max3);
       Lct_BATSE4->Scale(1./Max4);
     }
+  Lct_GBM->SetMinimum(-Lct_GBM->GetMaximum()/10.);
+  Lct_LAT->SetMinimum(-Lct_LAT->GetMaximum()/10.);
+
   Lct_GBM->Draw("l");
+
   Lct_BATSE1->Draw("lsame");
   Lct_BATSE2->Draw("lsame");
   Lct_BATSE3->Draw("lsame");
@@ -468,6 +472,8 @@ void PlotGRB(double enph = 0,char name[100]="grb_65540.root",TString name2="GRB_
   double fGBM   = sp->GetFluence(GBM1,GBM2);
   double fEXP   = sp->GetFluence(enph,emax);
   double fTOT   = sp->GetFluence();
+  double fPeakFlux = sp->GetPeakFlux(BATSE2,BATSE4);
+
   double Ep = e2Ne->GetBinCenter(e2Ne->GetMaximumBin());
   std::cout<<"* Theoretical values:  *****************************"<<std::endl;
   std::cout<<" T90 = "<<sp->GetT90()<<" Epeak = "<<Ep<<std::endl;
@@ -477,6 +483,7 @@ void PlotGRB(double enph = 0,char name[100]="grb_65540.root",TString name2="GRB_
   std::cout<<" BASTE flux (ch3) ("<<BATSE3<<","<<BATSE4<<") = "<<fBATSE3<<" erg/cm^2"<<std::endl;
   std::cout<<" BASTE flux (ch4) ("<<BATSE4<<","<<BATSE5<<") = "<<fBATSE4<<" erg/cm^2"<<std::endl;
   std::cout<<" BASTE flux (tot) ("<<BATSE1<<","<<BATSE5<<") = "<<fBATSET<<" erg/cm^2"<<std::endl;
+  std::cout<<" BASTE Peakflux ("<<BATSE2<<","<<BATSE4<<") = "<<fPeakFlux<<" ph/cm^2/s"<<std::endl;
   std::cout<<" GBM   flux ("<< GBM1 <<","<< GBM2 <<") = "<<fGBM<<" erg/cm^2"<<std::endl;
   std::cout<<" LAT   flux ("<< LAT1 <<","<< LAT2 <<") = "<<fLAT<<" erg/cm^2"<<std::endl;
   if(ExtractPhotons) std::cout<<" EXP   flux ("<< enph <<","<< emax <<") = "<<fEXP<<" erg/cm^2"<<std::endl; 
@@ -502,6 +509,7 @@ void MakeGRB(int NGRB=1, double enph=0, bool gbm=false)
   GRBobsParameters *params = new GRBobsParameters();  
   //////////////////////////////////////////////////
   params->ReadParametersFromFile(paramFile,NGRB);
+  params->PrintParameters();
   GRBobsSim* m_grb = new GRBobsSim(params);
   m_grb->MakeGRB();
   m_grb->SaveNv();
@@ -529,6 +537,7 @@ void ScanParameters(int Ngrb)
   //////////////////////////////////////////////////
   // OUTPUT
   double T90;
+  double fPeakFlux;
   double fBATSE1,fBATSE2,fBATSE3,fBATSE4;
   double fBATSE, fLAT,fGBM,fEXP,fTOT;
   double nBATSE,nLAT,nGBM,nEXP,nTOT,Ep;
@@ -541,6 +550,7 @@ void ScanParameters(int Ngrb)
   GRBTree->Branch("Logf2BATSE",&fBATSE2,"fBATSE2/D");
   GRBTree->Branch("Logf3BATSE",&fBATSE3,"fBATSE3/D");
   GRBTree->Branch("Logf4BATSE",&fBATSE4,"fBATSE4/D");
+  GRBTree->Branch("LogPeakFlux",&fPeakFlux,"fPeakFlux/D");
 
   GRBTree->Branch("LogfLAT",&fLAT,"LogfLAT/D");
   GRBTree->Branch("LogfGBM",&fGBM,"LogfGBM/D");
@@ -601,7 +611,9 @@ void ScanParameters(int Ngrb)
       fBATSE1 = log10(sp->GetFluence(BATSE1,BATSE2));
       fBATSE2 = log10(sp->GetFluence(BATSE2,BATSE3));
       fBATSE3 = log10(sp->GetFluence(BATSE3,BATSE4));
-      fBATSE4 =log10( sp->GetFluence(BATSE4,BATSE5));
+      fBATSE4 = log10( sp->GetFluence(BATSE4,BATSE5));
+
+      fPeakFlux = log10(sp->GetPeakFlux(BATSE2,BATSE4));
 
       fGBM   = log10(sp->GetFluence(GBM1,GBM2));
       fLAT   = log10(sp->GetFluence(LAT1,LAT2));
@@ -623,6 +635,7 @@ void ScanParameters(int Ngrb)
       std::cout<<" BASTE flux (ch3) ("<<BATSE3<<","<<BATSE4<<") = "<<pow(10.,fBATSE3)<<" erg/cm^2"<<std::endl;
       std::cout<<" BASTE flux (ch4) ("<<BATSE4<<","<<BATSE5<<") = "<<pow(10.,fBATSE4)<<" erg/cm^2"<<std::endl;
       std::cout<<" BASTE flux (tot) ("<<BATSE1<<","<<BATSE5<<") = "<<pow(10.,fBATSE)<<" erg/cm^2"<<std::endl;
+      std::cout<<" BASTE Peakflux ("<<BATSE2<<","<<BATSE4<<") = "<<pow(10.,fPeakFlux)<<" ph/cm^2/s"<<std::endl;
       std::cout<<" GBM   flux ("<< GBM1 <<","<< GBM2 <<") = "<<fGBM<<" erg/cm^2"<<std::endl;
       std::cout<<"  LAT   flux ("<< LAT1 <<","<< LAT2 <<") = "<<pow(10.,fLAT)<<" erg/cm^2"<<std::endl;
       std::cout<<"  Nph TOT    ("<<EMIN<<","<<EMAX<<")  = "<<pow(10.,nTOT)<<std::endl;
@@ -634,7 +647,7 @@ void ScanParameters(int Ngrb)
       GRBTree->Fill();
       if(grbn%10==0)
 	{
-	  TFile aFile("GRBCatalogueFile.root","RECREATE");
+	  TFile aFile("GRBobsCatalogueFile.root","RECREATE");
 	  GRBTree->Write();
 	}
       delete sp;

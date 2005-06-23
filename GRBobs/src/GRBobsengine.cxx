@@ -18,16 +18,15 @@ std::vector<GRBobsPulse*> GRBobsengine::CreatePulsesVector()
 {
   //////////////////////////////////////////////////
   std::vector<GRBobsPulse*> thePulses;
-  double tau, pt1,pt,rt, dt, ph, nu, ep, a, b,duration,startTime,endTime,BurstEndTime;
+  double tau, pt1,pt,rt, dt, ph, nu, ep, a, b,duration,endTime,BurstEndTime;
 
   pt=0.0;
   
   GRBobsPulse *aPulse;
   duration = m_params->GetDuration();
-  startTime=0.0;
   endTime=0.0;
   int npulses=0;
-
+  
   while(endTime<duration || npulses==0)
     {
       m_params->GenerateParameters();
@@ -52,16 +51,14 @@ std::vector<GRBobsPulse*> GRBobsengine::CreatePulsesVector()
 	  aPulse->Print();
 	}
 
-      endTime = aPulse->GetEndTime()-startTime;
-      //std::cout<<"ST= "<<startTime<<", ET= "<<endTime<<", D= "<<duration<<" npulses: "<<npulses<<std::endl;
-      
+      endTime = aPulse->GetEndTime();
+
       if(endTime <= duration) 
 	{
 	  thePulses.push_back(aPulse);
 	  pt1 = pt;
 	  npulses++;
 	  BurstEndTime = endTime;
-	  //std::cout<<"A: ST= "<<startTime<<", PET= "<<endTime<<", BET = "<<BurstEndTime<<", D = "<<duration<<std::endl;
       	}
     }
   
@@ -71,8 +68,7 @@ std::vector<GRBobsPulse*> GRBobsengine::CreatePulsesVector()
 	delete thePulses[i];
       return CreatePulsesVector();
     }
-  
-  
+
   return thePulses;
 }
 

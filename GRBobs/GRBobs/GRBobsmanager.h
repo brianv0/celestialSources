@@ -73,7 +73,7 @@ class GRBobsmanager : public ISpectrum
   std::string title() const {return "GRBobsmanager";} 
   const char * particleName() const {return "gamma";}
   const char * nameOf() const {return "GRBobsmanager";}
-  TString GetGRBname(double time);
+  TString GetGRBname();
   void GenerateGRB();  
   void DeleteGRB();  
 
@@ -93,7 +93,6 @@ class GRBobsmanager : public ISpectrum
   double m_theta;
   double m_phi;
 
-
   SpectObj    *m_spectrum;
   GRBobsSim   *m_GRB;
   GRBobsParameters  *m_par;
@@ -107,6 +106,7 @@ class GRBobsmanager : public ISpectrum
 
   double m_l;
   double m_b;
+  double m_duration;
   double m_fluence;
   long   m_GRBnumber;
   double m_alpha;

@@ -10,14 +10,12 @@
 #include "TCanvas.h"
 #define DEBUG 0
 
-
 using namespace ObsCst;
 //////////////////////////////////////////////////
 GRBobsSim::GRBobsSim(GRBobsParameters *params)
   : m_params(params)
 {
   m_GRBengine = new GRBobsengine(params);
-  m_fluence = m_params->GetFluence();
 }
 
 void GRBobsSim::GetUniqueName(const void *ptr, std::string & name)
@@ -27,6 +25,7 @@ void GRBobsSim::GetUniqueName(const void *ptr, std::string & name)
   name = my_name.str();
   gDirectory->Delete(name.c_str());
 }
+
 TH2D* GRBobsSim::MakeGRB()
 {
   double *e = new double[Ebin +1];
@@ -39,11 +38,12 @@ TH2D* GRBobsSim::MakeGRB()
   double s_TimeBinWidth=TimeBinWidth;
   std::vector<GRBobsPulse*> Pulses = m_GRBengine->CreatePulsesVector();
   m_tfinal=0.0;
-  
+  if(DEBUG) std::cout<<Pulses.size()<<std::endl;
   std::vector<GRBobsPulse*>::iterator pos;
   for(pos = Pulses.begin(); pos !=  Pulses.end(); ++pos)
     {
       m_tfinal=TMath::Max(m_tfinal,(*pos)->GetEndTime());      
+      if(DEBUG) (*pos)->Print();
     }
   
   m_tbin = TMath::Max(10,int(m_tfinal/s_TimeBinWidth));
@@ -75,28 +75,54 @@ TH2D* GRBobsSim::MakeGRB()
     }
 
   TH2D *nph = Nph(m_Nv); //ph/cm²
+  // Scale AT BATSE FLUENCE:
+  double norm=0;
   
-  int ei1 = nph->GetYaxis()->FindBin(BATSE1);
-  int ei2 = nph->GetYaxis()->FindBin(BATSE5);
-  double F=0.0;
-  double en;
-  for (int ei = ei1; ei<=ei2; ei++)
+  if(m_params->GetNormType()==0)
     {
-      en   = nph->GetYaxis()->GetBinCenter(ei);
-      for(int ti = 1; ti<=m_tbin; ti++)
+      double BATSEfluence = m_params->GetFluence();
+      std::cout<<" Scale at BATSE fluence:" << BATSEfluence <<std::endl;
+      
+      int ei1 = nph->GetYaxis()->FindBin(BATSE1);
+      int ei2 = nph->GetYaxis()->FindBin(BATSE5);
+      double F=0.0;
+      double en;
+      for (int ei = ei1; ei<=ei2; ei++)
 	{
-	  F+= nph->GetBinContent(ti, ei) * en;//[keV/cm²]
-	}  
+	  en   = nph->GetYaxis()->GetBinCenter(ei);
+	  for(int ti = 1; ti<=m_tbin; ti++)
+	    {
+	      F+= nph->GetBinContent(ti, ei) * en;//[keV/cm²]
+	    }  
+	}
+      F*=1.0e-3/(erg2meV); //erg/cm²
+      // IMPORTANT m_Nv has to  be in [ph/(m² s keV)]
+      norm = 1.0e4 * BATSEfluence/F;
     }
-  double norm = F*1.0e-3/(erg2meV); //erg/cm²  
-  //  double norm = nph->Integral(0,m_tbin,ei1,ei2,"width")*(1.0e-3)/(erg2meV)/s_TimeBinWidth; //erg/m²
+  else
+    {
+      //////////////////////////////////////////////////
+      //SCALE AT BATSE PEAK FLUX:
+      double BATSEPeakFlux = m_params->GetPeakFlux();
+      std::cout<<" Scale at BATSE PeakFlux:" << BATSEPeakFlux <<std::endl;
+      
+      int ei1 = nph->GetYaxis()->FindBin(BATSE2);
+      int ei2 = nph->GetYaxis()->FindBin(BATSE4);
+      double PF=0.0;
+      for (int ei = ei1; ei<=ei2; ei++)
+	{
+	  for(int ti = 1; ti<=m_tbin; ti++)
+	    {
+	      PF= TMath::Max(PF,nph->GetBinContent(ti, ei)/s_TimeBinWidth);//[ph/cm^2/s]
+	    }
+	}
+      norm = 1.0e4 * BATSEPeakFlux/PF;
+    }
   
-  // IMPORTANT m_Nv has to  be in [ph/(m² s keV)]
-  m_Nv->Scale(1.0e4 * m_fluence/norm);
+  m_Nv->Scale(norm);
   Pulses.erase(Pulses.begin(), Pulses.end());
   delete e;
   delete nph;
-  //SaveNv(m_Nv);
   return m_Nv;
 }
 //////////////////////////////////////////////////
@@ -287,13 +313,13 @@ void GRBobsSim::GetGBMFlux(TString GRBname)
       if(DEBUG)
 	{
 	  std::cout<<"t= "<<t<<" C= "<<Const<<" a= "<<a<<" b= "<<b<<" E0= "<<E0<<" Ep= "<<Ep<<std::endl;
-	  //gPad->SetLogx();
-	  //gPad->SetLogy();
+	  //	  gPad->SetLogx();
+	  //	  gPad->SetLogy();
 	  gPad->Update();
-	  //	  TString gbmFlux= "GBMFlux";
-	  //	  gbmFlux+=ti;
-	  //	  gbmFlux+=".gif";
-	  //	  if(ti%10==0) gPad->Print(gbmFlux);
+	  TString gbmFlux= "GBMFlux";
+	  gbmFlux+=ti;
+	  gbmFlux+=".gif";
+	  if(ti%10==0) gPad->Print(gbmFlux);
 	}
     }   
   os.close();
