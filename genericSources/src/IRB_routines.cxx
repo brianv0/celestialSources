@@ -33,12 +33,16 @@
  *  EBL model 3:  Primack's model (1999)
  *  EBL model 4:  Primack's model (2004)
 
-///////////////////////////////////////////////////////////////////////////
 Tau is calculated as a function of energy (TeV) and redshift for the following models
 in the GLAST range:
+
 Author: Luis C. Reyes    lreyes@milkyway.gsfc.nasa.gov
+
  *  EBL model 5: Salamon & Stecker (ApJ 1998, 493:547-554)
- *  EBL model 6: Primack & Bullock (1999) Valid for Energies > 10 GeV and Redshift < 5
+ *  EBL model 6: Primack & Bullock (1999) Valid for Energies < 500 GeV and Redshift < 5
+
+ For Both models the EBL attenuation turns on abruptly at 10 GeV. This is specially artificial for distant
+ blazars z > ~3. This can be improved by extrapolating the models to energies around 1-5 GeV
 //////////////////////////////////////////////////////////////////////////
  *
  * $Header$
@@ -317,9 +321,11 @@ float calcSS(float energy, float redshift){
   float tauvalue;
 
   float zvalue[6] = {0., 0.1, 0.5, 1., 2., 3.};
+
   //evalues in units of TeV
   float evalue[14] = {0.01, 0.015, 0.02, 0.03, 0.04, 0.05, 0.06, 0.08, 0.1, 0.15, 0.2, 0.3, 0.4, 0.5};
 
+  /*From Fig.6 of the paper mentioned above */
   float tau[14][6] = {{0., 0., 0., 0., 0.023, 0.18},
 		      {0., 0., 0., 0., 0.23, 0.8},
 		      {0., 0., 0., 0.055, 0.8, 1.9},
@@ -337,8 +343,8 @@ float calcSS(float energy, float redshift){
 
 
   if(redshift < 0.){
-     std::cout<<"Invalid redshift (z < 0)..."<<endl;
-     return -1.;
+     std::cerr<<"Invalid redshift (z < 0)..."<<endl;
+     redshift = 0.;
      }
 
 //According to the model by the authors (Stecker and Salomon) opacities for z>3 are
@@ -370,30 +376,20 @@ float calcSS(float energy, float redshift){
          }
         }
 
-//cout<<"(eindex, zindex) = ("<<eindex<<", "<<zindex<<") ..."<<endl;
 
-
+// Extrapolate in Energy for redshifts above and below the source
 tau1 = tau[eindex][zindex]+(tau[eindex+1][zindex]-tau[eindex][zindex])*(energy-evalue[eindex])/(evalue[eindex+1]-evalue[eindex]);
 tau2 = tau[eindex][zindex+1]+(tau[eindex+1][zindex+1]-tau[eindex][zindex+1])*(energy-evalue[eindex])/(evalue[eindex+1]-evalue[eindex]);
 
+//Extrapolate in redshift
 return tau1 + (tau2-tau1)*(redshift-zvalue[zindex])/(zvalue[zindex+1]-zvalue[zindex]);
-/*
-  if(redshift == zvalue[zindex] && energy == evalue[eindex])
-    tauvalue = tau[eindex][zindex];
-  if(redshift == zvalue[zindex] && energy > evalue[eindex])
-    tauvalue = tau[eindex][zindex] + (tau[eindex+1][zindex]-tau[eindex][zindex])*(energy-evalue[eindex])/(evalue[eindex+1]-evalue[eindex]);
-  if(redshift > zvalue[zindex] && energy == evalue[eindex])
-    tauvalue = tau[eindex][zindex] + (tau[eindex][zindex+1]-tau[eindex][zindex])*(redshift-zvalue[zindex])/(zvalue[zindex+1]-zvalue[zindex]);
-  if(redshift > zvalue[zindex] && energy > evalue[eindex]){
-    tau1 = tau[eindex][zindex] + (tau[eindex+1][zindex]-tau[eindex][zindex])*(energy-evalue[eindex])/(evalue[eindex+1]-evalue[eindex]);
-    tau2 = tau[eindex][zindex+1] + (tau[eindex+1][zindex+1]-tau[eindex][zindex+1])*(energy-evalue[eindex])/(evalue[eindex+1]-evalue[eindex]);
-    tauvalue = tau1 + (tau2 - tau1)*(redshift-zvalue[zindex])/(zvalue[zindex+1]-zvalue[zindex]);
-    }
 
-return tauvalue;*/
 }
 
 float calcPB(float energy, float redshift){
+// EBL model 6: Primack & Bullock (1999) Valid for Energies < 500 GeV and Redshift < 5
+//We are using here the LCDM model with Salpeter's  stellar Initial Mass Function (IMF)
+//The data provided by Bullock has opacities up to 10.
 
   int zindex=0,eindex=-1;
   int i;
@@ -455,11 +451,11 @@ tautables[8] = tau50;
 int MaxEindex[9] = {0, 85, 85, 70, 54, 46, 42, 30, 2};
 
 if(redshift < 0.){
-     std::cout<<"Invalid redshift (z < 0)..."<<std::endl;
-     return -1.;
+     std::cerr<<"Invalid redshift (z < 0)..."<<std::endl;
+     redshift = 0.;
      } else if (energy > 0.5) {
-       std::cout<<"This EBL model is only valid for E <= 500 GeV..."<<std::endl;
-       return -1.;
+       std::cerr<<"This EBL model is only valid for E <= 500 GeV..."<<std::endl;
+       return 10.;
        }
 
 
@@ -471,19 +467,25 @@ if(redshift > 5.) redshift=5.0;
     if(redshift >= zvalue[i] && redshift < zvalue[i+1]) zindex = i;
   if(redshift >= zvalue[8]) zindex = 8;
 
+  // Determine energy index
   for(int i=0; i<86; i++)
     if(energy >= evalue[i] && energy < evalue[i+1]) eindex = i;
   if(eindex < 0) return 0;
 
+
+
  if (zindex < 8){
+  //Find tau for redshifts above and below source
   if(eindex < MaxEindex[zindex])
     tau1 = tautables[zindex][eindex]+(tautables[zindex][eindex+1]-tautables[zindex][eindex])*(energy-evalue[eindex])/(evalue[eindex+1]-evalue[eindex]);
     else tau1 = tautables[zindex][MaxEindex[zindex]];
   if(eindex < MaxEindex[zindex+1])
   tau2 = tautables[zindex+1][eindex]+(tautables[zindex+1][eindex+1]-tautables[zindex+1][eindex])*(energy-evalue[eindex])/(evalue[eindex+1]-evalue[eindex]);
    else tau2 = tautables[zindex+1][MaxEindex[zindex+1]];
+  //interpolate in redshift
   tauvalue =tau1 + (tau2-tau1)*(redshift-zvalue[zindex])/(zvalue[zindex+1]-zvalue[zindex]);
   } else{
+    //Use tau for source at z = 5
      if (eindex < MaxEindex[zindex]) tau1 = tautables[zindex][eindex]+(tautables[zindex][eindex+1]-tautables[zindex][eindex])*(energy-evalue[eindex])/(evalue[eindex+1]-evalue[eindex]);
      else tau1 = tautables[zindex][MaxEindex[zindex]];
      tauvalue = tau1;
