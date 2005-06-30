@@ -32,9 +32,20 @@
  *                "fast evolution"; valid for z<0.3
  *  EBL model 3:  Primack's model (1999)
  *  EBL model 4:  Primack's model (2004)
+
+///////////////////////////////////////////////////////////////////////////
+Tau is calculated as a function of energy (TeV) and redshift for the following models
+in the GLAST range:
+Author: Luis C. Reyes    lreyes@milkyway.gsfc.nasa.gov
+ *  EBL model 5: Salamon & Stecker (ApJ 1998, 493:547-554)
+ *  EBL model 6: Primack & Bullock (1999) Valid for Energies > 10 GeV and Redshift < 5
+//////////////////////////////////////////////////////////////////////////
  *
  * $Header$
  */
+
+
+
 
 //-------------------------------------------------------------------
 
@@ -50,6 +61,8 @@ float calcSJ1(float energy, float redshift);
 float calcSJ2(float energy, float redshift);
 float calcPrimack(float energy, float redshift);
 float calcPrimack04(float energy, float redshift);
+float calcSS(float energy, float redshift);
+float calcPB(float energy, float redshift);
 
 float calcSJ1(float energy, float redshift){
 //  EBL model 1:  Stecker and de Jager (ApJ 2002) "baseline"; valid for z<0.3
@@ -86,6 +99,10 @@ float calcSJ1(float energy, float redshift){
   return pow(static_cast<float>(10.), static_cast<float>(logtau));  //return tau not log10(tau)
 }
 
+
+
+
+
 float calcSJ2(float energy, float redshift){
 //  EBL model 2:  Stecker and de Jager (ApJ 2002) "fast evolution"; valid for z<0.3
 //  Same as model 1 excpet for z polynomials' coefficients
@@ -99,7 +116,7 @@ float calcSJ2(float energy, float redshift){
 			       {10.444,     17.114,   11.173,    2.58430},
 			       {-5.8013,   -13.733,   -9.2033,  -2.17670},
 			       {1.4145,      4.3143,   2.9535,   0.71046},
-			       {-0.11656,   -0.46363, -0.32339, -0.078903}}; 
+			       {-0.11656,   -0.46363, -0.32339, -0.078903}};
   if(firsttime){
     double log10redshift = log10(redshift);  //for calculation use log10 of redshift
     //calculate redshift dependent constants
@@ -108,7 +125,7 @@ float calcSJ2(float energy, float redshift){
       coeff[i] = 0.;
       for(j=0;j<4;j++){
 	//add redshift dependent polynomial terms to get optical density polynomial coeffiecient
-	coeff[i] += redshiftCoeff[i][j]*pow(log10redshift,j); 
+	coeff[i] += redshiftCoeff[i][j]*pow(log10redshift,j);
       }
     }
     firsttime = 0;
@@ -123,7 +140,7 @@ float calcSJ2(float energy, float redshift){
 }
 
 float calcPrimack(float energy, float redshift){
-//  EBL model for LCDM:  Bullock thesis (1999ish) based on model of 
+//  EBL model for LCDM:  Bullock thesis (1999ish) based on model of
 //  Somerville and Primack (1999).  Valid for 100 GeV to 100 TeV.
 //  Input redshift and energy in TeV
 //  Returns tau (optical depth)
@@ -138,7 +155,7 @@ float calcPrimack(float energy, float redshift){
   //Define coefficients
   //Coeffs given for z=0.01,0.02,0.04... so defining bounds around these values
   float zboundslow[8] = {0.010, 0.025, 0.035, 0.07, 0.15, 0.25, 0.40, 0.75}; 
-  float zboundsup[8]  = {0.025, 0.035, 0.070, 0.15, 0.25, 0.40, 0.75, 1.50}; 
+  float zboundsup[8]  = {0.025, 0.035, 0.070, 0.15, 0.25, 0.40, 0.75, 1.50};
   float tau1[8] = {0.49, 0.74, 0.99, 2.63, 5.59, 8.96, 0.96, 66.27};
   float tau2[8] = {12586.52, 19212.86, 20930.67, 226.28, 71.17, 507.96, 15.39, 0.0};
   float log10E1[8] = {12.59, 12.59, 12.58, 12.59, 12.57, 12.55, 11.47, 12.71};
@@ -287,4 +304,194 @@ tau2 = tauvalues[zindex+1][eindex]+((tauvalues[zindex+1][eindex+1]-tauvalues[zin
 };
   return tau;
 }
+
+
+float calcSS(float energy, float redshift){
+// EBL model 5: Salamon & Stecker (ApJ 1998, 493:547-554)
+//We are using here the model with metallicity correction (see paper)
+//The paper has opacities up to z=3, for z>3 opacity remains constant according to Stecker
+
+  int zindex=0,eindex=0;
+  int i;
+  float tau1,tau2;
+  float tauvalue;
+
+  float zvalue[6] = {0., 0.1, 0.5, 1., 2., 3.};
+  //evalues in units of TeV
+  float evalue[14] = {0.01, 0.015, 0.02, 0.03, 0.04, 0.05, 0.06, 0.08, 0.1, 0.15, 0.2, 0.3, 0.4, 0.5};
+
+  float tau[14][6] = {{0., 0., 0., 0., 0.023, 0.18},
+		      {0., 0., 0., 0., 0.23, 0.8},
+		      {0., 0., 0., 0.055, 0.8, 1.9},
+		      {0., 0., 0.03, 0.31, 2.05, 3.8},
+		      {0., 0., 0.11, 0.8, 3.4, 5.9},
+		      {0., 0.01, 0.23, 1.23, 4.4, 7.},
+		      {0., 0.02, 0.4, 1.7, 5.8, 8.},
+		      {0., 0.05, 0.72, 2.8, 7.8, 10.0},
+		      {0., 0.09, 1.1, 3.4, 9., 12.},
+		      {0., 0.2, 2., 5.4, 10.7, 15.},
+		      {0., 0.3, 2.6, 7., 13., 16.},
+		      {0., 0.5, 3.9, 9., 15., 18.},
+		      {0., 0.7, 4.9, 10., 17., 19.5},
+		      {0., 0.8, 5.1, 10.1, 18.0, 20.}};
+
+
+  if(redshift < 0.){
+     std::cout<<"Invalid redshift (z < 0)..."<<endl;
+     return -1.;
+     }
+
+//According to the model by the authors (Stecker and Salomon) opacities for z>3 are
+//the same as for z=3. This is related to star formation among other things
+//This is a really sensitive topic among theory people...  beware :)
+  if (redshift > 3.) redshift = 3.;
+
+
+  //Determine redshift index...
+  if(redshift>=3.) zindex=5;
+    else
+      for(i=0;i<5;i++){
+         if(redshift>=zvalue[i] && redshift<zvalue[i+1]){
+	   zindex=i;
+         }
+       }
+
+//Ebl attenuation is negligible for photons with E < 10 GeV (0.01 TeV)
+//If energy > 500 GeV assume attenuation equivalent to energy = 500 GeV (outside Glast Energy Range anyway...)
+  if(energy <= 0.01) return 0;
+    else if (energy >= 0.5) {
+      eindex = 13;
+      energy = 0.5;
+      }
+     else
+       for(i=0;i<13;i++){
+        if(energy>=evalue[i] && energy<evalue[i+1]){
+	  eindex=i;
+         }
+        }
+
+//cout<<"(eindex, zindex) = ("<<eindex<<", "<<zindex<<") ..."<<endl;
+
+
+tau1 = tau[eindex][zindex]+(tau[eindex+1][zindex]-tau[eindex][zindex])*(energy-evalue[eindex])/(evalue[eindex+1]-evalue[eindex]);
+tau2 = tau[eindex][zindex+1]+(tau[eindex+1][zindex+1]-tau[eindex][zindex+1])*(energy-evalue[eindex])/(evalue[eindex+1]-evalue[eindex]);
+
+return tau1 + (tau2-tau1)*(redshift-zvalue[zindex])/(zvalue[zindex+1]-zvalue[zindex]);
+/*
+  if(redshift == zvalue[zindex] && energy == evalue[eindex])
+    tauvalue = tau[eindex][zindex];
+  if(redshift == zvalue[zindex] && energy > evalue[eindex])
+    tauvalue = tau[eindex][zindex] + (tau[eindex+1][zindex]-tau[eindex][zindex])*(energy-evalue[eindex])/(evalue[eindex+1]-evalue[eindex]);
+  if(redshift > zvalue[zindex] && energy == evalue[eindex])
+    tauvalue = tau[eindex][zindex] + (tau[eindex][zindex+1]-tau[eindex][zindex])*(redshift-zvalue[zindex])/(zvalue[zindex+1]-zvalue[zindex]);
+  if(redshift > zvalue[zindex] && energy > evalue[eindex]){
+    tau1 = tau[eindex][zindex] + (tau[eindex+1][zindex]-tau[eindex][zindex])*(energy-evalue[eindex])/(evalue[eindex+1]-evalue[eindex]);
+    tau2 = tau[eindex][zindex+1] + (tau[eindex+1][zindex+1]-tau[eindex][zindex+1])*(energy-evalue[eindex])/(evalue[eindex+1]-evalue[eindex]);
+    tauvalue = tau1 + (tau2 - tau1)*(redshift-zvalue[zindex])/(zvalue[zindex+1]-zvalue[zindex]);
+    }
+
+return tauvalue;*/
+}
+
+float calcPB(float energy, float redshift){
+
+  int zindex=0,eindex=-1;
+  int i;
+  float tau1,tau2, **tautables, tauvalue;
+
+  float zvalue[9] = {0., 0.1, 0.5, 1., 1.5, 2., 3., 4., 5.};
+
+  float evalue[86]={0.1000e-01, 0.1047e-01, 0.1097e-01, 0.1149e-01, 0.1203e-01, 0.1260e-01, 0.1320e-01, 0.1383e-01, 0.1448e-01, 0.1517e-01, 0.1589e-01, 0.1664e-01, 0.1743e-01, 0.1825e-01, 0.1912e-01, 0.2002e-01, 0.2097e-01, 0.2196e-01, 0.2300e-01, 0.2409e-01, 0.2524e-01, 0.2643e-01, 0.2768e-01, 0.2899e-01, 0.3037e-01, 0.3181e-01, 0.3331e-01, 0.3489e-01, 0.3654e-01, 0.3827e-01, 0.4009e-01, 0.4199e-01, 0.4398e-01, 0.4606e-01, 0.4824e-01, 0.5053e-01, 0.5292e-01, 0.5543e-01, 0.5805e-01, 0.6080e-01, 0.6368e-01, 0.6670e-01, 0.6986e-01, 0.7317e-01, 0.7663e-01, 0.8026e-01, 0.8407e-01, 0.8805e-01, 0.9222e-01, 0.9659e-01, 0.1012, 0.1060, 0.1110, 0.1162, 0.1217, 0.1275, 0.1335, 0.1399, 0.1465, 0.1534, 0.1607, 0.1683, 0.1763, 0.1846, 0.1934, 0.2026, 0.2121, 0.2222, 0.2327, 0.2437, 0.2553, 0.2674, 0.2801, 0.2933, 0.3072, 0.3218, 0.3370, 0.3530, 0.3697, 0.3872, 0.4055, 0.4248, 0.4449, 0.4660, 0.4880, 0.5111};
+
+
+float tau0[1] ={0.};
+
+float tau01[86] = {0.05044,0.04816,0.04598,0.04390,0.04191,0.04002,0.03821,0.03648,0.03483,0.03326,0.03175,0.03032,0.02894,0.02764,0.02639,0.02519,0.02407,
+0.02300,0.02200,0.02106,0.02020,0.01941,0.01872,0.01810,0.01756,0.01719,0.01691,0.01668,0.01667,0.01672,0.01689,0.01722,0.01764,0.01825,0.01902,0.01984,
+0.02084,0.02209,0.02339,0.02488,0.02659,0.02835,0.03037,0.03260,0.03492,0.03774,0.04057,0.04360,0.04713,0.05089,0.05465,0.05939,0.06423,0.06942,0.07540,
+0.08144,0.08862,0.09661,0.10431,0.11347,0.12391,0.13421,0.14563,0.15887,0.17252,0.18757,0.20456,0.22131,0.24177,0.26293,0.28349,0.30777,0.33455,0.35996,
+0.39091,0.42190,0.45415,0.48984,0.52425,0.56257,0.60443,0.64343,0.68610,0.73183,0.77681,0.82173};
+
+float tau05[86]={0.05044,0.04816,0.04598,0.04390,0.04192,0.04002,0.03821,0.03650,0.03489,0.03335,0.03201,0.03078,0.02974,0.02891,0.02835,0.02805,0.02806,
+0.02848,0.02955,0.03086,0.03288,0.03562,0.03916,0.04320,0.04734,0.05259,0.05949,0.06675,0.07506,0.08330,0.09376,0.10543,0.11700,0.13047,0.14464,0.16002,
+0.17624,0.19429,0.21342,0.23369,0.25603,0.27839,0.30383,0.33098,0.35983,0.39217,0.42593,0.46072,0.49828,0.54202,0.58845,0.63685,0.68838,0.74716,0.81362,
+0.87817,0.95018,1.03182,1.11620,1.20787,1.31027,1.42074,1.53603,1.66197,1.79468,1.93863,2.09184,2.25382,2.44020,2.62804,2.81407,3.01810,3.24102,3.46880,
+3.70482,3.94419,4.21036,4.48947,4.74677,5.03711,5.32504,5.62250,5.92042,6.23185,6.54397,6.85156};
+
+float tau10[71] = {0.05055,0.04838,0.04641,0.04466,0.04309,0.04165,0.04062,0.04058,0.04115,0.04222,0.04380,0.04713,0.05163,0.05689,0.06380,0.07313, 0.08424,0.09744,0.11312,0.13093,0.15043,0.17345,0.19764,0.22589,0.25653,0.28962,0.32740,0.36817,0.41008,0.45497,0.50754,0.56030,0.61270,0.67131,0.73566,
+0.80161,0.87014,0.94555,1.02595,1.11570,1.20579,1.30465,1.41392,1.52256,1.64368,1.77331,1.91196,2.05822,2.21835,2.39601,2.58247,2.78855,2.99329,3.24001,
+3.49657,3.75238,4.03416,4.34287,4.66736,5.00715,5.37851,5.77434,6.20143,6.64110,7.10022,7.60494,8.09390,8.62231,9.18755,9.77758,10.35777};
+
+float tau15[55] = {0.04283,0.04471,0.04879,0.05416,0.05972,0.06915,0.08260,0.09855,0.11749,0.13897,0.16835,0.20046,0.23560,0.27589,0.32207,0.37472, 0.42664,0.49159,0.55870,0.63295,0.71158,0.79007,0.88211,0.98407,1.07970,1.19164,1.30595,1.43081,1.55807,1.69511,1.83965,1.99051,2.15071,2.31911,2.50800,
+2.70071,2.90339,3.12064,3.35610,3.60785,3.86638,4.17478,4.47518,4.81546,5.14556,5.53774,5.95120,6.37901,6.83123,7.31972,7.83243,8.41666,8.99513,9.61588,
+10.28970};
+
+float tau20[47] = {0.02497,0.03678,0.05016,0.06877,0.09574,0.12887,0.15834,0.20098,0.25672,0.31359,0.37598,0.44497,0.53599,0.62514,0.71397,0.82767,
+0.93907,1.06119,1.19013,1.33648,1.49061,1.64903,1.81300,1.99702,2.18411,2.37337,2.57794,2.80693,3.02583,3.26354,3.51345,3.80321,4.08439,4.39201,4.70966,
+5.07996,5.42966,5.80825,6.23923,6.68865,7.15252,7.64205,8.16685,8.76766,9.35244,9.98335,10.71234};
+
+float tau30[43] = {0.12760,0.15369,0.18239,0.21531,0.26280,0.30838,0.34810,0.40751,0.47517,0.53306,0.60393,0.67753,0.76306,0.84639,0.92888,1.03448,
+1.15230,1.25744,1.36932,1.52043,1.66826,1.80743,1.97745,2.16587,2.36226,2.56421,2.78734,3.08298,3.36508,3.61257,3.96512,4.36544,4.72370,5.11846,5.59212,
+6.09073,6.61199,7.09702,7.72980,8.43907,9.09844,9.78671,10.62800};
+
+float tau40[31] = {0.63771,0.72971,0.82592,0.93823,1.05512,1.17521,1.30511,1.44529,1.59416,1.75078,1.92336,2.11099,2.30598,2.50734,2.73796,2.99315,
+3.25266,3.52705,3.85299,4.19963,4.55735,4.93732,5.37807,5.85975,6.35328,6.86966,7.47273,8.12476,8.77295,9.49649,10.27070};
+
+float tau50[3] = {8.45314,9.21388,10.01371};
+
+
+tautables = (float **)malloc(9*sizeof(float*));
+tautables[0] = tau0;
+tautables[1] = tau01;
+tautables[2] = tau05;
+tautables[3] = tau10;
+tautables[4] = tau15;
+tautables[5] = tau20;
+tautables[6] = tau30;
+tautables[7] = tau40;
+tautables[8] = tau50;
+
+
+int MaxEindex[9] = {0, 85, 85, 70, 54, 46, 42, 30, 2};
+
+if(redshift < 0.){
+     std::cout<<"Invalid redshift (z < 0)..."<<std::endl;
+     return -1.;
+     } else if (energy > 0.5) {
+       std::cout<<"This EBL model is only valid for E <= 500 GeV..."<<std::endl;
+       return -1.;
+       }
+
+
+//For z > 5. the opacity remains constant (same value as at z = 5.)
+if(redshift > 5.) redshift=5.0;
+
+  //Determine redshift index...
+  for(int i=0; i<8; i++)
+    if(redshift >= zvalue[i] && redshift < zvalue[i+1]) zindex = i;
+  if(redshift >= zvalue[8]) zindex = 8;
+
+  for(int i=0; i<86; i++)
+    if(energy >= evalue[i] && energy < evalue[i+1]) eindex = i;
+  if(eindex < 0) return 0;
+
+ if (zindex < 8){
+  if(eindex < MaxEindex[zindex])
+    tau1 = tautables[zindex][eindex]+(tautables[zindex][eindex+1]-tautables[zindex][eindex])*(energy-evalue[eindex])/(evalue[eindex+1]-evalue[eindex]);
+    else tau1 = tautables[zindex][MaxEindex[zindex]];
+  if(eindex < MaxEindex[zindex+1])
+  tau2 = tautables[zindex+1][eindex]+(tautables[zindex+1][eindex+1]-tautables[zindex+1][eindex])*(energy-evalue[eindex])/(evalue[eindex+1]-evalue[eindex]);
+   else tau2 = tautables[zindex+1][MaxEindex[zindex+1]];
+  tauvalue =tau1 + (tau2-tau1)*(redshift-zvalue[zindex])/(zvalue[zindex+1]-zvalue[zindex]);
+  } else{
+     if (eindex < MaxEindex[zindex]) tau1 = tautables[zindex][eindex]+(tautables[zindex][eindex+1]-tautables[zindex][eindex])*(energy-evalue[eindex])/(evalue[eindex+1]-evalue[eindex]);
+     else tau1 = tautables[zindex][MaxEindex[zindex]];
+     tauvalue = tau1;
+     }
+
+   return tauvalue;
+
+
+}
+
 } // namespace IRB

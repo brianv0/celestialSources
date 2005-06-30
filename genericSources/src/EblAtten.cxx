@@ -16,9 +16,11 @@ float calcSJ1(float energy, float redshift);
 float calcSJ2(float energy, float redshift);
 float calcPrimack(float energy, float redshift);
 float calcPrimack04(float energy, float redshift);
+float calcSS(float energy, float redshift);
+float calcPB(float energy, float redshift);
 
 EblAtten::EblAtten(EblModel model) : m_model(model) {
-   if (m_model < SdJbase || m_model > Primack04) {
+   if (m_model < SdJbase || m_model > Primack_Bullock) {
       throw std::runtime_error("Invalid model.");
    }
 }
@@ -35,6 +37,10 @@ float EblAtten::operator()(float energy, float redshift) const {
       return calcPrimack(energy, redshift);
    case Primack04:
       return calcPrimack04(energy, redshift);
+   case Salamon_Stecker:
+      return calcSS(energy, redshift);
+   case Primack_Bullock:
+      return calcPB(energy, redshift);
    }
    return 0;
 }
