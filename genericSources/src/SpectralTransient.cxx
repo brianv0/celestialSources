@@ -104,8 +104,8 @@ void SpectralTransient::createEvents(std::string templateFile) {
    for (long i = 0; i < nevts; i++) {
       std::pair<double, double> my_event = drawEvent(integralDist);
       if (m_z == 0 || m_tau == 0 ||
-          RandFlat::shoot() < std::exp(-(*m_tau)(m_z, my_event.second))) {
-         m_events.push_back(drawEvent(integralDist));
+          RandFlat::shoot() < std::exp(-(*m_tau)(my_event.second, m_z))) {
+         m_events.push_back(my_event);
       }
    }
    std::stable_sort(m_events.begin(), m_events.end(), compareEventTime);
