@@ -20,7 +20,8 @@ void GRBobsParameters::SetDuration(double duration)
   else 
     {
       m_Type = 2;
-      if(m_NormType==1)	m_duration*=TMath::Max(1.0,m_Stretch);
+      if(NormType=='P')	
+	m_duration*=TMath::Max(1.0,m_Stretch);
     }
 
 }
@@ -47,16 +48,6 @@ void GRBobsParameters::SetGRBNumber(long GRBnumber)
   double tmp;
   tmp = rnd->Uniform();
 }
-
-void GRBobsParameters::SetNormType(char NormType)
-{
-  if(NormType=='P')  m_NormType=1;
-  else  
-    {
-      m_NormType=0;
-    }
-}
-
 
 void GRBobsParameters::SetMinPhotonEnergy(double enph)
 {
@@ -126,14 +117,17 @@ void GRBobsParameters::GenerateParameters()
   m_riseTime          = m_RD/(1.0+m_RD) / pow(log10(2.0),1./m_Peakedness) * m_FWHM;
   m_pulseHeight       = rnd->Uniform();
   m_Epeak             = pow(10.,rnd->Gaus(log10(235.0),log10(1.75))); //Short
-  if(m_Type==2 && m_NormType==1) m_Epeak/=m_Stretch; //Long
+  if(m_Type==2 && NormType=='P') m_Epeak/=m_Stretch; //Long
 }
 
 void GRBobsParameters::PrintParameters()
 {
   std::cout<<" Parameters: Duration = "<<m_duration;
-  if(m_NormType==0) std::cout<<" FL = "<<m_fluence;
-  else std::cout<<" PF = "<<m_peakFlux;
+  if(NormType=='P')  
+    std::cout<<" PF = "<<m_peakFlux;
+  else 
+    std::cout<<" FL = "<<m_fluence;
+
   std::cout<<" dt = "<<m_decayTime<<" rt = "<<m_riseTime
 	   <<" pe = "<<m_Peakedness<<" ph = "<<m_pulseHeight<<" tau = "<<m_pulseSeparation
 	   <<" ep = "<<m_Epeak<<" a = "<<m_LowEnergy<<" b = "<<m_HighEnergy<<std::endl;
@@ -184,7 +178,6 @@ void GRBobsParameters::ReadParametersFromFile(std::string paramFile, int NGRB)
   
   SetGRBNumber(65540+ (long) floor(tstart));
 
-  SetNormType('P');  //Type (PeakFlux or Fluence)
   SetFluence(fluence);
   SetPeakFlux(fluence);
   SetDuration(duration);

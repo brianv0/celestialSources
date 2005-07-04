@@ -32,6 +32,7 @@ namespace ObsCst
   const double episode_mean_interval    = 10.;
   const double pulse_mean_interval   = 1.;
   const double episode_pulses        = 0.824;
+  const char   NormType              = 'P';  //Type (P = PeakFlux or F = Fluence)
 
   ///reference energy for the Universal Width (keV)
   const double E0           = 100.0;  
@@ -90,7 +91,7 @@ class GRBobsParameters
       gDirectory->Delete("PFshort");
     }
 
-  inline  int GetNormType()        {return m_NormType;}
+  inline  char GetNormType()        {return ObsCst::NormType;}
   inline  double GetFluence()        {return m_fluence;}
   inline  double GetPeakFlux()        {return m_peakFlux;}
   inline  double GetRiseTime()       {return m_riseTime;}
@@ -117,7 +118,6 @@ class GRBobsParameters
   void SetDuration(double);
   void SetFluence(double);
   void SetPeakFlux(double);
-  void   SetNormType(char);
   /// Sets the low energy spectral index and the high energy spectral index.
   /// \param alpha low energy spectral index (\f$-3<\alpha<1\f$)
   /// \param beta high energy spectral index (\f$\beta>-1\f$,\f$\beta>\alpha\f$)
@@ -190,7 +190,6 @@ class GRBobsParameters
 
   double  m_Epeak;
   double m_LowEnergy,m_HighEnergy;
-  int m_NormType;
   double m_fluence;
   double m_peakFlux;
   double m_Stretch;

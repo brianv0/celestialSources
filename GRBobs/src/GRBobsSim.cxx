@@ -78,10 +78,10 @@ TH2D* GRBobsSim::MakeGRB()
   // Scale AT BATSE FLUENCE:
   double norm=0;
   
-  if(m_params->GetNormType()==0)
+  if(m_params->GetNormType()=='F')
     {
       double BATSEfluence = m_params->GetFluence();
-      std::cout<<" Scale at BATSE fluence:" << BATSEfluence <<std::endl;
+      std::cout<<" Scale at BATSE fluence!:" << BATSEfluence <<std::endl;
       
       int ei1 = nph->GetYaxis()->FindBin(BATSE1);
       int ei2 = nph->GetYaxis()->FindBin(BATSE5);
@@ -104,7 +104,7 @@ TH2D* GRBobsSim::MakeGRB()
       //////////////////////////////////////////////////
       //SCALE AT BATSE PEAK FLUX:
       double BATSEPeakFlux = m_params->GetPeakFlux();
-      std::cout<<" Scale at BATSE PeakFlux:" << BATSEPeakFlux <<std::endl;
+      std::cout<<" Scale at BATSE PeakFlux!:" << BATSEPeakFlux <<std::endl;
       
       int ei1 = nph->GetYaxis()->FindBin(BATSE2);
       int ei2 = nph->GetYaxis()->FindBin(BATSE4);
