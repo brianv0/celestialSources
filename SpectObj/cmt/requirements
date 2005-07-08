@@ -1,7 +1,8 @@
 package SpectObj
 
 version v0r1p5
-
+author Nicola Omodei<nicola.omodei@pi.infn.it>
+#=============================================================
 use GlastPolicy v6r*
 use ROOT v* IExternal
 
