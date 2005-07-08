@@ -13,6 +13,7 @@
 // declare the external factories.
 ISpectrumFactory & GaussianSourceFactory();
 ISpectrumFactory & GRBmanagerFactory();
+ISpectrumFactory & GRBobsmanagerFactory();
 ISpectrumFactory & GRBobsFactory();
 ISpectrumFactory & IsotropicFactory();
 ISpectrumFactory & MapSourceFactory();
@@ -27,6 +28,7 @@ ISpectrumFactory & TransientTemplateFactory();
 SpectrumFactoryLoader::SpectrumFactoryLoader()
 {
    load(GRBmanagerFactory());
+   load(GRBobsmanagerFactory());
    load(GRBobsFactory());
    load(GaussianSourceFactory());
    load(IsotropicFactory());
