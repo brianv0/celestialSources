@@ -48,8 +48,9 @@ GRBobsmanager::GRBobsmanager(const std::string& params)
   m_par->SetAlphaBeta(m_alpha,m_beta);
   m_par->SetMinPhotonEnergy(m_MinPhotonEnergy); //keV
   
-  m_theta = -90.0;
-  double FOV=20.0; // degrees above the XY plane.
+  m_theta = -1000.0;
+  //  double FOV=20.0; // degrees above the XY plane.
+  double FOV=-90.0; // degrees above the XY plane.
   while(m_theta<FOV)
     {
       m_par->SetGalDir(-200,-200); //this generates random direction in the sky

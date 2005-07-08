@@ -1,36 +1,118 @@
+double GetPeakFluxLong(TRandom *rnd)
+{
+  // Peak Flux Distributions, from Jay and Jerry IDL code.
+  static const int NentriesL = 31;
+  //LONG BURSTS
+  static const double N[NentriesL] = { 8,      9,     10,     12,     15,     20,     25,     30,     35,   
+				       40,     50,     60,     70,     80,     90,    100,    120,    150,   
+				       200,    250,    300,    400,    500,    600,    700,    800,    900,   
+				       1000,   1100,   1200,   1262 };
+  
+  static const double P[NentriesL] = { 49.279, 44.093, 42.020, 38.082, 33.853, 28.819, 25.417, 21.994, 19.378,   
+				       18.148, 15.910, 13.671, 12.326, 10.387,  9.709,  8.521,  7.118,  5.709,   
+				       4.297,  3.366,  2.740,  1.981,  1.503,  1.250,  1.035,  0.858,  0.713,   
+				       0.595,  0.500,  0.389,  0.240 };
+  
+  // Long:
+  static double MaxP = TMath::MaxElement(NentriesL,P);
+  static double MaxN = TMath::MaxElement(NentriesL,N);
+  static double MinN = TMath::MinElement(NentriesL,N);
+  double Ni = rnd->Uniform(MinN,MaxN);
+  
+  double Ndum=0.0;
+  int idum=0;
+  
+  while(N[idum]<Ni)
+    {
+      Ndum=N[idum];
+      idum++;
+    }
+  double Fp_hi = P[idum-1];
+  double Fp_lo = P[idum];
+  double x = rnd->Uniform();
+  double   Fp = Fp_lo * pow(1.0 - x * (1.0 - pow(Fp_hi/Fp_lo,-1.0)),-1.0);
+  
+  //  std::cout<<N[idum-1]<<" < "<<Ni<<" < "<<N[idum]<<std::endl;
+  //  std::cout<<Fp_lo<<" < "<<Fp<<" < "<<Fp_hi<<std::endl;
+  return Fp;
+}
+
+double GetPeakFluxShort(TRandom *rnd)
+{
+  // Peak Flux Distributions, from Jay and Jerry IDL code.
+  static const int NentriesS = 24;
+  //SHORT BURSTS
+  static const double M[NentriesS] = { 8,      9,     10,     12,     15,     20,     25,     30,     35,    
+				       40,     50,     60,     70,     80,     90,    100,    120,    150,    
+				       200,    250,    300,    400,    430,    462 };
+  
+  static const double Q[NentriesS] = { 27.912, 27.792, 24.635, 21.766, 17.314, 15.150, 13.985, 12.510, 11.102,    
+				       9.845,  7.996,  7.318,  6.415,  5.344,  4.795,  4.191,  3.437,  2.998,   
+				       2.335,  1.908,  1.572,  1.001,  0.817,  0.371 };
+
+  static double MaxQ = TMath::MaxElement(NentriesS,Q);
+  static double MaxM = TMath::MaxElement(NentriesS,M);
+  static double MinM = TMath::MinElement(NentriesS,M);
+  double Mi = rnd->Uniform(MinM,MaxM);
+  
+  double Mdum=0.0;
+  int idum=0;
+  
+  while(M[idum]<Mi)
+    {
+      Mdum=M[idum];
+      idum++;
+    }
+  double Fp_hi = Q[idum-1];
+  double Fp_lo = Q[idum];
+  double x = rnd->Uniform();
+  double Fp = Fp_lo * pow(1.0 - x * (1.0 - pow(Fp_hi/Fp_lo,-1.0)),-1.0);
+  
+  //  std::cout<<M[idum-1]<<" < "<<Mi<<" < "<<M[idum]<<std::endl;
+  //  std::cout<<Fp_lo<<" < "<<Fp<<" < "<<Fp_hi<<std::endl;
+  return Fp;
+}
+
 //////////////////////////////////////////////////
 void GenerateXMLLibrary(int Nbursts=100)
 {
-  // Peak Flux Distributions, from Jay and Jarry IDL code.
+  TRandom *rnd = new TRandom();
+  // Peak Flux Distributions, from Jay and Jerry IDL code.
+  
   static const int NentriesL = 31;
   static const int NentriesS = 24;
-  //LONG BURSTS
-  double N[NentriesL] = { 8,      9,     10,     12,     15,     20,     25,     30,     35,   
-			  40,     50,     60,     70,     80,     90,    100,    120,    150,   
-			  200,    250,    300,    400,    500,    600,    700,    800,    900,   
-			  1000,   1100,   1200,   1262 };
   
-  double P[NentriesL] = { 49.279, 44.093, 42.020, 38.082, 33.853, 28.819, 25.417, 21.994, 19.378,   
-			  18.148, 15.910, 13.671, 12.326, 10.387,  9.709,  8.521,  7.118,  5.709,   
-			  4.297,  3.366,  2.740,  1.981,  1.503,  1.250,  1.035,  0.858,  0.713,   
-			  0.595,  0.500,  0.389,  0.240 };
+  //LONG BURSTS
+  static const double N[NentriesL] = { 8,      9,     10,     12,     15,     20,     25,     30,     35,   
+				       40,     50,     60,     70,     80,     90,    100,    120,    150,   
+				       200,    250,    300,    400,    500,    600,    700,    800,    900,   
+				       1000,   1100,   1200,   1262 };
+  
+  static const double P[NentriesL] = { 49.279, 44.093, 42.020, 38.082, 33.853, 28.819, 25.417, 21.994, 19.378,   
+				       18.148, 15.910, 13.671, 12.326, 10.387,  9.709,  8.521,  7.118,  5.709,   
+				       4.297,  3.366,  2.740,  1.981,  1.503,  1.250,  1.035,  0.858,  0.713,   
+				       0.595,  0.500,  0.389,  0.240 };
   
   //SHORT BURSTS
-  double M[NentriesS] = { 8,      9,     10,     12,     15,     20,     25,     30,     35,    
-			  40,     50,     60,     70,     80,     90,    100,    120,    150,    
-			  200,    250,    300,    400,    430,    462 };
+  static const double M[NentriesS] = { 8,      9,     10,     12,     15,     20,     25,     30,     35,    
+				       40,     50,     60,     70,     80,     90,    100,    120,    150,    
+				       200,    250,    300,    400,    430,    462 };
   
-  double Q[NentriesS] = { 27.912, 27.792, 24.635, 21.766, 17.314, 15.150, 13.985, 12.510, 11.102,    
-			  9.845,  7.996,  7.318,  6.415,  5.344,  4.795,  4.191,  3.437,  2.998,   
-			  2.335,  1.908,  1.572,  1.001,  0.817,  0.371 };
+  static const double Q[NentriesS] = { 27.912, 27.792, 24.635, 21.766, 17.314, 15.150, 13.985, 12.510, 11.102,    
+				       9.845,  7.996,  7.318,  6.415,  5.344,  4.795,  4.191,  3.437,  2.998,   
+				       2.335,  1.908,  1.572,  1.001,  0.817,  0.371 };
   
   double P1[NentriesL];
   double Q1[NentriesS];
+  
+  
+  //////////////////////////////////////////////////
   
   for(int i=0;i<NentriesL;i++)
     {
       P1[i]=P[NentriesL-1-i];
     }
+  
   for(int i=0;i<NentriesS;i++)
     {
       Q1[i]=Q[NentriesS-1-i];
@@ -49,18 +131,33 @@ void GenerateXMLLibrary(int Nbursts=100)
   PFlong->SetBinContent(NentriesL,0.0);
   for(int i=1;i<NentriesS;i++)
     {
-      PFshort->SetBinContent(i+1,M[NentriesS-i]-M[NentriesS-i-1]);
+      PFshort->SetBinContent(i,M[NentriesS-i]-M[NentriesS-i-1]);
     }
   PFshort->SetBinContent(NentriesS,0.0);
   //////////////////////////////////////////////////
-  
-  
-  
+  //
+  PFlong->DrawNormalized();
+  PFshort->SetLineStyle(2);
+  PFshort->DrawNormalized("same");
+
+  TH1D* PFlongJJ  = new TH1D("PFlongJJ","PFlong",NentriesL-1,P1);
+  TH1D* PFshortJJ = new TH1D("PFshortJJ","PFshort",NentriesS-1,Q1);
+  for(int i=0;i<10000;i++)
+    {
+      PFlongJJ->Fill(GetPeakFluxLong(rnd));
+      PFshortJJ->Fill(GetPeakFluxShort(rnd));
+    }
+  PFlongJJ->SetLineColor(2);
+  PFlongJJ->DrawNormalized("same");
+  PFshortJJ->SetLineColor(2);
+  PFshortJJ->SetLineStyle(2);
+  PFshortJJ->DrawNormalized("same");
+
   double MinExtractedPhotonEnergy = 30.0; //MeV
   double FirstBurstTime  =      1000; //1e4
-  double AverageInterval = 2000;//86400.0; //s
+  double AverageInterval = 86400.0; //s
   bool  GenerateFluence  =   true;//false;
-  bool  GeneratePF  =   true;//false;
+  bool  GeneratePF  =   true;// If true: PF is used to normalize Bursts.
   double FL=1e-5;
   double PF=1.0;
   double Fluence,PeakFlux;
@@ -70,7 +167,7 @@ void GenerateXMLLibrary(int Nbursts=100)
   double theta = 45.0;
   double phi   = 0.0;
   
-  int  GBM                        = 0;
+  int  GBM                        = 1;
   
   std::ofstream os("GRBobs_user_library.xml",std::ios::out);
   std::ofstream osTest("../src/test/GRBParam.txt",std::ios::out);
@@ -99,7 +196,7 @@ void GenerateXMLLibrary(int Nbursts=100)
   double log_mean_short = log10(0.4);
   double log_sigma_long = 0.6;
   double log_sigma_short = 0.4;
-  TRandom *rnd = new TRandom();
+
   for(int i = 0; i<Nbursts ; i++)
     {
       if(BURSTtype==1) type=1;
