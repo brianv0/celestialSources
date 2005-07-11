@@ -1,21 +1,15 @@
 /////////////////////////////////////////////////
-// File PulsarSim.cxx
-// contains the code for the implementation of the models
+// File PulsarSpectrum.cxx
+// Implementation of PulsarSpectrum class
 //////////////////////////////////////////////////
 
 #include <iostream>
+#include <fstream>
+#include <iomanip>
 #include "Pulsar/PulsarSpectrum.h"
 #include "Pulsar/PulsarConstants.h"
 #include "SpectObj/SpectObj.h"
 #include "flux/SpectrumFactory.h"
-#include "astro/JulianDate.h"
-#include "astro/EarthOrbit.h"
-#include "astro/SolarSystem.h"
-#include "astro/GPS.h"
-#include <cmath>
-#include <fstream>
-#include <iomanip>
-
 
 #define DEBUG 0
 
@@ -41,8 +35,13 @@ ISpectrumFactory &PulsarSpectrumFactory()
  * <br>
  * <a href="#dejager02">http://www.pi.infn.it/~razzano/Pulsar/PulsarSpTutor/PulsarSpTutor.htm </a>
  */
+
+//PulsarSpectrum::PulsarSpectrum(const std::string& params)
+  //: m_params(params), m_solSys(astro::SolarSystem::EARTH)
+
+
 PulsarSpectrum::PulsarSpectrum(const std::string& params)
-  : m_params(params)
+  : m_params(params), m_solSys(astro::SolarSystem::EARTH)
 {
 
   // Reset all variables;
@@ -106,8 +105,18 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
   //Init SolarSystem stuffs useful for barycentric decorrections
 
   astro::JulianDate JDStart(2007, 1, 1, 0.0);
-  m_earthOrbit = new astro::EarthOrbit(JDStart);
-  astro::SolarSystem m_solSys();
+  m_earthOrbit = new astro::EarthOrbit(JDStart); 
+  
+  //  astro::SolarSystem::Body body = astro::SolarSystem::MERCURY;
+  //Body body = SUN;
+  //std::cout << " body is " << body << std::endl;
+  //  astro::SolarSystem m_solSys(Body body=EARTH);
+  //  astro::SolarSystem m_solSys(astro::SolarSystem():EARTH);
+  // m_solSys* = new astro::SolarSystem(astro::SolarSystem::EARTH);
+  //PulsarSpectrum::PulsarSpectrum(const std::string& params)
+  //: m_params(params), m_solSys(astro::SolarSystem::EARTH)
+
+
 
   astro::SkyDir m_PulsarDir(m_RA,m_dec,astro::SkyDir::EQUATORIAL);
   m_PulsarVectDir = m_PulsarDir.dir();
@@ -155,8 +164,6 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
 
   ofstream PulsarLog(logLabel.c_str());
  
-  //  PulsarLog.open(logLabel);
-
   
   PulsarLog << "\n********   PulsarSpectrum Log for pulsar" << m_PSRname << std::endl;
   PulsarLog << "**   Name : " << m_PSRname << std::endl;
@@ -262,7 +269,20 @@ double PulsarSpectrum::flux(double time) const
 double PulsarSpectrum::interval(double time)
 {  
 
+
+
   double timeTildeDecorr = time + (StartMissionDateMJD)*SecsOneDay; //Arrival time decorrected
+
+  std::cout << std::setprecision(30) << " At " << time << " --> " << timeTildeDecorr << "coorection is**** " << std::endl;
+
+
+
+  // std::cout << getBaryCorr(timeTildeDecorr) << std::endl; 
+
+  //  std::cout << " Fine " << std::endl;
+
+
+
 
   if (((timeTildeDecorr/SecsOneDay) < m_t0Init) || ((timeTildeDecorr/SecsOneDay) > m_t0End))
     {
@@ -295,7 +315,8 @@ double PulsarSpectrum::interval(double time)
 
 
 
-  double timeTilde = timeTildeDecorr+ getBaryCorr(timeTildeDecorr); //should be corrected before applying ephem de-corrections
+  double timeTilde = timeTildeDecorr + getBaryCorr(timeTildeDecorr); //should be corrected before applying ephem de-corrections
+
     if (DEBUG)
   {
     if ((int(timeTilde - (StartMissionDateMJD)*SecsOneDay) % 1000) < 1.5)
@@ -323,7 +344,11 @@ double PulsarSpectrum::interval(double time)
   double ttMid = (ttUp + ttDown)/2;
 
   int i = 0;
-  double hMid = 1e30; //for the 1st iteration
+   double hMid = 1e30; //for the 1st iteration
+
+
+    
+
   while (fabs(hMid)>baryCorrTol )
     {
       //      double hUp = (nextTimeTilde - (ttUp + getBaryCorr(ttUp)));
@@ -347,8 +372,12 @@ double PulsarSpectrum::interval(double time)
 	}
        i++;
     }
+  
+   
+   double nextTimeDecorr = ttMid;
+  
 
-  double nextTimeDecorr = ttMid;
+   //double nextTimeDecorr = nextTimeTilde;
 
   if (DEBUG)
     { 
@@ -361,7 +390,10 @@ double PulsarSpectrum::interval(double time)
      std::cout << " interval is " <<  nextTimeDecorr - timeTildeDecorr << std::endl;
   }
   
-  return nextTimeDecorr - timeTildeDecorr; //interval between the de-corected times
+    return nextTimeDecorr - timeTildeDecorr; //interval between the de-corected times
+  //  return nextTimeTilde - timeTildeDecorr; //interval between the de-corected times
+  
+  // return 10.0;
 
 }
 

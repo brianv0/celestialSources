@@ -1,9 +1,20 @@
+//////////////////////////////////////////////////
+// File PulsarSim.h
+// Header file for PulsarSim class
+//////////////////////////////////////////////////
+
 #ifndef PulsarSIM_H
 #define PulsarSIM_H 
 
+#include <vector>
+#include <fstream>
+#include <iomanip>
+#include <ctime>
+#include "TFile.h"
+#include "TF1.h"
 #include "PulsarConstants.h"
 #include "SpectObj/SpectObj.h"
-#include <vector>
+
 
 /*! 
  * \class PulsarSim
@@ -14,8 +25,8 @@
  *
  * This class creates the TH2D ROOT histogram that contains the differential photon flux (dN/dE/dt/dA) of the simulated
  * pulsar espressed in ph/keV/s/m2.
- * The user can specify the emission model.Now the default model is a phenomenological one that can simulate the emission
- * from Polar Cap or Outer Gap.
+ * The user can specify the emission model.Now the default model is a phenomenological one based on observations of
+ * known gamma-ray pulsars.
 */
 
 class PulsarSim 

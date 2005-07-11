@@ -27,7 +27,7 @@
     </source>
 
     <source name=" PSRVelaPolarPhen " >
-       <spectrum escale="MeV"> <SpectrumClass name="PulsarSpectrum" params="PSRVELA, 128.83, -45.18, 1.0e5, 3.0e8, 1, 61243, 2, 1e6, 8e6, -1.62, 1.7"/>
+       <spectrum escale="MeV"> <SpectrumClass name="PulsarSpectrum" params="PSRVELA, 128.83, -45.18, 1.0e5, 3.0e8, 1, 61243, 3, 1e6, 8e6, -1.62, 1.7"/>
         <use_spectrum frame="galaxy"/> 
        </spectrum> 
     </source>

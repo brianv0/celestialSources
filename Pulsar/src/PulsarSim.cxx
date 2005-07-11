@@ -3,15 +3,10 @@
 // contains the code for the implementation of the models
 //////////////////////////////////////////////////
 
-#include <fstream>
 #include <iostream>
-#include <vector>
-#include <iomanip>
-#include <ctime>
 #include "Pulsar/PulsarConstants.h"
 #include "Pulsar/PulsarSim.h"
-#include "TFile.h"
-#include "TF1.h"
+
 
 #define DEBUG 0
 
@@ -38,14 +33,14 @@ using namespace cst;
 PulsarSim::PulsarSim(std::string name, int seed, double flux, double enphmin, double enphmax, double period, int numpeaks)
 {
 
+  m_name = name;         //Pulsar name
+  m_seed = seed;         //Random seed
   m_flux = flux;         //ph/cm2/s
-  m_period  = period;    //sec
-  m_numpeaks = numpeaks; //1,2 or 3 for using timeprofile
   m_enphmin = enphmin;   // KeV
   m_enphmax = enphmax;   //KeV
-  m_name = name;   
-  m_seed = seed;
-  m_Tbin = Tbin;        //If m_numpeaks==3 then m_Tbin depends upon the the bins contained in the txt file
+  m_period  = period;    //s
+  m_numpeaks = numpeaks; //1,2 or 3 (for using Timeprofile)
+  m_Tbin = Tbin;         //If m_numpeaks==3 then m_Tbin depends upon the the bins contained in the txt file
 
 }
 
@@ -56,25 +51,28 @@ PulsarSim::PulsarSim(std::string name, int seed, double flux, double enphmin, do
  * \param par3 Parameter g ;
  * \param par4 Parameter b ;
  *
- * This method creates a ROOT TH2D histogram according to a phenomenological model. The 2d hist is 
- * obtained by multiplying the lightcurve and the spectrum. The lightcurve is obtained by random generating 
- * a profile of 1 or 2 peaks separated by a minimum distance, that currently is set to one half of the period.
- * Or you can have the lightcurve starting from a TXT file that contain the time profile. 
- * The spectrum is generated from an analytical form :
+ * This method creates a ROOT TH2D histogram according to a phenomenological model based on observations of known
+ * gamma-ray pulsars. The 2D histogram is obtained by multiplying the lightcurve and the spectrum. 
+ * The lightcurve is obtained by random generating a profile of 1 or 2 peaks separated by a minimum distance,
+ * (that currently is set to one half of the period).
+ * Otherwise you can have the lightcurve starting from a TXT file that contain the time profile. In this case
+ * you should have the txt file in the <i>data</i> directory.For Example if you have in the PulsarDataList a pulsar
+ * named PSRTEST you must have a correspondant file PSRTESTTimeProfile.txt in the <i>data</i>. directory.
+ * <br>The spectrum is generated from an analytical form :<br>
  *
- * \image html NJSnForm.gif 
+ * \image html NJSnForm.jpg
  * <br>
  * where the parameters E0,En,g and g are the parameters of the method. This form describes a power law spectrum
  * with an exponential cutoff. This formula is choosen according to Nel, De Jager (1995,see Ref.below ) and 
  * De Jager (2002, see Ref.below). According to Cheng (1994, see Ref. below) an Outer Gap scenario can be obtained 
  * by setting b=1.
  * The constant K indicates the normalisation. We choose to set the normalisation in accord to the 3rd EGRET Catalog
- * where the fluxes are reported above 100MeV in ph/s/cm2. In our simulator we adopt the same convention.
- * The ROOT histogram is then saved to a ROOT file with the same name of the pulsar, and also a Txt Time profile id
- * saved.
- * For more informations and for a brief tutorial please see:
+ * where the fluxes are reported above 100MeV in ph/s/cm2. 
+ * The ROOT histogram is then saved to a ROOT file with the same name of the pulsar, and also a Txt Time profile is
+ * saved. <br>
+ * <i>For more informations and for a brief tutorial please see</i>:
  * <br>
- * <a href="#dejager02">http://www.pi.infn.it/~razzano/Pulsar/PulsarSpectrumTutorial/PsrSpectrumTut.html </a>
+ * <a href="#dejager02">http://www.pi.infn.it/~razzano/Pulsar/PulsarSpTutor/PulsarSpTutor.htm</a>
  * <br><br>
  * <i><b>References:</b></i>
  * <ul>
@@ -101,39 +99,12 @@ TH2D* PulsarSim::PSRPhenom(double par1, double par2, double par3, double par4)
   if (m_enphmax < cst::EnNormMax)
     m_enphmax = cst::EnNormMax;
   double HighEnBound = TMath::Max(cst::EnNormMax,m_enphmax); 
-  
-  if (DEBUG)
-    { 
-      //Writes out informations about the model parameters
-      std::cout << "\n******** Pulsar Phenomenological Model ********" << std::endl;
-      std::cout << "**  Random seed for the model : " << m_seed << std::endl;
-      std::cout << "**  Spectrum parameters: " << std::endl;
-      std::cout << "**           En = " << En  
-		<< " | E0 = " << E0 << std::endl;
-      std::cout << "**           G1 = " << G1 
-		<< " | b  = "  << b << std::endl;
-      std::cout << "**  enphmin " << m_enphmin << " enphmax " << m_enphmax << std::endl; 
-      std::cout << "**           Normalisation between " << cst::EnNormMin << " keV and " 
-		<< cst::EnNormMax << " keV " << std::endl;
-      std::cout << "**           Photon extraction between " << m_enphmin << " keV and " 
-		<< m_enphmax << " keV " << std::endl;
-      std::cout << "**  Spectrum calculated between " << LowEnBound << " keV and " 
-		<< HighEnBound << " keV " << std::endl; 
-    }
 
+  //writes out an output log file fo rthe pulsar.
 
-  //writes out an output log file fo rthe pulsar, instead of std::cout
-  char logSimLabel[40];
-
-  for (unsigned int i=0; i< m_name.length(); i++)
-    {
-      logSimLabel[i] = m_name[i];
-    }
-
-
-  sprintf(logSimLabel,"%sLog.txt",logSimLabel);
+  std::string logSimLabel = m_name + "Log.txt"; 
   ofstream PulsarLogSim;
-  PulsarLogSim.open(logSimLabel,std::ios::app);
+  PulsarLogSim.open(logSimLabel.c_str(),std::ios::app);
 
 
   //Write out informations about the model parameters on the file
@@ -154,7 +125,7 @@ TH2D* PulsarSim::PSRPhenom(double par1, double par2, double par3, double par4)
 
 
   //Create the spetrum profile
-   double de = pow(HighEnBound/LowEnBound,1.0/Ebin);
+  double de = pow(HighEnBound/LowEnBound,1.0/Ebin);
 
  
   TF1 PulsarSpectralShape("PulsarSpectralShape", 
@@ -175,7 +146,6 @@ TH2D* PulsarSim::PSRPhenom(double par1, double par2, double par3, double par4)
   // Part 2- LightCurve
 
   double dt = 0.0;
-
 
   if ((m_numpeaks ==1) || (m_numpeaks == 2)) //case of random lorentz peak generation
     {
@@ -234,42 +204,19 @@ TH2D* PulsarSim::PSRPhenom(double par1, double par2, double par3, double par4)
 	      ampl2 = 0;
 	    }
 	}
-      
-      //writes out informations about hte lightcurves.
-      if (DEBUG)
-	{
-	  
-	  std::cout << std::setprecision(3) << "**\n**  Lightcurve parameters: (midist = " 
-		    << mindist  << " s.)" << std::endl;
-	}
-      
+
       PulsarLogSim << std::setprecision(3) << "**\n**  Lightcurve parameters: (midist = " 
 		   << mindist  << " s.)" << std::endl;
       
+
       if (ampl1 !=0)
 	{
-	  if (DEBUG)
-	    {
-	      std::cout << std::setprecision(3) << "**           Peak 1 t = " 
-			<< peak1 << "(Ph.= " << peak1/m_period << " ) " 
-			<< " , FWHM " << fwhm1 << " ampl1 " << ampl1 << std::endl; 
-	    }
-	  
 	  PulsarLogSim << std::setprecision(3) << "**           Peak 1 t = " << peak1 
 		       << "(Ph.= " << peak1/m_period << " ) " 
 		       << " , FWHM " << fwhm1 << " ampl1 " << ampl1 << std::endl; 
 	}
       if (ampl2 !=0)
 	{
-	  if (DEBUG)
-	    {
-	      std::cout << std::setprecision(3) << "**           Peak 2 t = " 
-			<< peak2 << "(Ph.= " << peak2/m_period << " ) " 
-			<< " , FWHM " << fwhm2 << " ampl2 " << ampl2 << std::endl; 
-	      std::cout << "***********************************************" << std::endl;
-	    }
-	  
-	  
 	  PulsarLogSim << std::setprecision(3) << "**           Peak 2 t = " << peak2 
 		       << "(Ph.= " << peak2/m_period << " ) " 
 		       << " , FWHM " << fwhm2 << " ampl2 " << ampl2 << std::endl; 
@@ -278,7 +225,6 @@ TH2D* PulsarSim::PSRPhenom(double par1, double par2, double par3, double par4)
       
 
       PulsarLogSim.close();
-      
       PulsarTimeCurve.SetParameters(peak1,fwhm1,ampl1,peak2,fwhm2,ampl2);  
   
     }
@@ -286,26 +232,16 @@ TH2D* PulsarSim::PSRPhenom(double par1, double par2, double par3, double par4)
     {
 
       //Look for NAMETimeProfile.txt in the data directory...
-    
-      char* pulsar_root = ::getenv("PULSARROOT");
-      char TimeProfileFileName[100];
-      char timeSimLabel[40];
+      std::string  pulsar_root = ::getenv("PULSARROOT");
+      std::string TimeProfileFileName = pulsar_root + "/data/" + m_name + "TimeProfile.txt";
 
-      for (unsigned int i=0; i< m_name.length(); i++)
-	{
-	  timeSimLabel[i] = m_name[i];
-	}
-      sprintf(TimeProfileFileName,"%s/data/%sTimeProfile.txt",pulsar_root,timeSimLabel);
-      
       if (DEBUG)
 	{
 	  std::cout << "Building lightcurve from file " << TimeProfileFileName << std::endl;
 	}
 
-
-
       ifstream TimeProfileFile;
-      TimeProfileFile.open(TimeProfileFileName, std::ios::in);
+      TimeProfileFile.open(TimeProfileFileName.c_str(), std::ios::in);
   
       if (! TimeProfileFile.is_open()) 
 	{
@@ -335,7 +271,6 @@ TH2D* PulsarSim::PSRPhenom(double par1, double par2, double par3, double par4)
     }
 
   // Part 3 - Combination of Spectrum and lightCurve and filling of TH2D
-
 
   double *e = new double[Ebin +1];
   for(int i = 0; i<=Ebin; i++)
@@ -456,8 +391,7 @@ void PulsarSim::SaveNv(TH2D *Nv)
  * 
  * This method saves a Txt file containing the time profile (the TH2D integrated between the max and min energy)
  * The name of the file is created according to the label of the simulated pulsar.
- * E.g. if the pulsar's name is <i>Test</i> the output file
- * name is <i>TestTimeProfile.txt</i>. 
+ * E.g. if the pulsar's name is <i>Test</i> the output file name is <i>TestTimeProfile.txt</i>. 
 */
 void PulsarSim::SaveTimeProfile(TH2D *Nv)
 {
@@ -475,7 +409,6 @@ void PulsarSim::SaveTimeProfile(TH2D *Nv)
     }
 
   OutTimeProf.close();
-
  
 };
 
