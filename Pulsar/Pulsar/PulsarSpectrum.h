@@ -6,6 +6,8 @@
 #ifndef PulsarSpectrum_H
 #define PulsarSpectrum_H
 
+#include <iostream>
+#include <iomanip>
 #include <vector>
 #include <string>
 #include <fstream>
@@ -33,7 +35,7 @@
 *
 * PulsarSpectrum, derived from ISpectrum, takes the model parameters from the XML file, where are also located the pulsar name, his position in the sky, 
 * and the energy range of the extracted photons. Then it looks in the PulsarDataList.txt file ( in the <i>/data</i> directory)
-* for the name of the pulsar and then extract the specific parameters of the pulsar (period, flux, ephemerides, etc.) related 
+* for the name of the pulsar and then extracts the specific parameters of the pulsar (period, flux, ephemerides, etc.) related 
 * to that pulsar. 
 * Then it computes all the needed decorretions for timing, in particular the period changes and the barycentric decorrections.
 */
@@ -52,7 +54,7 @@ class PulsarSpectrum : public ISpectrum
   //! Return the flux of the Pulsar at time t
   double flux(double time)const;
 
-  //! Returns the time interval to the next extracted photon, according to the flux
+  //! Returns the time interval to the next extracted photon, according to the flux, in a frame where pdot=0 and no barycentric decorrections
   double interval(double time);
 
   //! Returns the number of turns made by the pulsar at a specified time, referred to an inital epoch t0
@@ -73,7 +75,7 @@ class PulsarSpectrum : public ISpectrum
     {
       return m_GalDir;
     } 
-
+  
   //! calls PulsarSpectrum::energySrc
   double energy(double time);
   
