@@ -66,8 +66,11 @@ class PulsarSpectrum : public ISpectrum
   //!Apply the barycentric corrections and returns arrival time in TDB
   double getBaryCorr( double tdbInput ); 
 
-  //! get the pulsar ephemerides and data from the DataList
+  //! Get the pulsar ephemerides and data from the DataList
   int getPulsarFromDataList();
+
+  //! Save an output txt file compatible with D4 file
+  int saveDbTxtFile();
 
   //! direction, taken from PulsarSim
   inline std::pair<double,double>
@@ -105,7 +108,7 @@ class PulsarSpectrum : public ISpectrum
 
   double m_RA, m_dec, m_l, m_b;  
   double m_period, m_pdot, m_p2dot, m_t0, m_t0Init, m_t0End, m_phi0, m_f0, m_f1, m_f2;
-  std::vector<double> m_periodVect, m_pdotVect, m_p2dotVect, m_phi0Vect, m_t0Vect, m_t0InitVect, m_t0EndVect;
+  std::vector<double> m_periodVect, m_pdotVect, m_p2dotVect, m_phi0Vect, m_t0Vect, m_t0InitVect, m_t0EndVect, m_txbaryVect;
   
   int m_numpeaks;
   int m_model;
