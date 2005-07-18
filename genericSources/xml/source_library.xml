@@ -192,7 +192,7 @@
    <source name="spectral_transient">
       <spectrum escale="MeV">
 <!-- 
-     mean flux = 0.1 (1e-4/m^2/s) 
+     mean flux = 0.1 (#/m^2/s) 
      start time = 0 (MET s)
      stop time = 1e4 (MET s)
      template file name = $(GENERICSOURCESROOT)/data/testTemplate.dat
