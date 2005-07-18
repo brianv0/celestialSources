@@ -200,9 +200,10 @@
      emax = 2e5 (MeV, default)
      lc # (in FITS file) = 0 (default)
      z (redshift) = 0 (default)
+     useLogParabola = 0 (default)
 -->
           <SpectrumClass name="SpectralTransient"
-          params="1e-1, 0., 1e4, $(GENERICSOURCESROOT)/data/testTemplate.dat,20,2e5,0,0"/>
+          params="flux=1e-1, tstart=0., tstop=1e4, templateFile=$(GENERICSOURCESROOT)/data/testTemplate.dat, emin=20, emax=2e5, lc=0, z=0, useLogParabola=0"/>
           <celestial_dir ra="193.4" dec="-5.82"/>
       </spectrum>
    </source>
