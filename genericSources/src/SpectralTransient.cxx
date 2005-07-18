@@ -26,10 +26,13 @@
 
 #include "fitsio.h"
 
-#include "Util.h"
+#include "ConstParMap.h"
 #include "FitsImage.h"
+#include "Util.h"
 #include "genericSources/EblAtten.h"
 #include "genericSources/SpectralTransient.h"
+
+std::vector<double> SpectralTransient::ModelInterval::s_energies;
 
 ISpectrumFactory & SpectralTransientFactory() {
    static SpectrumFactory<SpectralTransient> myFactory;
@@ -37,21 +40,55 @@ ISpectrumFactory & SpectralTransientFactory() {
 }
 
 SpectralTransient::SpectralTransient(const std::string & paramString) 
-   : m_emin(20.), m_emax(2e5), m_lc(0), m_z(0), m_tau(0) {
-   std::vector<std::string> params;
-   facilities::Util::stringTokenize(paramString, ", ", params);
-
-   m_flux = std::atof(params[0].c_str());
-   m_tstart = std::atof(params[1].c_str());
-   m_tstop = std::atof(params[2].c_str());
-   std::string templateFile = params[3];
-   if (params.size() > 4) m_emin = std::atof(params[4].c_str());
-   if (params.size() > 5) m_emax = std::atof(params[5].c_str());
-   if (params.size() > 6) m_lc = std::atoi(params[6].c_str());
-   if (params.size() > 7) {
-      m_z = std::atof(params[7].c_str());
-      m_tau = new IRB::EblAtten(IRB::Primack99);
-   }      
+   : m_emin(20.), m_emax(2e5), m_lc(0), m_z(0), m_logParabola(0), m_tau(0) {
+   std::string templateFile;
+   if (paramString.find("=") == std::string::npos) {
+      std::vector<std::string> params;
+      facilities::Util::stringTokenize(paramString, ", ", params);
+      
+      m_flux = std::atof(params[0].c_str());
+      m_tstart = std::atof(params[1].c_str());
+      m_tstop = std::atof(params[2].c_str());
+      templateFile = params[3];
+      if (params.size() > 4) m_emin = std::atof(params[4].c_str());
+      if (params.size() > 5) m_emax = std::atof(params[5].c_str());
+      if (params.size() > 6) m_lc = std::atoi(params[6].c_str());
+      if (params.size() > 7) {
+         m_z = std::atof(params[7].c_str());
+         m_tau = new IRB::EblAtten(IRB::Primack99);
+      }
+      if (params.size() > 8) m_logParabola = std::atoi(params[8].c_str());
+   } else {
+      std::map<std::string, std::string> params;
+      facilities::Util::keyValueTokenize(paramString, ", ", params);
+      
+      genericSources::ConstParMap parmap(params);
+      m_flux = parmap.value("flux");
+      m_tstart = parmap.value("tstart");
+      m_tstop = parmap.value("tstop");
+      templateFile = parmap["templateFile"];
+      try {
+         m_emin = parmap.value("emin");
+      } catch (...) {
+      }
+      try {
+         m_emax = parmap.value("emax");
+      } catch (...) {
+      }
+      try {
+         m_lc = static_cast<int>(parmap.value("lc"));
+      } catch (...) {
+      }
+      try {
+         m_z = parmap.value("z");
+         m_tau = new IRB::EblAtten(IRB::Primack99);
+      } catch (...) {
+      }
+      try {
+         m_logParabola = std::atoi(parmap["useLogParabola"].c_str());
+      } catch (...) {
+      }
+   }
 
    createEvents(templateFile);
 }
@@ -153,7 +190,8 @@ readFitsLightCurve(const std::string & templateFile) {
       double x[] = {startTimes.at(i), stopTimes.at(i), flux.at(i),
                     gamma1.at(i), gamma2.at(i), ebreak.at(i)};
       std::vector<double> data(x, x+6);
-      m_lightCurve.push_back(ModelInterval(data, m_emin, m_emax));
+      m_lightCurve.push_back(ModelInterval(data, m_emin, m_emax,
+                                           m_logParabola));
    }
 }
 
@@ -165,7 +203,8 @@ readLightCurve(const std::string & templateFile) {
    m_lightCurve.clear();
    m_lightCurve.reserve(lines.size());
    for (line = lines.begin(); line != lines.end(); ++line) {
-      m_lightCurve.push_back(ModelInterval(*line, m_emin, m_emax));
+      m_lightCurve.push_back(ModelInterval(*line, m_emin, m_emax,
+                                           m_logParabola));
    }
 }
 
@@ -204,24 +243,32 @@ drawEvent(const std::vector<double> & integralDist) const {
       /(integralDist[indx+1] - integralDist[indx])
       *(m_lightCurve[indx].stopTime - m_lightCurve[indx].startTime)
       + m_lightCurve[indx].startTime;
-   return std::make_pair(my_time, drawEnergy(m_lightCurve[indx]));
+   return std::make_pair(my_time,
+                         m_lightCurve[indx].drawEnergy(m_emin, m_emax));
 }
 
-double SpectralTransient::drawEnergy(const ModelInterval & interval) const {
+double SpectralTransient::ModelInterval::
+drawEnergy(double emin, double emax) const {
    double xi = RandFlat::shoot();
    double energy;
-   if (interval.drawBelowBreak(xi)) {
-      energy = genericSources::Util::drawFromPowerLaw(m_emin, interval.ebreak,
-                                                      interval.gamma1);
+   if (s_energies.size() > 0) {
+      size_t k = std::upper_bound(m_integral.begin(), m_integral.end(), xi)
+         - m_integral.begin() - 1;
+      energy = (xi - m_integral.at(k))/(m_integral.at(k+1) - m_integral.at(k))
+         *(s_energies.at(k+1) - s_energies.at(k)) + s_energies.at(k);
    } else {
-      energy = genericSources::Util::drawFromPowerLaw(interval.ebreak, m_emax,
-                                                      interval.gamma2);
+      if (drawBelowBreak(xi)) {
+         energy = genericSources::Util::drawFromPowerLaw(emin, ebreak, gamma1);
+      } else {
+         energy = genericSources::Util::drawFromPowerLaw(ebreak, emax, gamma2);
+      }
    }
    return energy;
 }
 
 SpectralTransient::ModelInterval::
-ModelInterval(const std::vector<double> & data, double emin, double emax) {
+ModelInterval(const std::vector<double> & data, double emin, double emax,
+              int useLogParabola) {
    startTime = data.at(0);
    stopTime = data.at(1);
    if (startTime > stopTime) {
@@ -233,11 +280,16 @@ ModelInterval(const std::vector<double> & data, double emin, double emax) {
    gamma1 = data.at(3);
    gamma2 = data.at(4);
    ebreak = data.at(5);
-   brokenPowerLawFractions(emin, emax);
+   if (useLogParabola) {
+      fillCumulativeDist(emin, emax);
+   } else {
+      brokenPowerLawFractions(emin, emax);
+   }
 }
 
 SpectralTransient::ModelInterval::ModelInterval(const std::string & line,
-                                                double emin, double emax) {
+                                                double emin, double emax,
+                                                int useLogParabola) {
    std::vector<std::string> tokens;
    facilities::Util::stringTokenize(line, ", \t", tokens);   
    if (tokens.size() != 6) {
@@ -256,7 +308,45 @@ SpectralTransient::ModelInterval::ModelInterval(const std::string & line,
    gamma1 = std::atof(tokens[3].c_str());
    gamma2 = std::atof(tokens[4].c_str());
    ebreak = std::atof(tokens[5].c_str());
-   brokenPowerLawFractions(emin, emax);
+   if (useLogParabola) {
+      fillCumulativeDist(emin, emax);
+   } else {
+      brokenPowerLawFractions(emin, emax);
+   }
+}
+
+void SpectralTransient::ModelInterval::
+fillCumulativeDist(double emin, double emax) {
+   if (s_energies.size() == 0) {
+      fillEnergies(emin, emax);
+   }
+   m_integral.push_back(0);
+   for (size_t k = 1; k < s_energies.size(); k++) {
+      const double & emin(s_energies.at(k-1));
+      const double & emax(s_energies.at(k));
+      m_integral.push_back(m_integral.back() + 
+                           (logParabola(emin) + logParabola(emax))/2.
+                           *(emax - emin));
+   }
+   for (size_t k = 1; k < s_energies.size(); k++) {
+      m_integral.at(k) /= m_integral.back();
+   }
+}
+
+double SpectralTransient::ModelInterval::
+logParabola(double energy) const {
+   double x = energy/ebreak;
+   return std::pow(x, -(gamma1 + gamma2*std::log(x)));
+}
+
+void SpectralTransient::ModelInterval::
+fillEnergies(double emin, double emax) {
+   size_t nee(200);
+   double estep(std::log(emax/emin)/(nee-1));
+   s_energies.reserve(nee);
+   for (size_t k = 0; k < nee; k++) {
+      s_energies.push_back(emin*std::exp(estep*k));
+   }
 }
 
 void SpectralTransient::ModelInterval::

@@ -72,6 +72,7 @@ private:
    double m_emax;
    int m_lc;
    float m_z;
+   int m_logParabola;
 
    IRB::EblAtten * m_tau;
 
@@ -87,11 +88,12 @@ private:
       ModelInterval() {}
 
       /// Read data members from a line in the template file.
-      ModelInterval(const std::string & line, double emin, double emax);
+      ModelInterval(const std::string & line, double emin, double emax,
+                    int useLogParabola=0);
 
       /// Pass the data members via an ordered vector.
       ModelInterval(const std::vector<double> & data,
-                    double emin, double emax);
+                    double emin, double emax, int useLogParabola=0);
 
       /// Fractional start time of the interval; the entire light curve 
       /// will be rescaled to fit the interval [m_tstart, m_tstop]
@@ -107,14 +109,22 @@ private:
       /// Break energy (MeV)
       double ebreak;
 
+      /// Draw a photon energy (MeV)
+      double drawEnergy(double emin, double emax) const;
+
+   private:
+      double m_lowerFraction;
+      void brokenPowerLawFractions(double emin, double emax);
       bool drawBelowBreak(double xi) const {
          return xi < m_lowerFraction;
       }
 
-   private:
-      double m_lowerFraction;
+      static std::vector<double> s_energies;
+      std::vector<double> m_integral;
 
-      void brokenPowerLawFractions(double emin, double emax);
+      double logParabola(double energy) const;
+      void fillCumulativeDist(double emin, double emax);
+      void fillEnergies(double emin, double emax);
    };
 
    std::vector<ModelInterval> m_lightCurve;
