@@ -63,7 +63,7 @@ namespace cst
   const double StartMissionDateMJD = 54101.0; 
   
   //! Tolerance for the ephemerides decorrection (in us.)
-  const double ephemCorrTol = 1e-6;
+  const double ephemCorrTol = 1e-6;//1e-6
 
   //! Tolerance for the barycentri decorrection (in us.)
   const double baryCorrTol = 1e-5;
