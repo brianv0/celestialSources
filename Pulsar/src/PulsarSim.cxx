@@ -7,7 +7,6 @@
 #include "Pulsar/PulsarConstants.h"
 #include "Pulsar/PulsarSim.h"
 
-
 #define DEBUG 0
 
 using namespace cst;

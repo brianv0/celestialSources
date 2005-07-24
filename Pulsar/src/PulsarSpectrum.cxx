@@ -315,8 +315,6 @@ double PulsarSpectrum::interval(double time)
 double PulsarSpectrum::getTurns( double time )
 {
   double dt = time - m_t0*SecsOneDay;
-  // std::cout << std::setprecision(30) << " GetTurns : f0 " << m_f0 
-  //    << " f1 " << m_f1 << " f2 " << m_f2 << " --> dt " << dt << std::endl; 
   return m_phi0 + m_f0*dt + 0.5*m_f1*dt*dt + ((m_f2*dt*dt*dt)/6.0);
 }
 
