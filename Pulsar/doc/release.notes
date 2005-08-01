@@ -16,6 +16,11 @@
 			    Specific user-defined TimeProfiles;	
 	                    Increased speed
 *   v1r0p5 30-Mar-2005 THB  Continuous phase inserted;
+*   v1r0p6 30-Mar-2005 THB  Compilation bugs fixed;
+*   v1r0p7 30-Mar-2005 THB  Re-organization of parameters; vela and crab profiles added
+*   v1r0p8 30-Mar-2005 THB  Compilation problems fixed;
+*   v1r0p9 30-Mar-2005 THB  Output ASCII File for database
+                            Possibility to input frequency and derivatives and not only period and derivatives
 
 *@endverbatim
 */
