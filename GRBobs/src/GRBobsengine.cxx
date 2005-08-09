@@ -25,6 +25,7 @@ std::vector<GRBobsPulse*> GRBobsengine::CreatePulsesVector()
   GRBobsPulse *aPulse;
   duration = m_params->GetDuration();
   endTime=0.0;
+  BurstEndTime=0.0;
   int npulses=0;
   
   while(endTime<duration || npulses==0)
@@ -42,7 +43,7 @@ std::vector<GRBobsPulse*> GRBobsengine::CreatePulsesVector()
 	pt  = pow(log(100.0),1./nu) * rt; //this sets the tstart =0
       else 
 	pt=pt1+tau; 
-
+      
       aPulse = new GRBobsPulse(pt,rt,dt,ph,nu,ep,a,b);
       
       if(DEBUG) 
@@ -52,23 +53,23 @@ std::vector<GRBobsPulse*> GRBobsengine::CreatePulsesVector()
 	}
 
       endTime = aPulse->GetEndTime();
-
+      
       if(endTime <= duration) 
 	{
 	  thePulses.push_back(aPulse);
 	  pt1 = pt;
 	  npulses++;
-	  BurstEndTime = endTime;
+	  BurstEndTime = TMath::Max(BurstEndTime,endTime);
       	}
     }
   
-  if(BurstEndTime < 0.9 * duration)
+  if(BurstEndTime < 0.99 * duration)
     {
       for(int i =0; i<(int) thePulses.size();i++)
 	delete thePulses[i];
       return CreatePulsesVector();
     }
-
+  std::cout<<BurstEndTime<<" "<<duration<<std::endl;
   return thePulses;
 }
 

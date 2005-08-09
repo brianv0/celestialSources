@@ -20,8 +20,8 @@ void GRBobsParameters::SetDuration(double duration)
   else 
     {
       m_Type = 2;
-      if(NormType=='P')	
-	m_duration*=TMath::Max(1.0,m_Stretch);
+      //      if(NormType=='P')	
+      //	m_duration*=m_Stretch;
     }
 
 }
@@ -177,7 +177,7 @@ void GRBobsParameters::ReadParametersFromFile(std::string paramFile, int NGRB)
     }
   
   SetGRBNumber(65540+ (long) floor(tstart));
-
+  
   SetFluence(fluence);
   SetPeakFlux(fluence);
   SetDuration(duration);
@@ -185,4 +185,5 @@ void GRBobsParameters::ReadParametersFromFile(std::string paramFile, int NGRB)
   SetMinPhotonEnergy(3e4); //keV (this is a defaul value)
   SetGalDir(-200,-200);
   SetGRBNumber(65540+ (long) floor(tstart));
+  std::cout<<alpha<<" "<<beta<<std::endl;
 }

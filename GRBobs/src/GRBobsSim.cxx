@@ -49,7 +49,7 @@ TH2D* GRBobsSim::MakeGRB()
   m_tbin = TMath::Max(10,int(m_tfinal/s_TimeBinWidth));
   m_tbin = TMath::Min(10000,m_tbin);
   s_TimeBinWidth = m_tfinal/m_tbin;
-  //  double dt = m_tfinal/(m_tbin-1);
+
   gDirectory->Delete("Nv");
   m_Nv = new TH2D("Nv","Nv",m_tbin,0.,m_tfinal,Ebin, e);
   
@@ -125,6 +125,70 @@ TH2D* GRBobsSim::MakeGRB()
   delete nph;
   return m_Nv;
 }
+
+//////////////////////////////////////////////////
+TH2D* GRBobsSim::MakeGRB_ExtraComponent(double duration, double LATphotons)
+{
+  double *e = new double[Ebin +1];
+  for(int i = 0; i<=Ebin; i++)
+    {
+      e[i] = emin*pow(de,1.0*i); //keV
+    }
+  const int tbin = 1000;
+  const double dt = duration/(1.0*tbin);
+  
+  gDirectory->Delete("NvEC");
+  m_NvEC = new TH2D("NvEC","NvEC",tbin,0.,duration,Ebin, e);
+
+  std::string name;
+  GetUniqueName(m_NvEC,name);
+  m_NvEC->SetName(name.c_str());
+  
+  for(int ti = 0; ti<tbin; ti++)
+    {
+      double t=ti*dt;
+      double I0 = pow(duration/(t+duration),2.0);
+      for(int ei = 0; ei < Ebin; ei++)
+	{
+	  double I = I0*pow(e[ei],-1.0);
+	  m_NvEC->SetBinContent(ti+1,ei+1,I); // [ph/(cm² s keV)]
+	}
+    }
+  
+  int ei1 = m_NvEC->GetYaxis()->FindBin(LAT1);
+  int ei2 = m_NvEC->GetYaxis()->FindBin(LAT2);
+  double norm=0.0;  
+  for(int ti = 1; ti<=tbin; ti++)
+    {
+      for (int ei = ei1; ei<=ei2; ei++)
+	{
+	  double de = m_NvEC->GetYaxis()->GetBinWidth(ei);
+	  norm += m_NvEC->GetBinContent(ti, ei) * dt * de; // ph/(cm²)
+	}
+    }
+  std::cout<<LATphotons<<" "<<norm<<std::endl;
+  m_NvEC->Scale(LATphotons/norm);
+  delete e;
+  return m_NvEC;
+}
+//////////////////////////////////////////////////
+
+TH2D* GRBobsSim::CutOff(TH2D *Nv, double E_CO)
+{
+  if (E_CO==0) return Nv;
+  int tbin = Nv->GetXaxis()->GetNbins();
+  for(int ti = 0; ti<tbin; ti++)
+    {
+      for(int ei = 0; ei < Ebin; ei++)
+	{
+	  double nv = Nv->GetBinContent(ti+1,ei+1); // [ph/(cm² s keV)]
+	  double e = Nv->GetYaxis()->GetBinCenter(ei+1)*1e-6; // (GeV)
+	  double suppression = exp(-e/E_CO);
+	  Nv->SetBinContent(ti+1,ei+1,suppression*nv); // [ph/(cm² s keV)]
+	}
+    }
+  return Nv;
+}
 //////////////////////////////////////////////////
 TH2D *GRBobsSim::Nph(const TH2D *Nv)
 {
@@ -150,6 +214,30 @@ TH2D *GRBobsSim::Nph(const TH2D *Nv)
 }
 
 //////////////////////////////////////////////////
+void GRBobsSim::SaveNvEC()
+{
+  
+  m_NvEC->SetXTitle("Time [s]");
+  m_NvEC->SetYTitle("Energy [keV]");
+  m_NvEC->SetZTitle("N_{v} [ph/m^2/s/keV]");
+  m_NvEC->GetXaxis()->SetTitleOffset(1.5);
+  m_NvEC->GetYaxis()->SetTitleOffset(1.5);
+  m_NvEC->GetZaxis()->SetTitleOffset(1.2);
+  m_NvEC->GetXaxis()->CenterTitle();
+  m_NvEC->GetYaxis()->CenterTitle();
+  m_NvEC->GetZaxis()->CenterTitle();
+  
+  char root_name[100];
+  sprintf(root_name,"grbobs_%d_EC.root",(int)m_params->GetGRBNumber());
+  std::cout<<" Saving "<<root_name<<std::endl;
+  TFile mod(root_name,"RECREATE");
+  std::string name = m_NvEC->GetName();
+  m_NvEC->SetName("Nv"); // I need a default name.
+  m_NvEC->Write();
+  mod.Close();
+  m_NvEC->SetName(name.c_str());
+};
+
 void GRBobsSim::SaveNv()
 {
   

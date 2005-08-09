@@ -30,6 +30,7 @@ class GRBobsSim
     {
       delete m_GRBengine;
       delete m_Nv;
+      if(!m_NvEC) delete m_NvEC;
     }
   /// This method ensures that a unique name is given to the ROOT objects. It is set equal to the pointer address.
   void GetUniqueName(const void *ptr, std::string & name);
@@ -40,7 +41,8 @@ class GRBobsSim
    * Initialize the simulation
    */
   TH2D* MakeGRB();
-
+  TH2D* MakeGRB_ExtraComponent(double ,double);
+  TH2D* CutOff(TH2D *Nv, double E_CO);
   /*! 
     Compute the Flux, as a function of time. It returns a matrix.
   */
@@ -52,6 +54,7 @@ class GRBobsSim
   inline double Tmax(){return m_tfinal;} 
   /// This methods save the TH2 histogram in a root file. It is used by GRBROOTTest.cxx
   void SaveNv();
+  void SaveNvEC();
   /*!
     \brief This methods performs a series of fits using the well known Band function. (Band et al.(1993) ApJ.,413:281-292)
     
@@ -98,6 +101,7 @@ class GRBobsSim
   double m_fluence;
   int m_tbin;
   TH2D *m_Nv;
+  TH2D *m_NvEC;
 };
 
 #endif

@@ -22,6 +22,8 @@
 #include "flux/ISpectrum.h"
 #include "flux/EventSource.h"
 #include "GRBobsSim.h"
+#include "SpectralComponent.h"
+
 #include "SpectObj/SpectObj.h"
 
 #include "facilities/Util.h"
@@ -94,6 +96,11 @@ class GRBobsmanager : public ISpectrum
   double m_phi;
 
   SpectObj    *m_spectrum;
+  SpectObj    *m_spectrum1;
+
+  SpectralComponent *PromptEmission;
+  SpectralComponent *AfterGlowEmission;
+  
   GRBobsSim   *m_GRB;
   GRBobsParameters  *m_par;
 
@@ -112,7 +119,12 @@ class GRBobsmanager : public ISpectrum
   double m_alpha;
   double m_beta;
   double m_MinPhotonEnergy;
+  double m_Energy_CO;
+  double m_LATphotons;
+  double m_EC_delay;
+  double m_EC_duration;
   double m_startTime;
   double m_endTime;
+
 };
 #endif

@@ -17,8 +17,7 @@ double GetPeakFluxLong(TRandom *rnd)
   static double MaxP = TMath::MaxElement(NentriesL,P);
   static double MaxN = TMath::MaxElement(NentriesL,N);
   static double MinN = TMath::MinElement(NentriesL,N);
-  double Ni = rnd->Uniform(MinN,MaxN);
-  
+  double Ni = rnd->Uniform(MinN,MaxN);  
   double Ndum=0.0;
   int idum=0;
   
@@ -31,9 +30,6 @@ double GetPeakFluxLong(TRandom *rnd)
   double Fp_lo = P[idum];
   double x = rnd->Uniform();
   double   Fp = Fp_lo * pow(1.0 - x * (1.0 - pow(Fp_hi/Fp_lo,-1.0)),-1.0);
-  
-  //  std::cout<<N[idum-1]<<" < "<<Ni<<" < "<<N[idum]<<std::endl;
-  //  std::cout<<Fp_lo<<" < "<<Fp<<" < "<<Fp_hi<<std::endl;
   return Fp;
 }
 
@@ -67,9 +63,6 @@ double GetPeakFluxShort(TRandom *rnd)
   double Fp_lo = Q[idum];
   double x = rnd->Uniform();
   double Fp = Fp_lo * pow(1.0 - x * (1.0 - pow(Fp_hi/Fp_lo,-1.0)),-1.0);
-  
-  //  std::cout<<M[idum-1]<<" < "<<Mi<<" < "<<M[idum]<<std::endl;
-  //  std::cout<<Fp_lo<<" < "<<Fp<<" < "<<Fp_hi<<std::endl;
   return Fp;
 }
 
@@ -83,75 +76,31 @@ void GenerateXMLLibrary(int Nbursts=100)
   static const int NentriesS = 24;
   
   //LONG BURSTS
-  static const double N[NentriesL] = { 8,      9,     10,     12,     15,     20,     25,     30,     35,   
-				       40,     50,     60,     70,     80,     90,    100,    120,    150,   
-				       200,    250,    300,    400,    500,    600,    700,    800,    900,   
-				       1000,   1100,   1200,   1262 };
+
+  static const double PL[NentriesL] = { 49.279, 44.093, 42.020, 38.082, 33.853, 28.819, 25.417, 21.994, 19.378,   
+					18.148, 15.910, 13.671, 12.326, 10.387,  9.709,  8.521,  7.118,  5.709,   
+					4.297,  3.366,  2.740,  1.981,  1.503,  1.250,  1.035,  0.858,  0.713,   
+					0.595,  0.500,  0.389,  0.240 };
   
-  static const double P[NentriesL] = { 49.279, 44.093, 42.020, 38.082, 33.853, 28.819, 25.417, 21.994, 19.378,   
-				       18.148, 15.910, 13.671, 12.326, 10.387,  9.709,  8.521,  7.118,  5.709,   
-				       4.297,  3.366,  2.740,  1.981,  1.503,  1.250,  1.035,  0.858,  0.713,   
-				       0.595,  0.500,  0.389,  0.240 };
+  static const double PS[NentriesS] = { 27.912, 27.792, 24.635, 21.766, 17.314, 15.150, 13.985, 12.510, 11.102,    
+					9.845,  7.996,  7.318,  6.415,  5.344,  4.795,  4.191,  3.437,  2.998,   
+					2.335,  1.908,  1.572,  1.001,  0.817,  0.371 };
   
-  //SHORT BURSTS
-  static const double M[NentriesS] = { 8,      9,     10,     12,     15,     20,     25,     30,     35,    
-				       40,     50,     60,     70,     80,     90,    100,    120,    150,    
-				       200,    250,    300,    400,    430,    462 };
-  
-  static const double Q[NentriesS] = { 27.912, 27.792, 24.635, 21.766, 17.314, 15.150, 13.985, 12.510, 11.102,    
-				       9.845,  7.996,  7.318,  6.415,  5.344,  4.795,  4.191,  3.437,  2.998,   
-				       2.335,  1.908,  1.572,  1.001,  0.817,  0.371 };
-  
-  double P1[NentriesL];
-  double Q1[NentriesS];
-  
+  double XL[NentriesL];
+  double XS[NentriesS];
   
   //////////////////////////////////////////////////
   
   for(int i=0;i<NentriesL;i++)
     {
-      P1[i]=P[NentriesL-1-i];
+      XL[i]=PL[NentriesL-1-i];
     }
   
   for(int i=0;i<NentriesS;i++)
     {
-      Q1[i]=Q[NentriesS-1-i];
+      XS[i]=PS[NentriesS-1-i];
     }
   
-  gDirectory->Delete("PFlong");
-  gDirectory->Delete("PFshort");
-  
-  TH1D* PFlong  = new TH1D("PFlong","PFlong",NentriesL-1,P1);
-  TH1D* PFshort = new TH1D("PFshort","PFshort",NentriesS-1,Q1);
-  
-  for(int i=1; i<NentriesL; i++)
-    {
-      PFlong->SetBinContent(i,N[NentriesL-i]-N[NentriesL-1-i]);
-    }
-  PFlong->SetBinContent(NentriesL,0.0);
-  for(int i=1;i<NentriesS;i++)
-    {
-      PFshort->SetBinContent(i,M[NentriesS-i]-M[NentriesS-i-1]);
-    }
-  PFshort->SetBinContent(NentriesS,0.0);
-  //////////////////////////////////////////////////
-  //
-  PFlong->DrawNormalized();
-  PFshort->SetLineStyle(2);
-  PFshort->DrawNormalized("same");
-
-  TH1D* PFlongJJ  = new TH1D("PFlongJJ","PFlong",NentriesL-1,P1);
-  TH1D* PFshortJJ = new TH1D("PFshortJJ","PFshort",NentriesS-1,Q1);
-  for(int i=0;i<10000;i++)
-    {
-      PFlongJJ->Fill(GetPeakFluxLong(rnd));
-      PFshortJJ->Fill(GetPeakFluxShort(rnd));
-    }
-  PFlongJJ->SetLineColor(2);
-  PFlongJJ->DrawNormalized("same");
-  PFshortJJ->SetLineColor(2);
-  PFshortJJ->SetLineStyle(2);
-  PFshortJJ->DrawNormalized("same");
 
   double MinExtractedPhotonEnergy = 30.0; //MeV
   double FirstBurstTime  =      1000; //1e4
@@ -166,8 +115,46 @@ void GenerateXMLLibrary(int Nbursts=100)
   bool GLASTCoordinate            = false;
   double theta = 45.0;
   double phi   = 0.0;
+  double alpha0 = 10.0;  //  -3<= a < 1.0 
+  double beta0  = 10.0;   //   b < a && b < -1 
+  double alpha_min = -3.0;  //  -3<= a < 1.0 
+  double alpha_max = 1.0;   //   -3<= a < 1.0 
+  double beta_max = -1.5;   //   b < a && b < -2 
+  double beta_min = -7.2;   //   b < a && b < -2 
+  int  GBM                        = 0;
   
-  int  GBM                        = 1;
+  int NphLat=0;
+  double DelayTime=0;
+  double ExtraComponent_Duration=0.0;
+  double CO_Energy=-1.0;  
+  
+
+  gDirectory->Delete("PFlong");
+  gDirectory->Delete("PFshort");
+
+  gDirectory->Delete("T90long");
+  gDirectory->Delete("T90short");
+
+  TH1D* PFlong  = new TH1D("PFlong","Peak FLux ",NentriesL-1,XL);
+  TH1D* PFshort = new TH1D("PFshort","Peak FLux",NentriesS-1,XS);
+
+  TH1D* T90long  = new TH1D("T90long","Duration",100,-3,3);
+  TH1D* T90short = new TH1D("T90short","Duration",100,-3,3);
+
+  TH1D* alphalong  = new TH1D("alphalong","Low energy spectral index",100,alpha_min,alpha_max);
+  TH1D* alphashort = new TH1D("alphashort","Low energy spectral index",100,alpha_min,alpha_max);
+  TH1D* betalong  = new TH1D("betalong","High energy spectral index",100,-4.0,beta_max);
+  TH1D* betashort = new TH1D("betashort","High energy spectral index",100,-4.0,beta_max);
+  
+  PFlong->SetLineColor(4);
+  PFshort->SetLineColor(2);
+  T90long->SetLineColor(4);
+  T90short->SetLineColor(2);
+  alphalong->SetLineColor(4);
+  alphashort->SetLineColor(2);
+  betalong->SetLineColor(4);
+  betashort->SetLineColor(2);
+
   
   std::ofstream os("GRBobs_user_library.xml",std::ios::out);
   std::ofstream osTest("../src/test/GRBParam.txt",std::ios::out);
@@ -179,8 +166,6 @@ void GenerateXMLLibrary(int Nbursts=100)
   
   double BurstTime=FirstBurstTime;
   
-  double alpha;
-  double beta;
   if(GeneratePF)
     osTest<<" T0  PF T90  alpha beta"<<std::endl;
   else 
@@ -196,34 +181,68 @@ void GenerateXMLLibrary(int Nbursts=100)
   double log_mean_short = log10(0.4);
   double log_sigma_long = 0.6;
   double log_sigma_short = 0.4;
+  //////////////////////////////////////////////////
+  const double a = 0.277;
+  const double b = -0.722;
+  const double c = 1.47;
+
 
   for(int i = 0; i<Nbursts ; i++)
     {
       if(BURSTtype==1) type=1;
       else if(BURSTtype==2) type=2;
       else type = ((rnd->Uniform() > nfracL) ? 1 : 2);
-      
-      if (type==1)
+
+      //////////////////////////////////////////////////
+      theta = 0.0;//10.0*(i%8);
+      phi   = 0.0;//10.0*(i%37);
+      double alpha = alpha0;
+      double beta  = beta0;
+      while (alpha < alpha_min || alpha > alpha_max) alpha = rnd->Gaus(-1.0,0.4);
+      while(beta >= alpha || beta >= beta_max || beta < beta_min) beta = rnd->Gaus(-2.25,0.4);
+      //////////////////////////////////////////////////
+      if (type==1) //SHORT
 	{
 	  Duration = pow(10.0,(double)rnd->Gaus(log_mean_short,log_sigma_short)); //(Short Bursts)
 	  //	  Duration = pow(10.0,(double)rnd->Gaus(-0.2,0.55)); //(Short Bursts)
-	  Fluence  = ((GenerateFluence) ? pow(10.0,(double)rnd->Gaus(-6.3,0.57)) : FL); //erg/cm^2 (Short Bursts)
-	  PeakFlux = ((GeneratePF)      ? PFlong->GetRandom(): PF); //ph/cm^2/s (Short Bursts)
+	  if(GeneratePF)
+	    {
+	      PeakFlux = ((GeneratePF)      ? GetPeakFluxShort(rnd): PF); //ph/cm^2/s (Short Bursts)
+	      PFshort->Fill(PeakFlux);	  
+	    }
+	  else
+	    Fluence  = ((GenerateFluence) ? pow(10.0,(double)rnd->Gaus(-6.3,0.57)) : FL); //erg/cm^2 (Short Bursts)
+	  
+	  T90short->Fill(log10(Duration));
+	  alphashort->Fill(alpha);
+	  betashort->Fill(beta); 
+
 	  Nshort++;
 	}
-      else
+      else //LONG
 	{
 	  Duration = pow(10.0,(double)rnd->Gaus(log_mean_long,log_sigma_long)); //(Long Bursts)
 	  //	  Duration = pow(10.0,(double)rnd->Gaus(1.46,0.49)); //(Long Burst)
-	  Fluence = ((GenerateFluence) ? pow(10.0,(double)rnd->Gaus(-5.4,0.62)): FL); //erg/cm^2 (Long Burst)
-	  PeakFlux = ((GeneratePF)      ? PFshort->GetRandom(): PF); //ph/cm^2/s (Long Bursts)
+	  if(GeneratePF)
+	    {	  
+	      PeakFlux = ((GeneratePF)      ? GetPeakFluxLong(rnd): PF); //ph/cm^2/s (Long Bursts)
+	      PFlong->Fill(PeakFlux);
+	      double lpf = log10(PeakFlux);
+	      Stretch =  TMath::Max(1.0, a * lpf*lpf + b * lpf + c);
+	      Duration*=Stretch;
+	    }
+	  else
+	    Fluence = ((GenerateFluence) ? pow(10.0,(double)rnd->Gaus(-5.4,0.62)): FL); //erg/cm^2 (Long Burst)
+	  
+	  T90long->Fill(log10(Duration));
+
+	  alphalong->Fill(alpha);
+	  betalong->Fill(beta); 
+
 	  Nlong++;
+
 	}
       
-      theta = 0.0;//10.0*(i%8);
-      phi   = 0.0;//10.0*(i%37);
-      alpha= rnd->Uniform(0.0, 1.5);
-      beta = -1.0*rnd->Uniform(2.0, 2.5);
       os<<""<<std::endl;
       if(i<10) os<<"<source name=\" GRB_0000"<<i<<" \">"<<std::endl;
       else if(i<100) os<<"<source name=\" GRB_000"<<i<<" \">"<<std::endl;
@@ -231,15 +250,26 @@ void GenerateXMLLibrary(int Nbursts=100)
       else if(i<10000) os<<"<source name=\" GRB_0"<<i<<" \">"<<std::endl;
       else os<<"<source name=\" GRB_"<<i<<" \">"<<std::endl;
       os<<"<spectrum escale=\"MeV\">"<<std::endl;
+
+      double co_energy=CO_Energy;
+      if(co_energy<0) co_energy = rnd->Uniform(1.,10.0);
+
       if(GeneratePF)
-	os<<" <SpectrumClass name=\"GRBobsmanager\" params=\""<<BurstTime<<" , "<<Duration<<" , "<<PeakFlux<<" , "<<alpha<<" , "<<beta<<" , "<<MinExtractedPhotonEnergy<<" , "<<GBM<<" \"/>"<<std::endl;
+	os<<" <SpectrumClass name=\"GRBobsmanager\" params=\""<<BurstTime<<" , "<<Duration<<" , "<<PeakFlux<<" , "<<alpha<<" , "<<beta<<" , "<<MinExtractedPhotonEnergy<<" , "<<GBM;
       else 
-	os<<" <SpectrumClass name=\"GRBobsmanager\" params=\""<<BurstTime<<" , "<<Duration<<" , "<<Fluence<<" , "<<alpha<<" , "<<beta<<" , "<<MinExtractedPhotonEnergy<<" , "<<GBM<<" \"/>"<<std::endl;
+	os<<" <SpectrumClass name=\"GRBobsmanager\" params=\""<<BurstTime<<" , "<<Duration<<" , "<<Fluence<<" , "<<alpha<<" , "<<beta<<" , "<<MinExtractedPhotonEnergy<<" , "<<GBM;
+      
+      os<<" , "<<NphLat<<" , "<<DelayTime<<" , "<<ExtraComponent_Duration<<" , "<<co_energy<<" \"/>"<<std::endl;
+
+
+
 
       if(GLASTCoordinate)  
 	os<<"<direction theta=\""<<theta<<"\" phi=\""<<phi<<"\" />"<<std::endl;//u galactic_dir l=\""<<l<<"\" b=\""<<b<<"\" />"<<std::endl;
       else
 	os<<"<use_spectrum frame=\"galaxy\" />"<<std::endl;//u galactic_dir l=\""<<l<<"\" b=\""<<b<<"\" />"<<std::endl;
+
+
       os<<"</spectrum> </source>"<<std::endl;
       //////////////////////////////////////////////////
       if(GeneratePF) 
@@ -249,6 +279,16 @@ void GenerateXMLLibrary(int Nbursts=100)
       //////////////////////////////////////////////////
       BurstTime+=rnd->Exp(AverageInterval);
     }
+  //////////////////////////////////////////////////
+  os<<""<<std::endl;
+  os<<"<source name=\" GRBobs-10\" >"<<std::endl;
+  for(int i = 0; i<10 ; i++)
+    {
+      if(i<10) os<<"     <nestedSource sourceRef=\" GRB_0000"<<i<<" \"/>"<<std::endl;
+    }
+  os<<"</source>"<<std::endl;
+  //////////////////////////////////////////////////
+
   os<<""<<std::endl;
   os<<"<source name=\" AllGRBobs\" >"<<std::endl;
   for(int i = 0; i<Nbursts ; i++)
@@ -261,11 +301,37 @@ void GenerateXMLLibrary(int Nbursts=100)
     }
   os<<"</source>"<<std::endl;
   os<<"  </source_library>"<<std::endl;
+
+  
+  TCanvas *Distributions = new TCanvas("Distributions","Distributions",500,800);
+  Distributions->SetFillColor(10);
+  Distributions->Divide(2,2);
+  Distributions->cd(1);
+  T90long->Draw();
+  T90short->Draw("same");
+  
+  Distributions->cd(2);
+  gPad->SetLogx();
+  gPad->SetLogy();
+  PFlong->Draw();
+  PFshort->Draw("same");
   
   std::cout<<"--------------------------------------------------"<<std::endl;
   std::cout<<"Generate "<<Nlong<<" Long Burst"<<std::endl;
   std::cout<<"Generate "<<Nshort<<" Short Burst"<<std::endl;
   std::cout<<"--------------------------------------------------"<<std::endl;
+
+  Distributions->cd(3);
+  alphalong->Draw();
+  alphashort->Draw("same");
+
+  Distributions->cd(4);
+  betalong->Draw();
+  betashort->Draw("same");
+
+  Distributions->cd();
+  Distributions->Print("GeneratedDistributions.eps");
+
 
 }
 

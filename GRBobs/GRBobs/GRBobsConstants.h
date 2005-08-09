@@ -130,8 +130,8 @@ class GRBobsParameters
       m_LowEnergy       = alpha;
       m_HighEnergy      = beta;
       
-      while (m_LowEnergy<-3.0 || m_LowEnergy>1.0)                      m_LowEnergy  = rnd->Gaus(-1.0,0.4);
-      while(m_HighEnergy >= m_LowEnergy || m_HighEnergy >= -1.0)       m_HighEnergy = rnd->Gaus(-2.25,0.4);
+      //      while (m_LowEnergy<-3.0 || m_LowEnergy>=1.0)                      m_LowEnergy  = rnd->Gaus(-1.0,0.4);
+      //      while(m_HighEnergy >= m_LowEnergy || m_HighEnergy >= -1.0)       m_HighEnergy = rnd->Gaus(-2.25,0.4);
       
       m_LowEnergy       += ObsCst::We;
       m_HighEnergy      += ObsCst::We;

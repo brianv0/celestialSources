@@ -10,7 +10,10 @@
 #include "astro/EarthOrbit.h"
 
 
-#define DEBUG 0 
+#define DEBUG 0
+//  Field Of View for generating bursts degrees above the XY plane.
+#define FOV -90
+
 
 ISpectrumFactory &GRBobsmanagerFactory() 
 {
@@ -33,10 +36,14 @@ GRBobsmanager::GRBobsmanager(const std::string& params)
   m_alpha           = parseParamList(params,3);
   m_beta            = parseParamList(params,4);
   m_MinPhotonEnergy = parseParamList(params,5)*1.0e3; //MeV
-
-  if(parseParamList(params,6)!=0) m_GenerateGBMOutputs = true;
   
-    
+  if(parseParamList(params,6)!=0) m_GenerateGBMOutputs = true;
+
+  m_LATphotons  = parseParamList(params,7);
+  m_EC_delay    = parseParamList(params,8);
+  m_EC_duration = parseParamList(params,9);
+  m_Energy_CO   = parseParamList(params,10);
+  
   m_par = new GRBobsParameters();
 
   m_GRBnumber = (long) floor(65540+m_startTime);
@@ -49,8 +56,7 @@ GRBobsmanager::GRBobsmanager(const std::string& params)
   m_par->SetMinPhotonEnergy(m_MinPhotonEnergy); //keV
   
   m_theta = -1000.0;
-  //  double FOV=20.0; // degrees above the XY plane.
-  double FOV=-90.0; // degrees above the XY plane.
+  //  double FOV=-90.0; // degrees above the XY plane.
   while(m_theta<FOV)
     {
       m_par->SetGalDir(-200,-200); //this generates random direction in the sky
@@ -67,7 +73,7 @@ GRBobsmanager::GRBobsmanager(const std::string& params)
       m_theta = 90. - scdir.theta()*180.0/M_PI; // theta=0 -> XY plane, theta=90 -> Z
       m_phi   = scdir.phi()*180.0/M_PI;
     }
-
+  
   m_par->SetGRBNumber(m_GRBnumber);
   m_grbGenerated    = false;
   m_grbdeleted      = false;
@@ -153,11 +159,27 @@ GRBobsmanager::~GRBobsmanager()
 void GRBobsmanager::GenerateGRB()
 {
   /////GRB GRNERATION////////////////////////////////
-  m_GRB      = new  GRBobsSim(m_par);
-  m_spectrum = new  SpectObj(m_GRB->MakeGRB(),0);
+  m_GRB      = new GRBobsSim(m_par);
+  TH2D *h;
+  h = m_GRB->MakeGRB();
+  m_spectrum = new SpectObj(m_GRB->CutOff(h,m_Energy_CO) , 0);
   m_spectrum->SetAreaDetector(EventSource::totalArea());
+  m_endTime    = m_startTime  + m_GRB->Tmax();
+  
+  PromptEmission = new SpectralComponent(m_spectrum,m_startTime,m_endTime);
+  std::cout<<"Generate PROMPT emission ("<<m_startTime<<" "<<m_endTime<<")"<<std::endl;
+  if(m_LATphotons>0)
+    {
+      h = m_GRB->MakeGRB_ExtraComponent(m_EC_duration,m_LATphotons);
+      m_spectrum1 = new SpectObj(m_GRB->CutOff(h,m_Energy_CO),0);
+      m_spectrum1->SetAreaDetector(EventSource::totalArea());
+      double m_startTime_EC = m_startTime    + m_EC_delay;
+      double m_endTime_EC   = m_startTime_EC + m_EC_duration;
+      AfterGlowEmission = new SpectralComponent(m_spectrum1,m_startTime_EC,m_endTime_EC);
+      std::cout<<"Generate AFTERGLOW Emission ("<<m_startTime_EC<<" "<<m_endTime_EC<<")"<<std::endl;
+    }
+  
   //////////////////////////////////////////////////
-  m_endTime   = m_startTime + m_GRB->Tmax();
   TString GRBname = GetGRBname();
 
   if(m_GenerateGBMOutputs)
@@ -171,27 +193,40 @@ void GRBobsmanager::GenerateGRB()
   name+="_PAR.txt";
   
   std::ofstream os(name,std::ios::out);
-  os<<m_startTime<<" "<<m_endTime<<" "<<m_l<<" "<<m_b<<" "<<m_theta<<" "<<m_phi<<" "<<m_fluence<<" "<<" "<<m_alpha<<" "<<m_beta<<std::endl;
+  
+  os<<m_startTime<<" "<<m_endTime<<" "<<m_l<<" "<<m_b<<" "<<m_theta<<" "<<m_phi<<" "<<m_fluence<<" "<<m_alpha<<" "<<m_beta<<std::endl;
   os.close();
   std::cout<<"Phenomen. Model GRB"<<GRBname<<" t start "<<m_startTime<<", tend "<<m_endTime
-	   <<" l,b = "<<m_l<<", "<<m_b<<" elevation,phi(deg) = "<<m_theta<<", "<<m_phi<<" Fluence = "<<m_fluence<<std::endl;
+	   <<" l,b = "<<m_l<<", "<<m_b<<" elevation,phi(deg) = "<<m_theta<<", "<<m_phi<<" PF = "<<m_fluence<<std::endl;
   m_grbGenerated=true;
+  
+  if(m_LATphotons>0) m_endTime = TMath::Max(m_endTime, m_startTime + m_EC_delay  + m_EC_duration);
+
 }
 
 void GRBobsmanager::DeleteGRB()
 {
   delete m_par;
-  delete m_GRB;
-  delete m_spectrum;
+  if(m_grbGenerated)
+    {
+      delete m_GRB;
+      delete m_spectrum;
+      delete PromptEmission;
+      if(m_LATphotons>0) 
+	{
+	  delete AfterGlowEmission;
+	  delete m_spectrum1;
+	}
+    }
   m_grbdeleted=true;
 }
 
 //return flux, given a time
 double GRBobsmanager::flux(double time) const
 {
-  if(DEBUG) std::cout<<"flux at "<<time<<std::endl;
-  double flux;
-
+  double flux = 0.0;
+  //////////////////////////////////////////////////
+  
   if(m_grbdeleted) 
     flux = 0.0;
   else if(time <= m_startTime) 
@@ -201,7 +236,8 @@ double GRBobsmanager::flux(double time) const
       if(!m_grbGenerated) const_cast<GRBobsmanager*>(this)->GenerateGRB();
       if(time < m_endTime)
 	{
-	  flux = m_spectrum->flux(time-m_startTime,m_MinPhotonEnergy);
+	  flux   = PromptEmission->flux(time,m_MinPhotonEnergy);
+	  if(m_LATphotons>0) flux  += AfterGlowEmission->flux(time,m_MinPhotonEnergy);
 	}
       else 
 	{
@@ -209,27 +245,37 @@ double GRBobsmanager::flux(double time) const
 	  flux = 0.0;
 	}
     }
-  if(DEBUG) std::cout<<"flux("<<time<<") = "<<flux<<std::endl;
+  if(DEBUG && flux) std::cout<<"flux("<<time<<") = "<<flux<<std::endl;
   return flux;
 }
 
 double GRBobsmanager::interval(double time)
 {  
   if(DEBUG) std::cout<<"interval at "<<time<<std::endl;
-  double inte;
+  double inte, inte_prompt, inte_ag;
+  inte_ag=1e20;
   if(m_grbdeleted) inte = 1e10;
   else if(time < m_startTime) 
     inte = m_startTime - time;
   else 
     {
       if(!m_grbGenerated) GenerateGRB();
-      if(time == m_startTime) 
+      if(time<m_endTime)
 	{
-	  inte = m_startTime - time + m_spectrum->interval(0.0,m_MinPhotonEnergy);
-	}
-      else if(time<m_endTime)
-	{
-	  inte = m_spectrum->interval(time - m_startTime,m_MinPhotonEnergy);
+	  inte_prompt = PromptEmission->interval(time,m_MinPhotonEnergy);
+	  if(m_LATphotons>0) inte_ag = AfterGlowEmission->interval(time,m_MinPhotonEnergy);
+	  if (inte_prompt<=inte_ag) 
+	    { 
+	      inte  = inte_prompt;
+	      PromptEmission->SetResiduals(0.0);
+	      if(m_LATphotons>0) AfterGlowEmission->SetResiduals(inte);
+	    }
+	  else
+	    { 
+	      inte  = inte_ag;
+	      PromptEmission->SetResiduals(inte);
+	      if(m_LATphotons>0) AfterGlowEmission->SetResiduals(0.0);
+	    }
 	}
       else 
 	{
@@ -245,9 +291,15 @@ double GRBobsmanager::energy(double time)
 {
   if(DEBUG) std::cout<<"energy at "<<time<<std::endl;
   double ene=0.1;
+  double ene_prompt,ene_ag;
+  ene_ag=0.0;
   if(m_grbGenerated && !m_grbdeleted)
-    ene = m_spectrum->energy(time-m_startTime,m_MinPhotonEnergy)*1.0e-3; //MeV
-  if(DEBUG) std::cout<<"energy("<<time<<") = "<<ene<<std::endl;
+    {
+      if(m_LATphotons>0) ene_ag = AfterGlowEmission->energyMeV(time,m_MinPhotonEnergy);
+      ene = TMath::Max(PromptEmission->energyMeV(time,m_MinPhotonEnergy),ene_ag);
+    }
+  if(DEBUG) 
+    std::cout<<"energy("<<time<<") = "<<ene<<std::endl;
   return ene;
 }
 

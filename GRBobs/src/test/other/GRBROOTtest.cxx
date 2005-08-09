@@ -26,6 +26,7 @@ bool movie       = false;
 bool bandFit     = false;
 bool powerlawFit = false;
 bool scaled      = false;
+bool ExtraComponent = false;
 int extension;
 
 double Band(double *var, double *par);
@@ -511,15 +512,27 @@ void MakeGRB(int NGRB=1, double enph=0, bool gbm=false)
   params->ReadParametersFromFile(paramFile,NGRB);
   params->PrintParameters();
   GRBobsSim* m_grb = new GRBobsSim(params);
-  m_grb->MakeGRB();
-  m_grb->SaveNv();
+
+
+  if(ExtraComponent) 
+    {
+      m_grb->MakeGRB_ExtraComponent(10.,100.);
+      m_grb->SaveNvEC();
+    }
   
+  else
+    {
+      m_grb->MakeGRB();
+      m_grb->SaveNv();
+    }
   char GRBname[100];
   sprintf(GRBname,"%d",(int) params->GetGRBNumber());
   if (gbm)  m_grb->GetGBMFlux(GRBname);
   delete m_grb;
   char name[100];
   sprintf(name,"grbobs_%d.root",(int) params->GetGRBNumber());
+  if(ExtraComponent)  sprintf(name,"grbobs_%d_EC.root",(int) params->GetGRBNumber());
+
   extension=params->GetGRBNumber();
   delete params; //??
   PlotGRB(enph,name);
@@ -683,6 +696,8 @@ int main(int argc, char** argv)
 	{
 	  gbm=true;
 	}
+      else if ("-EC" ==arg_name)
+	ExtraComponent=true;
       else if("-scan"==arg_name)
 	{
 	  ngrbs=atoi(argv[++current_arg]);
