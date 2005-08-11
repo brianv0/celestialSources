@@ -5,6 +5,7 @@
 #include "TROOT.h"
 #include "TRandom.h"
 #include <vector>
+#include <iostream>
 
 /*! 
   \struct photon
