@@ -512,17 +512,19 @@ void MakeGRB(int NGRB=1, double enph=0, bool gbm=false)
   params->ReadParametersFromFile(paramFile,NGRB);
   params->PrintParameters();
   GRBobsSim* m_grb = new GRBobsSim(params);
-
-
+  double Eco = params->GetCutOffEnergy();
+  std::cout<<Eco<<std::endl;
   if(ExtraComponent) 
     {
-      m_grb->MakeGRB_ExtraComponent(10.,100.);
+      TH2D *h = m_grb->MakeGRB_ExtraComponent(10.,100.);
+      m_grb->CutOff(h,Eco);
       m_grb->SaveNvEC();
     }
   
   else
     {
-      m_grb->MakeGRB();
+      TH2D *h = m_grb->MakeGRB();
+      m_grb->CutOff(h,Eco);
       m_grb->SaveNv();
     }
   char GRBname[100];

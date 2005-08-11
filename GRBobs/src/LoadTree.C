@@ -1,5 +1,5 @@
 
-void LoadTree(int type=0, double tmin=0, double tmax=0)
+void LoadTree(int type=0, double tmin, double tmax , TString cuts="")
 {
  gStyle->SetCanvasColor(10);
  gStyle->SetPalette(1,0);
@@ -31,11 +31,11 @@ void LoadTree(int type=0, double tmin=0, double tmax=0)
  LightCurve = new TH1D("LightCurve","LightCurve",1000,tmin,tmax);
  Spectrum   = new TH1D("Spectrum","Spectrum",Ebin,e);
  
- t->Draw("Time>>LightCurve");
+ t->Draw("Time>>LightCurve",cuts);
  LAT_DISPLAY_MC_UP->cd(2);
  gPad->SetLogx();
  gPad->SetLogy();
- t->Draw("Energy>>Spectrum","","E");
+ t->Draw("Energy>>Spectrum",cuts,"E");
  for(int ei = 1; ei<=Ebin; ei++)
    {
      double ene = Spectrum->GetBinCenter(ei);
@@ -49,7 +49,7 @@ void LoadTree(int type=0, double tmin=0, double tmax=0)
  // LAT_DISPLAY_MC_DO->SetLogz();
  // SM = new TH2D("SkyMap","SkyMap",360,-180,180,180,-90,90);
  // t->Draw("B:L>>SkyMap(360,-180,180,180,-90,90)","","AITOFF");
- t->Draw("sin(Theta/2)*cos(Phi):sin(Theta/2)*sin(Phi)>>SkyMap(100,-1,1,100,-1,1)");
+ t->Draw("sin(Theta/2)*cos(Phi):sin(Theta/2)*sin(Phi)>>SkyMap(100,-1,1,100,-1,1)",cuts);
  
  double conv  =  TMath::Pi()/360.0;
  TEllipse *fov10 = new TEllipse(0.,0.,sin( 10.* conv));

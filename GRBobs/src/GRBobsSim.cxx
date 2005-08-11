@@ -166,7 +166,7 @@ TH2D* GRBobsSim::MakeGRB_ExtraComponent(double duration, double LATphotons)
 	  norm += m_NvEC->GetBinContent(ti, ei) * dt * de; // ph/(cm²)
 	}
     }
-  std::cout<<LATphotons<<" "<<norm<<std::endl;
+  //  std::cout<<LATphotons<<" "<<norm<<std::endl;
   m_NvEC->Scale(LATphotons/norm);
   delete e;
   return m_NvEC;
@@ -175,6 +175,7 @@ TH2D* GRBobsSim::MakeGRB_ExtraComponent(double duration, double LATphotons)
 
 TH2D* GRBobsSim::CutOff(TH2D *Nv, double E_CO)
 {
+  
   if (E_CO==0) return Nv;
   int tbin = Nv->GetXaxis()->GetNbins();
   for(int ti = 0; ti<tbin; ti++)

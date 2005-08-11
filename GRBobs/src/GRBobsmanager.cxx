@@ -12,7 +12,7 @@
 
 #define DEBUG 0
 //  Field Of View for generating bursts degrees above the XY plane.
-#define FOV -90
+#define FOV 20
 
 
 ISpectrumFactory &GRBobsmanagerFactory() 
@@ -27,7 +27,6 @@ GRBobsmanager::GRBobsmanager(const std::string& params)
 {
   using astro::GPS;
   m_GenerateGBMOutputs = false;
-
   facilities::Util::expandEnvVar(&paramFile);  
   
   m_startTime       = parseParamList(params,0);
@@ -53,10 +52,9 @@ GRBobsmanager::GRBobsmanager(const std::string& params)
   m_par->SetPeakFlux(m_fluence);
   m_par->SetDuration(duration);
   m_par->SetAlphaBeta(m_alpha,m_beta);
-  m_par->SetMinPhotonEnergy(m_MinPhotonEnergy); //keV
+  m_par->SetMinPhotonEnergy(m_MinPhotonEnergy); //keV  
+  m_theta = -100.0;
   
-  m_theta = -1000.0;
-  //  double FOV=-90.0; // degrees above the XY plane.
   while(m_theta<FOV)
     {
       m_par->SetGalDir(-200,-200); //this generates random direction in the sky
@@ -167,16 +165,16 @@ void GRBobsmanager::GenerateGRB()
   m_endTime    = m_startTime  + m_GRB->Tmax();
   
   PromptEmission = new SpectralComponent(m_spectrum,m_startTime,m_endTime);
-  std::cout<<"Generate PROMPT emission ("<<m_startTime<<" "<<m_endTime<<")"<<std::endl;
+  //std::cout<<"Generate PROMPT emission ("<<m_startTime<<" "<<m_endTime<<")"<<std::endl;
   if(m_LATphotons>0)
     {
+      m_startTime_EC = m_startTime    + m_EC_delay;
+      m_endTime_EC   = m_startTime_EC + m_EC_duration;
       h = m_GRB->MakeGRB_ExtraComponent(m_EC_duration,m_LATphotons);
       m_spectrum1 = new SpectObj(m_GRB->CutOff(h,m_Energy_CO),0);
       m_spectrum1->SetAreaDetector(EventSource::totalArea());
-      double m_startTime_EC = m_startTime    + m_EC_delay;
-      double m_endTime_EC   = m_startTime_EC + m_EC_duration;
       AfterGlowEmission = new SpectralComponent(m_spectrum1,m_startTime_EC,m_endTime_EC);
-      std::cout<<"Generate AFTERGLOW Emission ("<<m_startTime_EC<<" "<<m_endTime_EC<<")"<<std::endl;
+      //std::cout<<"Generate AFTERGLOW Emission ("<<m_startTime_EC<<" "<<m_endTime_EC<<")"<<std::endl;
     }
   
   //////////////////////////////////////////////////
@@ -191,17 +189,19 @@ void GRBobsmanager::GenerateGRB()
   TString name = "GRBOBS_";
   name+=GRBname; 
   name+="_PAR.txt";
-  
-  std::ofstream os(name,std::ios::out);
-  
+  //..................................................//
+  std::ofstream os(name,std::ios::out);  
   os<<m_startTime<<" "<<m_endTime<<" "<<m_l<<" "<<m_b<<" "<<m_theta<<" "<<m_phi<<" "<<m_fluence<<" "<<m_alpha<<" "<<m_beta<<std::endl;
   os.close();
+  
   std::cout<<"Phenomen. Model GRB"<<GRBname<<" t start "<<m_startTime<<", tend "<<m_endTime
 	   <<" l,b = "<<m_l<<", "<<m_b<<" elevation,phi(deg) = "<<m_theta<<", "<<m_phi<<" PF = "<<m_fluence<<std::endl;
+  if(m_LATphotons>0) 
+    {
+      m_endTime = TMath::Max(m_endTime, m_startTime + m_EC_delay  + m_EC_duration);
+      std::cout<<"Generate AFTERGLOW Emission ("<<m_startTime_EC<<" "<<m_endTime_EC<<")"<<std::endl;
+    }
   m_grbGenerated=true;
-  
-  if(m_LATphotons>0) m_endTime = TMath::Max(m_endTime, m_startTime + m_EC_delay  + m_EC_duration);
-
 }
 
 void GRBobsmanager::DeleteGRB()

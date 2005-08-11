@@ -104,6 +104,7 @@ class GRBobsParameters
   inline  double GetHighEnergy()     {return m_HighEnergy;}
   inline  long   GetGRBNumber()      {return m_GRBnumber;}
   inline  double GetDuration()       {return m_duration;}
+  inline  double GetCutOffEnergy()   {return m_Eco;}
   
   inline std::pair<double,double> GetGalDir(){return m_GalDir;}
   inline void GetUniqueName(const void *ptr, std::string & name)
@@ -118,6 +119,8 @@ class GRBobsParameters
   void SetDuration(double);
   void SetFluence(double);
   void SetPeakFlux(double);
+  inline void SetCutOffEnergy(double Eco){m_Eco = Eco;}
+  
   /// Sets the low energy spectral index and the high energy spectral index.
   /// \param alpha low energy spectral index (\f$-3<\alpha<1\f$)
   /// \param beta high energy spectral index (\f$\beta>-1\f$,\f$\beta>\alpha\f$)
@@ -199,6 +202,7 @@ class GRBobsParameters
 
   long   m_GRBnumber;
   double m_enph;
+  double m_Eco;
   std::pair<double,double> m_GalDir;
   
   TH1D *PFshort;

@@ -58,9 +58,11 @@ void GRBobsParameters::SetMinPhotonEnergy(double enph)
 //////////////////////////////////////////////////
 void GRBobsParameters::SetGalDir(double l, double b)
 {
+  double r1 = rnd->Uniform();
+  double r2 = rnd->Uniform();
   
-  double ll = (l<=180.0 && l>=-180.0) ? l : rnd->Uniform(-180.0,180.0);
-  double bb = (b<=90.0 && b>=-90.0)   ? b : rnd->Uniform(-90.0,90.0);
+  double ll = (l<=180.0 && l>=-180.0) ? l : 180.-360.*r1;
+  double bb = (b<=90.0 && b>=-90.0)   ? b : ((180.0/TMath::Pi())*acos(1.0-2.0*r2)-90.0);
   m_GalDir=std::make_pair(ll,bb);
 }
 
@@ -149,6 +151,7 @@ void GRBobsParameters::ReadParametersFromFile(std::string paramFile, int NGRB)
   double fluence;  
   double alpha;
   double beta;
+  double Eco;
 
   char buf[100];
   f1.getline(buf,100);
@@ -157,7 +160,7 @@ void GRBobsParameters::ReadParametersFromFile(std::string paramFile, int NGRB)
   
   while(i<=NGRB && f1.getline(buf,100))
     {
-      if(sscanf(buf,"%lf %lf %lf %lf %lf",&tstart,&duration,&fluence,&alpha,&beta)<=0) break;
+      if(sscanf(buf,"%lf %lf %lf %lf %lf %lf",&tstart,&duration,&fluence,&alpha,&beta,&Eco)<=0) break;
       i++;
     } 
   i--;
@@ -171,7 +174,7 @@ void GRBobsParameters::ReadParametersFromFile(std::string paramFile, int NGRB)
       for(int j = 1; j<=(NGRB %i);j++)
 	{
 	  f2.getline(buf,100);
-	  sscanf(buf,"%lf %lf %lf %lf %lf",&tstart,&duration,&fluence,&alpha,&beta);
+	  sscanf(buf,"%lf %lf %lf %lf %lf %lf",&tstart,&duration,&fluence,&alpha,&beta,&Eco);
 	}
       f2.close();
     }
@@ -184,6 +187,7 @@ void GRBobsParameters::ReadParametersFromFile(std::string paramFile, int NGRB)
   SetAlphaBeta(alpha,beta);
   SetMinPhotonEnergy(3e4); //keV (this is a defaul value)
   SetGalDir(-200,-200);
+  SetCutOffEnergy(Eco);
   SetGRBNumber(65540+ (long) floor(tstart));
-  std::cout<<alpha<<" "<<beta<<std::endl;
+  
 }

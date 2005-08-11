@@ -69,7 +69,6 @@ std::vector<GRBobsPulse*> GRBobsengine::CreatePulsesVector()
 	delete thePulses[i];
       return CreatePulsesVector();
     }
-  std::cout<<BurstEndTime<<" "<<duration<<std::endl;
   return thePulses;
 }
 

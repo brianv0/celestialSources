@@ -78,7 +78,6 @@ class GRBobsmanager : public ISpectrum
   TString GetGRBname();
   void GenerateGRB();  
   void DeleteGRB();  
-
   /*! 
     This method parses the parameter list
     \param input is the string to parse
@@ -125,6 +124,9 @@ class GRBobsmanager : public ISpectrum
   double m_EC_duration;
   double m_startTime;
   double m_endTime;
+  double m_startTime_EC;
+  double m_endTime_EC;
+
 
 };
 #endif
