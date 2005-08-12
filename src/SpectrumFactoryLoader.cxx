@@ -15,6 +15,7 @@ ISpectrumFactory & GaussianSourceFactory();
 ISpectrumFactory & GRBmanagerFactory();
 ISpectrumFactory & GRBobsmanagerFactory();
 ISpectrumFactory & GRBobsFactory();
+
 ISpectrumFactory & IsotropicFactory();
 ISpectrumFactory & MapSourceFactory();
 ISpectrumFactory & MapCubeFactory();
