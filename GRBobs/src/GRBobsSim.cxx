@@ -146,8 +146,8 @@ TH2D* GRBobsSim::MakeGRB_ExtraComponent(double duration, double LATphotons)
   
   for(int ti = 0; ti<tbin; ti++)
     {
-      double t=ti*dt;
-      double I0 = pow(duration/(t+duration),2.0);
+      double t  = ti*dt;
+      double I0 = pow(duration/(9.*t+duration),2.0);
       for(int ei = 0; ei < Ebin; ei++)
 	{
 	  double I = I0*pow(e[ei],-1.0);

@@ -516,7 +516,7 @@ void MakeGRB(int NGRB=1, double enph=0, bool gbm=false)
   std::cout<<Eco<<std::endl;
   if(ExtraComponent) 
     {
-      TH2D *h = m_grb->MakeGRB_ExtraComponent(10.,100.);
+      TH2D *h = m_grb->MakeGRB_ExtraComponent(10000.,100.);
       m_grb->CutOff(h,Eco);
       m_grb->SaveNvEC();
     }
@@ -555,7 +555,9 @@ void ScanParameters(int Ngrb)
   double fPeakFlux;
   double fBATSE1,fBATSE2,fBATSE3,fBATSE4;
   double fBATSE, fLAT,fGBM,fEXP,fTOT;
-  double nBATSE,nLAT,nGBM,nEXP,nTOT,Ep;
+  double nLAT30,nLAT100,nLAT1000;
+  double nBATSE,nGBM,nEXP,nTOT;
+  double alpha,beta,Ep;
   //////////////////////////////////////////////////
   TTree *GRBTree = new TTree("GRBTree","GRBOBS Catalogue");
   GRBTree->Branch("T90",&T90,"T90/D");
@@ -565,6 +567,7 @@ void ScanParameters(int Ngrb)
   GRBTree->Branch("Logf2BATSE",&fBATSE2,"fBATSE2/D");
   GRBTree->Branch("Logf3BATSE",&fBATSE3,"fBATSE3/D");
   GRBTree->Branch("Logf4BATSE",&fBATSE4,"fBATSE4/D");
+
   GRBTree->Branch("LogPeakFlux",&fPeakFlux,"fPeakFlux/D");
 
   GRBTree->Branch("LogfLAT",&fLAT,"LogfLAT/D");
@@ -573,13 +576,17 @@ void ScanParameters(int Ngrb)
   GRBTree->Branch("LogfTOT",&fTOT,"LogfTOT/D");
   
   GRBTree->Branch("LognBATSE",&nBATSE,"LognBATSE/D");
-  GRBTree->Branch("LognLAT",&nLAT,"LognLAT/D");
+
+  GRBTree->Branch("LognLAT30",&nLAT30,"LognLAT30/D");
+  GRBTree->Branch("LognLAT100",&nLAT100,"LognLAT100/D");
+  GRBTree->Branch("LognLAT1000",&nLAT1000,"LognLAT1000/D");
+
   GRBTree->Branch("LognGBM",&nGBM,"LognGBM/D");
-  GRBTree->Branch("LognEXP",&nEXP,"LognEXP/D");
   GRBTree->Branch("LognTOT",&nTOT,"LognTOT/D");
+  //////////////////////////////////////////////////
   GRBTree->Branch("LogEp",&Ep,"LogEp/D");
-  
-  
+  GRBTree->Branch("alpha",&alpha,"alpha/D");
+  GRBTree->Branch("beta",&beta,"beta/D");
   
   for(long grbn=1;grbn<=Ngrb;grbn++)
     {
@@ -609,6 +616,8 @@ void ScanParameters(int Ngrb)
 	  //if(en*de*ne > FEp && en < 1e4) Ep=e;
 	}
       Ep = log10(e2Ne->GetBinCenter(e2Ne->GetMaximumBin()));
+      alpha =  params->GetLowEnergy();
+      beta =   params->GetHighEnergy();
       //////////////////////////////////////////////////
       SpectObj *sp = new SpectObj(Nv,0);              //ph
       sp->SetAreaDetector(GenerationArea); //like observation sim
@@ -617,7 +626,10 @@ void ScanParameters(int Ngrb)
       TH1D *Lct_TOT   = sp->Integral_E(EMIN,EMAX);  // ph
       TH1D *Lct_BATSE = sp->Integral_E(BATSE1,BATSE5);  // ph
       TH1D *Lct_GBM   = sp->Integral_E(GBM1,GBM2);  // ph
-      TH1D *Lct_LAT   = sp->Integral_E(LAT1,LAT2);  // ph
+
+      TH1D *Lct_LAT30   = sp->Integral_E(30000.,LAT2);  // ph
+      TH1D *Lct_LAT100   = sp->Integral_E(100000.,LAT2);  // ph
+      TH1D *Lct_LAT1000   = sp->Integral_E(1000000.,LAT2);  // ph
       //      TH1D *Lct_EXT   = sp->Integral_E(enph,EMAX);  // ph
       
       T90    = log10(sp->GetT90());
@@ -637,7 +649,11 @@ void ScanParameters(int Ngrb)
       nTOT   = log10(sp->Integral_T(Lct_TOT,0.0,TMAX));
       nBATSE = log10(sp->Integral_T(Lct_BATSE,0.0,TMAX));
       nGBM   = log10(sp->Integral_T(Lct_GBM,0.0,TMAX));
-      nLAT   = log10(sp->Integral_T(Lct_LAT,0.0,TMAX));
+
+      nLAT30   = log10(sp->Integral_T(Lct_LAT30,0.0,TMAX));
+      nLAT100   = log10(sp->Integral_T(Lct_LAT100,0.0,TMAX));
+      nLAT1000   = log10(sp->Integral_T(Lct_LAT1000,0.0,TMAX));
+
       double Ep = e2Ne->GetBinCenter(e2Ne->GetMaximumBin());
       std::cout<<"* Theoretical values:  *****************************"<<std::endl;
 #ifdef WIN32
@@ -656,7 +672,9 @@ void ScanParameters(int Ngrb)
       std::cout<<"  Nph TOT    ("<<EMIN<<","<<EMAX<<")  = "<<pow(10.,nTOT)<<std::endl;
       std::cout<<"  Nph BATSE  ("<<BATSE1<<","<<BATSE5<<") = "<<pow(10.,nBATSE)<<std::endl;
       std::cout<<"  Nph GBM    ("<<GBM1<<","<<GBM2<<")  = "<<pow(10.,nGBM)<<std::endl;
-      std::cout<<"  Nph LAT    ("<<LAT1<<","<<LAT2<<")  = "<<pow(10.,nLAT)<<std::endl;
+      std::cout<<"  Nph LAT30    ("<<30000<<","<<LAT2<<")  = "<<pow(10.,nLAT30)<<std::endl;
+      std::cout<<"  Nph LAT100    ("<<100000<<","<<LAT2<<")  = "<<pow(10.,nLAT100)<<std::endl;
+      std::cout<<"  Nph LAT1000    ("<<1000000<<","<<LAT2<<")  = "<<pow(10.,nLAT1000)<<std::endl;
 #endif
       //	  if(output) delete sp;
       GRBTree->Fill();
