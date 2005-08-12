@@ -20,7 +20,6 @@ SpectObj::SpectObj(const TH2D* In_Nv, int type)
   GetUniqueName(Nv,name);
   Nv->SetName(name.c_str());
   
-  if(DEBUG) std::cout<<type<<" ->SpectObj<-  "<<name<<std::endl;
   counts=0;
   m_SpRandGen = new TRandom();
   sourceType = type; //Max
@@ -36,6 +35,14 @@ SpectObj::SpectObj(const TH2D* In_Nv, int type)
   
   m_TimeBinWidth   = Nv->GetXaxis()->GetBinWidth(0);
   
+//////////////////////////////////////////////////
+  //if(DEBUG) {
+  std::cout<<type<<" SpectObj address:  "<<name<<std::endl;
+  std::cout<<"nt,tmin,tmax "<<nt<<" "<<m_Tmin<<" "<<m_Tmax<<std::endl;
+
+    //////////////////////////////////////////////////
+
+
   for(int ei = 0 ; ei<=ne ; ei++) 
     {      
       en[ei] =  Nv->GetYaxis()->GetBinLowEdge(ei+1);
@@ -274,7 +281,6 @@ void SpectObj::ComputeProbability(double enph)
 //////////////////////////////////////////////////
 photon SpectObj::GetPhoton(double t0, double enph)
 {
-  counts++;
   //  photon ph;
   int ei  = TMath::Max(1,Nv->GetYaxis()->FindBin(enph));
   
@@ -545,6 +551,9 @@ double SpectObj::interval(double time, double enph)
 
 double SpectObj::energy(double time, double enph)
 {
+  time=time;
+  enph=enph;
+  counts++;
   return ph.energy;
 }
 
