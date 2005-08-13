@@ -318,7 +318,6 @@ float calcSS(float energy, float redshift){
   int zindex=0,eindex=0;
   int i;
   float tau1,tau2;
-  float tauvalue;
 
   float zvalue[6] = {0., 0.1, 0.5, 1., 2., 3.};
 
@@ -387,12 +386,12 @@ return tau1 + (tau2-tau1)*(redshift-zvalue[zindex])/(zvalue[zindex+1]-zvalue[zin
 }
 
 float calcPB(float energy, float redshift){
-// EBL model 6: Primack & Bullock (1999) Valid for Energies < 500 GeV and Redshift < 5
-//We are using here the LCDM model with Salpeter's  stellar Initial Mass Function (IMF)
-//The data provided by Bullock has opacities up to 10.
+// EBL model 6: Primack & Bullock (1999) Valid for Energies < 500 GeV
+//and Redshift < 5 We are using here the LCDM model with Salpeter's
+//stellar Initial Mass Function (IMF) The data provided by Bullock has
+//opacities up to 10.
 
   int zindex=0,eindex=-1;
-  int i;
   float tau1,tau2, **tautables, tauvalue;
 
   float zvalue[9] = {0., 0.1, 0.5, 1., 1.5, 2., 3., 4., 5.};
