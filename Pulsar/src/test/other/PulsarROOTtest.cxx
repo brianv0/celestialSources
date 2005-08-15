@@ -80,8 +80,10 @@ void PlotPulsar(double enph = 0,char name[100]="pulsar.root")
   // Ne =  [ph/m²/s/keV]
   gDirectory->Delete("Ne");
   Nv->ProjectionY("Ne");
+
+
   TH1D *Ne = (TH1D*) gDirectory->Get("Ne");
-  
+
   Ne->SetYTitle("Ne [ph/m^2/s/keV]");
   Ne->SetXTitle(" Energy[keV] ");
   // Fv = Ne * de: [ph/m^2/s]
@@ -115,6 +117,9 @@ void PlotPulsar(double enph = 0,char name[100]="pulsar.root")
       vFv->SetBinContent(i+1,e*de*ne);
     }
   
+
+ 
+
   //////////////////////////////////////////////////
   
   Nv->SetMinimum(1e-20);
@@ -124,27 +129,6 @@ void PlotPulsar(double enph = 0,char name[100]="pulsar.root")
   if(enph<=0) ExtractPhotons = false;
   else if (enph<EMIN)  enph = EMIN;
   
-  //Pezzo di test
-  double dei = 0.0;
-  double tot = 0.0;
-  double tote =0.0;
-
-  int ei2 = Nv->GetYaxis()->FindBin(EnNormMin);
-  int ei3 = Nv->GetYaxis()->FindBin(EnNormMax);
-
-  for(int ti = 0; ti<TBIN; ti++)
-    {
-      tot = 0.0;
-      for (int ei = ei2; ei<=ei3; ei++)
-	{
-	  dei   = Nv->GetYaxis()->GetBinWidth(ei);
-	  tot = tot + (Nv->GetBinContent(ti+1,ei))*dei;
-	}
-      tote = tote + tot;
-      //      TimeInt->SetBinContent(ti+1,tot);
-    }
-
-
   //////////////////////////////////////////////////
   SpectObj *sp = new SpectObj(Nv,1);              //ph 
   AreaDetector = 1.21;//EventSource::totalArea();
@@ -153,7 +137,6 @@ void PlotPulsar(double enph = 0,char name[100]="pulsar.root")
   //////////////////////////////////////////////////
   TCanvas *clc = new TCanvas("LightCurves","LightCurves",600,800);
   clc->Divide(1,2);
-
 
   TCanvas *csp = new TCanvas("csp","csp");
   csp->SetLogx();
@@ -197,17 +180,13 @@ void PlotPulsar(double enph = 0,char name[100]="pulsar.root")
   Lct_LAT->SetLineWidth(2);
   
   Lct_Pulsar->SetLineColor(2);
-  Lct_EGRET->SetLineColor(3);
+  Lct_EGRET->SetLineColor(7);
   Lct_LAT->SetLineColor(4);
  
 
   csp->cd();
   
   vFv->Scale(1e-6); //Scale in order to plot the 3 histos on the same canvas
-
-  //  Ne->Scale(nLoops*DT*6e4);
-  //Fv->Scale(nLoops/(1e4));//*DT*6e4);
-  //vFv->Scale(nLoops*DT*6e4);
 
   Ne->SetMinimum(1e-10);
   Fv->SetMinimum(1e-10);
@@ -230,9 +209,15 @@ void PlotPulsar(double enph = 0,char name[100]="pulsar.root")
   
   TH1D *Counts   = sp->GetSpectrum(); //ph
   Counts->SetName("Counts");
-  TH1D *Lc = new TH1D("Lc","Lc",100,0,TMAX);//sp->GetTimes();  
+  TH1D *Lc = new TH1D("Lc","Lc",TBIN,0,TMAX);//sp->GetTimes();  
   Lc->SetName("Counts[ph]");
-  
+  Lc->SetMarkerStyle(20);
+  Lc->SetMarkerSize(0.5);
+  Lc->SetMarkerColor(1);
+  Lc->SetLineColor(1);
+  Lc->SetStats(0);  
+
+
   if(ExtractPhotons)
     {  
       double time =0.0;
@@ -253,15 +238,14 @@ void PlotPulsar(double enph = 0,char name[100]="pulsar.root")
 	  
 	  Counts->Fill(energy); // ph
 	  Lc->Fill(time - (TMAX*int(time/TMAX)));       // ph
-	  //std::cout << " Phase " << (time - (TMAX*int(time/TMAX)))/TMAX << std::endl;
 	  time+=Interval;
-
 	  /*
-	  std::cout<<" Time (s)  = "<<time
-		   << " within period = " << time - (TMAX*int(time/TMAX))
-		   <<" Flux (ph/s/cm^2)  = "<<flux*1e-4
-		   <<" energy (keV) = "<<energy
-		   <<" Interval (s) = "<<Interval<<std::endl;
+	    std::cout << " Phase " << (time - (TMAX*int(time/TMAX)))/TMAX << std::endl;
+	    std::cout<<" Time (s)  = "<<time
+	       << " within period = " << time - (TMAX*int(time/TMAX))
+	       <<" Flux (ph/s/cm^2)  = "<<flux*1e-4
+	       <<" energy (keV) = "<<energy
+	       <<" Interval (s) = "<<Interval<<std::endl;
 	  */ 
 	
 	  i++;
@@ -281,7 +265,6 @@ void PlotPulsar(double enph = 0,char name[100]="pulsar.root")
     {
       //Counts->SetMaximum(1.5*Ne->GetMaximum());
 
-      //pippo
       Ne->Scale(nLoops*DT*AreaDetector);
       Fv->Scale(nLoops*DT*AreaDetector);//*DT*6e4);
       vFv->Scale(nLoops*DT*AreaDetector);
@@ -312,7 +295,6 @@ void PlotPulsar(double enph = 0,char name[100]="pulsar.root")
   
   clc->cd(2);
 
-
   std::cout << "****-------------------------------------------------" <<std::endl;
   std::cout << "Fluxes summary: (Eff.Area=" << AreaDetector << " m2 )" << std::endl;
   std::cout << "       Normalisation:   (" << EnNormMin <<","<< EnNormMax <<")  = "
@@ -322,33 +304,33 @@ void PlotPulsar(double enph = 0,char name[100]="pulsar.root")
   std::cout << "       EGRET band  (" << EGRET1 <<","<<EGRET3<<")  = "
 	    << Lct_EGRET->Integral(0,TBIN)*(DT/TMAX) << " ph/cm2/s" << std::endl;
 
-
   if(ExtractPhotons)
     {
       std::cout << "       LAT band (" << LAT1 <<","<<LAT2<<")  = " 
 		<< Lct_LAT->Integral(0,TBIN)*(DT/TMAX) << " ph/cm2/s" << std::endl;
 
-      Lc->SetMarkerStyle(20);
-      Lc->SetMarkerSize(0.5);
-      Lc->SetMarkerColor(6);
-      Lc->SetLineColor(6);
-      Lc->SetStats(1);
-      std::cout<<" Photons Extracted : = "<<Lc->GetEntries()<<std::endl;
-      std::cout<<" flux (exp)        : = "<<Counts->Integral(0,EBIN,"width")<<" ph/m^2"<<std::endl;
-      std::cout<<" flux (exp)        : = "<<Counts->Integral(0,EBIN,"width")*1.0e-7/erg2meV<<" erg/cm^2"<<std::endl;
-      Lct_LAT->Scale(nLoops*DT*6e4);
-      Lct_LAT->Draw();          
-      lcleg->AddEntry(Lc,"LAT extracted photons in ph/cm2/s (30 MeV-300GeV)","lp");
-      Lc->SetLineColor(9);
-      Lct_EXT->SetLineColor(7);
-      Lct_EXT->Scale(nLoops*AreaDetector);
-      
-      Lc->Draw();      
-      Lct_EXT->Draw("same");     
-      
 
   
-      std::cout << " Photon expecteed : " << Lct_EXT->Integral(0,TBIN) << " ph " << std::endl;  
+      int en2 = Fv->GetXaxis()->FindBin(EnNormMin);
+      int en3 = Fv->GetXaxis()->FindBin(EnNormMax);
+      std::cout<<" Photons Extracted : = "<<Lc->GetEntries()<<std::endl;
+      //std::cout<<" flux (exp)        : = "<<Counts->Integral(en2,en3)/(1e4*nLoops*AreaDetector)<<" ph/m^2"<<std::endl;
+      //std::cout<<" flux (exp)        : = "<<Counts->Integral(0,EBIN,"width")*1.0e-7/erg2meV<<" erg/cm^2"<<std::endl;
+      Lct_LAT->Scale(nLoops*DT*6e4);
+
+      lcleg->AddEntry(Lc,"LAT extracted photons in ph/cm2/s (30 MeV-300GeV)","lp");
+      
+      Lct_EXT->SetLineColor(8);
+      Lct_EXT->Scale(nLoops);
+      Lct_EXT->SetLineWidth(2);
+
+      Lct_EXT->Draw(); 
+      Lc->SetStats(0);
+      Lct_EXT->SetStats(0);
+
+      Lc->Draw("epsame");            
+
+      std::cout << " Photon expecteed : " << Lct_EXT->Integral(0,TBIN) << " ph. " << std::endl;  
 
     } 
   else
@@ -363,10 +345,7 @@ void PlotPulsar(double enph = 0,char name[100]="pulsar.root")
 
 
   std::cout << "****-------------------------------------------------" <<std::endl;
-  
 
-
-  //  if(ExtractPhotons) std::cout<<" Flux[ erg/cm^2] EXT ("<<enph<<","<<EMAX<<")  = "<<Fv->Integral(iEXP,EBIN,"width")*1.0e-7/erg2meV<<" erg/cm^2"<<std::endl;
  
   delete sp; 
 }
@@ -398,7 +377,7 @@ int main(int argc, char** argv)
 
   
   double Period  = 0.089; // s
-  double flux = 2e-6; // ph/cm2/s
+  double flux = 1e-5; // ph/cm2/s
   int npeaks = 2;
   double ppar1 = 1e6;
   double ppar2 = 8e6;
@@ -406,49 +385,16 @@ int main(int argc, char** argv)
   double ppar4 = 1.7;//1.7;
   int seed = 61443;
 
+
+  PulsarSim* m_pulsar = new PulsarSim("PSRVELA",seed,flux,enphmin, enphmax, Period);
+  m_pulsar->SaveNv((TH2D*)m_pulsar->PSRPhenom(double(npeaks), ppar1,ppar2,ppar3,ppar4));
+
   
 
-  //Crab Polar Cap vs Outer Gap
-  /*
-  double Period  = 0.033; // s
-  double flux = 2.3e-6; // ph/cm2/s
-  int npeaks = 2;
-  double ppar1 = 1e6;
-  double ppar2 = 30e6;
-  double ppar3 = -1.9;
-  double ppar4 = 0.29; // 1.0 for outer
-
-
-  //Vela Polar Cap vs Outer 
-  double Period  = 0.089; // s
-  double flux = 9e-6; // ph/cm2/s
-  int npeaks = 2;
-  double ppar1 = 1e6;
-  double ppar2 = 8e6;
-  double ppar3 = -1.62;
-  double ppar4 = 1.7; // for outer
-  //double ppar4 = 1.7; // for polar
-  */ 
-  /*
-  //Geminga Polar Cap vs Outer 
-  double Period  = 0.237; // s
-  double flux = 366e-6; // ph/cm2/s
-  int npeaks = 2;
-  double ppar1 = 1e6;
-  double ppar2 = 4.8e6;
-  double ppar3 = -1.56;
-  double ppar4 = 1.0; // 1.0 for outer
- */
-
-
-
-
-  PulsarSim* m_pulsar = new PulsarSim("PSRVELA",seed,flux,enphmin, enphmax, Period, npeaks);
-  m_pulsar->SaveNv((TH2D*)m_pulsar->PSRPhenom(ppar1,ppar2,ppar3,ppar4));
   char name[100];
   sprintf(name,"PSRVELAroot.root");
-
-  std::cout << "**  Total time for simulation " << Period*nLoops << " s. " << std::endl;
+  
+  std::cout << "**  Photons simulated on a period of " << Period*nLoops << " s. " << std::endl;
   PlotPulsar(enph,name);  
 
   theApp.Run();

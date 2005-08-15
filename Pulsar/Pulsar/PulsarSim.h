@@ -12,8 +12,10 @@
 #include <ctime>
 #include "TFile.h"
 #include "TF1.h"
+#include <TTree.h>
 #include "PulsarConstants.h"
 #include "SpectObj/SpectObj.h"
+#include "facilities/Util.h"
 
 
 /*! 
@@ -25,7 +27,7 @@
  *
  * This class creates the TH2D ROOT histogram that contains the differential photon flux (dN/dE/dt/dA) of the simulated
  * pulsar espressed in ph/keV/s/m2.
- * The user can specify the emission model.Now the default model is a phenomenological one based on observations of
+ * The user can specify the emission model. Now the default model is a phenomenological one based on observations of
  * known gamma-ray pulsars.
 */
 
@@ -34,7 +36,7 @@ class PulsarSim
  public:
   
   //! Constructor of PulsarSim
-  PulsarSim(std::string name, int seed, double flux, double enphmin, double enphmax, double period, int numpeaks);
+  PulsarSim(std::string name, int seed, double flux, double enphmin, double enphmax, double period);
 
   //! Destructor of PulsarSim
   ~PulsarSim()
@@ -43,7 +45,7 @@ class PulsarSim
     }
   
   //! Method that creates the TH2D histogram according to the phenomenological model.
-  TH2D* PSRPhenom(double par1, double par2, double par3, double par4);
+  TH2D* PSRPhenom(double par0, double par1, double par2, double par3, double par4);
 
   // Returns a TH2D ROOT matrix that contains in every bin Nv*dE*dT*Aeff
   TH2D *PulsarSim::Nph(const TH2D *Nv);

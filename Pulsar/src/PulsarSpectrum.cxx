@@ -140,7 +140,7 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
   PulsarLog << "**   Position : (RA,Dec)=(" << m_RA << "," << m_dec 
 	    << ") ; (l,b)=(" << m_l << "," << m_b << ")" << std::endl; 
   PulsarLog << "**   Flux above 100 MeV : " << m_flux << " ph/cm2/s " << std::endl;
-
+  
   //Writes down on Log all the ephemerides
   for (unsigned int n=0; n < m_t0Vect.size(); n++)
     {
@@ -171,16 +171,15 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
 	    << std::setprecision(12) << (StartMissionDateMJD+JDminusMJD)*SecsOneDay 
 	    << " sec.) - Jan,1 2007 00:00.00 (TT)" << std::endl;
   PulsarLog << "**************************************************" << std::endl;
-  PulsarLog << "**   Model chosen : " << m_model << " --> Using Phenomenological Pulsar Model " << std::endl;  
-
 
   //Instantiate an object of PulsarSim class
-  m_Pulsar    = new PulsarSim(m_PSRname, m_seed, m_flux, m_enphmin, m_enphmax, m_period, m_numpeaks);
+  m_Pulsar    = new PulsarSim(m_PSRname, m_seed, m_flux, m_enphmin, m_enphmax, m_period);
  
   //Instantiate an object of SpectObj class
   if (m_model == 1)
     {
-      m_spectrum = new SpectObj(m_Pulsar->PSRPhenom(ppar1,ppar2,ppar3,ppar4),1);
+      PulsarLog << "**   Model chosen : " << m_model << " --> Using Phenomenological Pulsar Model " << std::endl;  
+      m_spectrum = new SpectObj(m_Pulsar->PSRPhenom(double(m_numpeaks), ppar1,ppar2,ppar3,ppar4),1);
       m_spectrum->SetAreaDetector(EventSource::totalArea());
 
       PulsarLog << "**   Effective Area set to : " << m_spectrum->GetAreaDetector() << " m2 " << std::endl; 
@@ -202,8 +201,16 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
   //Save the output txt file..
   int DbFlag = saveDbTxtFile();
 
+  if (DEBUG) 
+    if (DbFlag == 0)
+      { 
+	std::cout << "Database Output file created from scratch " << std::endl;
+      } 
+    else 
+      {
+	std::cout << "Appendended data to existing Database output file" << std::endl;
+      }
 }
-
 /////////////////////////////////////////////////
 PulsarSpectrum::~PulsarSpectrum() 
 {  
@@ -252,8 +259,7 @@ double PulsarSpectrum::interval(double time)
     }
   
   double timeTilde = timeTildeDecorr + getBaryCorr(timeTildeDecorr); //should be corrected before applying ephem de-corrections
-
-
+    
   if (DEBUG)
     {
       if ((int(timeTilde - (StartMissionDateMJD)*SecsOneDay) % 1000) < 1.5)
@@ -285,7 +291,7 @@ double PulsarSpectrum::interval(double time)
      std::cout << " interval is " <<  nextTimeDecorr - timeTildeDecorr << std::endl;
   }
   
-    return nextTimeDecorr - timeTildeDecorr; //interval between the de-corected times
+  return nextTimeDecorr - timeTildeDecorr; //interval between the de-corected times
 
 }
 
@@ -460,10 +466,9 @@ double PulsarSpectrum::getDecorrectedTime(double CorrectedTime)
       double hDown = (CorrectedTime - (ttDown + getBaryCorr(ttDown)));
       hMid = (CorrectedTime - (ttMid + getBaryCorr(ttMid)));
                 
-      // std::cout << std::setprecision(30) 
+      //std::cout << std::setprecision(30) 
       //	<< "\n" << i << "**ttUp " << ttUp << " ttDown " << ttDown << " mid " << ttMid << std::endl;
-      //std::cout << "  hUp " << hUp << " hDown " << hDown << " hMid " << hMid << std::endl;
-      
+             
       if (fabs(hMid) < baryCorrTol) break;
       if ((hDown*hMid)>0)
 	{
@@ -510,10 +515,9 @@ int PulsarSpectrum::getPulsarFromDataList()
       Status = 0;
       exit(1);
     }
-
   
   char aLine[400];  
-  PulsarDataTXT.getline(aLine,200); 
+  PulsarDataTXT.getline(aLine,400); 
 
   char tempName[15] = "";
 
@@ -527,6 +531,7 @@ int PulsarSpectrum::getPulsarFromDataList()
      
       if (std::string(tempName) == m_PSRname)
 	{
+
 	  Status = 1;
 	  m_flux = flux;
 	  m_ephemType = ephemType;
@@ -568,6 +573,7 @@ int PulsarSpectrum::getPulsarFromDataList()
 	  phi0 = -1.0*(f0*(txbary-t0) + 0.5*f1*(pow((txbary-t0),2)) + (1/6)*f1*(pow((txbary-t0),2))); 
 	  phi0 = modf(phi0,&phas);
 	  m_phi0Vect.push_back(phi0);
+	  
 	}
     }
 
@@ -622,10 +628,10 @@ int PulsarSpectrum::saveDbTxtFile()
       DbOutputFile.close();
   }
 
-  //Writes out the infors of the file
+  //Writes out the infos of the file
   DbOutputFile.open(DbOutputFileName.c_str(),std::ios::app);
   double tempInt, tempFract, f0, f1, f2;
-  for (int ep = 0; ep < m_periodVect.size(); ep++)
+  for (unsigned int ep = 0; ep < m_periodVect.size(); ep++)
     {
       DbOutputFile << "\"" << m_PSRname << std::setprecision(5) << "\" " << m_RA << " " << m_dec << " ";
       tempFract = modf(m_t0Vect[ep],&tempInt);
