@@ -1,10 +1,10 @@
 package Pulsar
-version v1r0p1
-author Nicola Omodei<nicola.omodei@pi.infn.it>, Massimiliano Razzano <massimiliano.razzano@pi.infn.it>
+version v1r0
+author Nicola Omodei<nicola.omodei@pi.infn.it> Massimiliano Razzano <massimiliano.razzano@pi.infn.it>
 # $Id$
 
 use flux       v8r*
-use ROOT       v*  IExternal
+use ROOT       v2r*  IExternal
 use SpectObj   v* celestialSources
 use astro v*
 

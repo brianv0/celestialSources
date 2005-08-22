@@ -20,7 +20,6 @@ SpectObj::SpectObj(const TH2D* In_Nv, int type)
   GetUniqueName(Nv,name);
   Nv->SetName(name.c_str());
   
-  if(DEBUG) std::cout<<type<<" ->SpectObj<-  "<<name<<std::endl;
   counts=0;
   m_SpRandGen = new TRandom();
   sourceType = type; //Max
@@ -35,6 +34,15 @@ SpectObj::SpectObj(const TH2D* In_Nv, int type)
   m_Tmax = Nv->GetXaxis()->GetXmax();
   
   m_TimeBinWidth   = Nv->GetXaxis()->GetBinWidth(0);
+  
+  //////////////////////////////////////////////////
+  if(DEBUG) 
+    {
+      std::cout<<type<<" SpectObj address:  "<<name<<std::endl;
+      std::cout<<"nt,tmin,tmax "<<nt<<" "<<m_Tmin<<" "<<m_Tmax<<std::endl;
+    }
+  //////////////////////////////////////////////////
+  
   
   for(int ei = 0 ; ei<=ne ; ei++) 
     {      
@@ -274,7 +282,6 @@ void SpectObj::ComputeProbability(double enph)
 //////////////////////////////////////////////////
 photon SpectObj::GetPhoton(double t0, double enph)
 {
-  counts++;
   //  photon ph;
   int ei  = TMath::Max(1,Nv->GetYaxis()->FindBin(enph));
   
@@ -462,6 +469,22 @@ double SpectObj::GetFluence(double BL, double BH)
   //  return Nv->Integral(0,nt,ei1,ei2,"width")*1.0e-7/(m_TimeBinWidth*erg2meV)/m_AreaDetector; //erg/cm²
 }
 
+double SpectObj::GetPeakFlux(double BL, double BH)
+{
+  if(BH<=0) BH = emax;
+  int ei1 = Nv->GetYaxis()->FindBin(TMath::Max(emin,BL));
+  int ei2 = Nv->GetYaxis()->FindBin(TMath::Min(emax,BH));
+  double PF=0.0;
+  for (int ei = ei1; ei<=ei2; ei++)
+    {
+      for(int ti = 1; ti<=nt; ti++)
+	{
+	  PF= TMath::Max(PF,Nv->GetBinContent(ti, ei));//[ph]
+	}  
+    }
+  return PF*1e-4/(m_AreaDetector*m_TimeBinWidth); //ph/cm²/s
+}
+
 
 void SpectObj::ScaleAtBATSE(double fluence)
 {
@@ -529,6 +552,9 @@ double SpectObj::interval(double time, double enph)
 
 double SpectObj::energy(double time, double enph)
 {
+  time=time;
+  enph=enph;
+  counts++;
   return ph.energy;
 }
 

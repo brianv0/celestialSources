@@ -5,6 +5,7 @@
 #include "TROOT.h"
 #include "TRandom.h"
 #include <vector>
+#include <iostream>
 
 /*! 
   \struct photon
@@ -67,6 +68,7 @@ class SpectObj
   //////////////////////////////////////////////////
   void ScaleAtBATSE(double fluence);
   double GetFluence(double BL=0.0, double BH=0.0);
+  double GetPeakFlux(double BL=0.0, double BH=0.0);
   double GetT90(double BL=0.0, double BH=0.0);
   void GetGBM();
   //////////////////////////////////////////////////
