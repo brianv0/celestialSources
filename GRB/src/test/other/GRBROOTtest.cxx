@@ -31,6 +31,7 @@ int frame=10;
 bool movie     = false;
 bool bandFit     = false;
 bool powerlawFit = false;
+bool COFit = false;
 bool scaled=false;
 int  extension;
 //////////////////////////////////////////////////
@@ -342,6 +343,23 @@ void PlotGRB(double enph = 0,char name[100]="grb_65540.root",TString name2="GRB_
       std::cout<<" No    = "<<pow(10.,pl.GetParameter(0))<<std::endl;
       std::cout<<" Index = "<<pl.GetParameter(1)<<std::endl;
       std::cout<<"--------------------------------------------------"<<std::endl;
+    }
+  
+  if(COFit)
+    {
+      TF1 plco("PLCO_f","10^([0])*(x/10000)^(-[1])*exp(-x/(1e6*[2]))",1.0e+5,1.0e+8);
+      
+      plco.SetLineStyle(2);
+      plco.SetLineColor(2);
+      plco.SetParameters(4.0,-2.5,1.0);
+      //      plco.FixParameter(2,1.0);
+      plco.SetParLimits(0,-8,10);
+      plco.SetParLimits(2,0.1,100.0);
+      
+      //////////////////////////////////////////////////
+      Ne->Fit("PLCO_f","R+","lsame");
+      Fv->Fit("PLCO_f","R+","lsame");
+      e2Ne->Fit("PLCO_f","R+","lsame");
     }
   TLegend *leg = new TLegend(0.11,0.12,0.37,0.25);
   leg->SetFillStyle(0);
@@ -737,6 +755,10 @@ int main(int argc, char** argv)
       else if("-powerLaw"==arg_name)
 	{
 	  powerlawFit=true;
+	}
+      else if("-CutOff"==arg_name)
+	{
+	  COFit=true;
 	}
       else if("-scaled"==arg_name)
 	{

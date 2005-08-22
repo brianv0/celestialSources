@@ -260,9 +260,9 @@ void GRBSim::GetGBMFlux(TString GRBname)
   double dt   = m_Nv->GetXaxis()->GetBinWidth(1);
   int tbin = (int) tfinal/GBMTimeBinWidth;
   /*
-  double t    = 0;
-  double dt   = m_Nv->GetXaxis()->GetBinWidth(1);
-  double tbin = m_Nv->GetXaxis()->GetNbins();
+    double t    = 0;
+    double dt   = m_Nv->GetXaxis()->GetBinWidth(1);
+    double tbin = m_Nv->GetXaxis()->GetNbins();
   */
 
   TString name = "GRB_";
@@ -282,6 +282,7 @@ void GRBSim::GetGBMFlux(TString GRBname)
       GBM.Draw();
     }
 #endif
+
   a =  -1.00;
   b =  -2.25;
   
@@ -307,6 +308,7 @@ void GRBSim::GetGBMFlux(TString GRBname)
       double LogEp0 = 2.0;
 
       band.SetParameters(a,b-a,LogEp0,LogC0);
+
       if(LogC0>-5) 
 	{
 	  if(DEBUG)
@@ -316,14 +318,14 @@ void GRBSim::GetGBMFlux(TString GRBname)
 	} 
       else 
 	{
-	  band.SetParameters(-2.0,-3.0,LogEp0,-10.0);
+	  band.SetParameters(-2.0,-1.0,LogEp0,-8.0);
 	}
       
       a  = band.GetParameter(0);
       b  = a+band.GetParameter(1);
       E0    = pow(10.,band.GetParameter(2));
       Const = pow(10.,band.GetParameter(3));
-      double Ep=(2.0+a)*E0; 
+      double Ep=TMath::Max(30.0,(2.0+a)*E0); 
       os<<Const<<" "<<a<<" "<<b<<" "<<Ep<<" "<<std::endl;
       
       if(DEBUG)

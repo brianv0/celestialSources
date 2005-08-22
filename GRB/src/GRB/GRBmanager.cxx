@@ -119,7 +119,9 @@ TString GRBmanager::GetGRBname(double time)
 
 void GRBmanager::GenerateGRB()
 {
-    using astro::GPS;
+  //  Field Of View for generating bursts degrees above the XY plane.
+  const double FOV=-20;
+  using astro::GPS;
   TString GRBname = GetGRBname(m_startTime);
   //////////////////////////////////////////////////
   m_Nbursts++;
@@ -133,8 +135,7 @@ void GRBmanager::GenerateGRB()
   m_fluence   = m_GRB->GetFluence();
   m_GRBnumber = m_GRB->GetGRBNumber();
 
-  m_theta = -90.0;
-  double FOV=20.0; // degrees above the XY plane.
+  m_theta = -100.0;
   while(m_theta<FOV)
     {
       m_par->SetGalDir(-200,-200); //this generates random direction in the sky

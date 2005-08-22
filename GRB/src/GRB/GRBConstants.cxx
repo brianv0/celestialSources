@@ -5,7 +5,7 @@
 
 #include "GRBConstants.h"
 
-#define DEBUG  0
+#define DEBUG  1
 
 Parameters::Parameters()
 {
@@ -46,10 +46,12 @@ double Parameters::GetBATSEDuration()
 
 void Parameters::SetGalDir(double l, double b)
 {
-  double ll,bb;
+  double r1 = rnd->Uniform();
+  double r2 = rnd->Uniform();
   
-  ll = (l<=180.0 && l>=-180.0) ? l : rnd->Uniform(-180.0,180.0);
-  bb = (b<=90.0 && b>=-90.0)   ? b : rnd->Uniform(-90.0,90.0);
+  double ll = (l<=180.0 && l>=-180.0) ? l : 180.-360.*r1;
+  double bb = (b<=90.0 && b>=-90.0)   ? b : ((180.0/TMath::Pi())*acos(1.0-2.0*r2)-90.0);
+  m_GalDir=std::make_pair(ll,bb);
   m_GalDir=std::make_pair(ll,bb);
 }
 
@@ -178,7 +180,7 @@ void Parameters::ComputeParametersFromFile(std::string paramFile, int NGRB)
   double d7=0.0;
   double tv=0.0;
   
-  if (Eco<=2.0) Eco = rnd->Uniform(3.0,10.0);
+  if (Eco<1.0) Eco = rnd->Uniform(3.0,10.0);
   if(m_Type==1) // SHORT BURSTS
     {
       tv  = m_Duration;
