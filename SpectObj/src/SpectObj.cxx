@@ -35,14 +35,15 @@ SpectObj::SpectObj(const TH2D* In_Nv, int type)
   
   m_TimeBinWidth   = Nv->GetXaxis()->GetBinWidth(0);
   
-//////////////////////////////////////////////////
-  //if(DEBUG) {
-  std::cout<<type<<" SpectObj address:  "<<name<<std::endl;
-  std::cout<<"nt,tmin,tmax "<<nt<<" "<<m_Tmin<<" "<<m_Tmax<<std::endl;
-
-    //////////////////////////////////////////////////
-
-
+  //////////////////////////////////////////////////
+  if(DEBUG) 
+    {
+      std::cout<<type<<" SpectObj address:  "<<name<<std::endl;
+      std::cout<<"nt,tmin,tmax "<<nt<<" "<<m_Tmin<<" "<<m_Tmax<<std::endl;
+    }
+  //////////////////////////////////////////////////
+  
+  
   for(int ei = 0 ; ei<=ne ; ei++) 
     {      
       en[ei] =  Nv->GetYaxis()->GetBinLowEdge(ei+1);
