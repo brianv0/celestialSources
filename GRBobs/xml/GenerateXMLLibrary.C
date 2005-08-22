@@ -128,7 +128,7 @@ void GenerateXMLLibrary(int Nbursts=100)
   int NphLat=0;
   double DelayTime=0;
   double ExtraComponent_Duration=0.0;
-  double CO_Energy= -1.0;  
+  double CO_Energy= 0.0;  
   
 
   gDirectory->Delete("PFlong");
