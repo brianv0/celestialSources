@@ -616,8 +616,8 @@ void ScanParameters(int Ngrb)
 	  //if(en*de*ne > FEp && en < 1e4) Ep=e;
 	}
       Ep = log10(e2Ne->GetBinCenter(e2Ne->GetMaximumBin()));
-      alpha =  params->GetLowEnergy();
-      beta =   params->GetHighEnergy();
+      alpha =  params->GetAlpha();
+      beta =   params->GetBeta();
       //////////////////////////////////////////////////
       SpectObj *sp = new SpectObj(Nv,0);              //ph
       sp->SetAreaDetector(GenerationArea); //like observation sim

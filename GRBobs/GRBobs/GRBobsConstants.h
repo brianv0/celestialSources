@@ -102,6 +102,8 @@ class GRBobsParameters
   inline  double GetEpeak()          {return m_Epeak;}
   inline  double GetLowEnergy()      {return m_LowEnergy;}
   inline  double GetHighEnergy()     {return m_HighEnergy;}
+  inline  double GetAlpha()      {return m_LowEnergy-ObsCst::We;}
+  inline  double GetBeta()       {return m_HighEnergy-ObsCst::We;}
   inline  long   GetGRBNumber()      {return m_GRBnumber;}
   inline  double GetDuration()       {return m_duration;}
   inline  double GetCutOffEnergy()   {return m_Eco;}

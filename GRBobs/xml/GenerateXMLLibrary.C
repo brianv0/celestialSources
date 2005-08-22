@@ -264,7 +264,7 @@ void GenerateXMLLibrary(int Nbursts=100)
 		  //	  Duration = pow(10.0,(double)rnd->Gaus(1.46,0.49)); //(Long Burst)
 		  PFlong->Fill(PeakFlux);
 		  double lpf = log10(PeakFlux);
-		  Stretch =  TMath::Max(1.0, a * lpf*lpf + b * lpf + c);
+		  double Stretch =  TMath::Max(1.0, a * lpf*lpf + b * lpf + c);
 		  Duration*=Stretch;
 		}
 	      rnd->SetSeed(seed);
@@ -317,7 +317,7 @@ void GenerateXMLLibrary(int Nbursts=100)
       else
 	os<<"<use_spectrum frame=\"galaxy\" />"<<std::endl;//u galactic_dir l=\""<<l<<"\" b=\""<<b<<"\" />"<<std::endl;
 
-
+      
       os<<"</spectrum> </source>"<<std::endl;
       //////////////////////////////////////////////////
       if(GeneratePF) 
@@ -336,7 +336,31 @@ void GenerateXMLLibrary(int Nbursts=100)
     }
   os<<"</source>"<<std::endl;
   //////////////////////////////////////////////////
-
+  
+  //////////////////////////////////////////////////
+  os<<""<<std::endl;
+  os<<"<source name=\" GRBobs-100\" >"<<std::endl;
+  for(int i = 0; i<100 ; i++)
+    {
+      if(i<10) os<<"     <nestedSource sourceRef=\" GRB_0000"<<i<<" \"/>"<<std::endl;
+      else if(i<100) os<<"     <nestedSource sourceRef=\" GRB_000"<<i<<" \"/>"<<std::endl;
+      else os<<"     <nestedSource sourceRef=\" GRB_"<<i<<" \"/>"<<std::endl;
+    }
+  os<<"</source>"<<std::endl;
+  //////////////////////////////////////////////////
+  
+  //////////////////////////////////////////////////
+  os<<""<<std::endl;
+  os<<"<source name=\" GRBobs-1000\" >"<<std::endl;
+  for(int i = 0; i<1000 ; i++)
+    {
+      if(i<10) os<<"     <nestedSource sourceRef=\" GRB_0000"<<i<<" \"/>"<<std::endl;
+      else if(i<100) os<<"     <nestedSource sourceRef=\" GRB_000"<<i<<" \"/>"<<std::endl;
+      else if(i<1000) os<<"     <nestedSource sourceRef=\" GRB_00"<<i<<" \"/>"<<std::endl;
+    }
+  os<<"</source>"<<std::endl;
+  //////////////////////////////////////////////////
+  
   os<<""<<std::endl;
   os<<"<source name=\" AllGRBobs\" >"<<std::endl;
   for(int i = 0; i<Nbursts ; i++)

@@ -11,8 +11,6 @@
 
 
 #define DEBUG 0
-//  Field Of View for generating bursts degrees above the XY plane.
-#define FOV 20
 
 
 ISpectrumFactory &GRBobsmanagerFactory() 
@@ -25,6 +23,9 @@ ISpectrumFactory &GRBobsmanagerFactory()
 GRBobsmanager::GRBobsmanager(const std::string& params)
   : m_params(params)
 {
+  //  Field Of View for generating bursts degrees above the XY plane.
+  const double FOV=-20;
+
   using astro::GPS;
   m_GenerateGBMOutputs = false;
   facilities::Util::expandEnvVar(&paramFile);  
