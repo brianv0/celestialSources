@@ -472,7 +472,7 @@ float calcPrimack(float energy, float redshift){
     for(i=0;i<8;i++){
       if(redshift>zboundslow[i] && redshift<=zboundsup[i]){
 	zindex=i;
-		cout<<"index="<<zindex<<endl;
+//		cout<<"index="<<zindex<<endl;
       }
     }
     firsttime = 0;
