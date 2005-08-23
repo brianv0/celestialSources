@@ -16,15 +16,15 @@ namespace IRB {
 
 /**
  * @class EblAtten
- * @brief Function object wrapper to Hays/McEnery code (in IRB_routines.cxx) 
+ * @brief Function object wrapper to Hays/McEnery code (in IRB_routines.cxx)
  * that calculates EBL optical depth as a function of energy and redshift
  * for four different models.
  * @author J. Chiang
  *
- * $Header$ 
+ * $Header$
  */
 
-enum EblModel {SdJbase, SdJfast, Primack99, Primack04, Salamon_Stecker, Primack_Bullock};
+enum EblModel {SdJbase, SdJfast, Primack99, Primack04, Salamon_Stecker, Primack_Bullock, Hartmann};
 
 class EblAtten {
 
