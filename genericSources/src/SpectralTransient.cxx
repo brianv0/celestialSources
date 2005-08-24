@@ -55,7 +55,7 @@ SpectralTransient::SpectralTransient(const std::string & paramString)
       if (params.size() > 6) m_lc = std::atoi(params[6].c_str());
       if (params.size() > 7) {
          m_z = std::atof(params[7].c_str());
-         m_tau = new IRB::EblAtten(IRB::Hartmann);
+         m_tau = new IRB::EblAtten(IRB::Kneiske);
       }
       if (params.size() > 8) m_logParabola = std::atoi(params[8].c_str());
    } else {
@@ -81,7 +81,7 @@ SpectralTransient::SpectralTransient(const std::string & paramString)
       }
       try {
          m_z = parmap.value("z");
-         m_tau = new IRB::EblAtten(IRB::Hartmann);
+         m_tau = new IRB::EblAtten(IRB::Kneiske);
       } catch (...) {
       }
       try {

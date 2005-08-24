@@ -10,7 +10,7 @@
 
  *  EBL model 1: Salamon & Stecker (ApJ 1998, 493:547-554)
  *  EBL model 2: Primack & Bullock (1999) Valid for Energies < 500 GeV and Redshift < 5
- *  EBL model 3: Kneiske, Hartmann et al (A&A 413, 807-815, 2004)
+ *  EBL model 3: Kneiske et al (A&A 413, 807-815, 2004)
 
  * For  models 1 and 2 the EBL attenuation turns on abruptly at 10 GeV. This is specially artificial for distant
  * blazars z > ~3. This can be improved by extrapolating the models to energies around 1-5 GeV
@@ -77,8 +77,8 @@ float calcSJ2(float energy, float redshift);
 float calcPrimack(float energy, float redshift);
 float calcPrimack04(float energy, float redshift);
 float calcSS(float energy, float redshift);
-float calcPB(float energy, float redshift);
-float calcHartmann(float energy, float redshift);
+float calcPB99(float energy, float redshift);
+float calcKneiske(float energy, float redshift);
 
 
 float calcSS(float energy, float redshift){
@@ -156,7 +156,7 @@ return tau1 + (tau2-tau1)*(redshift-zvalue[zindex])/(zvalue[zindex+1]-zvalue[zin
 
 }
 
-float calcPB(float energy, float redshift){
+float calcPB99(float energy, float redshift){
 // EBL model 2: Primack & Bullock (1999) Valid for Energies < 500 GeV
 //and Redshift < 5 We are using here the LCDM model with Salpeter's
 //stellar Initial Mass Function (IMF) The data provided by Bullock has
@@ -267,7 +267,7 @@ if(redshift > 5.) redshift=5.0;
 }
 
 
-float calcHartmann(float energy, float redshift){
+float calcKneiske(float energy, float redshift){
 /************************************************************************
 EBL model 6: Kneiske, Bretz, Mannheim, Hartmann (A&A 413, 807-815, 2004)
   Valid for redshift <= 4.0
@@ -332,7 +332,7 @@ if(redshift < 0.){
 	 } else if (logenergy >= 0.) {
             std::cerr<<"This EBL model is only valid for E < 1000 GeV..."<<std::endl;
             return 10.;
-            }
+            } else if (logenergy < -2.) return 0.;
 	    else if (energy <= 0.) {
 	      std::cerr<<"Invalid energy value"<<std::endl;
 	      return 0.;

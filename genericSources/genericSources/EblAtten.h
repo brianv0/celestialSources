@@ -24,7 +24,7 @@ namespace IRB {
  * $Header$
  */
 
-enum EblModel {SdJbase, SdJfast, Primack99, Primack04, Salamon_Stecker, Primack_Bullock, Hartmann};
+enum EblModel {SdJbase, SdJfast, Primack99, Primack04, Salamon_Stecker, Primack_Bullock99, Kneiske};
 
 class EblAtten {
 
