@@ -13,8 +13,6 @@
 #include "TF1.h"
 #include "TH1D.h"
 
-#define QG false
-
 #define DEBUG 0
 
 using namespace cst;
@@ -73,7 +71,7 @@ TH2D* GRBSim::Fireball()
   //////////////////////////////////////////////////
   double dtqg=0.0;
   double max_tqg=0.0;
-  if(QG)
+  if(m_params->QG())
     {
       double dist = GetDistance();
       double Ep = 1e19 * 1e6; //keV;
@@ -106,7 +104,7 @@ TH2D* GRBSim::Fireball()
       for(int ei = 0; ei < Ebin; ei++)
 	{
 	  double nv = m_Nv->GetBinContent(ti+1, ei+1);
-	  if(QG) energy = m_params->rnd->Uniform(e[ei],e[ei+1]);
+	  if(m_params->QG()) energy = m_params->rnd->Uniform(e[ei],e[ei+1]);
 	  else energy = e[ei];
 	  tqg    = t-shift-energy*dtqg;
 	  

@@ -8,6 +8,7 @@
 #define DEBUG  1
 
 Parameters::Parameters()
+  : m_QG(false)
 {
   rnd = new TRandom();
   SetGRBNumber(UInt_t(rnd->GetSeed()));
@@ -127,7 +128,7 @@ void Parameters::ComputeParametersFromFile(std::string paramFile, int NGRB)
   double ep,Eco;
   char type;
   
-  int GBM;
+  int GBM,QG;
   
   char buf[200];
   f1.getline(buf,100);
@@ -135,7 +136,7 @@ void Parameters::ComputeParametersFromFile(std::string paramFile, int NGRB)
   int i=1;
   while(i<=NGRB && f1.getline(buf,100))
     {
-      if(sscanf(buf,"%lf %s %lf %lf %lf %d",&fluence,&type,&Eco,&ep,&ic,&GBM)<=0) break;
+      if(sscanf(buf,"%lf %s %lf %lf %lf %d %d",&fluence,&type,&Eco,&ep,&ic,&GBM,&QG)<=0) break;
       i++;
     } 
   i--;
@@ -149,11 +150,14 @@ void Parameters::ComputeParametersFromFile(std::string paramFile, int NGRB)
       for(int j = 1; j<=(NGRB %i);j++)
 	{
 	  f2.getline(buf,100);
-	  if(sscanf(buf,"%lf %s %lf %lf %lf %d",&fluence,&type,&Eco,&ep,&ic,&GBM)<=0);
+	  if(sscanf(buf,"%lf %s %lf %lf %lf %d %d",&fluence,&type,&Eco,&ep,&ic,&GBM,&QG)<=0);
 	}
       f2.close();
     }
   //////////////////////////////////////////////////
+  //  if(QG>0)
+  //    std::cout<<"Lorentz Violation effect enabled!"<<std::endl;
+  SetQGOutput(QG>0);
   /// Sets the bolean flag for GBM output
   if (GBM>0) 
     SetGBMOutput(true);
@@ -230,4 +234,6 @@ void Parameters::PrintParameters()
   std::cout<<" Inverse Compton Parameter   = "<<m_InverseCompton<<std::endl;
   if(m_GBM) 
     std::cout<<" for this bursts will be generated the GBM output "<<std::endl;
+  if(m_QG)
+    std::cout<<" Lorentz Violation set to true for this burst "<<std::endl;
 }

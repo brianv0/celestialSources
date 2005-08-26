@@ -157,6 +157,7 @@ class Parameters
   void SetGammaMax(double gmax);
   void SetInverseCompton(double ic);
   inline void SetGBMOutput(bool flag){m_GBM=flag;}
+  inline void SetQGOutput(bool flag){m_QG=flag;}
   /// Initialize the random number generator
   void SetGRBNumber(UInt_t GRBnumber);
   
@@ -181,9 +182,13 @@ class Parameters
   /// The random number generator.
   TRandom *rnd; 
 
+  const bool QG() const {return m_QG;}
+
+
  private:
   
   bool m_GBM;
+  bool m_QG;
   UInt_t m_GRBnumber;
   int m_Type;
   double m_Duration;
