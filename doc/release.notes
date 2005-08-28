@@ -4,6 +4,7 @@
 
   @verbatim
   $Id$
+  28-Aug-05 v1r0p5   JC    tag for GRBobsmanager
   27-Apr-05 v1r0p4   THB   restore GRBobs 
   27-Apr-05 v1r0p3   THB   remove GRBobs for now--does not build on Windows, not used yet
   27-Apr-05 v1r0p2   THB   add header files to project on Windows, enable creation of names
