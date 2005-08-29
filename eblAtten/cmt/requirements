@@ -22,4 +22,4 @@ macro source *.cxx WIN32 "*.h *.cxx"
 
 library eblAtten -no_share $(source)
 
-#application test_eblAtten test/test.cxx
+application test_eblAtten test/test.cxx
