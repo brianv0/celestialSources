@@ -11,6 +11,7 @@ use CLHEP v* IExternal
 use facilities v*
 use astro v*
 use flux v*
+use eblAtten v* celestialSources
 
 apply_pattern package_include
 apply_pattern package_linkopts

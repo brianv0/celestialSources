@@ -29,7 +29,7 @@
 #include "ConstParMap.h"
 #include "FitsImage.h"
 #include "Util.h"
-#include "genericSources/EblAtten.h"
+#include "eblAtten/EblAtten.h"
 #include "genericSources/SpectralTransient.h"
 
 std::vector<double> SpectralTransient::ModelInterval::s_energies;
@@ -102,7 +102,7 @@ double SpectralTransient::interval(double time) {
       return event->first - time;
    } 
 // There should be a better way to turn off a source than this:
-   return 8.64e5;
+   return 3.155e8;
 }
 
 
