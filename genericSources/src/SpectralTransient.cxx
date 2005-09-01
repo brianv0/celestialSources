@@ -55,9 +55,22 @@ SpectralTransient::SpectralTransient(const std::string & paramString)
       if (params.size() > 6) m_lc = std::atoi(params[6].c_str());
       if (params.size() > 7) {
          m_z = std::atof(params[7].c_str());
-         m_tau = new IRB::EblAtten(IRB::Kneiske);
       }
       if (params.size() > 8) m_logParabola = std::atoi(params[8].c_str());
+      if (params.size() > 9) {
+         IRB::EblModel eblModel = 
+            static_cast<IRB::EblModel>(std::atoi(params[9].c_str()));
+         try {
+            m_tau = new IRB::EblAtten(eblModel);
+         } catch (std::exception & eObj) {
+            std::cerr << "Invalid model ID, " << eblModel << "\n"
+                      << "Using default, IRB::Kneiske = " 
+                      << IRB::Kneiske << "\n";
+            m_tau = new IRB::EblAtten(IRB::Kneiske);
+         }
+      } else {
+         m_tau = new IRB::EblAtten(IRB::Kneiske);
+      }
    } else {
       std::map<std::string, std::string> params;
       facilities::Util::keyValueTokenize(paramString, ", ", params);
@@ -87,6 +100,20 @@ SpectralTransient::SpectralTransient(const std::string & paramString)
       try {
          m_logParabola = std::atoi(parmap["useLogParabola"].c_str());
       } catch (...) {
+      }
+      try {
+         IRB::EblModel eblModel = 
+            static_cast<IRB::EblModel>(std::atoi(parmap["eblModel"].c_str()));
+         try {
+            m_tau = new IRB::EblAtten(eblModel);
+         } catch (std::exception & eObj) {
+            std::cerr << "Invalid model ID, " << eblModel << "\n"
+                      << "Using default, IRB::Kneiske = " 
+                      << IRB::Kneiske << "\n";
+            m_tau = new IRB::EblAtten(IRB::Kneiske);
+         }
+      } catch (...) {
+         m_tau = new IRB::EblAtten(IRB::Kneiske);
       }
    }
 
