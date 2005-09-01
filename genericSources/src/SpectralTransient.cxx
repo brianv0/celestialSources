@@ -63,9 +63,8 @@ SpectralTransient::SpectralTransient(const std::string & paramString)
          try {
             m_tau = new IRB::EblAtten(eblModel);
          } catch (std::exception & eObj) {
-            std::cerr << "Invalid model ID, " << eblModel << "\n"
-                      << "Using default, IRB::Kneiske = " 
-                      << IRB::Kneiske << "\n";
+            std::cerr << eObj.what() << "\n"
+                      << "Using default, IRB::Kneiske" << std::endl;
             m_tau = new IRB::EblAtten(IRB::Kneiske);
          }
       } else {
@@ -107,9 +106,8 @@ SpectralTransient::SpectralTransient(const std::string & paramString)
          try {
             m_tau = new IRB::EblAtten(eblModel);
          } catch (std::exception & eObj) {
-            std::cerr << "Invalid model ID, " << eblModel << "\n"
-                      << "Using default, IRB::Kneiske = " 
-                      << IRB::Kneiske << "\n";
+            std::cerr << eObj.what() << "\n"
+                      << "Using default, IRB::Kneiske" << std::endl;
             m_tau = new IRB::EblAtten(IRB::Kneiske);
          }
       } catch (...) {

@@ -5,6 +5,8 @@
   @verbatim
   $Id$
 
+  01-Sep-05 v1r5p1  JC    allow user to set EBL model in SpectralTransient
+                          from xml definition
   29-Aug-05 v1r5    JC    use eblAtten package; remove EBL-related code
   29-Aug-05 v1r4p3  JC    tag for new EBL models
   18-Jul-05 v1r4p2  JC    add LogParabola spectral form to SpectralTransient
