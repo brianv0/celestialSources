@@ -1,28 +1,40 @@
 /**
  * @file EblAtten.cxx
- * @brief Function object wrapper to Hays/McEnery code (in IRB_routines.cxx) 
- * that calculates EBL optical depth as a function of energy and redshift
+ * @brief Function object wrapper to code in IRB_routines.cxx that
+ * calculates EBL optical depth as a function of energy and redshift
  * for four different models.
  * @author J. Chiang
  *
  * $Header$
  */
 
+#include <sstream>
+
 #include "eblAtten/EblAtten.h"
 
 namespace IRB {
 
-float calcSJ1(float energy, float redshift);
-float calcSJ2(float energy, float redshift);
-float calcPrimack(float energy, float redshift);
-float calcPrimack04(float energy, float redshift);
+std::map<EblModel, std::string> EblAtten::s_model_Ids;
+
 float calcSS(float energy, float redshift);
 float calcPB99(float energy, float redshift);
 float calcKneiske(float energy, float redshift);
 
 EblAtten::EblAtten(EblModel model) : m_model(model) {
-   if (m_model < SdJbase || m_model > Kneiske) {
-      throw std::runtime_error("Invalid model.");
+   if (s_model_Ids.size() == 0) {
+      s_model_Ids[Salamon_Stecker] = "Salamon & Stecker (1998)";
+      s_model_Ids[Primack_Bullock99] = "Primack & Bullock (1999)";
+      s_model_Ids[Kneiske] = "Kneiske et al. (2004)";
+   }
+   if (s_model_Ids.find(model) == s_model_Ids.end()) {
+      std::ostringstream message;
+      message << "Invalid model ID: " << model << "\n"
+              << "Valid models are \n";
+      std::map<EblModel, std::string>::iterator it;
+      for (it = s_model_Ids.begin(); it != s_model_Ids.end(); ++it) {
+         message << it->first << " : " << it->second << "\n";
+      }
+      throw std::runtime_error(message.str());
    }
 }
 
@@ -30,14 +42,6 @@ float EblAtten::operator()(float energy, float redshift) const {
 // Convert energy from MeV to TeV:
    energy /= 1e6;
    switch (m_model) {
-   case SdJbase:
-      return calcSJ1(energy, redshift);
-   case SdJfast:
-      return calcSJ2(energy, redshift);
-   case Primack99:
-      return calcPrimack(energy, redshift);
-   case Primack04:
-      return calcPrimack04(energy, redshift);
    case Salamon_Stecker:
       return calcSS(energy, redshift);
    case Primack_Bullock99:

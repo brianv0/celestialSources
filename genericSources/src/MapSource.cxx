@@ -23,8 +23,7 @@
 #include "flux/SpectrumFactory.h"
 #include "flux/EventSource.h"
 
-#include "Likelihood/FitsImage.h"
-
+#include "FitsImage.h"
 #include "genericSources/MapSource.h"
 
 ISpectrumFactory &MapSourceFactory() {
@@ -125,7 +124,7 @@ double MapSource::mapValue(unsigned int i, unsigned int j) {
 void MapSource::readFitsFile(std::string fitsFile) {
    facilities::Util::expandEnvVar(&fitsFile);
 
-   Likelihood::FitsImage fitsImage(fitsFile);
+   genericSources::FitsImage fitsImage(fitsFile);
 
    fitsImage.fetchAxisNames(m_axisTypes);
 

@@ -1,6 +1,8 @@
 #include "GRBobs/GRBobsPulse.h"
 #include <iostream>
 
+#define DEBUG 0 
+
 GRBobsPulse::GRBobsPulse(){;}
 
 GRBobsPulse::GRBobsPulse(double peakTime,
@@ -16,11 +18,24 @@ GRBobsPulse::GRBobsPulse(double peakTime,
   m_riseTime     = riseTime;
   m_decayTime    = decayTime;
   m_Intensity    = Intensity;
-  m_Peakedness   = 1.0;//Peakedness;
+  m_Peakedness   = Peakedness;
   m_Epeak        = Epeak;
   m_LowEnergy    = LowEnergy;
   m_HighEnergy   = HighEnergy;
-  std::cout<<GetStartTime()<<" "<<GetPeakTime()<<" "<<GetEndTime()<<std::endl;
+  if(DEBUG)  Print();
+  
+}
+
+void GRBobsPulse::Print()
+{
+  std::cout<<"Pulse: start= "<<m_peakTime
+	   <<" rise t= "<<m_riseTime
+	   <<" Decay t= "<<m_decayTime
+	   <<" Intensity= "<<m_Intensity
+	   <<" Peakedness= "<<m_Peakedness
+	   <<" Peak Energy= "<<m_Epeak
+	   <<" Low Energy idx= "<<m_LowEnergy
+	   <<" High Energy idx= "<<m_HighEnergy<<std::endl;
 }
 
 double GRBobsPulse::PulseShape(double t, double e)
@@ -55,9 +70,6 @@ double GRBobsPulse::PulseShape(double t, double e)
   else
     bandf= C * pow(e,b); // ph cm^(-2) s^(-1) keV^(-1)
   
-  /*  if(fabs(t-m_peakTime)<0.016 && e < 10.0)
-      std::cout<<m_peakTime<<" "<<dt<<" "<<rt<<" "<<m_Peakedness<<" "<<pulse<<" "<<a<<" "<<b<<" "<<Ep<<" "<<Eb<<std::endl;
-  */
   return m_Intensity * bandf * pulse;
 }
 

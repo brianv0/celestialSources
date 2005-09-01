@@ -20,19 +20,20 @@ GRBobsmanager::GRBobsmanager(const std::string& params)
   m_fluence         = parseParamList(params,1);
   m_Npulses         = (int) parseParamList(params,2);
   m_ExponentialTau  = parseParamList(params,3);
-  m_MinPhotonEnergy = parseParamList(params,4);
+  m_MinPhotonEnergy = parseParamList(params,4); //MeV
   
   m_par = new GRBobsParameters();
 
   m_par->SetGRBNumber(65540+m_Npulses);  
   m_par->SetNumberOfPulses(m_Npulses);
   m_par->SetTau(m_ExponentialTau);
-  m_par->SetMinPhotonEnergy(m_MinPhotonEnergy);
+  m_par->SetMinPhotonEnergy(m_MinPhotonEnergy*1.0e3);
   m_par->SetFluence(m_fluence);
   
   //////////////////////////////////////////////////
   m_GRB      = new  GRBobsSim(m_par);
   m_spectrum = new  SpectObj(m_GRB->MakeGRB(),0);
+  m_spectrum->SetAreaDetector(EventSource::totalArea());
   //////////////////////////////////////////////////
   m_endTime   = m_startTime + m_GRB->Tmax();
   std::cout<<"GRB starting at time: "<<m_startTime<<std::endl;

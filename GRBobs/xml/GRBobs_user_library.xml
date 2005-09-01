@@ -3,70 +3,70 @@
 <source_library title="GRBobs_user_library">
     <source name=" GRB1 ">
         <spectrum escale="MeV"> 
-        <SpectrumClass name="GRBobsmanager" params="10,0.0e-5,10,0.1,1e5"/>
+        <SpectrumClass name="GRBobsmanager" params="10,0.0e-5,10,0.1,100"/>
         <celestial_dir ra="83." dec="22."/>
     </spectrum> </source>
 
 
     <source name=" GRB2 ">
         <spectrum escale="MeV"> 
-        <SpectrumClass name="GRBobsmanager" params="20,0.0e-5,20,0.1,1e5"/>
+        <SpectrumClass name="GRBobsmanager" params="20,0.0e-5,20,0.1,100"/>
         <celestial_dir ra="10." dec="22."/>
     </spectrum> </source>
 
 
     <source name=" GRB3 ">
         <spectrum escale="MeV"> 
-        <SpectrumClass name="GRBobsmanager" params="30,0.0e-5,5,0.1,1e5"/>
+        <SpectrumClass name="GRBobsmanager" params="30,0.0e-5,5,0.1,100"/>
         <celestial_dir ra="10." dec="-10."/>
     </spectrum> </source>
 
 
     <source name=" GRB4 ">
         <spectrum escale="MeV"> 
-        <SpectrumClass name="GRBobsmanager" params="40,0.0e-5,50,0.1,1e5"/>
+        <SpectrumClass name="GRBobsmanager" params="40,0.0e-5,50,0.1,100"/>
         <celestial_dir ra="0." dec="0."/>
     </spectrum> </source>
 
 
     <source name=" GRB5 ">
         <spectrum escale="MeV"> 
-        <SpectrumClass name="GRBobsmanager" params="50,0.0e-5,15,0.1,1e5"/>
+        <SpectrumClass name="GRBobsmanager" params="50,0.0e-5,15,0.1,100"/>
         <celestial_dir ra="62." dec="20."/>
     </spectrum> </source>
 
 
     <source name=" GRB6 ">
         <spectrum escale="MeV"> 
-        <SpectrumClass name="GRBobsmanager" params="60,0.0e-5,100,0.1,1e5"/>
+        <SpectrumClass name="GRBobsmanager" params="60,0.0e-5,100,0.1,100"/>
         <celestial_dir ra="8." dec="2."/>
     </spectrum> </source>
 
 
     <source name=" GRB7 ">
         <spectrum escale="MeV"> 
-        <SpectrumClass name="GRBobsmanager" params="70,0.0e-5,7,0.1,1e5"/>
+        <SpectrumClass name="GRBobsmanager" params="70,0.0e-5,7,0.1,100"/>
         <celestial_dir ra="10." dec="20."/>
     </spectrum> </source>
 
 
     <source name=" GRB8 ">
         <spectrum escale="MeV"> 
-        <SpectrumClass name="GRBobsmanager" params="80,0.0e-5,30,0.1,1e5"/>
+        <SpectrumClass name="GRBobsmanager" params="80,0.0e-5,30,0.1,100"/>
         <celestial_dir ra="0." dec="85."/>
     </spectrum> </source>
 
 
     <source name=" GRB9 ">
         <spectrum escale="MeV"> 
-        <SpectrumClass name="GRBobsmanager" params="90,0.0e-5,50,0.1,1e5"/>
+        <SpectrumClass name="GRBobsmanager" params="90,0.0e-5,50,0.1,100"/>
         <celestial_dir ra="83." dec="12."/>
     </spectrum> </source>
 
 
     <source name=" GRB10 ">
         <spectrum escale="MeV"> 
-        <SpectrumClass name="GRBobsmanager" params="100,0.0e-5,32,0.1,1e5"/>
+        <SpectrumClass name="GRBobsmanager" params="100,0.0e-5,32,0.1,100"/>
         <celestial_dir ra="10." dec="90."/>
     </spectrum> </source>
 </source_library>

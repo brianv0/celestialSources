@@ -26,7 +26,7 @@ int    TBIN, EBIN;
 
 
 double Band(double *var, double *par);
-
+void help();
 #define DEBUG=0
 
 double Band(double *var, double *par)
@@ -521,5 +521,17 @@ int main(int argc, char** argv)
 
   MakeGRB(ngrb,enph,gbm);
   theApp.Run();
+}
+
+void help()
+{
+  std::cout<<"--------------------------------------------------"<<std::endl;
+  std::cout<<"   GRB ROOT test program author: Nicola Omodei    "<<std::endl;
+  std::cout<<"   Option are: "<<std::endl;
+  std::cout<<"  -extract [enph] : etxtract photons above enph"<<std::endl;
+  std::cout<<"  -grb [N] processes the N grb in the $GRBROOT/src/test/GRBParam.txt file "<<std::endl;
+  std::cout<<"  -gbm      Fit the GBM spectrum with as Band function, as afunction of the time"<<std::endl;
+  std::cout<<"--------------------------------------------------"<<std::endl;
+
 }
 

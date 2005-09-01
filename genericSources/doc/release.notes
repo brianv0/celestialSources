@@ -5,6 +5,7 @@
   @verbatim
   $Id$
 
+  13-Aug-04 v0r1    JC    removed dependence on Likelihood
   29-Jun-04 v0      JC    initial version
  
   @endverbatim
