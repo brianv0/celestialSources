@@ -10,6 +10,7 @@
 #ifndef eblAtten_EblAtten_h
 #define eblAtten_EblAtten_h
 
+#include <map>
 #include <stdexcept>
 
 namespace IRB {
@@ -24,8 +25,7 @@ namespace IRB {
  * $Header$
  */
 
-enum EblModel {SdJbase, SdJfast, Primack99, Primack04,
-               Salamon_Stecker, Primack_Bullock99, Kneiske};
+enum EblModel {Salamon_Stecker, Primack_Bullock99, Kneiske};
 
 class EblAtten {
 
@@ -41,6 +41,8 @@ public:
 private:
 
    EblModel m_model;
+
+   static std::map<EblModel, std::string> s_model_Ids;
 
 };
 
