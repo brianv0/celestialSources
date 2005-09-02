@@ -7,6 +7,8 @@
  * $Header$
  */
 
+#include <cmath>
+
 #include <iostream>
 
 #include "eblAtten/EblAtten.h"
@@ -21,9 +23,9 @@ int main() {
    
    double z(0.1);
 
-   double estep(log(emax/emin)/float(npts));
+   double estep(std::log(emax/emin)/float(npts));
    for (int i = 0; i < npts; i++) {
-      double energy(emin*exp(i*estep));
+      double energy(emin*std::exp(i*estep));
       std::cout << energy << "  " 
                 << tau0(energy, z) << "  "
                 << tau1(energy, z) << "  "
