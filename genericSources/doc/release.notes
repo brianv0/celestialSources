@@ -5,7 +5,6 @@
   @verbatim
   $Id$
 
-  25-Oct-04 v0r1p2  JC    check for template file existence
   11-Oct-04 v0r1p1  JC    removed use of iterators in TransientTemplate
                           since it was causing mysterious seg faults
                           for zero flux entries in template file

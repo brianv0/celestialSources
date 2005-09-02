@@ -4,8 +4,7 @@
 
   @verbatim
   $Id$
-  25-Oct-04 v0r2p1   JC    new tag for genericSources
-  15-Oct-04 v0r2p0   JCT   new tag for Pulsar
+
   11-Oct-04 v0r1p1   JC    new tag for genericSources
   13-Aug-04 v0r1     JC    many undocumented changes: Pulsar, GRB, SpectObj
                            added in previous tags.  Removed Likelihood

@@ -37,11 +37,11 @@ class SpectObj
       delete Probability;
       delete Nv;
       delete m_SpRandGen;
-      if (PeriodicSpectrumIsComputed == true ) 
+      //      if (PeriodicSpectrumIsComputed == true ) 
 	delete PeriodicSpectrum;
     }
   void GetUniqueName(const void *ptr, std::string & name);
-    
+  
   TH1D *Integral_E(double e1, double e2);
   TH1D *Integral_E(int ei1, int ei2); 
   TH1D *Integral_T(double t1, double t2, double e1, double e2);
@@ -52,16 +52,12 @@ class SpectObj
   double Integral_E(TH1* Sp, int ei1, int ei2);
   double Integral_T(TH1* Lc, double t1=0.0, double t2=0.0);
   double Integral_T(TH1* Lc, int ti1, int ti2);
-  TH1D *ComputeProbability(double enph);
+  void ComputeProbability(double enph);
   TH1D *N(TH1D *EN);
   photon GetPhoton(double t0, double enph);
   
-  inline void SetAreaDetector(double AreaDetector=6.0)
-    {
-      Nv->Scale(AreaDetector/m_AreaDetector); // ph
-      m_AreaDetector = AreaDetector;
-    }
-
+  void SetAreaDetector(double AreaDetector=6.0);
+    
   inline double GetAreaDetector() { return m_AreaDetector; }
   double flux(double time, double enph);
   double interval(double time, double enph);
@@ -85,10 +81,12 @@ class SpectObj
   int ne,nt;
   int sourceType; //"0=Transient,1=Periodic"
   double emin,emax;
+
   double m_Tmin,m_Tmax, m_TimeBinWidth;
   double Ptot;
   TH1D *spec,*times,*Probability,*PeriodicSpectrum;
   photon ph;
   bool ProbabilityIsComputed, PeriodicSpectrumIsComputed;
+  
 };
 #endif

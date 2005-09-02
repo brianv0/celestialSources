@@ -23,9 +23,7 @@
 #include "flux/SpectrumFactory.h"
 #include "flux/EventSource.h"
 
-#include "st_facilities/FitsImage.h"
-#include "st_facilities/Util.h"
-
+#include "FitsImage.h"
 #include "genericSources/MapSource.h"
 
 ISpectrumFactory &MapSourceFactory() {
@@ -126,18 +124,17 @@ double MapSource::mapValue(unsigned int i, unsigned int j) {
 void MapSource::readFitsFile(std::string fitsFile) {
    facilities::Util::expandEnvVar(&fitsFile);
 
-   st_facilities::Util::file_ok(fitsFile);
-   st_facilities::FitsImage fitsImage(fitsFile);
+   genericSources::FitsImage fitsImage(fitsFile);
 
-   fitsImage.getAxisNames(m_axisTypes);
+   fitsImage.fetchAxisNames(m_axisTypes);
 
-   fitsImage.getAxisVector(0, m_lon);
-   fitsImage.getAxisVector(1, m_lat);
+   fitsImage.fetchAxisVector(0, m_lon);
+   fitsImage.fetchAxisVector(1, m_lat);
 
-   fitsImage.getCelestialArrays(m_lonArray, m_latArray);
+   fitsImage.fetchCelestialArrays(m_lonArray, m_latArray);
 
-   fitsImage.getSolidAngles(m_solidAngles);
-   fitsImage.getImageData(m_image);
+   fitsImage.fetchSolidAngles(m_solidAngles);
+   fitsImage.fetchImageData(m_image);
 
    int npix = m_solidAngles.size();
    m_integralDist.resize(npix);

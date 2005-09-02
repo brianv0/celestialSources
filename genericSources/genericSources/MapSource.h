@@ -10,7 +10,7 @@
 #ifndef mySpectrum_MapSource_h
 #define mySpectrum_MapSource_h
 
-#include <vector>
+#include <valarray>
 
 #include "flux/Spectrum.h"
 
@@ -76,10 +76,10 @@ private:
    std::vector<std::string> m_axisTypes;
    std::vector<double> m_lon;
    std::vector<double> m_lat;
-   std::vector<double> m_lonArray;
-   std::vector<double> m_latArray;
-   std::vector<double> m_solidAngles;
-   std::vector<double> m_image;
+   std::valarray<double> m_lonArray;
+   std::valarray<double> m_latArray;
+   std::valarray<double> m_solidAngles;
+   std::valarray<double> m_image;
 
    std::vector<double> m_integralDist;
 
