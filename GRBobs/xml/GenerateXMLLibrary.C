@@ -377,6 +377,7 @@ void GenerateXMLLibrary(int Nbursts=100)
   
   TCanvas *Distributions = new TCanvas("Distributions","Distributions",500,800);
   Distributions->SetFillColor(10);
+  gStyle->SetOptStat(0);
   Distributions->Divide(2,2);
   if(Nlong>Nshort)
     {
