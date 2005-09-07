@@ -25,7 +25,7 @@ namespace IRB {
  * $Header$
  */
 
-enum EblModel {Salamon_Stecker, Primack_Bullock99, Kneiske};
+enum EblModel {Kneiske, Primack05, Kneiske_HighUV, Salamon_Stecker};
 
 class EblAtten {
 
@@ -34,7 +34,7 @@ public:
    EblAtten(EblModel model);
 
    /// @return Optical depth to photon-photon absorption.
-   /// @param Photon energy (MeV)
+   /// @param Photon energy (GeV)
    /// @param Source redshift
    float operator()(float energy, float redshift) const;
 
