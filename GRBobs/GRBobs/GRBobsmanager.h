@@ -13,8 +13,6 @@
 #define GRBobsmanager_H
 #include "GRBobsConstants.h"
 
-#include "TString.h"
-
 #include <vector>
 #include <string>
 #include <map>
@@ -22,8 +20,6 @@
 #include "flux/ISpectrum.h"
 #include "flux/EventSource.h"
 #include "GRBobsSim.h"
-#include "SpectralComponent.h"
-
 #include "SpectObj/SpectObj.h"
 
 #include "facilities/Util.h"
@@ -51,6 +47,7 @@ class GRBobsmanager : public ISpectrum
   */
   
   GRBobsmanager(const std::string& params);
+  
   virtual  ~GRBobsmanager();
    
   /*! If a burst is shining it returns the flux method 
@@ -64,69 +61,42 @@ class GRBobsmanager : public ISpectrum
   double interval(double time);
   
   //! direction, taken from GRBobsSim
-  inline std::pair<double,double> dir(double) 
+  inline std::pair<double,double>
+    dir(double energy) 
     {
-      (void)(energy);//energy is not used here
-      return m_GalDir;
+      return m_GRB->GRBdir();
     } 
-  
+
   double energy(double time);
   
   std::string title() const {return "GRBobsmanager";} 
   const char * particleName() const {return "gamma";}
   const char * nameOf() const {return "GRBobsmanager";}
-  TString GetGRBname();
-  void GenerateGRB();  
-  void DeleteGRB();  
+  
   /*! 
     This method parses the parameter list
     \param input is the string to parse
     \param index if the position of the parameter in the input list. 
     \retval output is the value of the parameter as float number.
   */  
-  double parseParamList(std::string input, unsigned int index);  
+  double parseParamList(std::string input, int index);  
   
  private:
-  double m_Rest;
-  double m_Frac;
-  double m_ra;
-  double m_dec;
-  double m_theta;
-  double m_phi;
-
-  SpectObj    *m_spectrum;
-  SpectObj    *m_spectrum1;
-
-  SpectralComponent *PromptEmission;
-  SpectralComponent *AfterGlowEmission;
   
+  SpectObj    *m_spectrum;
+
   GRBobsSim   *m_GRB;
   GRBobsParameters  *m_par;
 
   const std::string& m_params;
   std::string paramFile;
-  std::pair<double,double> m_GalDir;
-  bool m_grbGenerated;
-  bool m_grbdeleted;
-  bool m_GenerateGBMOutputs;
 
-  double m_l;
-  double m_b;
-  double m_duration;
+
   double m_fluence;
-  long   m_GRBnumber;
-  double m_alpha;
-  double m_beta;
+  int    m_Npulses;
+  double m_ExponentialTau;
   double m_MinPhotonEnergy;
-  double m_Energy_CO;
-  double m_LATphotons;
-  double m_EC_delay;
-  double m_EC_duration;
   double m_startTime;
   double m_endTime;
-  double m_startTime_EC;
-  double m_endTime_EC;
-
-
 };
 #endif

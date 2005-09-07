@@ -1,9 +1,10 @@
 /*!
  * \class GRBobsengine
  *
- * This class generates a sequance of pulses stored into a std::vector.
+ * \brief This class permits to generate different kind of GRBs.
  * 
  * \author Nicola Omodei       nicola.omodei@pi.infn.it 
+ * \author Johann Cohen-Tanugi johann.cohen@pi.infn.it
  *
  */
 
@@ -19,19 +20,25 @@ class GRBobsengine
 {
   
  public:
-  /// Initialize the simulation, getting the burst direction. 
   GRBobsengine(GRBobsParameters *params);
-  ~GRBobsengine(){;}
-  /*!
-    Generate a sequance of pulses (GRBobsPulses) and is store them into a vector.
-  */
+  ~GRBobsengine()
+    {
+      //      delete m_params;
+    }
+    
   std::vector<GRBobsPulse*> CreatePulsesVector();
-  /// Returns the galactic position of the burst in <em>l and <em>b coordinates.
-  inline std::pair<double,double> GetDirection(){return m_dir;}
   
+  /*
+    inline double GetRiseTime()    {return m_rise;}
+    inline double GetDecayTime()   {return m_decay;}
+    inline double GetPulseHeight() {return m_pulseHeight;}
+  */
+  inline std::pair<double,double> GetDirection(){return m_dir;}
+
  private:
   std::pair<double,double> m_dir;
   GRBobsParameters *m_params;
+  //  double m_rise,m_decay,m_pulseHeight;  
 };
 
 #endif
