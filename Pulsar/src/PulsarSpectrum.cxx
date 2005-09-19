@@ -407,8 +407,14 @@ double PulsarSpectrum::getBaryCorr( double ttInput )
   // Conversion TT to TDB, from JDMissionStart (that glbary uses as MJDref)
   double tdb_min_tt = m_earthOrbit->tdb_minus_tt(ttJD);
 
+  double timeMET = ttInput - (StartMissionDateMJD)*SecsOneDay;
+  Hep3Vector scPos;
+
+  if (timeMET > 0.)
+    scPos = astro::GPS::instance()->position(timeMET);
+
   //Correction due to geometric time delay of light propagation 
-  Hep3Vector GeomVect = (m_earthOrbit->position(ttJD)/clight) - m_solSys.getBarycenter(ttJD);
+  Hep3Vector GeomVect = (scPos/clight) - m_solSys.getBarycenter(ttJD);
   double GeomCorr = GeomVect.dot(m_PulsarVectDir);
 
   //Correction due to Shapiro delay.
@@ -645,11 +651,11 @@ int PulsarSpectrum::saveDbTxtFile()
       tempFract = modf(m_txbaryVect[ep],&tempInt);
       DbOutputFile << std::setprecision (6) << tempInt << " " << tempFract << " ";
 
-      f0 = 1.0/m_periodVect[ep];
-      f1 = -m_pdotVect[ep]/(m_periodVect[ep]*m_periodVect[ep]);
-      f2 = 2*pow((m_pdotVect[ep]/m_periodVect[ep]),2.0)/m_periodVect[ep] - m_p2dotVect[ep]/(m_periodVect[ep]*m_periodVect[ep]);
+      //f0 = 1.0/m_periodVect[ep];
+      //f1 = -m_pdotVect[ep]/(m_periodVect[ep]*m_periodVect[ep]);
+      //f2 = 2*pow((m_pdotVect[ep]/m_periodVect[ep]),2.0)/m_periodVect[ep] - m_p2dotVect[ep]/(m_periodVect[ep]*m_periodVect[ep]);
 
-      DbOutputFile << std::setprecision(14) << f0 << " " << f1 << " " << f2 << " 0.0 " << m_t0InitVect[ep] << " " << m_t0EndVect[ep] 
+      DbOutputFile << std::setprecision(14) << m_f0Vect[ep] << " " << m_f1Vect[ep] << " " << m_f2Vect[ep] << " 0.0 " << m_t0InitVect[ep] << " " << m_t0EndVect[ep] 
       		   << " F \"JPL DE200\" P" << std::endl;
 
     }

@@ -22,5 +22,7 @@
 *   v1r0p9 30-Mar-2005 THB  Output ASCII File for database
                             Possibility to input frequency and derivatives and not only period and derivatives
 *   v1r0p10 14-Aug-2005 THB  Updated Datalist, xml file and bug fixes;
+*   v1r0p11 19-Sep-2005 THB  GPS and pointing history fixed; Db outut fixed;
+
 *@endverbatim
 */
