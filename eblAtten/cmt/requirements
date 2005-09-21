@@ -14,7 +14,7 @@ apply_pattern package_stamps
 
 private
 
-macro genericSources_cppflags "" \
+macro eblAtten_cppflags "" \
       Linux "-I ../src " \
       WIN32 '/I..\src /wd4290 /wd4305 '
 
