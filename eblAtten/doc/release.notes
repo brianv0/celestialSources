@@ -5,6 +5,8 @@
   @verbatim
   $Id$
 
+  21-Sep-05 v0r2p3  JC    Fix line in req file so that compiler warnings are
+                          properly suppressed
   08-Sep-05 v0r2p2  LR    Reduce Kneiske's models energy range to GLAST range
   07-Sep-05 v0r2p1  LR    Fix version number in requirements file
   07-Sep-05 v0r2    LR    include 2 new models: Primack05 and Kneiske_HighUV
