@@ -82,6 +82,15 @@
        </spectrum> 
     </source>
 
+  <!-- Diagnostic source - Dirac's Delta -->
+
+  <source name=" PSRMuro " >
+     <spectrum escale="MeV"> 
+      <SpectrumClass name="PulsarSpectrum" params="PSRMURO, 50.0, -25.0, 1.0e5, 3.0e8, 1, 63443, 3, 1e6, 30e6, -1.9, 2.0"/>
+        <use_spectrum frame="galaxy"/> 
+     </spectrum> 
+  </source>
+
 <!-- All EGRET Pulsars in Polar Cap or Outer Gap -->
 
     <source name="AllEGRETPulsarsPolar" >

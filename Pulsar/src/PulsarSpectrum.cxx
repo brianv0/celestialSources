@@ -120,7 +120,8 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
 
   //Init SolarSystem stuffs useful for barycentric decorrections
 
-  astro::JulianDate JDStart(2007, 1, 1, 0.0);
+  //  astro::JulianDate JDStart(2007, 1, 1, 0.0);
+  astro::JulianDate JDStart(StartMissionDateMJD+JDminusMJD);
   m_earthOrbit = new astro::EarthOrbit(JDStart); 
   
   astro::SkyDir m_PulsarDir(m_RA,m_dec,astro::SkyDir::EQUATORIAL);
@@ -396,7 +397,8 @@ double PulsarSpectrum::retrieveNextTimeTilde( double tTilde, double totalTurns, 
 double PulsarSpectrum::getBaryCorr( double ttInput )
 {
   //Start Date;
-  astro::JulianDate ttJD(2007, 1, 1, 0.0);
+  //  astro::JulianDate ttJD(2007, 1, 1, 0.0);
+  astro::JulianDate ttJD(StartMissionDateMJD+JDminusMJD);
   ttJD = ttJD+(ttInput - (StartMissionDateMJD)*SecsOneDay)/SecsOneDay;
 
   if (DEBUG)
