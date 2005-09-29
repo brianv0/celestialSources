@@ -91,8 +91,57 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
   double ppar3 = std::atof(parseParamList(params,10).c_str());
   double ppar4 = std::atof(parseParamList(params,11).c_str());
 
-  int Retrieved = getPulsarFromDataList();
-  
+
+  //Retrieve pulsar data from a list of DataList file.
+  std::string pulsar_root = ::getenv("PULSARROOT");
+  std::string ListFileName = pulsar_root + "/data/PulsarDataList.txt";
+  std::ifstream ListFile;
+  ListFile.open(ListFileName.c_str(), std::ios::in);
+  char DataListFileName[40];
+  std::string CompletePathFileName;
+
+  int Retrieved;
+  //  int AllRetrieved;
+ 
+  if (! ListFile.is_open()) 
+    {
+      std::cout << "Error opening file containing DataList files" << ListFileName  
+		<< " (check whether $PULSARROOT is set" << std::endl; 
+      exit(1);
+    }  else 
+      {
+	while (ListFile.eof() != 1)
+	  {	
+	    if (ListFile.eof() == 1) break;
+
+	    ListFile >> DataListFileName;
+	    CompletePathFileName = pulsar_root + "/data/" + std::string(DataListFileName);
+	    std::cout << "Looking for DataList " << CompletePathFileName << std::endl;
+	    Retrieved = getPulsarFromDataList(CompletePathFileName);
+
+	    if (DEBUG==0)
+	      {
+		if (Retrieved == 1)
+		  {
+		    std::cout << "Pulsar " << m_PSRname << " found in file " << CompletePathFileName << std::endl;
+		  } 
+		else
+		  {
+		    std::cout << "ERROR! Pulsar " 
+			      << m_PSRname << " NOT found in Datalist.File...Exit. " << std::endl;
+		    exit(1);	
+		  }
+	      }
+	  }
+      }
+
+
+
+
+
+
+  //   Retrieved = getPulsarFromDataList(DataListFileName);
+  /*
   if (DEBUG==0)
     {
       if (Retrieved == 1)
@@ -104,7 +153,9 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
 	  std::cout << "ERROR! Pulsar " << m_PSRname << " NOT found in Datalist.File...Exit. " << std::endl;
 	  exit(1);	
 	}
-    }
+     }
+  */
+
 
   //Assign as ephemerides ONLY the first entry (don't use the multiple ephemerides)
   m_t0Init = m_t0InitVect[0];
@@ -502,11 +553,11 @@ double PulsarSpectrum::getDecorrectedTime(double CorrectedTime)
  * This method gets from the ASCII <i>PulsarDatalist.txt</i> file stored in <i>/data</i> directory)
  * the pulsar parameters and returns a integer status code (1 is Ok, 0 is failure)
  */
-int PulsarSpectrum::getPulsarFromDataList()
+int PulsarSpectrum::getPulsarFromDataList(std::string sourceFileName)
 {
   int Status = 0;
-  std::string pulsar_root = ::getenv("PULSARROOT");
-  std::string sourceFileName = pulsar_root + "/data/PulsarDataList.txt";
+  //  std::string pulsar_root = ::getenv("PULSARROOT");
+  //std::string sourceFileName = pulsar_root + "/data/" + FileName; //PulsarDataList.txt";
   std::ifstream PulsarDataTXT;
   
   if (DEBUG)

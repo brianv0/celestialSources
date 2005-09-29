@@ -70,7 +70,7 @@ class PulsarSpectrum : public ISpectrum
   double getDecorrectedTime( double CorrectedTime);
   
   //! Get the pulsar ephemerides and data from the DataList
-  int getPulsarFromDataList();
+  int getPulsarFromDataList(std::string sourceFileName);
 
   //! Save an output txt file compatible with D4 file
   int saveDbTxtFile();
