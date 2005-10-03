@@ -64,6 +64,9 @@ namespace ObsCst
   const double LAT1=30.0e3;                   
   /// Top edge of the of GLAST/LAT energy band 300 GeV
   const double LAT2=3.0e8;            
+  
+  const double SWIFT1=15.0;
+  const double SWIFT2=150.0;
   //////////////////////////////////////////////////
 };
 

@@ -26,6 +26,8 @@ bool movie       = false;
 bool bandFit     = false;
 bool powerlawFit = false;
 bool scaled      = false;
+bool noise      = false;
+
 bool ExtraComponent = false;
 int extension;
 
@@ -36,6 +38,34 @@ void ScanParameters(int Ngrb);
 #define DEBUG 0 
 
 #define GenerationArea 1.00 
+
+double AeffLAT(double MeV, double Z)
+{
+  const double p0 = 9.8e3;
+  const double p1 = 120.0;
+  const double p2 = 2.0;
+  double pr = 1.25*(Z-0.2);
+  if(MeV<30.0 || pr<=0) return 0.0; 
+  return pr*p0/(1.0+exp(-p2*log(MeV/p1)));
+}
+
+double AeffNaI(double MeV, double Z)
+{
+  if(MeV > 0.01 && MeV <=1.0)
+    return 126.0 * 1.0;
+  else 
+    return 0.0;
+}
+
+double AeffBGO(double MeV, double Z)
+{
+  if(MeV > 0.15 && MeV <=30.0)
+    return 200.0 * 1.0;
+  else 
+    return 0.0;
+}
+
+
 
 double Band(double *var, double *par)
 {
@@ -110,6 +140,12 @@ void PlotGRB(double enph = 0,char name[100]="grb_65540.root",TString name2="GRB_
   
   // Ne =  [ph/keV/s/m²]
   gDirectory->Delete("Ne");
+  gDirectory->Delete("Fv");
+  gDirectory->Delete("LAT");
+  gDirectory->Delete("BGO");
+  gDirectory->Delete("NaI");
+  gDirectory->Delete("e2Ne");
+  
   Nv->ProjectionY("Ne");
   TH1D *Ne = (TH1D*) gDirectory->Get("Ne");
   Ne->GetXaxis()->SetTitleOffset(1.1);
@@ -123,6 +159,22 @@ void PlotGRB(double enph = 0,char name[100]="grb_65540.root",TString name2="GRB_
   Fv->SetName("Fv");
   Fv->SetYTitle("Fv [keV/keV/m^{2}]");  
   // e2Ne = e * Ne * de: [keV/m^2]
+  //////////////////////////////////////////////////
+  TH1D *LAT = (TH1D*) Ne->Clone();
+  LAT->SetTitle("LAT");
+  LAT->SetName("LAT");
+  LAT->SetYTitle("LAT [counts]");  
+  TH1D *NaI = (TH1D*) Ne->Clone();
+  NaI->SetTitle("NaI");
+  NaI->SetName("NaI");
+  NaI->SetYTitle("NaI [counts]");  
+  TH1D *BGO = (TH1D*) Ne->Clone();
+  BGO->SetTitle("BGO");
+  BGO->SetName("BGO");
+  BGO->SetYTitle("BGO [counts]");  
+
+
+
   TH1D *e2Ne = (TH1D*) Ne->Clone();
   e2Ne->SetTitle("Fluxes");
   e2Ne->SetName("e2Ne");
@@ -144,7 +196,15 @@ void PlotGRB(double enph = 0,char name[100]="grb_65540.root",TString name2="GRB_
       double ne = Ne->GetBinContent(i+1);
       double de = Ne->GetBinWidth(i+1);//GetBinCenter(i+1);
       double e = Ne->GetBinCenter(i+1);
+      double Aeff_LAT = AeffLAT(e*1e-3,1.0); 
+      double Aeff_NaI = AeffNaI(e*1e-3,1.0); 
+      double Aeff_BGO = AeffBGO(e*1e-3,1.0); 
+      
       Fv->SetBinContent(i+1,de*ne);
+      LAT->SetBinContent(i+1,de * ne * Aeff_LAT);
+      BGO->SetBinContent(i+1,de * ne * Aeff_BGO);
+      NaI->SetBinContent(i+1,de * ne * Aeff_NaI);
+
       e2Ne->SetBinContent(i+1,e*e*ne);
     }
   
@@ -208,13 +268,13 @@ void PlotGRB(double enph = 0,char name[100]="grb_65540.root",TString name2="GRB_
   else if (enph<EMIN)  enph = EMIN;
   
   //////////////////////////////////////////////////
-  TCanvas *clc = new TCanvas("clc","clc",600,800);
+  TCanvas *clc = new TCanvas("clc","clc",600,900);
   TCanvas *csp = new TCanvas("csp","csp");
  
   csp->SetLogx();
   csp->SetLogy();
   
-  clc->Divide(1,2);
+  clc->Divide(1,3);
   
   TH1D *Lct_GBM = sp->Integral_E(GBM1,GBM2);  // ph
   
@@ -229,6 +289,7 @@ void PlotGRB(double enph = 0,char name[100]="grb_65540.root",TString name2="GRB_
   TH1D *Lct_BATSE2 = sp->Integral_E(BATSE2,BATSE3);  // ph
   TH1D *Lct_BATSE3 = sp->Integral_E(BATSE3,BATSE4);  // ph
   TH1D *Lct_BATSE4 = sp->Integral_E(BATSE4,BATSE5);  // ph
+  TH1D *Lct_SWIFT = sp->Integral_E(SWIFT1,SWIFT2);  // ph
     
   TH1D *Lct_LAT = sp->Integral_E(LAT1,LAT2);  // ph
   TH1D *Lct_EXT = sp->Integral_E(enph,EMAX);  // ph
@@ -238,7 +299,6 @@ void PlotGRB(double enph = 0,char name[100]="grb_65540.root",TString name2="GRB_
   
   Lct_GBM->SetNameTitle("flux [ph]","flux [ph]");
   Lct_GBM->SetXTitle("Time (s)");
-  Lct_GBM->SetYTitle("photons");
   
   Lct_LAT->SetNameTitle("flux [ph]","flux [ph]");
   Lct_LAT->SetXTitle("Time (s)");
@@ -253,6 +313,7 @@ void PlotGRB(double enph = 0,char name[100]="grb_65540.root",TString name2="GRB_
   Lct_BATSE2->SetLineWidth(1);
   Lct_BATSE3->SetLineWidth(1);
   Lct_BATSE4->SetLineWidth(1);
+  Lct_SWIFT->SetLineWidth(1);
   Lct_GBM->SetLineWidth(1);
   Lct_LAT->SetLineWidth(2);
   Lct_EXT->SetLineWidth(1);
@@ -262,7 +323,8 @@ void PlotGRB(double enph = 0,char name[100]="grb_65540.root",TString name2="GRB_
   Lct_BATSE2->SetLineColor(3);
   Lct_BATSE3->SetLineColor(4);
   Lct_BATSE4->SetLineColor(6);
-  //  Lct_GBM->SetLineColor(1);
+  Lct_SWIFT->SetLineColor(7);
+
   Lct_LAT->SetLineColor(4);
   //  Lct_EXT->SetLineColor(6);
  
@@ -271,6 +333,15 @@ void PlotGRB(double enph = 0,char name[100]="grb_65540.root",TString name2="GRB_
   e2Ne->Draw("al");
   Fv->Draw("samel");
   Ne->Draw("samel");
+
+  LAT->SetMarkerStyle(2);
+  BGO->SetMarkerStyle(3);
+  NaI->SetMarkerStyle(4);
+
+  LAT->Draw("samep");
+  NaI->Draw("samep");
+  BGO->Draw("samep");
+
   //  gDirectory->Delete("band");
   // Fit with the band function
   if(bandFit)
@@ -392,7 +463,17 @@ void PlotGRB(double enph = 0,char name[100]="grb_65540.root",TString name2="GRB_
       Counts->SetStats(1);
     }
   //////////////////////////////////////////////////      
-  clc->cd(1);
+
+  Lct_GBM->Scale(1.0/GenerationArea*1e-4);
+  Lct_BATSE1->Scale(1.0/GenerationArea*1e-4);
+  Lct_BATSE2->Scale(1.0/GenerationArea*1e-4);
+  Lct_BATSE3->Scale(1.0/GenerationArea*1e-4);
+  Lct_BATSE4->Scale(1.0/GenerationArea*1e-4);
+  Lct_SWIFT->Scale(1.0/GenerationArea*1e-4);
+
+  Lct_GBM->SetYTitle("N_{ph}/cm^{2}"); 
+  Lct_SWIFT->SetYTitle("N_{ph}/cm^{2}"); 
+
   if(scaled)
     {
       double MaxGBM = Lct_GBM->GetMaximum();
@@ -400,31 +481,97 @@ void PlotGRB(double enph = 0,char name[100]="grb_65540.root",TString name2="GRB_
       double Max2   = Lct_BATSE2->GetMaximum();
       double Max3   = Lct_BATSE3->GetMaximum();
       double Max4   = Lct_BATSE4->GetMaximum();
+      double Max5   = Lct_SWIFT->GetMaximum();
       
       Lct_GBM->Scale(1./MaxGBM);
       Lct_BATSE1->Scale(1./Max1);
       Lct_BATSE2->Scale(1./Max2);
       Lct_BATSE3->Scale(1./Max3);
       Lct_BATSE4->Scale(1./Max4);
+      Lct_SWIFT->Scale(1./Max5);
+      Lct_SWIFT->SetYTitle("Normalized counts");  
+      Lct_GBM->SetYTitle("Normalized counts");  
+    }
+  else if (noise)
+    {
+      TRandom rnd;
+      double AGBM     = 125.0*6.0;
+      double ABATSE   = 2025.0;
+      double ASWIFT_BAT = 2000.0;
+
+      double BGBM     = 200.0;
+      double BBATSE1   = 220.0;
+      double BBATSE2   = 150.0;
+      double BBATSE3   = 120.0;
+      double BBATSE4   = 80.0;
+      double BSWIFT_BAT = 10000.0;
+      
+      Lct_GBM->Scale(AGBM);
+      Lct_BATSE1->Scale(ABATSE);
+      Lct_BATSE2->Scale(ABATSE);
+      Lct_BATSE3->Scale(ABATSE);
+      Lct_BATSE4->Scale(ABATSE);
+      Lct_SWIFT->Scale(ASWIFT_BAT);
+
+      Lct_SWIFT->SetYTitle("Counts");  
+      Lct_GBM->SetYTitle("Counts");  
+      
+      for (int i = 1; i<= TBIN; i++)
+	{
+	  Lct_GBM->SetBinContent(i,rnd.Poisson(BGBM+Lct_GBM->GetBinContent(i)));
+	  Lct_BATSE1->SetBinContent(i,rnd.Poisson(BBATSE1+Lct_BATSE1->GetBinContent(i)));
+	  Lct_BATSE2->SetBinContent(i,rnd.Poisson(BBATSE2+Lct_BATSE2->GetBinContent(i)));
+	  Lct_BATSE3->SetBinContent(i,rnd.Poisson(BBATSE3+Lct_BATSE3->GetBinContent(i)));
+	  Lct_BATSE4->SetBinContent(i,rnd.Poisson(BBATSE4+Lct_BATSE4->GetBinContent(i)));
+	  Lct_SWIFT->SetBinContent(i,rnd.Poisson(BSWIFT_BAT+Lct_SWIFT->GetBinContent(i)));
+	}
     }
   Lct_GBM->SetMinimum(-Lct_GBM->GetMaximum()/10.);
   Lct_LAT->SetMinimum(-Lct_LAT->GetMaximum()/10.);
+  if(noise)
+    {
+      clc->cd(1);
+      //      gPad->SetLogx();
+      gPad->SetLogy();
 
-  Lct_GBM->Draw("l");
-
-  Lct_BATSE1->Draw("lsame");
-  Lct_BATSE2->Draw("lsame");
-  Lct_BATSE3->Draw("lsame");
-  Lct_BATSE4->Draw("lsame");
+      Lct_SWIFT->Draw();
+      clc->cd(2);
+      Lct_GBM->Draw();
+      Lct_BATSE1->Draw("same");
+      Lct_BATSE2->Draw("same");
+      Lct_BATSE3->Draw("same");
+      Lct_BATSE4->Draw("same");
+    }
+  else
+    {
+      clc->cd(1);
+      Lct_SWIFT->Draw("l");
+      clc->cd(2);
+      Lct_GBM->Draw("l");
+      Lct_BATSE1->Draw("lsame");
+      Lct_BATSE2->Draw("lsame");
+      Lct_BATSE3->Draw("lsame");
+      Lct_BATSE4->Draw("lsame");
+    }
   TLegend *legL = new TLegend(0.7,0.7,0.99,0.99);
-  legL->AddEntry(Lct_BATSE1,"BATSE (ch1)");
-  legL->AddEntry(Lct_BATSE2,"BATSE (ch2)");
-  legL->AddEntry(Lct_BATSE3,"BATSE (ch3)");
-  legL->AddEntry(Lct_BATSE4,"BATSE (ch4)");
-  legL->AddEntry(Lct_GBM,"GBM (tot)");
-  legL->Draw();
-  clc->cd(2);
+  TLegend *legL1 = new TLegend(0.7,0.7,0.99,0.99);
+  char legname[100];
+  sprintf(legname, "BATSE %.0f-%.0f keV",BATSE1,BATSE2);
+  legL->AddEntry(Lct_BATSE1,legname);
+  sprintf(legname, "BATSE %.0f-%.0f keV",BATSE2,BATSE3);
+  legL->AddEntry(Lct_BATSE2,legname);
+  sprintf(legname, "BATSE %.0f-%.0f keV",BATSE3,BATSE4);
+  legL->AddEntry(Lct_BATSE3,legname);
+  sprintf(legname, "BATSE %.0f-%.0f keV",BATSE4,BATSE5);
+  legL->AddEntry(Lct_BATSE4,legname);
+  sprintf(legname, "GBM %.0f-%.0f keV",GBM1,GBM2);
+  legL->AddEntry(Lct_GBM,legname);
+
+  sprintf(legname, "SWIFT %.0f-%.0f keV",SWIFT1,SWIFT2);
+  legL1->AddEntry(Lct_SWIFT,legname);
+
   TLegend *legH = new TLegend(0.7,0.8,0.99,0.99);
+  clc->cd(3);
   if(ExtractPhotons)
     {
       Lc->SetMarkerStyle(20);
@@ -447,14 +594,22 @@ void PlotGRB(double enph = 0,char name[100]="grb_65540.root",TString name2="GRB_
     }
   
   legH->AddEntry(Lct_LAT,"LAT (tot)");
+  clc->cd(1);
+  legL1->Draw();
+  clc->cd(2);
+  legL->Draw();
+  clc->cd(3);
   legH->Draw();
 
 
-  std::cout<<" Nph BATSE1 ("<<BATSE1<<","<<BATSE2<<")  = "<<sp->Integral_T(Lct_BATSE1,0.0,TMAX)<<std::endl;
-  std::cout<<" Nph BATSE2 ("<<BATSE2<<","<<BATSE3<<")  = "<<sp->Integral_T(Lct_BATSE2,0.0,TMAX)<<std::endl;
-  std::cout<<" Nph BATSE3 ("<<BATSE3<<","<<BATSE4<<")  = "<<sp->Integral_T(Lct_BATSE3,0.0,TMAX)<<std::endl;
-  std::cout<<" Nph BATSE4 ("<<BATSE4<<","<<BATSE5<<")  = "<<sp->Integral_T(Lct_BATSE4,0.0,TMAX)<<std::endl;
-  std::cout<<" Nph GBM ("<<GBM1<<","<<GBM2<<")  = "<<sp->Integral_T(Lct_GBM,0.0,TMAX)<<std::endl;
+  /*
+    std::cout<<" Nph BATSE1 ("<<BATSE1<<","<<BATSE2<<")  = "<<sp->Integral_T(Lct_BATSE1,0.0,TMAX)<<std::endl;
+    std::cout<<" Nph BATSE2 ("<<BATSE2<<","<<BATSE3<<")  = "<<sp->Integral_T(Lct_BATSE2,0.0,TMAX)<<std::endl;
+    std::cout<<" Nph BATSE3 ("<<BATSE3<<","<<BATSE4<<")  = "<<sp->Integral_T(Lct_BATSE3,0.0,TMAX)<<std::endl;
+    std::cout<<" Nph BATSE4 ("<<BATSE4<<","<<BATSE5<<")  = "<<sp->Integral_T(Lct_BATSE4,0.0,TMAX)<<std::endl;
+    std::cout<<" Nph SWIFT ("<<SWIFT1<<","<<SWIFT2<<")  = "<<sp->Integral_T(Lct_SWIFT,0.0,TMAX)<<std::endl;
+    std::cout<<" Nph GBM ("<<GBM1<<","<<GBM2<<")  = "<<sp->Integral_T(Lct_GBM,0.0,TMAX)<<std::endl;
+  */
   std::cout<<" Nph LAT ("<<LAT1<<","<<LAT2<<")  = "<<sp->Integral_T(Lct_LAT,0.0,TMAX)<<std::endl;
   if(ExtractPhotons) 
     {
@@ -555,8 +710,8 @@ void ScanParameters(int Ngrb)
   double fPeakFlux;
   double fBATSE1,fBATSE2,fBATSE3,fBATSE4;
   double fBATSE, fLAT,fGBM,fEXP,fTOT;
-  double nLAT30,nLAT100,nLAT1000;
-  double nBATSE,nGBM,nEXP,nTOT;
+  double nLAT,nLAT30,nLAT100,nLAT1000;
+  //  double nBATSE,nGBM,nEXP;
   double alpha,beta,Ep;
   //////////////////////////////////////////////////
   TTree *GRBTree = new TTree("GRBTree","GRBOBS Catalogue");
@@ -575,14 +730,14 @@ void ScanParameters(int Ngrb)
   GRBTree->Branch("LogfEXP",&fEXP,"LogfEXP/D");
   GRBTree->Branch("LogfTOT",&fTOT,"LogfTOT/D");
   
-  GRBTree->Branch("LognBATSE",&nBATSE,"LognBATSE/D");
+  //  GRBTree->Branch("LognBATSE",&nBATSE,"LognBATSE/D");
+  //  GRBTree->Branch("LognGBM",&nGBM,"LognGBM/D");
 
+  GRBTree->Branch("LognLAT",&nLAT,"LognLAT/D");
   GRBTree->Branch("LognLAT30",&nLAT30,"LognLAT30/D");
   GRBTree->Branch("LognLAT100",&nLAT100,"LognLAT100/D");
   GRBTree->Branch("LognLAT1000",&nLAT1000,"LognLAT1000/D");
 
-  GRBTree->Branch("LognGBM",&nGBM,"LognGBM/D");
-  GRBTree->Branch("LognTOT",&nTOT,"LognTOT/D");
   //////////////////////////////////////////////////
   GRBTree->Branch("LogEp",&Ep,"LogEp/D");
   GRBTree->Branch("alpha",&alpha,"alpha/D");
@@ -600,20 +755,25 @@ void ScanParameters(int Ngrb)
       EMIN = Nv->GetYaxis()->GetXmin();
       EMAX = Nv->GetYaxis()->GetXmax();
       EBIN = Nv->GetYaxis()->GetNbins();
-      
+      double dt = Nv->GetXaxis()->GetBinWidth(1);
       
       // e2Ne = e * Ne * de: [keV/s/m^2]
-      gDirectory->Delete("e2Ne");
+	gDirectory->Delete("e2Ne");
+      gDirectory->Delete("LAT");
       Nv->ProjectionY("e2Ne");
+      Nv->ProjectionY("LAT");
+
       TH1D *e2Ne = (TH1D*) gDirectory->Get("e2Ne");
+      TH1D *LAT = (TH1D*) gDirectory->Get("LAT");
       Ep=0.0;
       for(int i=0; i < EBIN; i++)
 	{
 	  double ne = e2Ne->GetBinContent(i+1);
-	  //	  double de = e2Ne->GetBinWidth(i+1);//GetBinCenter(i+1);
+	  double de = e2Ne->GetBinWidth(i+1);//GetBinCenter(i+1);
 	  double en = e2Ne->GetBinCenter(i+1);
+	  double Aeff_on = AeffLAT(en*1e-3,1.0); 
+	  LAT->SetBinContent(i+1,1e-4*dt*de*ne*Aeff_on);
 	  e2Ne->SetBinContent(i+1,en*en*ne);
-	  //if(en*de*ne > FEp && en < 1e4) Ep=e;
 	}
       Ep = log10(e2Ne->GetBinCenter(e2Ne->GetMaximumBin()));
       alpha =  params->GetAlpha();
@@ -623,7 +783,7 @@ void ScanParameters(int Ngrb)
       sp->SetAreaDetector(GenerationArea); //like observation sim
       //////////////////////////////////////////////////
   
-      TH1D *Lct_TOT   = sp->Integral_E(EMIN,EMAX);  // ph
+      TH1D *Lct_TOT   = sp->Integral_E(EMIN,EMAX);  // ph (over generation area)
       TH1D *Lct_BATSE = sp->Integral_E(BATSE1,BATSE5);  // ph
       TH1D *Lct_GBM   = sp->Integral_E(GBM1,GBM2);  // ph
 
@@ -646,9 +806,9 @@ void ScanParameters(int Ngrb)
       fLAT   = log10(sp->GetFluence(LAT1,LAT2));
       fEXP   = log10(sp->GetFluence(enph,emax));
       
-      nTOT   = log10(sp->Integral_T(Lct_TOT,0.0,TMAX));
-      nBATSE = log10(sp->Integral_T(Lct_BATSE,0.0,TMAX));
-      nGBM   = log10(sp->Integral_T(Lct_GBM,0.0,TMAX));
+      nLAT   = log10(LAT->Integral());
+      //      nBATSE = log10(sp->Integral_T(Lct_BATSE,0.0,TMAX));
+      //      nGBM   = log10(sp->Integral_T(Lct_GBM,0.0,TMAX));
 
       nLAT30   = log10(sp->Integral_T(Lct_LAT30,0.0,TMAX));
       nLAT100   = log10(sp->Integral_T(Lct_LAT100,0.0,TMAX));
@@ -668,10 +828,10 @@ void ScanParameters(int Ngrb)
       std::cout<<" BASTE flux (tot) ("<<BATSE1<<","<<BATSE5<<") = "<<pow(10.,fBATSE)<<" erg/cm^2"<<std::endl;
       std::cout<<" BASTE Peakflux ("<<BATSE2<<","<<BATSE4<<") = "<<pow(10.,fPeakFlux)<<" ph/cm^2/s"<<std::endl;
       std::cout<<" GBM   flux ("<< GBM1 <<","<< GBM2 <<") = "<<pow(10.,fGBM)<<" erg/cm^2"<<std::endl;
-      std::cout<<"  LAT   flux ("<< LAT1 <<","<< LAT2 <<") = "<<pow(10.,fLAT)<<" erg/cm^2"<<std::endl;
-      std::cout<<"  Nph TOT    ("<<EMIN<<","<<EMAX<<")  = "<<pow(10.,nTOT)<<std::endl;
-      std::cout<<"  Nph BATSE  ("<<BATSE1<<","<<BATSE5<<") = "<<pow(10.,nBATSE)<<std::endl;
-      std::cout<<"  Nph GBM    ("<<GBM1<<","<<GBM2<<")  = "<<pow(10.,nGBM)<<std::endl;
+      std::cout<<"  LAT  flux ("<< LAT1 <<","<< LAT2 <<") = "<<pow(10.,fLAT)<<" erg/cm^2"<<std::endl;
+      //      std::cout<<"  Nph BATSE  ("<<BATSE1<<","<<BATSE5<<") = "<<pow(10.,nBATSE)<<std::endl;
+      //      std::cout<<"  Nph GBM    ("<<GBM1<<","<<GBM2<<")  = "<<pow(10.,nGBM)<<std::endl;
+      std::cout<<"  Nph LAT    ("<<EMIN<<","<<EMAX<<")  = "<<pow(10.,nLAT)<<std::endl;
       std::cout<<"  Nph LAT30    ("<<30000<<","<<LAT2<<")  = "<<pow(10.,nLAT30)<<std::endl;
       std::cout<<"  Nph LAT100    ("<<100000<<","<<LAT2<<")  = "<<pow(10.,nLAT100)<<std::endl;
       std::cout<<"  Nph LAT1000    ("<<1000000<<","<<LAT2<<")  = "<<pow(10.,nLAT1000)<<std::endl;
@@ -738,6 +898,10 @@ int main(int argc, char** argv)
       else if("-scaled"==arg_name)
 	{
 	  scaled=true;
+	}
+      else if("-noise"==arg_name)
+	{
+	  noise=true;
 	}
       else if("-movie"==arg_name)
 	{

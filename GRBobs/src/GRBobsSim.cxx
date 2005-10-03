@@ -45,7 +45,7 @@ TH2D* GRBobsSim::MakeGRB()
       m_tfinal=TMath::Max(m_tfinal,(*pos)->GetEndTime());      
       if(DEBUG) (*pos)->Print();
     }
-  
+  m_tfinal*=1.5; 
   m_tbin = TMath::Max(10,int(m_tfinal/s_TimeBinWidth));
   m_tbin = TMath::Min(10000,m_tbin);
   s_TimeBinWidth = m_tfinal/m_tbin;
