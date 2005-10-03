@@ -269,7 +269,7 @@ void GRBobsSim::SaveGBMDefinition(TString GRBname, double ra, double dec, double
 {
   TString name = "GRBOBS_";
   name+=GRBname; 
-  name+="_DEF.txt";
+  name+=".DEF";
   std::ofstream os(name,std::ios::out);
   os<<"BURST DEFINITION FILE"<<std::endl;
   os<<"Burst Name"<<std::endl;
@@ -344,7 +344,7 @@ void GRBobsSim::GetGBMFlux(TString GRBname)
   
   TString name = "GRBOBS_";
   name+=GRBname; 
-  name+="_GBM.txt";
+  name+=".lc";
   std::ofstream os(name,std::ios::out);
   os<<"Sample Spectrum File "<<std::endl;
   os<<tbin<<" bins"<<std::endl;
