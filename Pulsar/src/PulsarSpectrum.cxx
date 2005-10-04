@@ -97,11 +97,13 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
   std::string ListFileName = pulsar_root + "/data/PulsarDataList.txt";
   std::ifstream ListFile;
   ListFile.open(ListFileName.c_str(), std::ios::in);
-  char DataListFileName[40];
-  std::string CompletePathFileName;
+  char DataListFileName[200];
+  std::string CompletePathFileName = "";
 
-  int Retrieved;
-  //  int AllRetrieved;
+  ListFile.getline(DataListFileName,200); 
+
+  int Retrieved = 0;
+  int AllRetrieved = 0;
  
   if (! ListFile.is_open()) 
     {
@@ -110,52 +112,31 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
       exit(1);
     }  else 
       {
-	while (ListFile.eof() != 1)
+
+	ListFile >> DataListFileName;
+	while (!ListFile.eof()) 
 	  {	
-	    if (ListFile.eof() == 1) break;
-
-	    ListFile >> DataListFileName;
 	    CompletePathFileName = pulsar_root + "/data/" + std::string(DataListFileName);
-	    std::cout << "Looking for DataList " << CompletePathFileName << std::endl;
+	    // std::cout << "Looking for DataList " << CompletePathFileName << std::endl;
 	    Retrieved = getPulsarFromDataList(CompletePathFileName);
-
-	    if (DEBUG==0)
+	    
+	    if (Retrieved == 1)
 	      {
-		if (Retrieved == 1)
-		  {
-		    std::cout << "Pulsar " << m_PSRname << " found in file " << CompletePathFileName << std::endl;
-		  } 
-		else
-		  {
-		    std::cout << "ERROR! Pulsar " 
-			      << m_PSRname << " NOT found in Datalist.File...Exit. " << std::endl;
-		    exit(1);	
-		  }
-	      }
+		std::cout << "Pulsar " << m_PSRname << " found in file " << CompletePathFileName << std::endl;
+		AllRetrieved = 1;
+	      } 
+	    ListFile >> DataListFileName ;	  
+
+	  }
+
+	if (AllRetrieved == 0)
+	  {
+	    std::cout << "Pulsar " << m_PSRname 
+		      << " not found in any DataList file.Please Check if PULSARROOT is correctly set " 
+		      << std::endl;
+	    exit(1);
 	  }
       }
-
-
-
-
-
-
-  //   Retrieved = getPulsarFromDataList(DataListFileName);
-  /*
-  if (DEBUG==0)
-    {
-      if (Retrieved == 1)
-	{
-	  std::cout << "Pulsar " << m_PSRname << " found in Datalist file! " << std::endl;
-	} 
-      else
-	{
-	  std::cout << "ERROR! Pulsar " << m_PSRname << " NOT found in Datalist.File...Exit. " << std::endl;
-	  exit(1);	
-	}
-     }
-  */
-
 
   //Assign as ephemerides ONLY the first entry (don't use the multiple ephemerides)
   m_t0Init = m_t0InitVect[0];
