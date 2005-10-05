@@ -23,6 +23,8 @@
                             Possibility to input frequency and derivatives and not only period and derivatives
 *   v1r0p10 14-Aug-2005 THB  Updated Datalist, xml file and bug fixes;
 *   v1r0p11 19-Sep-2005 THB  GPS and pointing history fixed; Db outut fixed;
+*   v1r1    1-Oct-2005 THB   Timing issue solved
+*   v1r1p0  5-Oct-2005 THB   DataList parameterization changed
 
 *@endverbatim
 */
