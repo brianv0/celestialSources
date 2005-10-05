@@ -27,7 +27,8 @@ ISpectrumFactory &PulsarSpectrumFactory()
  * to be used and the parameters specific for the choosen model. Then extracts from the
  * TXT DataList file the characteristics of the choosen pulsar (e.g. period, flux, period derivatives
  * ,ephemerides, flux, etc...)
- * The parameters taken from <i>PulsarDataList.txt</i> are: <br>
+ * The names of DataList files are defined in the file <i>PulsarDataList.txt</i><br>
+ * The parameters are:<br>
  * <ul>
  *  <li> Pulsar name;
  *  <li> Flux, expressed in ph/cm2/s (E>100MeV);
@@ -532,13 +533,12 @@ double PulsarSpectrum::getDecorrectedTime(double CorrectedTime)
  *
  * <br>
  * This method gets from the ASCII <i>PulsarDatalist.txt</i> file stored in <i>/data</i> directory)
- * the pulsar parameters and returns a integer status code (1 is Ok, 0 is failure)
+ * the names of the files that contain the pulsars parameters. The default one is BasicDataList.txt.
+ * This method returns a integer status code (1 is Ok, 0 is failure)
  */
 int PulsarSpectrum::getPulsarFromDataList(std::string sourceFileName)
 {
   int Status = 0;
-  //  std::string pulsar_root = ::getenv("PULSARROOT");
-  //std::string sourceFileName = pulsar_root + "/data/" + FileName; //PulsarDataList.txt";
   std::ifstream PulsarDataTXT;
   
   if (DEBUG)
