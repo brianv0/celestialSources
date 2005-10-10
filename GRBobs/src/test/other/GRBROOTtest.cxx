@@ -26,11 +26,11 @@ bool movie       = false;
 bool bandFit     = false;
 bool powerlawFit = false;
 bool scaled      = false;
-bool noise      = false;
-
+bool noise       = false;
+double noiseL    = 0.0;
 bool ExtraComponent = false;
 int extension;
-
+int nlat;
 double Band(double *var, double *par);
 void help();
 void ScanParameters(int Ngrb);
@@ -123,7 +123,7 @@ TH2D *Load(char name[100]="grb_65540.root")
   return Nv;
 }
 
-void PlotGRB(double enph = 0,char name[100]="grb_65540.root",TString name2="GRB_")
+void PlotGRB(double enph = 0,double z=0,char name[100]="grb_65540.root",TString name2="GRB_")
 {
   gStyle->SetCanvasColor(10);
   
@@ -134,7 +134,7 @@ void PlotGRB(double enph = 0,char name[100]="grb_65540.root",TString name2="GRB_
   TH2D *Nv = Load(name); // [ph/keV/s/m²]
 
   //////////////////////////////////////////////////
-  SpectObj *sp = new SpectObj(Nv,0);              //ph
+  SpectObj *sp = new SpectObj(Nv,0,z);              //ph
   sp->SetAreaDetector(GenerationArea); //like observation sim
   //////////////////////////////////////////////////
   
@@ -200,10 +200,10 @@ void PlotGRB(double enph = 0,char name[100]="grb_65540.root",TString name2="GRB_
       double Aeff_NaI = AeffNaI(e*1e-3,1.0); 
       double Aeff_BGO = AeffBGO(e*1e-3,1.0); 
       
-      Fv->SetBinContent(i+1,de*ne);
-      LAT->SetBinContent(i+1,de * ne * Aeff_LAT);
-      BGO->SetBinContent(i+1,de * ne * Aeff_BGO);
-      NaI->SetBinContent(i+1,de * ne * Aeff_NaI);
+      Fv->SetBinContent(i+1,de*ne); //
+      LAT->SetBinContent(i+1,de * ne * Aeff_LAT); //
+      BGO->SetBinContent(i+1,de * ne * Aeff_BGO); //
+      NaI->SetBinContent(i+1,de * ne * Aeff_NaI); //
 
       e2Ne->SetBinContent(i+1,e*e*ne);
     }
@@ -268,7 +268,7 @@ void PlotGRB(double enph = 0,char name[100]="grb_65540.root",TString name2="GRB_
   else if (enph<EMIN)  enph = EMIN;
   
   //////////////////////////////////////////////////
-  TCanvas *clc = new TCanvas("clc","clc",600,900);
+  TCanvas *clc = new TCanvas("clc","clc",600,800);
   TCanvas *csp = new TCanvas("csp","csp");
  
   csp->SetLogx();
@@ -498,7 +498,6 @@ void PlotGRB(double enph = 0,char name[100]="grb_65540.root",TString name2="GRB_
       double AGBM     = 125.0*6.0;
       double ABATSE   = 2025.0;
       double ASWIFT_BAT = 2000.0;
-
       double BGBM     = 200.0;
       double BBATSE1   = 220.0;
       double BBATSE2   = 150.0;
@@ -523,7 +522,7 @@ void PlotGRB(double enph = 0,char name[100]="grb_65540.root",TString name2="GRB_
 	  Lct_BATSE2->SetBinContent(i,rnd.Poisson(BBATSE2+Lct_BATSE2->GetBinContent(i)));
 	  Lct_BATSE3->SetBinContent(i,rnd.Poisson(BBATSE3+Lct_BATSE3->GetBinContent(i)));
 	  Lct_BATSE4->SetBinContent(i,rnd.Poisson(BBATSE4+Lct_BATSE4->GetBinContent(i)));
-	  Lct_SWIFT->SetBinContent(i,rnd.Poisson(BSWIFT_BAT+Lct_SWIFT->GetBinContent(i)));
+	  Lct_SWIFT->SetBinContent(i,rnd.Poisson(noiseL * BSWIFT_BAT * DT + Lct_SWIFT->GetBinContent(i)));
 	}
     }
   Lct_GBM->SetMinimum(-Lct_GBM->GetMaximum()/10.);
@@ -567,7 +566,7 @@ void PlotGRB(double enph = 0,char name[100]="grb_65540.root",TString name2="GRB_
   sprintf(legname, "GBM %.0f-%.0f keV",GBM1,GBM2);
   legL->AddEntry(Lct_GBM,legname);
 
-  sprintf(legname, "SWIFT %.0f-%.0f keV",SWIFT1,SWIFT2);
+  sprintf(legname, "SWIFT (BAT) %.0f-%.0f keV",SWIFT1,SWIFT2);
   legL1->AddEntry(Lct_SWIFT,legname);
 
   TLegend *legH = new TLegend(0.7,0.8,0.99,0.99);
@@ -601,15 +600,6 @@ void PlotGRB(double enph = 0,char name[100]="grb_65540.root",TString name2="GRB_
   clc->cd(3);
   legH->Draw();
 
-
-  /*
-    std::cout<<" Nph BATSE1 ("<<BATSE1<<","<<BATSE2<<")  = "<<sp->Integral_T(Lct_BATSE1,0.0,TMAX)<<std::endl;
-    std::cout<<" Nph BATSE2 ("<<BATSE2<<","<<BATSE3<<")  = "<<sp->Integral_T(Lct_BATSE2,0.0,TMAX)<<std::endl;
-    std::cout<<" Nph BATSE3 ("<<BATSE3<<","<<BATSE4<<")  = "<<sp->Integral_T(Lct_BATSE3,0.0,TMAX)<<std::endl;
-    std::cout<<" Nph BATSE4 ("<<BATSE4<<","<<BATSE5<<")  = "<<sp->Integral_T(Lct_BATSE4,0.0,TMAX)<<std::endl;
-    std::cout<<" Nph SWIFT ("<<SWIFT1<<","<<SWIFT2<<")  = "<<sp->Integral_T(Lct_SWIFT,0.0,TMAX)<<std::endl;
-    std::cout<<" Nph GBM ("<<GBM1<<","<<GBM2<<")  = "<<sp->Integral_T(Lct_GBM,0.0,TMAX)<<std::endl;
-  */
   std::cout<<" Nph LAT ("<<LAT1<<","<<LAT2<<")  = "<<sp->Integral_T(Lct_LAT,0.0,TMAX)<<std::endl;
   if(ExtractPhotons) 
     {
@@ -624,6 +614,7 @@ void PlotGRB(double enph = 0,char name[100]="grb_65540.root",TString name2="GRB_
   double fBATSE3 = sp->GetFluence(BATSE3,BATSE4);
   double fBATSE4 = sp->GetFluence(BATSE4,BATSE5);
   double fBATSET = sp->GetFluence(BATSE1,BATSE5);
+  double fBAT    = sp->GetFluence(SWIFT1,SWIFT2);
   double fLAT   = sp->GetFluence(LAT1,LAT2);
   double fGBM   = sp->GetFluence(GBM1,GBM2);
   double fEXP   = sp->GetFluence(enph,emax);
@@ -640,6 +631,7 @@ void PlotGRB(double enph = 0,char name[100]="grb_65540.root",TString name2="GRB_
   std::cout<<" BASTE flux (ch4) ("<<BATSE4<<","<<BATSE5<<") = "<<fBATSE4<<" erg/cm^2"<<std::endl;
   std::cout<<" BASTE flux (tot) ("<<BATSE1<<","<<BATSE5<<") = "<<fBATSET<<" erg/cm^2"<<std::endl;
   std::cout<<" BASTE Peakflux ("<<BATSE2<<","<<BATSE4<<") = "<<fPeakFlux<<" ph/cm^2/s"<<std::endl;
+  std::cout<<" BAT   flux ("<< SWIFT1 <<","<< SWIFT2 <<") = "<<fBAT<<" erg/cm^2"<<std::endl;
   std::cout<<" GBM   flux ("<< GBM1 <<","<< GBM2 <<") = "<<fGBM<<" erg/cm^2"<<std::endl;
   std::cout<<" LAT   flux ("<< LAT1 <<","<< LAT2 <<") = "<<fLAT<<" erg/cm^2"<<std::endl;
   if(ExtractPhotons) std::cout<<" EXP   flux ("<< enph <<","<< emax <<") = "<<fEXP<<" erg/cm^2"<<std::endl; 
@@ -668,10 +660,9 @@ void MakeGRB(int NGRB=1, double enph=0, bool gbm=false)
   params->PrintParameters();
   GRBobsSim* m_grb = new GRBobsSim(params);
   double Eco = params->GetCutOffEnergy();
-  std::cout<<Eco<<std::endl;
   if(ExtraComponent) 
     {
-      TH2D *h = m_grb->MakeGRB_ExtraComponent(10000.,100.);
+      TH2D *h = m_grb->MakeGRB_ExtraComponent(10000,nlat);
       m_grb->CutOff(h,Eco);
       m_grb->SaveNvEC();
     }
@@ -691,8 +682,10 @@ void MakeGRB(int NGRB=1, double enph=0, bool gbm=false)
   if(ExtraComponent)  sprintf(name,"grbobs_%d_EC.root",(int) params->GetGRBNumber());
 
   extension=params->GetGRBNumber();
+  double z = params->GetRedshift();
+
   delete params; //??
-  PlotGRB(enph,name);
+  PlotGRB(enph,z,name);
   
  }
 
@@ -758,7 +751,7 @@ void ScanParameters(int Ngrb)
       double dt = Nv->GetXaxis()->GetBinWidth(1);
       
       // e2Ne = e * Ne * de: [keV/s/m^2]
-	gDirectory->Delete("e2Ne");
+      gDirectory->Delete("e2Ne");
       gDirectory->Delete("LAT");
       Nv->ProjectionY("e2Ne");
       Nv->ProjectionY("LAT");
@@ -779,7 +772,7 @@ void ScanParameters(int Ngrb)
       alpha =  params->GetAlpha();
       beta =   params->GetBeta();
       //////////////////////////////////////////////////
-      SpectObj *sp = new SpectObj(Nv,0);              //ph
+      SpectObj *sp = new SpectObj(Nv,0, params->GetRedshift());              //ph
       sp->SetAreaDetector(GenerationArea); //like observation sim
       //////////////////////////////////////////////////
   
@@ -860,6 +853,7 @@ int main(int argc, char** argv)
   int ngrb=1;
   int ngrbs=0;
   bool gbm = false;
+  
   while(current_arg < argc)
     {
       arg_name = argv[current_arg];
@@ -877,7 +871,10 @@ int main(int argc, char** argv)
 	  gbm=true;
 	}
       else if ("-EC" ==arg_name)
-	ExtraComponent=true;
+	{
+	  ExtraComponent=true;
+	  nlat=atoi(argv[++current_arg]);
+	}
       else if("-scan"==arg_name)
 	{
 	  ngrbs=atoi(argv[++current_arg]);
@@ -902,6 +899,7 @@ int main(int argc, char** argv)
       else if("-noise"==arg_name)
 	{
 	  noise=true;
+	  noiseL = TMath::Max(0.0,atof(argv[++current_arg]));
 	}
       else if("-movie"==arg_name)
 	{

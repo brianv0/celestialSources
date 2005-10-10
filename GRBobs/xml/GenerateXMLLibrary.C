@@ -1,3 +1,19 @@
+#include <iomanip>
+
+double GetRedshiftLong(TRandom *rnd)
+{
+  double z=0.0;
+  while(z<=0) z = rnd->Gaus(2.0,1.0);
+  return z;
+}
+
+double GetRedshiftShort(TRandom *rnd)
+{
+  double z=0.0;
+  while(z<=0) z = rnd->Gaus(.1,.1);
+  return z;
+}
+
 double GetPeakFluxLong(TRandom *rnd)
 {
   // Peak Flux Distributions, from Jay and Jerry IDL code.
@@ -106,12 +122,13 @@ void GenerateXMLLibrary(int Nbursts=100)
   
 
   double MinExtractedPhotonEnergy = 30.0; //MeV
-  double FirstBurstTime  =      1000; //1e4
+  long FirstBurstTime  =      1000; //1e4
   double AverageInterval = 86400.0; //s
   bool  GeneratePF  =   true;// If true: PF is used to normalize Bursts.
   double FL=1e-5;
   double PF=-1.0;
   double Fluence,PeakFlux;
+  double z;
   double Duration;
   int BURSTtype = 0; // 1->S, 2->L, else S+L
   bool GLASTCoordinate            = false;
@@ -160,17 +177,23 @@ void GenerateXMLLibrary(int Nbursts=100)
   
   std::ofstream os("GRBobs_user_library.xml",std::ios::out);
   std::ofstream osTest("../src/test/GRBParam.txt",std::ios::out);
-  
+  os.precision(4);
+
   os<<"<!-- $Header -->"<<std::endl;
   os<<"<!-- ************************************************************************** -->"<<std::endl;
   os<<"<source_library title=\"GRBobs_user_library\">"<<std::endl;
   char SourceName[100]="GRB";
   
-  double BurstTime=FirstBurstTime;
+  long BurstTime=FirstBurstTime;
+
+  //  FILE osTest("../src/test/GRBParam.txt");
   
+
   if(GeneratePF)
+    //    fprint(osTest," T0  T90   Z    PF  alpha   beta   Eco ");
     osTest<<" T0  T90    PF  alpha   beta   Eco "<<std::endl;
-  else 
+  else
+    //    fprint(osTest," T0  T90   Z    PF  alpha   beta   Eco ");
     osTest<<" T0  T90    FL  alpha   beta   Eco "<<std::endl;
   
   int type;
@@ -223,6 +246,7 @@ void GenerateXMLLibrary(int Nbursts=100)
 		}
 	      PFshort->Fill(PeakFlux);	  
 	      Duration = pow(10.0,(double)rnd->Gaus(log_mean_short,log_sigma_short)); //(Short Bursts)
+	      z = GetRedshiftShort(rnd);
 	      //	  Duration = pow(10.0,(double)rnd->Gaus(-0.2,0.55)); //(Short Bursts)
 	    }
 	  else
@@ -258,7 +282,7 @@ void GenerateXMLLibrary(int Nbursts=100)
 		}
 	      Duration=1e6;
 	      long seed = rnd->GetSeed();
-	      while(Duration>1000)
+	      while(Duration>640.0)
 		{
 		  Duration = pow(10.0,(double)rnd->Gaus(log_mean_long,log_sigma_long)); //(Long Bursts)
 		  //	  Duration = pow(10.0,(double)rnd->Gaus(1.46,0.49)); //(Long Burst)
@@ -267,6 +291,7 @@ void GenerateXMLLibrary(int Nbursts=100)
 		  double Stretch =  TMath::Max(1.0, a * lpf*lpf + b * lpf + c);
 		  Duration*=Stretch;
 		}
+	      z = GetRedshiftLong(rnd);
 	      rnd->SetSeed(seed);
 	      rnd->Gaus();
 	    }
@@ -303,12 +328,14 @@ void GenerateXMLLibrary(int Nbursts=100)
       if(co_energy < 0.0) co_energy = floor(rnd->Uniform(1.,10.));
       
       if(GeneratePF)
-	os<<" <SpectrumClass name=\"GRBobsmanager\" params=\""<<BurstTime<<" , "<<Duration<<" , "<<PeakFlux<<" , "<<alpha<<" , "<<beta<<" , "<<MinExtractedPhotonEnergy<<" , "<<GBM;
+	os<<" <SpectrumClass name=\"GRBobsmanager\" params=\""<<BurstTime<<" , "<<Duration<<" , "<<PeakFlux<<" , "<<
+	  z<<" , "<<alpha<<" , "<<beta<<" , "<<MinExtractedPhotonEnergy<<" , "<<GBM;
       else 
-	os<<" <SpectrumClass name=\"GRBobsmanager\" params=\""<<BurstTime<<" , "<<Duration<<" , "<<Fluence<<" , "<<alpha<<" , "<<beta<<" , "<<MinExtractedPhotonEnergy<<" , "<<GBM;
+	os<<" <SpectrumClass name=\"GRBobsmanager\" params=\""<<BurstTime<<" , "<<Duration<<" , "<<Fluence<<" , "<<
+	  z<<" , "<<alpha<<" , "<<beta<<" , "<<MinExtractedPhotonEnergy<<" , "<<GBM;
       
       os<<" , "<<NphLat<<" , "<<DelayTime<<" , "<<ExtraComponent_Duration<<" , "<<co_energy<<" \"/>"<<std::endl;
-
+      
 
 
 
@@ -316,16 +343,27 @@ void GenerateXMLLibrary(int Nbursts=100)
 	os<<"<direction theta=\""<<theta<<"\" phi=\""<<phi<<"\" />"<<std::endl;//u galactic_dir l=\""<<l<<"\" b=\""<<b<<"\" />"<<std::endl;
       else
 	os<<"<use_spectrum frame=\"galaxy\" />"<<std::endl;//u galactic_dir l=\""<<l<<"\" b=\""<<b<<"\" />"<<std::endl;
-
+      
       
       os<<"</spectrum> </source>"<<std::endl;
       //////////////////////////////////////////////////
+      
+      
       if(GeneratePF) 
-	osTest<<BurstTime<<" "<<Duration<<" "<<PeakFlux<<" "<<alpha<<" "<<beta<<" "<<co_energy<<std::endl;
+	osTest<<setw(11)<<BurstTime<<" "<<setw(8)<<setprecision(4)<<Duration<<" "<<setw(8)<<PeakFlux<<" "<<setw(8)<<z<<" "<<setw(8)<<alpha<<" "<<setw(8)<<beta<<" "<<setw(8)<<co_energy<<std::endl;
       else
-	osTest<<BurstTime<<" "<<Duration<<" "<<Fluence<<" "<<alpha<<" "<<beta<<" "<<co_energy<<std::endl;
+	osTest<<setw(11)<<BurstTime<<" "<<setw(8)<<setprecision(5)<<Duration<<" "<<setw(8)<<Fluence<<" "<<setw(8)<<z<<" "<<setw(8)<<alpha<<" "<<setw(8)<<beta<<" "<<setw(8)<<co_energy<<std::endl;
       //////////////////////////////////////////////////
-      BurstTime+=rnd->Exp(AverageInterval);
+      
+      
+      /*
+	if(GeneratePF) 
+	fprintf("%d %.3f  %.3f %.3f %.3f %.3f %d",BurstTime,Duration,PeakFlux,z,alpha,beta,co_energy);
+	else
+	fprintf("%d %.3f  %.3f %.3f %.3f %.3f %d",BurstTime,Duration,Fluence,z,alpha,beta,co_energy);
+      */
+      //////////////////////////////////////////////////
+      BurstTime+=(int) rnd->Exp(AverageInterval);
     }
   //////////////////////////////////////////////////
   os<<""<<std::endl;

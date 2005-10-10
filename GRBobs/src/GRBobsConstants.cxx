@@ -9,6 +9,7 @@ GRBobsParameters::GRBobsParameters()
   SetGRBNumber((long) rnd->GetSeed());
   m_Type=0; //1->Short, 2->Long, 0->Both
   m_enph=emin;
+  NormType=='P';
 }
 
 //////////////////////////////////////////////////
@@ -28,7 +29,16 @@ void GRBobsParameters::SetDuration(double duration)
 
 void GRBobsParameters::SetFluence(double fluence)
 {
-  m_fluence = fluence;
+  if (m_fluence>1.0e-3) 
+    {
+      SetPeakFlux(fluence);
+      NormType='P';
+    }
+  else 
+    {
+      NormType='F';
+      m_fluence = fluence;
+    }
 }
 
 void GRBobsParameters::SetPeakFlux(double peakflux)
@@ -133,6 +143,7 @@ void GRBobsParameters::PrintParameters()
   std::cout<<" dt = "<<m_decayTime<<" rt = "<<m_riseTime
 	   <<" pe = "<<m_Peakedness<<" ph = "<<m_pulseHeight<<" tau = "<<m_pulseSeparation
 	   <<" ep = "<<m_Epeak<<" a = "<<m_LowEnergy<<" b = "<<m_HighEnergy<<std::endl;
+  std::cout<<"Redshift = "<<m_z<<std::endl;
 }
 
 //..................................................//
@@ -149,6 +160,7 @@ void GRBobsParameters::ReadParametersFromFile(std::string paramFile, int NGRB)
   double tstart;
   double duration;
   double fluence;  
+  double z;
   double alpha;
   double beta;
   double Eco;
@@ -160,7 +172,7 @@ void GRBobsParameters::ReadParametersFromFile(std::string paramFile, int NGRB)
   
   while(i<=NGRB && f1.getline(buf,100))
     {
-      if(sscanf(buf,"%lf %lf %lf %lf %lf %lf",&tstart,&duration,&fluence,&alpha,&beta,&Eco)<=0) break;
+      if(sscanf(buf,"%lf %lf %lf %lf %lf %lf %lf",&tstart,&duration,&fluence,&z,&alpha,&beta,&Eco)<=0) break;
       i++;
     } 
   i--;
@@ -174,7 +186,7 @@ void GRBobsParameters::ReadParametersFromFile(std::string paramFile, int NGRB)
       for(int j = 1; j<=(NGRB %i);j++)
 	{
 	  f2.getline(buf,100);
-	  sscanf(buf,"%lf %lf %lf %lf %lf %lf",&tstart,&duration,&fluence,&alpha,&beta,&Eco);
+	  sscanf(buf,"%lf %lf %lf %lf %lf %lf %lf",&tstart,&duration,&fluence,&z,&alpha,&beta,&Eco);
 	}
       f2.close();
     }
@@ -182,12 +194,13 @@ void GRBobsParameters::ReadParametersFromFile(std::string paramFile, int NGRB)
   SetGRBNumber(65540+ (long) floor(tstart));
   
   SetFluence(fluence);
-  SetPeakFlux(fluence);
+  //  SetPeakFlux(fluence);
   SetDuration(duration);
   SetAlphaBeta(alpha,beta);
   SetMinPhotonEnergy(3e4); //keV (this is a defaul value)
   SetGalDir(-200,-200);
   SetCutOffEnergy(Eco);
+  SetRedshift(z);
   SetGRBNumber(65540+ (long) floor(tstart));
   
 }

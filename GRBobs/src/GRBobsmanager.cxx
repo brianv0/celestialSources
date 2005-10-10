@@ -33,16 +33,17 @@ GRBobsmanager::GRBobsmanager(const std::string& params)
   m_startTime       = parseParamList(params,0);
   double duration   = parseParamList(params,1);
   m_fluence         = parseParamList(params,2);
-  m_alpha           = parseParamList(params,3);
-  m_beta            = parseParamList(params,4);
-  m_MinPhotonEnergy = parseParamList(params,5)*1.0e3; //MeV
-  
-  if(parseParamList(params,6)!=0) m_GenerateGBMOutputs = true;
+  m_z               = parseParamList(params,3);
+  m_alpha           = parseParamList(params,4);
+  m_beta            = parseParamList(params,5);
+  m_MinPhotonEnergy = parseParamList(params,6)*1.0e3; //MeV
 
-  m_LATphotons  = parseParamList(params,7);
-  m_EC_delay    = parseParamList(params,8);
-  m_EC_duration = parseParamList(params,9);
-  m_Energy_CO   = parseParamList(params,10);
+  if(parseParamList(params,7)!=0) m_GenerateGBMOutputs = true;
+
+  m_LATphotons  = parseParamList(params,8);
+  m_EC_delay    = parseParamList(params,9);
+  m_EC_duration = parseParamList(params,10);
+  m_Energy_CO   = parseParamList(params,11);
   
   m_par = new GRBobsParameters();
 
@@ -161,7 +162,7 @@ void GRBobsmanager::GenerateGRB()
   m_GRB      = new GRBobsSim(m_par);
   TH2D *h;
   h = m_GRB->MakeGRB();
-  m_spectrum = new SpectObj(m_GRB->CutOff(h,m_Energy_CO) , 0);
+  m_spectrum = new SpectObj(m_GRB->CutOff(h,m_Energy_CO) , 0, m_z);
   m_spectrum->SetAreaDetector(EventSource::totalArea());
   m_endTime    = m_startTime  + m_GRB->Tmax();
   
@@ -172,7 +173,7 @@ void GRBobsmanager::GenerateGRB()
       m_startTime_EC = m_startTime    + m_EC_delay;
       m_endTime_EC   = m_startTime_EC + m_EC_duration;
       h = m_GRB->MakeGRB_ExtraComponent(m_EC_duration,m_LATphotons);
-      m_spectrum1 = new SpectObj(m_GRB->CutOff(h,m_Energy_CO),0);
+      m_spectrum1 = new SpectObj(m_GRB->CutOff(h,m_Energy_CO),0, m_z);
       m_spectrum1->SetAreaDetector(EventSource::totalArea());
       AfterGlowEmission = new SpectralComponent(m_spectrum1,m_startTime_EC,m_endTime_EC);
       //std::cout<<"Generate AFTERGLOW Emission ("<<m_startTime_EC<<" "<<m_endTime_EC<<")"<<std::endl;
