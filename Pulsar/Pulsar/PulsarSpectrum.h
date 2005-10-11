@@ -110,7 +110,7 @@ class PulsarSpectrum : public ISpectrum
   std::string m_PSRname;
 
   double m_RA, m_dec, m_l, m_b;  
-  double m_period, m_pdot, m_p2dot, m_t0, m_t0Init, m_t0End, m_phi0, m_f0, m_f1, m_f2;
+  double m_period, m_pdot, m_p2dot, m_t0, m_t0Init, m_t0End, m_phi0, m_f0, m_f1, m_f2,m_N0;
   std::string m_ephemType;
   std::vector<double> m_periodVect, m_pdotVect, m_p2dotVect, m_f0Vect, m_f1Vect, m_f2Vect, m_phi0Vect, m_t0Vect, m_t0InitVect, m_t0EndVect, m_txbaryVect;
   
@@ -118,6 +118,7 @@ class PulsarSpectrum : public ISpectrum
   int m_model;
   double m_flux, m_enphmin, m_enphmax;
   int m_seed;
+  double m_ppar1,m_ppar2,m_ppar3,m_ppar4;
 
 
 };

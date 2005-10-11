@@ -71,6 +71,7 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
   m_f0 = 0.0;
   m_f1 = 0.0;
   m_f2 = 0.0;
+  m_N0 = 0.0;
   m_t0Init = 0.0;
   m_t0 = 0.0;
   m_t0End = 0.0;  
@@ -87,10 +88,14 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
   m_model      = std::atoi(parseParamList(params,5).c_str()); // choosen model
   m_seed       = std::atoi(parseParamList(params,6).c_str()); //Model Parameters: Random seed
   m_numpeaks   = std::atoi(parseParamList(params,7).c_str()); //Model Parameters: Number of peaks
-  double ppar1 = std::atof(parseParamList(params,8).c_str()); // model parameters
-  double ppar2 = std::atof(parseParamList(params,9).c_str());
-  double ppar3 = std::atof(parseParamList(params,10).c_str());
-  double ppar4 = std::atof(parseParamList(params,11).c_str());
+  //  double
+ m_ppar1 = std::atof(parseParamList(params,8).c_str()); // model parameters
+ //double 
+m_ppar2 = std::atof(parseParamList(params,9).c_str());
+//double
+ m_ppar3 = std::atof(parseParamList(params,10).c_str());
+ //double
+ m_ppar4 = std::atof(parseParamList(params,11).c_str());
 
 
   //Retrieve pulsar data from a list of DataList file.
@@ -213,7 +218,7 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
   if (m_model == 1)
     {
       PulsarLog << "**   Model chosen : " << m_model << " --> Using Phenomenological Pulsar Model " << std::endl;  
-      m_spectrum = new SpectObj(m_Pulsar->PSRPhenom(double(m_numpeaks), ppar1,ppar2,ppar3,ppar4),1);
+      m_spectrum = new SpectObj(m_Pulsar->PSRPhenom(double(m_numpeaks), m_ppar1,m_ppar2,m_ppar3,m_ppar4),1);
       m_spectrum->SetAreaDetector(EventSource::totalArea());
 
       PulsarLog << "**   Effective Area set to : " << m_spectrum->GetAreaDetector() << " m2 " << std::endl; 
@@ -285,15 +290,54 @@ double PulsarSpectrum::interval(double time)
 
   double timeTildeDecorr = time + (StartMissionDateMJD)*SecsOneDay; //Arrival time decorrected
 
-  //Checks whether ephemerides (period,pdot, etc..) are within validity ranges
-  if (((timeTildeDecorr/SecsOneDay) < m_t0Init) || ((timeTildeDecorr/SecsOneDay) > m_t0End)) 
-    {
-      if (DEBUG)
-	std::cout << " Warning: time is out of range of validity: continuing with the same ephemerides" << std::endl;
-    }
-  
   double timeTilde = timeTildeDecorr + getBaryCorr(timeTildeDecorr); //should be corrected before applying ephem de-corrections
-    
+  
+  double initTurns = getTurns(timeTilde); //Turns made at this time
+  double intPart; //Integer part
+  double tStart = modf(initTurns,&intPart)*m_period; // Start time for interval
+
+  //Checks whether ephemerides (period,pdot, etc..) are within validity ranges
+  if (((timeTilde/SecsOneDay) < m_t0Init) || ((timeTilde/SecsOneDay) > m_t0End)) 
+    {
+      //      if (DEBUG)
+      std::cout << " Warning: time is out of range of validity: for pulsar " << m_PSRname << ": Switchting to new ephemerides set..." << std::endl;
+
+	for (int e=0; e < m_t0Vect.size();e++)
+	  if (((timeTilde/SecsOneDay) > m_t0InitVect[e]) && ((timeTilde/SecsOneDay) < m_t0EndVect[e])) 
+	    {
+	      m_t0Init = m_t0InitVect[e];
+	      m_t0 = m_t0Vect[e];
+ 	      m_t0End = m_t0EndVect[e];
+	      m_f0 = m_f0Vect[e];
+	      m_f1 = m_f1Vect[e];
+	      m_f2 = m_f2Vect[e];
+	      m_period = m_periodVect[e];
+	      m_pdot = m_pdotVect[e];
+	      m_p2dot = m_p2dotVect[e];
+	      m_phi0 = m_phi0Vect[e];
+
+	      std::cout << "Valid Ephemerides set found:" << std::endl;
+	      std::cout << "MJD("<<m_t0Init<<"-"<<m_t0End<<") --> Epoch t0 = MJD " << m_t0 << std::endl; 
+	      std::cout << "f0 " << m_f0 << " f1 " << m_f1 << " f2 " << m_f2 << std::endl;
+	      std::cout << "per " << m_period << " pdot " << m_pdot << " p2dot " << m_p2dot 
+			<< " phi0 " << m_phi0 << std::endl;
+
+	      //Re-instantiate Pulsar
+	      delete m_Pulsar;
+	      m_Pulsar = new PulsarSim(m_PSRname, m_seed, m_flux, m_enphmin, m_enphmax, m_period);
+
+	      if (m_model == 1)
+		{
+		  delete m_spectrum;
+		  m_spectrum = new SpectObj(m_Pulsar->PSRPhenom(double(m_numpeaks), m_ppar1,m_ppar2,m_ppar3,m_ppar4),1);
+		  m_spectrum->SetAreaDetector(EventSource::totalArea());
+		  //		  std::cout << " SpectrObj instantiated " << std::endl;
+		}
+	       m_N0 = initTurns - getTurns(timeTilde); 
+	       //std::cout << " At Next t0 #turns will be : " << m_N0 << std::endl;
+	    }
+    }
+
   if (DEBUG)
     {
       if ((int(timeTilde - (StartMissionDateMJD)*SecsOneDay) % 1000) < 1.5)
@@ -304,16 +348,27 @@ double PulsarSpectrum::interval(double time)
 
 
    //First part: Ephemerides calculations...
+
+  /*
   double initTurns = getTurns(timeTilde); //Turns made at this time
   double intPart; //Integer part
   double tStart = modf(initTurns,&intPart)*m_period; // Start time for interval
+  */
+
   double inte = m_spectrum->interval(tStart,m_enphmin); //deltaT (in system where Pdot = 0
   double inteTurns = inte/m_period; // conversion to # of turns
+
   double totTurns = initTurns + inteTurns; //Total turns at the nextTimeTilde
+
+
+  //  std::cout << " initTurns " << initTurns << " Inte " << inte << " inteTurns " << inteTurns << " totTurns " << totTurns << std::endl;
 
   double nextTimeTilde = retrieveNextTimeTilde(timeTilde, totTurns, (ephemCorrTol/m_period));
   double nextTimeDecorr = getDecorrectedTime(nextTimeTilde);
  
+  //std::cout << std::setprecision(20) << " nextTimeTilde " << nextTimeTilde << " nextTimeDecorr " << nextTimeDecorr 
+  //    << "timeTildeDecorr " << timeTildeDecorr << std::endl;
+
   if (DEBUG)
     { 
      std::cout << "\nTimeTildeDecorr at Spacecraft (TT) is: " 
@@ -323,8 +378,13 @@ double PulsarSpectrum::interval(double time)
      std::cout << " nextTimeTilde decorrected (TT)is" << nextTimeDecorr - (StartMissionDateMJD)*SecsOneDay << "sec." << std::endl;
      std::cout << " corrected is " << nextTimeDecorr + getBaryCorr(nextTimeDecorr) - (StartMissionDateMJD)*SecsOneDay << std::endl;
      std::cout << " interval is " <<  nextTimeDecorr - timeTildeDecorr << std::endl;
-  }
+    }
   
+  //  std::cout << "**  nextTimeTilde" << std::setprecision(20) << nextTimeTilde<<std::endl;
+  //  std::cout << "**  nextTimeDecorr" << std::setprecision(20) << nextTimeDecorr<<std::endl;
+  //  std::cout << "**  timeTildeDecorr" << std::setprecision(20) << timeTildeDecorr<<std::endl;
+  //  std::cout << "**  interval " <<nextTimeDecorr - timeTildeDecorr<<std::endl;
+
   return nextTimeDecorr - timeTildeDecorr; //interval between the de-corected times
 
 }
@@ -355,7 +415,7 @@ double PulsarSpectrum::interval(double time)
 double PulsarSpectrum::getTurns( double time )
 {
   double dt = time - m_t0*SecsOneDay;
-  return m_phi0 + m_f0*dt + 0.5*m_f1*dt*dt + ((m_f2*dt*dt*dt)/6.0);
+  return m_N0 + m_phi0 + m_f0*dt + 0.5*m_f1*dt*dt + ((m_f2*dt*dt*dt)/6.0);
 }
 
 /////////////////////////////////////////////
