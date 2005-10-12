@@ -334,7 +334,14 @@ double PulsarSpectrum::interval(double time)
 		  //		  std::cout << " SpectrObj instantiated " << std::endl;
 		}
 	       m_N0 = initTurns - getTurns(timeTilde); 
-	       //std::cout << " At Next t0 #turns will be : " << m_N0 << std::endl;
+	       double intN0;
+	       double N0frac = modf(m_N0,&intN0); // Start time for interval
+	       std::cout << " m_phi0 " << m_phi0 << std::endl;
+	       m_phi0 = m_phi0 - N0frac;
+	       std::cout << "N0frac" << N0frac << " m_phi0 " << m_phi0 << std::endl;
+
+
+	       std::cout << std::setprecision(20) << " At Next t0 #turns will be : " << m_N0 << std::endl;
 	    }
     }
 
