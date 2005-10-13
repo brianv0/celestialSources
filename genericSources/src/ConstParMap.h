@@ -9,6 +9,9 @@
 #ifndef genericSources_ConstParMap_h
 #define genericSources_ConstParMap_h
 
+#include <map>
+#include <stdexcept>
+
 namespace genericSources {
 
 class ConstParMap {
