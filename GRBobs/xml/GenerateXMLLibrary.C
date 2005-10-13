@@ -79,6 +79,7 @@ double GetPeakFluxShort(TRandom *rnd)
   double Fp_lo = Q[idum];
   double x = rnd->Uniform();
   double Fp = Fp_lo * pow(1.0 - x * (1.0 - pow(Fp_hi/Fp_lo,-1.0)),-1.0);
+  if(Fp<1e-3) std::cout<<" WARNING PF < 1e-3************************************"<<std::endl;
   return Fp;
 }
 
@@ -125,7 +126,7 @@ void GenerateXMLLibrary(int Nbursts=100)
   long FirstBurstTime  =      1000; //1e4
   double AverageInterval = 86400.0; //s
   bool  GeneratePF  =   true;// If true: PF is used to normalize Bursts.
-  double FL=1e-5;
+  double FL=-1e-5;
   double PF=-1.0;
   double Fluence,PeakFlux;
   double z;
@@ -151,11 +152,17 @@ void GenerateXMLLibrary(int Nbursts=100)
   gDirectory->Delete("PFlong");
   gDirectory->Delete("PFshort");
 
+  gDirectory->Delete("FLlong");
+  gDirectory->Delete("FLshort");
+
   gDirectory->Delete("T90long");
   gDirectory->Delete("T90short");
 
-  TH1D* PFlong  = new TH1D("PFlong","Peak FLux ",NentriesL-1,XL);
-  TH1D* PFshort = new TH1D("PFshort","Peak FLux",NentriesS-1,XS);
+  TH1D* PFlong  = new TH1D("PFlong","Peak Flux ",NentriesL-1,XL);
+  TH1D* PFshort = new TH1D("PFshort","Peak Flux",NentriesS-1,XS);
+  
+  TH1D* FLlong  = new TH1D("FLlong","Fluence ",50,-9,-2);
+  TH1D* FLshort = new TH1D("FLshort","Fluence",50,-9,-2);
 
   TH1D* T90long  = new TH1D("T90long","Duration",100,-3,3);
   TH1D* T90short = new TH1D("T90short","Duration",100,-3,3);
@@ -167,6 +174,8 @@ void GenerateXMLLibrary(int Nbursts=100)
   
   PFlong->SetLineColor(4);
   PFshort->SetLineColor(2);
+  FLlong->SetLineColor(4);
+  FLshort->SetLineColor(2);
   T90long->SetLineColor(4);
   T90short->SetLineColor(2);
   alphalong->SetLineColor(4);
@@ -235,6 +244,8 @@ void GenerateXMLLibrary(int Nbursts=100)
       //////////////////////////////////////////////////
       if (type==1) //SHORT
 	{
+	  //// Peak flux normalization:
+	  long seed = rnd->GetSeed();
 	  if(GeneratePF)
 	    {
 	      if(PF<=0)
@@ -245,13 +256,11 @@ void GenerateXMLLibrary(int Nbursts=100)
 		  GetPeakFluxShort(rnd);
 		}
 	      PFshort->Fill(PeakFlux);	  
-	      Duration = pow(10.0,(double)rnd->Gaus(log_mean_short,log_sigma_short)); //(Short Bursts)
-	      z = GetRedshiftShort(rnd);
 	      //	  Duration = pow(10.0,(double)rnd->Gaus(-0.2,0.55)); //(Short Bursts)
 	    }
 	  else
 	    {
-	      if(Fluence<=0)
+	      if(FL<=0)
 		{
 		  Fluence = pow(10.0,(double)rnd->Gaus(-6.3,0.57));
 		}
@@ -260,15 +269,23 @@ void GenerateXMLLibrary(int Nbursts=100)
 		  Fluence = FL; //erg/cm^2 (Short Bursts)
 		  rnd->Gaus();
 		}
+	      FLshort->Fill(log10(Fluence));
+	      if(Fluence>1e-3) std::cout<<" WARNING F > 1e-3************************************"<<std::endl;
 	    }
+
+	  rnd->SetSeed(seed);
+	  Duration = pow(10.0,(double)rnd->Gaus(log_mean_short,log_sigma_short)); //(Short Bursts)
+	  z = GetRedshiftShort(rnd);
+
 	  T90short->Fill(log10(Duration));
 	  alphashort->Fill(alpha);
 	  betashort->Fill(beta); 
-	  
 	  Nshort++;
 	}
       else //LONG
 	{
+	  double Stretch;
+	  long seed = rnd->GetSeed();
 	  if(GeneratePF)
 	    {	
 	      if(PF<=0)
@@ -278,37 +295,35 @@ void GenerateXMLLibrary(int Nbursts=100)
 	      else
 		{
 		  PeakFlux =  PF; //ph/cm^2/s (Long Bursts)
-		  GetPeakFluxLong(rnd);
 		}
-	      Duration=1e6;
-	      long seed = rnd->GetSeed();
-	      while(Duration>640.0)
-		{
-		  Duration = pow(10.0,(double)rnd->Gaus(log_mean_long,log_sigma_long)); //(Long Bursts)
-		  //	  Duration = pow(10.0,(double)rnd->Gaus(1.46,0.49)); //(Long Burst)
-		  PFlong->Fill(PeakFlux);
-		  double lpf = log10(PeakFlux);
-		  double Stretch =  TMath::Max(1.0, a * lpf*lpf + b * lpf + c);
-		  Duration*=Stretch;
-		}
-	      z = GetRedshiftLong(rnd);
-	      rnd->SetSeed(seed);
-	      rnd->Gaus();
+	      double lpf = log10(PeakFlux);
+	      Stretch =  TMath::Max(1.0, a * lpf*lpf + b * lpf + c);
+	      PFlong->Fill(PeakFlux);
 	    }
 	  else
 	    {
-	      if(Fluence<=0)
+	      if(FL<=0)
 		{
 		  Fluence = pow(10.0,(double)rnd->Gaus(-5.4,0.62)); //erg/cm^2 (Long Burst)
 		}
 	      else
 		{
 		  Fluence = FL;
-		  rnd->Gaus();
 		}
+	      Stretch =  1.0;
+	      FLlong->Fill(log10(Fluence));
+	      if(Fluence>1e-3) std::cout<<" WARNING F > 1e-3************************************"<<std::endl;
+	    }
+	  
+	  Duration=1e6;
+	  rnd->SetSeed(seed);
+	  while(Duration>640.0)
+	    {
+	      Duration = pow(10.0,(double)rnd->Gaus(log_mean_long,log_sigma_long)); //(Long Bursts)
+	      Duration*=Stretch;
 	    }
 	  T90long->Fill(log10(Duration));
-	  
+	  z = GetRedshiftLong(rnd);
 	  alphalong->Fill(alpha);
 	  betalong->Fill(beta); 
 	  
@@ -420,15 +435,22 @@ void GenerateXMLLibrary(int Nbursts=100)
   if(Nlong>Nshort)
     {
       Distributions->cd(1);
-      
       T90long->Draw();
       T90short->Draw("same");
       
       Distributions->cd(2);
-      gPad->SetLogx();
-      gPad->SetLogy();
-      PFlong->Draw();
-      PFshort->Draw("same");
+      if(GeneratePF)
+	{
+	  gPad->SetLogx();
+	  gPad->SetLogy();
+	  PFlong->Draw();
+	  PFshort->Draw("same");
+	}
+      else
+	{
+	  FLlong->Draw();
+	  FLshort->Draw("same");
+	}
       Distributions->cd(3);
       alphalong->Draw();
       alphashort->Draw("same");

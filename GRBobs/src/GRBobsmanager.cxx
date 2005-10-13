@@ -87,6 +87,8 @@ TString GRBobsmanager::GetGRBname()
   //  astro::EarthOrbit m_EarthOrbit;
   //  astro::JulianDate JD = m_EarthOrbit.dateFromSeconds(time);
   //  else: 
+  //  std::cout<<astro::
+
   astro::JulianDate JD(2007, 1, 1, 0.0); //DC2
   astro::EarthOrbit m_EarthOrbit(JD);
   //  astro::JulianDate JD = m_EarthOrbit.dateFromSeconds(static_cast<double>(mytime));
@@ -196,8 +198,14 @@ void GRBobsmanager::GenerateGRB()
   os<<m_startTime<<" "<<m_endTime<<" "<<m_l<<" "<<m_b<<" "<<m_theta<<" "<<m_phi<<" "<<m_fluence<<" "<<m_alpha<<" "<<m_beta<<std::endl;
   os.close();
   
-  std::cout<<"Phenomen. Model GRB"<<GRBname<<" t start "<<m_startTime<<", tend "<<m_endTime
-	   <<" l,b = "<<m_l<<", "<<m_b<<" elevation,phi(deg) = "<<m_theta<<", "<<m_phi<<" PF = "<<m_fluence<<std::endl;
+  std::cout<<"Phenomen. Model GRB"<<GRBname;
+  if( m_z >0)  std::cout<<" redshift = "<<m_z;
+  std::cout<<" t start "<<m_startTime<<", tend "<<m_endTime
+	   <<" l,b = "<<m_l<<", "<<m_b<<" elevation,phi(deg) = "<<m_theta<<", "<<m_phi<<" * "<<m_par->GetNormType();
+  if(m_par->GetNormType()=='P')
+    std::cout<<" PF = "<<m_fluence<<std::endl;
+  else 
+    std::cout<<" FL = "<<m_fluence<<std::endl;
   if(m_LATphotons>0) 
     {
       m_endTime = TMath::Max(m_endTime, m_startTime + m_EC_delay  + m_EC_duration);

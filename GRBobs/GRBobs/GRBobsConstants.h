@@ -95,7 +95,7 @@ class GRBobsParameters
     }
 
   //  inline  char GetNormType()         {return ObsCst::NormType;}
-  inline  char GetNormType()         {return NormType;}
+  inline  char GetNormType()         {return m_NormType;}
   inline  double GetFluence()        {return m_fluence;}
   inline  double GetPeakFlux()       {return m_peakFlux;}
   inline  double GetRiseTime()       {return m_riseTime;}
@@ -194,7 +194,7 @@ class GRBobsParameters
   TRandom *rnd;
  
  private:
-  char NormType;
+  char m_NormType;
   int m_Type;
   double  m_Peakedness;
   double  m_FWHM;
