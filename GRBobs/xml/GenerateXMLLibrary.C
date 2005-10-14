@@ -125,7 +125,7 @@ void GenerateXMLLibrary(int Nbursts=100)
   double MinExtractedPhotonEnergy = 30.0; //MeV
   long FirstBurstTime  =      1000; //1e4
   double AverageInterval = 86400.0; //s
-  bool  GeneratePF  =   true;// If true: PF is used to normalize Bursts.
+  bool  GeneratePF  =   false;//true;// If true: PF is used to normalize Bursts.
   double FL=-1e-5;
   double PF=-1.0;
   double Fluence,PeakFlux;
@@ -200,10 +200,12 @@ void GenerateXMLLibrary(int Nbursts=100)
 
   if(GeneratePF)
     //    fprint(osTest," T0  T90   Z    PF  alpha   beta   Eco ");
-    osTest<<" T0  T90    PF  alpha   beta   Eco "<<std::endl;
+    osTest<<setw(11)<<"T0"<<setw(9)<<"T90"<<setw(9)<<"PF"<<setw(9)<<"z"<<setw(9)<<"alpha"<<setw(9)<<"beta"<<setw(10)<<"Eco"<<std::endl;
+  //osTest<<" T0  T90    PF  alpha   beta   Eco "<<std::endl;
   else
     //    fprint(osTest," T0  T90   Z    PF  alpha   beta   Eco ");
-    osTest<<" T0  T90    FL  alpha   beta   Eco "<<std::endl;
+    osTest<<setw(11)<<"T0"<<setw(9)<<"T90"<<setw(9)<<"FL"<<setw(9)<<"z"<<setw(9)<<"alpha"<<setw(9)<<"beta"<<setw(10)<<"Eco"<<std::endl;
+  //osTest<<" T0  T90    FL  alpha   beta   Eco "<<std::endl;
   
   int type;
   int Nlong=0;

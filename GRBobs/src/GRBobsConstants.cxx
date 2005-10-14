@@ -109,6 +109,7 @@ double GRBobsParameters::GetBATSEFWHM()
 void GRBobsParameters::GenerateParameters()
 {
   m_RD                = RD_Ratio;
+
   while(m_RD<=0) 
     m_RD = rnd->Gaus(0.4,0.1);
   
@@ -121,14 +122,14 @@ void GRBobsParameters::GenerateParameters()
   else
     m_pulseSeparation = pow(10.0,rnd->Gaus(log10(episode_mean_interval),logsigma));
   
-  m_FWHM = GetBATSEFWHM();
+  m_FWHM =  GetBATSEFWHM();
   
   if(m_Type==1) m_FWHM/=10.0;
 
   m_decayTime         = 1.00/(1.0+m_RD) / pow(log10(2.0),1./m_Peakedness) * m_FWHM;
   m_riseTime          = m_RD/(1.0+m_RD) / pow(log10(2.0),1./m_Peakedness) * m_FWHM;
   m_pulseHeight       = rnd->Uniform();
-  m_Epeak             = pow(10.,rnd->Gaus(log10(235.0),log10(1.75))); //Short
+  m_Epeak             =  pow(10.,rnd->Gaus(log10(235.0),log10(1.75))); //Short
   if(m_Type==2 && m_NormType=='P') m_Epeak/=m_Stretch; //Long
 }
 

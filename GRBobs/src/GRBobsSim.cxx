@@ -28,6 +28,7 @@ void GRBobsSim::GetUniqueName(const void *ptr, std::string & name)
 
 TH2D* GRBobsSim::MakeGRB()
 {
+  double z = m_params->GetRedshift();
   double *e = new double[Ebin +1];
   for(int i = 0; i<=Ebin; i++)
     {
@@ -42,10 +43,10 @@ TH2D* GRBobsSim::MakeGRB()
   std::vector<GRBobsPulse*>::iterator pos;
   for(pos = Pulses.begin(); pos !=  Pulses.end(); ++pos)
     {
-      m_tfinal=TMath::Max(m_tfinal,(*pos)->GetEndTime());      
+      m_tfinal= TMath::Max(m_tfinal,(*pos)->GetEndTime());      
       if(DEBUG) (*pos)->Print();
     }
-  m_tfinal*=1.5; 
+  m_tfinal*=(1.0+z)*1.5; 
   m_tbin = TMath::Max(10,int(m_tfinal/s_TimeBinWidth));
   m_tbin = TMath::Min(10000,m_tbin);
   s_TimeBinWidth = m_tfinal/m_tbin;
@@ -60,14 +61,14 @@ TH2D* GRBobsSim::MakeGRB()
   double t = 0.0;
   for(int ti = 0; ti<m_tbin; ti++)
     {
-      t = ti*s_TimeBinWidth;
+      t = ti * s_TimeBinWidth;
       for(int ei = 0; ei < Ebin; ei++)
 	{
 	  double nv = 0.0;//m_Nv->GetBinContent(ti+1, ei+1);
 	  
 	  for(pos = Pulses.begin(); pos !=  Pulses.end(); ++pos)
 	    {	
-	      nv += (*pos)->PulseShape(t,e[ei]);
+	      nv += (*pos)->PulseShape(t/(1.+z),e[ei]*(1.+z));
 	    }
 	  m_Nv->SetBinContent(ti+1, ei+1, nv);
 	  // [ph/(cm² s keV)]
