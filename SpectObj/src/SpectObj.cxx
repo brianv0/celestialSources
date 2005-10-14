@@ -5,12 +5,13 @@
 #include <iomanip>
 //#include "SpectObj.h"
 #include "SpectObj/SpectObj.h"
+#include "eblAtten/EblAtten.h"
 
 #define DEBUG 0
 
 const double erg2meV      = 624151.0;
 
-SpectObj::SpectObj(const TH2D* In_Nv, int type)
+SpectObj::SpectObj(const TH2D* In_Nv, int type, double z)
 {
   m_AreaDetector = 1.0;
   sourceType = type;
@@ -34,6 +35,29 @@ SpectObj::SpectObj(const TH2D* In_Nv, int type)
   m_Tmax = Nv->GetXaxis()->GetXmax();
   
   m_TimeBinWidth   = Nv->GetXaxis()->GetBinWidth(0);
+  m_z = z;
+  /************************************************************************
+EBL model 0: Kneiske, Bretz, Mannheim, Hartmann (A&A 413, 807-815, 2004)
+  Valid for redshift <= 5.0
+  Here we have implemented the "best fit" model from their paper
+  ************************************************************************/
+  //  m_tau = new IRB::EblAtten(IRB::Kneiske);
+
+  /************************************************************************
+   EBL model 1: Salamon & Stecker (ApJ 1998, 493:547-554)
+   We are using here the model with metallicity correction (see paper)
+   The paper has opacities up to z=3, for z>3 opacity remains constant according to Stecker
+  */  
+  //m_tau = new IRB::EblAtten(IRB::Salamon_Stecker);
+  
+  //    EBL model 1: Primack & Bullock (2005) Valid for opacities < 15
+  m_tau = new IRB::EblAtten(IRB::Primack05);
+  /************************************************************************
+EBL model 2: Kneiske, Bretz, Mannheim, Hartmann (A&A 413, 807-815, 2004)
+  Valid for redshift <= 5.0
+  Here we have implemented the "High UV" model from their paper
+  ************************************************************************/
+  //  m_tau = new IRB::EblAtten(IRB::Kneiske_HighUV);
   
   //////////////////////////////////////////////////
   if(DEBUG) 
@@ -282,6 +306,7 @@ void SpectObj::ComputeProbability(double enph)
 //////////////////////////////////////////////////
 photon SpectObj::GetPhoton(double t0, double enph)
 {
+  
   //  photon ph;
   int ei  = TMath::Max(1,Nv->GetYaxis()->FindBin(enph));
   
@@ -345,6 +370,7 @@ photon SpectObj::GetPhoton(double t0, double enph)
     } 
   else if (sourceType == 1) //Periodic //Max
     {
+      m_z=0.0;
       if (!PeriodicSpectrumIsComputed)
 	{
 	  PeriodicSpectrum = Integral_T(1,nt,ei);
@@ -447,7 +473,10 @@ photon SpectObj::GetPhoton(double t0, double enph)
     }
   
   if(DEBUG)  std::cout<< " New Photon at ("<<t0<<"): Internal time =  " << ph.time << " Energy  (KeV) " << ph.energy << std::endl;
-  return ph;
+  if (m_z == 0 || m_tau == 0 || m_SpRandGen->Uniform() < std::exp(-(*m_tau)(ph.energy/1000.0, m_z)))
+    return ph;
+  else
+    return GetPhoton( ph.time, enph);
 }
 
 double SpectObj::GetFluence(double BL, double BH)

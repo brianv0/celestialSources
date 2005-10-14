@@ -11,6 +11,9 @@
   \struct photon
   Trivial struct for storing time and energy.
 */
+namespace IRB {
+   class EblAtten;
+}
 
 struct photon
 {
@@ -29,7 +32,7 @@ struct photon
 class SpectObj
 {
  public:
-  SpectObj(const TH2D* In_Nv, int type); //Max
+  SpectObj(const TH2D* In_Nv, int type, double z=0.0); //Max
   
   ~SpectObj()
     {
@@ -88,9 +91,12 @@ class SpectObj
 
   double m_Tmin,m_Tmax, m_TimeBinWidth;
   double Ptot;
+  double m_z;
+  
   TH1D *spec,*times,*Probability,*PeriodicSpectrum;
   photon ph;
   bool ProbabilityIsComputed, PeriodicSpectrumIsComputed;
-  
+  IRB::EblAtten * m_tau;
+
 };
 #endif

@@ -5,6 +5,7 @@ author Nicola Omodei<nicola.omodei@pi.infn.it>
 #=============================================================
 use GlastPolicy v6r*
 use ROOT v* IExternal
+use eblAtten v* celestialSources
 
 #macro_append ROOT_libs " -lHist -lGraf "\
 #                 WIN32 " libHist.lib libGraf.lib "
