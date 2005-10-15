@@ -118,6 +118,10 @@ SpectralTransient::SpectralTransient(const std::string & paramString)
    createEvents(templateFile);
 }
 
+SpectralTransient::~SpectralTransient() {
+   delete m_tau;
+}
+
 double SpectralTransient::interval(double time) {
    std::vector<std::pair<double, double> >::const_iterator event =
       std::upper_bound(m_events.begin(), m_events.end(), 
@@ -129,7 +133,6 @@ double SpectralTransient::interval(double time) {
 // There should be a better way to turn off a source than this:
    return 3.155e8;
 }
-
 
 void SpectralTransient::createEvents(std::string templateFile) {
    facilities::Util::expandEnvVar(&templateFile);

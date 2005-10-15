@@ -105,7 +105,7 @@ void MapCube::checkForNonPositivePixels() const {
    for ( ; pixel != m_image.end(); ++pixel) {
       if (*pixel <= 0) {
          throw std::runtime_error("MapCube: There are negative or zero-valued"
-                                  + std::string(" pixels in the FITS image."));
+                                  " pixels in the FITS image.");
       }
    }
 }
