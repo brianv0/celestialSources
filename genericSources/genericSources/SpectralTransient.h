@@ -35,7 +35,7 @@ public:
 
    SpectralTransient(const std::string & params);
    
-   virtual ~SpectralTransient() {}
+   virtual ~SpectralTransient();
 
    /// @return Particle energy in MeV.
    /// @param xi Uniform random deviate on the unit interval.
