@@ -1,0 +1,30 @@
+PROJECT_NAME           = "GRB package"
+#PROJECT_NUMBER         = "v1"
+FILE_PATTERNS          = *.cxx *.cpp *.h
+STRIP_CODE_COMMENTS    = NO
+FULL_PATH_NAMES        = NO
+EXAMPLE_PATH           = ".." "." 
+GENERATE_TREEVIEW      = YES
+INPUT                  = ..
+RECURSIVE              = YES
+EXAMPLE_PATH           = ../src/test \
+			 ../src/test/other \
+                         ../cmt \
+                         ../doc
+EXAMPLE_PATTERNS       = 
+EXAMPLE_RECURSIVE      = NO
+SOURCE_BROWSER         = YES
+GENERATE_HTML          = YES
+GENERATE_TREEVIEW      = YES
+GENERATE_LATEX         = NO
+PDF_HYPERLINKS         = NO
+USE_PDFLATEX           = NO
+
+CLASS_DIAGRAMS         = YES
+HIDE_UNDOC_RELATIONS   = NO
+HAVE_DOT               = YES
+CLASS_GRAPH            = YES
+COLLABORATION_GRAPH    = YES
+TEMPLATE_RELATIONS     = YES
+INCLUDE_GRAPH          = YES
+DOT_IMAGE_FORMAT       = png
