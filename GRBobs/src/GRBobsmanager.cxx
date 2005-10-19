@@ -55,6 +55,7 @@ GRBobsmanager::GRBobsmanager(const std::string& params)
   m_par->SetDuration(duration);
   m_par->SetAlphaBeta(m_alpha,m_beta);
   m_par->SetMinPhotonEnergy(m_MinPhotonEnergy); //keV  
+  m_par->SetRedshift(m_z);
   m_theta = -100.0;
   
   while(m_theta<FOV)
@@ -178,7 +179,7 @@ void GRBobsmanager::GenerateGRB()
       m_spectrum1 = new SpectObj(m_GRB->CutOff(h,m_Energy_CO),0, m_z);
       m_spectrum1->SetAreaDetector(EventSource::totalArea());
       AfterGlowEmission = new SpectralComponent(m_spectrum1,m_startTime_EC,m_endTime_EC);
-      //std::cout<<"Generate AFTERGLOW Emission ("<<m_startTime_EC<<" "<<m_endTime_EC<<")"<<std::endl;
+      //      std::cout<<"Generate AFTERGLOW Emission ("<<m_startTime_EC<<" "<<m_endTime_EC<<")"<<std::endl;
     }
   
   //////////////////////////////////////////////////
@@ -198,14 +199,14 @@ void GRBobsmanager::GenerateGRB()
   os<<m_startTime<<" "<<m_endTime<<" "<<m_l<<" "<<m_b<<" "<<m_theta<<" "<<m_phi<<" "<<m_fluence<<" "<<m_alpha<<" "<<m_beta<<std::endl;
   os.close();
   
-  std::cout<<"Phenomen. Model GRB"<<GRBname;
+  std::cout<<"GRB"<<GRBname;
   if( m_z >0)  std::cout<<" redshift = "<<m_z;
   std::cout<<" t start "<<m_startTime<<", tend "<<m_endTime
-	   <<" l,b = "<<m_l<<", "<<m_b<<" elevation,phi(deg) = "<<m_theta<<", "<<m_phi<<" * "<<m_par->GetNormType();
+	   <<" l,b = "<<m_l<<", "<<m_b<<" elevation,phi(deg) = "<<m_theta<<", "<<m_phi;
   if(m_par->GetNormType()=='P')
-    std::cout<<" PF = "<<m_fluence<<std::endl;
+    std::cout<<" Peak Flux = "<<m_fluence<<" 1/cm^2/s "<<std::endl;
   else 
-    std::cout<<" FL = "<<m_fluence<<std::endl;
+    std::cout<<" Fluence = "<<m_fluence<<" erg/cm^2"<<std::endl;
   if(m_LATphotons>0) 
     {
       m_endTime = TMath::Max(m_endTime, m_startTime + m_EC_delay  + m_EC_duration);
