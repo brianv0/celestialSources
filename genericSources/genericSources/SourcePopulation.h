@@ -58,9 +58,9 @@ public:
    }
 
    /// @return Time interval to the next event.  This implementation
-   /// returns -1 to instruct the callling class to use the cumulative
-   /// flux value.  However, calling it causes the photon direction
-   /// and energy to be set.
+   /// returns -1 to instruct the flux/FluxSource class to use the
+   /// cumulative flux value.  However, the execution of this function
+   /// sets the photon direction and energy.
    virtual double interval(double time);
 
    /// @return Photon energy (MeV).
@@ -82,6 +82,8 @@ public:
    }
 
 private:
+
+   IRB::EblAtten * m_tau;
 
    double m_l;
    double m_b;
