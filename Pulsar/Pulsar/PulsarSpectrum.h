@@ -13,6 +13,7 @@
 #include <fstream>
 #include <map>
 #include <cmath>
+#include <stdexcept>
 #include "PulsarConstants.h"
 #include "PulsarSim.h"
 #include "SpectObj/SpectObj.h"

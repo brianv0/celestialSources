@@ -186,7 +186,8 @@ m_ppar2 = std::atof(parseParamList(params,9).c_str());
       PulsarLog << "**   Ephemerides valid from " << m_t0InitVect[n] 
 		<< " to " << m_t0EndVect[n] << " (MJD): " << std::endl;
       PulsarLog << "**     Epoch (MJD) :  " << m_t0Vect[n] << std::endl;
-      PulsarLog << "**     TxBary (MJD) where fiducial point phi=0 is reached : " << m_txbaryVect[n] << std::endl;
+      PulsarLog << std::setprecision(8) << "**     TxBary (MJD) where fiducial point phi=0 is reached : " 
+		<< m_txbaryVect[n] << std::endl;
       PulsarLog << "**     Phi0 (at Epoch t0) : " << m_phi0Vect[n] << std::endl;
       
       if (m_ephemType == "P")
@@ -365,12 +366,17 @@ double PulsarSpectrum::interval(double time)
   double inte = m_spectrum->interval(tStart,m_enphmin); //deltaT (in system where Pdot = 0
   double inteTurns = inte/m_period; // conversion to # of turns
 
-  double totTurns = initTurns + inteTurns; //Total turns at the nextTimeTilde
+  double totTurns = initTurns + inteTurns;// + m_phi0; //Total turns at the nextTimeTilde
 
 
   //  std::cout << " initTurns " << initTurns << " Inte " << inte << " inteTurns " << inteTurns << " totTurns " << totTurns << std::endl;
 
   double nextTimeTilde = retrieveNextTimeTilde(timeTilde, totTurns, (ephemCorrTol/m_period));
+
+  //wirte out phase 
+
+  std::cout << "\nPulsarSpectrum Phase is " << std::setprecision(20) << getTurns(nextTimeTilde) << "phi0 is " << m_phi0 << std::endl;
+
   double nextTimeDecorr = getDecorrectedTime(nextTimeTilde);
  
   //std::cout << std::setprecision(20) << " nextTimeTilde " << nextTimeTilde << " nextTimeDecorr " << nextTimeDecorr 
@@ -422,7 +428,8 @@ double PulsarSpectrum::interval(double time)
 double PulsarSpectrum::getTurns( double time )
 {
   double dt = time - m_t0*SecsOneDay;
-  return m_N0 + m_phi0 + m_f0*dt + 0.5*m_f1*dt*dt + ((m_f2*dt*dt*dt)/6.0);
+  return m_N0 + m_f0*dt + 0.5*m_f1*dt*dt + ((m_f2*dt*dt*dt)/6.0);
+  //m_phi0 + m_f0*dt + 0.5*m_f1*dt*dt + ((m_f2*dt*dt*dt)/6.0);
 }
 
 /////////////////////////////////////////////
@@ -512,8 +519,37 @@ double PulsarSpectrum::getBaryCorr( double ttInput )
   double timeMET = ttInput - (StartMissionDateMJD)*SecsOneDay;
   Hep3Vector scPos;
 
-  if (timeMET > 0.)
+
+
+
+  //  if (timeMET > start_time)
+  //scPos = astro::GPS::instance()->position(timeMET);
+
+  //Block by Jim...
+
+  //  std::string message;
+
+  try {
     scPos = astro::GPS::instance()->position(timeMET);
+    //std::cout << " Giusto " << std::endl;
+  }  catch (std::runtime_error  & eObj) {
+    // check to see this is the exception I want to ignore, rethrowing if
+    // it is not:
+        std::string message(eObj.what());
+	//message = eObj.what();
+    if (message.find("WARNING: Time out of Range!") == std::string::npos) {
+      throw;
+    }
+    // if so, do nothing....
+  }
+
+
+
+
+
+  ///end of Jim's block
+
+
 
   //Correction due to geometric time delay of light propagation 
   Hep3Vector GeomVect = (scPos/clight) - m_solSys.getBarycenter(ttJD);
@@ -679,6 +715,9 @@ int PulsarSpectrum::getPulsarFromDataList(std::string sourceFileName)
 	  
 	  phi0 = -1.0*(f0*(txbary-t0) + 0.5*f1*(pow((txbary-t0),2)) + (1/6)*f1*(pow((txbary-t0),2))); 
 	  phi0 = modf(phi0,&phas);
+	  if (phi0 < 0. ) 
+	    phi0++;
+
 	  m_phi0Vect.push_back(phi0);
 	  
 	}
@@ -742,15 +781,16 @@ int PulsarSpectrum::saveDbTxtFile()
     {
       DbOutputFile << "\"" << m_PSRname << std::setprecision(5) << "\" " << m_RA << " " << m_dec << " ";
       tempFract = modf(m_t0Vect[ep],&tempInt);
-      DbOutputFile << std::setprecision (6) << tempInt << " " << tempFract << " ";
+      DbOutputFile << std::setprecision (8) << tempInt << " " << tempFract << " ";
     
       tempFract = getDecorrectedTime(m_txbaryVect[ep]*SecsOneDay)/SecsOneDay;
+      //tempFract = modf(m_txbaryVect[ep],&tempInt);
 
       tempFract = modf(tempFract,&tempInt);
-      DbOutputFile << std::setprecision (6) << tempInt << " " << tempFract << " ";
+      DbOutputFile << std::setprecision (8) << tempInt << " " << tempFract << " ";
 
       tempFract = modf(m_txbaryVect[ep],&tempInt);
-      DbOutputFile << std::setprecision (6) << tempInt << " " << tempFract << " ";
+      DbOutputFile << std::setprecision (8) << tempInt << " " << tempFract << " ";
 
       //f0 = 1.0/m_periodVect[ep];
       //f1 = -m_pdotVect[ep]/(m_periodVect[ep]*m_periodVect[ep]);
