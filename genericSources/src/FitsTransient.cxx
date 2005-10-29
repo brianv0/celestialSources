@@ -25,8 +25,6 @@
 
 #include "flux/EventSource.h"
 #include "flux/SpectrumFactory.h"
-#include "flux/SpectrumFactory.h"
-#include "flux/Spectrum.h"
 
 #include "eblAtten/EblAtten.h"
 

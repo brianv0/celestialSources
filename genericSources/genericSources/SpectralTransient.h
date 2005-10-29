@@ -76,6 +76,8 @@ private:
 
    IRB::EblAtten * m_tau;
 
+   double m_tauScale;
+
    double m_currentEnergy;
 
    std::vector<std::pair<double, double> > m_events;

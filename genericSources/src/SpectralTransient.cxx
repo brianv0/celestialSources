@@ -40,7 +40,8 @@ ISpectrumFactory & SpectralTransientFactory() {
 }
 
 SpectralTransient::SpectralTransient(const std::string & paramString) 
-   : m_emin(20.), m_emax(2e5), m_lc(0), m_z(0), m_logParabola(0), m_tau(0) {
+   : m_emin(20.), m_emax(2e5), m_lc(0), m_z(0), m_logParabola(0),
+     m_tau(0), m_tauScale(1) {
    std::string templateFile;
    if (paramString.find("=") == std::string::npos) {
       std::vector<std::string> params;
@@ -50,13 +51,21 @@ SpectralTransient::SpectralTransient(const std::string & paramString)
       m_tstart = std::atof(params[1].c_str());
       m_tstop = std::atof(params[2].c_str());
       templateFile = params[3];
-      if (params.size() > 4) m_emin = std::atof(params[4].c_str());
-      if (params.size() > 5) m_emax = std::atof(params[5].c_str());
-      if (params.size() > 6) m_lc = std::atoi(params[6].c_str());
+      if (params.size() > 4) {
+         m_emin = std::atof(params[4].c_str());
+      }
+      if (params.size() > 5) {
+         m_emax = std::atof(params[5].c_str());
+      }
+      if (params.size() > 6) {
+         m_lc = std::atoi(params[6].c_str());
+      }
       if (params.size() > 7) {
          m_z = std::atof(params[7].c_str());
       }
-      if (params.size() > 8) m_logParabola = std::atoi(params[8].c_str());
+      if (params.size() > 8) {
+         m_logParabola = std::atoi(params[8].c_str());
+      }
       if (params.size() > 9) {
          IRB::EblModel eblModel = 
             static_cast<IRB::EblModel>(std::atoi(params[9].c_str()));
@@ -112,6 +121,10 @@ SpectralTransient::SpectralTransient(const std::string & paramString)
          }
       } catch (...) {
          m_tau = new IRB::EblAtten(IRB::Kneiske);
+      }
+      try {
+         m_tauScale = std::atoi(parmap["tauScale"].c_str());
+      } catch (...) {
       }
    }
 
@@ -169,7 +182,8 @@ void SpectralTransient::createEvents(std::string templateFile) {
    for (long i = 0; i < nevts; i++) {
       std::pair<double, double> my_event = drawEvent(integralDist);
       if (m_z == 0 || m_tau == 0 ||
-          RandFlat::shoot() < std::exp(-(*m_tau)(my_event.second, m_z))) {
+          RandFlat::shoot() < std::exp(-m_tauScale*
+                                       (*m_tau)(my_event.second, m_z))) {
          m_events.push_back(my_event);
       }
    }

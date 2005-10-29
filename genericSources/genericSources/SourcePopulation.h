@@ -40,12 +40,12 @@ public:
 
    SourcePopulation(const std::string & params);
    
+   /// @return Time interval to the next event
+   virtual double interval(double time);
+
    /// @return Particle energy in MeV.
    /// @param xi Uniform random deviate on the unit interval.
-   virtual float operator() (float xi) const {
-      (void)(xi);
-      return m_currentEnergy;
-   }
+   virtual float operator() (float xi);
 
    /// @return Particle type, "gamma".
    virtual const char * particleName() const {
@@ -57,17 +57,8 @@ public:
       return "SourcePopulation";
    }
 
-   /// @return Time interval to the next event.  This implementation
-   /// returns -1 to instruct the flux/FluxSource class to use the
-   /// cumulative flux value.  However, the execution of this function
-   /// sets the photon direction and energy.
-   virtual double interval(double time);
-
    /// @return Photon energy (MeV).
-   virtual double energy(double time) {
-      (void)(time);
-      return m_currentEnergy;
-   }
+   virtual double energy(double time);
 
    /// @return photon direction in (l, b)
    /// @param energy This is the energy returned from a previous call

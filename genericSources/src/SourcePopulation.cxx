@@ -22,6 +22,7 @@
 
 #include "astro/SkyDir.h"
 
+#include "flux/EventSource.h"
 #include "flux/SpectrumFactory.h"
 
 #include "eblAtten/EblAtten.h"
@@ -70,7 +71,7 @@ SourcePopulation::SourcePopulation(const std::string & params) {
    std::string inputFile(pars.at(0));
    facilities::Util::expandEnvVar(&inputFile);
    readSourceFile(inputFile);
-   setFlux(m_cumulativeFlux.back());
+   m_flux = m_cumulativeFlux.back();
 }
 
 void SourcePopulation::readSourceFile(const std::string & input_file) {
@@ -105,16 +106,26 @@ void SourcePopulation::readSourceFile(const std::string & input_file) {
    }
 }
 
-double SourcePopulation::interval(double time) {
-   (void)(time);
-   double xi(RandFlat::shoot()*m_flux);
+float SourcePopulation::operator()(float xi) {
+   xi *= m_flux;
    std::vector<double>::const_iterator it = 
       std::upper_bound(m_cumulativeFlux.begin(), m_cumulativeFlux.end(), xi);
    size_t indx = it - m_cumulativeFlux.begin();
    m_currentEnergy = m_sources.at(indx).energy();
    m_l = m_sources.at(indx).dir().l();
    m_b = m_sources.at(indx).dir().b();
-   return -1;
+   return m_currentEnergy;
+}
+
+double SourcePopulation::energy(double time) {
+   (void)(time);
+   double xi = RandFlat::shoot();
+   return this->operator()(xi);
+}
+
+double SourcePopulation::interval(double time) {
+   (void)(time);
+   return -std::log(1. - RandFlat::shoot())/m_flux/EventSource::totalArea();
 }
 
 SourcePopulation::
