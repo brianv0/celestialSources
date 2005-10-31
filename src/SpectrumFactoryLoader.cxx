@@ -11,23 +11,25 @@
 #include "flux/ISpectrumFactory.h"
 
 // declare the external factories.
+ISpectrumFactory & FitsTransientFactory();
 ISpectrumFactory & GaussianSourceFactory();
 ISpectrumFactory & GRBmanagerFactory();
 ISpectrumFactory & GRBobsmanagerFactory();
 ISpectrumFactory & GRBobsFactory();
-
 ISpectrumFactory & IsotropicFactory();
 ISpectrumFactory & MapSourceFactory();
 ISpectrumFactory & MapCubeFactory();
 ISpectrumFactory & PeriodicSourceFactory();
 ISpectrumFactory & PulsarFactory();
 ISpectrumFactory & PulsarSpectrumFactory();
+ISpectrumFactory & SourcePopulationFactory();
 ISpectrumFactory & SimpleTransientFactory();
 ISpectrumFactory & SpectralTransientFactory();
 ISpectrumFactory & TransientTemplateFactory();
 
 SpectrumFactoryLoader::SpectrumFactoryLoader()
 {
+   load(FitsTransientFactory());
    load(GRBmanagerFactory());
    load(GRBobsmanagerFactory());
    load(GRBobsFactory());
@@ -38,6 +40,7 @@ SpectrumFactoryLoader::SpectrumFactoryLoader()
    load(PeriodicSourceFactory());
    load(PulsarFactory());
    load(SimpleTransientFactory());
+   load(SourcePopulationFactory());
    load(SpectralTransientFactory());
    load(TransientTemplateFactory());
    load(PulsarSpectrumFactory());
