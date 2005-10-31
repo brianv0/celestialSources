@@ -86,9 +86,10 @@ private:
 
    class PointSource {
    public:
+      PointSource() {}
       PointSource(const astro::SkyDir & dir, double flux,
                   double gamma, double gamma2, double ebreak,
-                  double emin, double emax, const IRB::EblAtten * tau=0);
+                  double emin, double emax);
 
       PointSource(const std::string & line);
 
@@ -107,6 +108,12 @@ private:
          return m_flux;
       }
 
+      static void setEblAtten(IRB::EblAtten * tau) {
+         s_tau = tau;
+      }
+
+      double integral(double emin, double emax) const;
+
    private:
 
       astro::SkyDir m_dir;
@@ -116,16 +123,21 @@ private:
       double m_ebreak;
       double m_emin;
       double m_emax;
-      const IRB::EblAtten * m_tau;
+
+      static IRB::EblAtten * s_tau;
 
       double m_part1;
       double m_part2;
       double m_frac;
 
       void setPowerLaw();
+
+      double dnde(double * energy);
    };
 
    std::vector<PointSource> m_sources;
+
+   void setEblAtten(const std::string & ebl_par);
 
    void readSourceFile(const std::string & input_file);
 
