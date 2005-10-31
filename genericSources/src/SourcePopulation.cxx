@@ -69,7 +69,8 @@ ISpectrumFactory & SourcePopulationFactory() {
    return myFactory;
 }
 
-SourcePopulation::SourcePopulation(const std::string & params) : m_tau(0) {
+SourcePopulation::SourcePopulation(const std::string & params) 
+   : m_tau(0), m_l(0), m_b(0) {
    std::vector<std::string> pars;
    facilities::Util::stringTokenize(params, ",", pars);
    std::string inputFile(pars.at(0));
@@ -82,7 +83,7 @@ SourcePopulation::SourcePopulation(const std::string & params) : m_tau(0) {
 }
 
 SourcePopulation::~SourcePopulation() {
-   delete m_tau;
+  delete m_tau;
 }
 
 void SourcePopulation::setEblAtten(const std::string & ebl_par) {
@@ -136,17 +137,19 @@ double SourcePopulation::interval(double time) {
    return -std::log(1. - RandFlat::shoot())/m_flux/EventSource::totalArea();
 }
 
+SourcePopulation::PointSource * SourcePopulation::PointSource::Self::s_self(0);
+
 SourcePopulation::
 PointSource::PointSource(const astro::SkyDir & dir, double flux,
                          double gamma, double gamma2, double ebreak,
-                         double emin, double emax) 
+                         double emin, double emax, double zz) 
    : m_dir(dir), m_flux(flux), m_gamma(gamma), m_gamma2(gamma2),
-     m_ebreak(ebreak), m_emin(emin), m_emax(emax) {
+     m_ebreak(ebreak), m_emin(emin), m_emax(emax), m_z(zz) {
    setPowerLaw();
 }
 
 SourcePopulation::
-PointSource::PointSource(const std::string & line) {
+PointSource::PointSource(const std::string & line) : m_z(0) {
    std::vector<std::string> tokens;
    facilities::Util::stringTokenize(line, ", \n", tokens);
    double ra = std::atof(tokens.at(1).c_str());
@@ -158,63 +161,71 @@ PointSource::PointSource(const std::string & line) {
    m_ebreak = std::atof(tokens.at(6).c_str());
    m_emin = std::atof(tokens.at(7).c_str());
    m_emax = std::atof(tokens.at(8).c_str());
+   if (tokens.size() == 10) {
+      m_z = std::atof(tokens.at(9).c_str());
+   }
    setPowerLaw();
 }
 
 void 
 SourcePopulation::
 PointSource::setPowerLaw() {
-   if (s_tau == 0) {
-      if (m_gamma == 1) {
-         m_part1 = std::log(m_ebreak/m_emin);
-      } else {
-         m_part1 = (std::pow(m_ebreak, 1 - m_gamma) 
-                    - std::pow(m_emin, 1 - m_gamma))
-            /(1 - m_gamma)/std::pow(m_ebreak, 1 - m_gamma);
-      }
-      if (m_gamma2 == 1) {
-         m_part2 = std::log(m_emax/m_ebreak);
-      } else {
-         m_part2 = (std::pow(m_emax, 1 - m_gamma2) 
-                    - std::pow(m_ebreak, 1 - m_gamma2))
-            /(1 - m_gamma2)/std::pow(m_ebreak, 1 - m_gamma2);
-      }
-      m_frac = m_part1/(m_part1 + m_part2);
-   }
+   m_part1 = integral(m_emin, m_ebreak);
+   m_part2 = integral(m_ebreak, m_emax);
+   m_frac = m_part1/(m_part1 + m_part2);
 }
 
 double SourcePopulation::
 PointSource::energy() const {
+   double my_energy;
    double xi(RandFlat::shoot());
    if (xi < m_frac) {
-      xi /= m_frac;
-      double aa(1. - m_gamma);
-      double bb(std::pow(m_ebreak, 1. - m_gamma));
-      return std::pow(xi*aa*bb*m_part1 + std::pow(m_emin, aa), 1./aa);
+      do {
+         xi = RandFlat::shoot();
+         double aa(1. - m_gamma);
+         double bb(std::pow(m_ebreak, aa) - std::pow(m_emin, aa));
+         my_energy = std::pow(xi*bb + std::pow(m_emin, aa), 1./aa);
+      } while (RandFlat::shoot() > attenuation(my_energy));
+   } else {
+      do {
+         xi = RandFlat::shoot();
+         double aa(1. - m_gamma2);
+         double bb(std::pow(m_emax, aa) - std::pow(m_ebreak, aa));
+         my_energy = std::pow(xi*bb + std::pow(m_ebreak, aa), 1./aa);
+      } while (RandFlat::shoot() > attenuation(my_energy));
    }
-   xi = (xi - m_frac)/(1. - m_frac);
-   double aa(1. - m_gamma2);
-   double bb(std::pow(m_ebreak, 1. - m_gamma2));
-   return std::pow(xi*aa*bb*m_part2 + std::pow(m_ebreak, aa), 1./aa);
+   return my_energy;
 }
 
 double SourcePopulation::
-PointSource::integral(double emin, double emax) const {
+PointSource::integral(double emin, double emax) {
    double err(1e-5);
    double result(0);
    long ierr;
-   PointSource my_pointSource(*this);
-   dgaus8_(&my_pointSource::dnde, &emin, &emax, &err, &result, &ierr);
+   Self::setPointSource(this);
+   dgaus8_(&Self::dndeIntegrand, &emin, &emax, &err, &result, &ierr);
    return result;
 }
 
 double SourcePopulation::
-PointSource::dnde(double * energy) {
-   if (*energy < m_emin || *energy > m_emax) {
+PointSource::dnde(double energy) const {
+   if (energy < m_emin || energy > m_emax) {
       return 0;
    }
-   if (*energy < m_ebreak) {
-      return std::pow(*energy/m_ebreak, m_gamma);
-   } 
-   return std::pow(*energy/m_ebreak, m_gamma2);
+   double gamma;
+   if (energy < m_ebreak) {
+      gamma = m_gamma;
+   } else {
+      gamma = m_gamma2;
+   }
+   return attenuation(energy)*std::pow(energy/m_ebreak, -gamma);
+}
+
+double SourcePopulation::
+PointSource::attenuation(double energy) const {
+   double atten(1.);
+   if (s_tau != 0) {
+      atten = std::exp(-s_tau->operator()(energy, m_z));
+   }
+   return atten;
 }

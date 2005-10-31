@@ -40,7 +40,7 @@ public:
 
    SourcePopulation(const std::string & params);
 
-   ~SourcePopulation();
+   virtual ~SourcePopulation();
    
    /// @return Time interval to the next event
    virtual double interval(double time);
@@ -86,10 +86,9 @@ private:
 
    class PointSource {
    public:
-      PointSource() {}
       PointSource(const astro::SkyDir & dir, double flux,
                   double gamma, double gamma2, double ebreak,
-                  double emin, double emax);
+                  double emin, double emax, double zz);
 
       PointSource(const std::string & line);
 
@@ -112,7 +111,7 @@ private:
          s_tau = tau;
       }
 
-      double integral(double emin, double emax) const;
+      double integral(double emin, double emax);
 
    private:
 
@@ -123,6 +122,7 @@ private:
       double m_ebreak;
       double m_emin;
       double m_emax;
+      double m_z;
 
       static IRB::EblAtten * s_tau;
 
@@ -132,7 +132,24 @@ private:
 
       void setPowerLaw();
 
-      double dnde(double * energy);
+      double dnde(double energy) const;
+
+      double attenuation(double energy) const;
+
+      /// @class Self
+      /// @brief Static functions to provide a function pointer for 
+      /// integration of the photon spectrum, dnde, using dgaus8.
+      class Self {
+      public:
+         static void setPointSource(PointSource * self) {
+            s_self = self;
+         }
+         static double dndeIntegrand(double * energy) {
+            return s_self->dnde(*energy);
+         }
+      private:
+         static PointSource * s_self;
+      };
    };
 
    std::vector<PointSource> m_sources;
