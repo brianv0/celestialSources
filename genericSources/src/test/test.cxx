@@ -20,6 +20,7 @@
 #include "flux/CompositeSource.h"
 #include "flux/FluxMgr.h"
 
+ISpectrumFactory & FitsTransientFactory();
 ISpectrumFactory & GaussianSourceFactory();
 ISpectrumFactory & GRBmanagerFactory();
 ISpectrumFactory & IsotropicFactory();
@@ -28,6 +29,7 @@ ISpectrumFactory & MapSourceFactory();
 ISpectrumFactory & PeriodicSourceFactory();
 ISpectrumFactory & PulsarFactory();
 ISpectrumFactory & SimpleTransientFactory();
+ISpectrumFactory & SourcePopulationFactory();
 ISpectrumFactory & TransientTemplateFactory();
 
 class TestApp {
@@ -118,8 +120,10 @@ void TestApp::setSources() {
                         "gaussian_source",
                         "Extragalactic_diffuse",
                         "map_cube_source",
-                        "map_cube_source_0"};
-   std::vector<std::string> sourceNames(srcNames, srcNames+13);
+                        "map_cube_source_0",
+                        "fits_spectrum",
+                        "source_population"};
+   std::vector<std::string> sourceNames(srcNames, srcNames+15);
 
    m_compositeSource = new CompositeSource();
    unsigned long nsrcs(0);
@@ -164,6 +168,7 @@ void TestApp::createEvents(const std::string & filename) {
 }
 
 void TestApp::load_sources() {
+   FitsTransientFactory();
    GaussianSourceFactory();
    IsotropicFactory();
    MapCubeFactory();
@@ -171,6 +176,7 @@ void TestApp::load_sources() {
    PeriodicSourceFactory();
    PulsarFactory();
    SimpleTransientFactory();
+   SourcePopulationFactory();
    TransientTemplateFactory();
 }
 

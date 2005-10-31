@@ -207,4 +207,21 @@
           <celestial_dir ra="193.4" dec="-5.82"/>
       </spectrum>
    </source>
+
+   <source name="fits_spectrum">
+      <spectrum escale="MeV">
+         <SpectrumClass name="FitsTransient"
+          params = "flux=1, tstart=0., tstop=1e4, fitsFile=$(GENERICSOURCESROOT)/data/fitsSpectrum.fits"/>
+         <celestial_dir ra="193.98" dec="-5.82"/>
+      </spectrum>
+   </source>
+
+   <source name="source_population">
+      <spectrum escale="MeV">
+         <SpectrumClass name="SourcePopulation"
+          params="$(GENERICSOURCESROOT)/data/sourcePop.dat, 1"/>
+         <use_spectrum frame="galaxy"/>
+      </spectrum>
+   </source>
+
 </source_library>

@@ -5,6 +5,7 @@
   @verbatim
   $Id$
 
+  31-Oct-05 v1r6    JC    add FitsTransient, SourcePopulation classes
   01-Sep-05 v1r5p1  JC    allow user to set EBL model in SpectralTransient
                           from xml definition
   29-Aug-05 v1r5    JC    use eblAtten package; remove EBL-related code

@@ -148,11 +148,6 @@ drawEvents(const std::vector<double> & times,
            const std::vector<double> & lightCurve) {
    double npred = m_flux*EventSource::totalArea()*(m_tstop - m_tstart);
    long nevts = RandPoisson::shoot(npred);
-   std::cout << "m_flux = " << m_flux << "\n"
-             << "m_tstop = " << m_tstop << "\n"
-             << "m_tstart = " << m_tstart << "\n"
-             << "npred = " << npred << "\n"
-             << "nevts = " << nevts << "\n";
    for (long i = 0; i < nevts; i++) {
       std::pair<long, double> arrTime = draw(times, lightCurve);
       std::pair<long, double> energy = draw(energies,

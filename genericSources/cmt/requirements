@@ -1,11 +1,12 @@
 package genericSources
-version v1r5p1
+version v1r6
 
 author James Chiang <jchiang@slac.stanford.edu>
 
 # $Id$
 
 use GlastPolicy *
+use f2c *
 use cfitsio v* IExternal
 use CLHEP v* IExternal
 use facilities v*
@@ -25,6 +26,6 @@ macro genericSources_cppflags "" \
 
 macro source *.cxx WIN32 "*.h *.cxx"
 
-library genericSources -no_share $(source)
+library genericSources -no_share $(source) *.c
 
 application test_genericSources test/test.cxx
