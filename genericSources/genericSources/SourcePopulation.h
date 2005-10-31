@@ -27,7 +27,7 @@ namespace IRB {
  * @class SourcePopulation
  * @brief Draw from a population of steady point sources.  The sources
  * are read in from a standard flux-style xml file and so may be
- * modeled using a power-low or broken power-law.
+ * modeled using a power-law or broken power-law.
  *
  * @author J. Chiang
  *
@@ -39,6 +39,8 @@ class SourcePopulation : public Spectrum {
 public:
 
    SourcePopulation(const std::string & params);
+
+   ~SourcePopulation();
    
    /// @return Time interval to the next event
    virtual double interval(double time);
@@ -88,7 +90,9 @@ private:
                   double gamma, double gamma2, double ebreak,
                   double emin, double emax, const IRB::EblAtten * tau=0);
 
-      ~PointSource();
+      PointSource(const std::string & line);
+
+      ~PointSource() {}
 
       /// @return Photon direction as a SkyDir object
       const astro::SkyDir & dir() const {
@@ -117,6 +121,8 @@ private:
       double m_part1;
       double m_part2;
       double m_frac;
+
+      void setPowerLaw();
    };
 
    std::vector<PointSource> m_sources;

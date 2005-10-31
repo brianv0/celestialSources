@@ -65,13 +65,17 @@ ISpectrumFactory & SourcePopulationFactory() {
    return myFactory;
 }
 
-SourcePopulation::SourcePopulation(const std::string & params) {
+SourcePopulation::SourcePopulation(const std::string & params) : m_tau(0) {
    std::vector<std::string> pars;
    facilities::Util::stringTokenize(params, ",", pars);
    std::string inputFile(pars.at(0));
    facilities::Util::expandEnvVar(&inputFile);
    readSourceFile(inputFile);
    m_flux = m_cumulativeFlux.back();
+}
+
+SourcePopulation::~SourcePopulation() {
+   delete m_tau;
 }
 
 void SourcePopulation::readSourceFile(const std::string & input_file) {
@@ -86,22 +90,12 @@ void SourcePopulation::readSourceFile(const std::string & input_file) {
 
    std::vector<std::string>::const_iterator line = lines.begin();
    for ( ; line != lines.end(); ++line) {
-      std::vector<std::string> tokens;
-      facilities::Util::stringTokenize(*line, ", \n", tokens);
-      double ra = std::atof(tokens.at(0).c_str());
-      double dec = std::atof(tokens.at(1).c_str());
-      double flux = std::atof(tokens.at(2).c_str());
-      double gamma = std::atof(tokens.at(3).c_str());
-      double gamma2 = std::atof(tokens.at(4).c_str());
-      double ebreak = std::atof(tokens.at(5).c_str());
-      double emin = std::atof(tokens.at(6).c_str());
-      double emax = std::atof(tokens.at(7).c_str());
-      m_sources.push_back(PointSource(astro::SkyDir(ra, dec), flux, gamma,
-                                      gamma2, ebreak, emin, emax));
+      m_sources.push_back(PointSource(*line));
       if (line == lines.begin()) {
-         m_cumulativeFlux.push_back(flux);
+         m_cumulativeFlux.push_back(m_sources.back().flux());
       } else {
-         m_cumulativeFlux.push_back(m_cumulativeFlux.back() + flux);
+         m_cumulativeFlux.push_back(m_cumulativeFlux.back() 
+                                    + m_sources.back().flux());
       }
    }
 }
@@ -110,7 +104,7 @@ float SourcePopulation::operator()(float xi) {
    xi *= m_flux;
    std::vector<double>::const_iterator it = 
       std::upper_bound(m_cumulativeFlux.begin(), m_cumulativeFlux.end(), xi);
-   size_t indx = it - m_cumulativeFlux.begin();
+   size_t indx = it - m_cumulativeFlux.begin() - 1;
    m_currentEnergy = m_sources.at(indx).energy();
    m_l = m_sources.at(indx).dir().l();
    m_b = m_sources.at(indx).dir().b();
@@ -134,25 +128,42 @@ PointSource::PointSource(const astro::SkyDir & dir, double flux,
                          double emin, double emax, const IRB::EblAtten * tau) 
    : m_dir(dir), m_flux(flux), m_gamma(gamma), m_gamma2(gamma2),
      m_ebreak(ebreak), m_emin(emin), m_emax(emax), m_tau(tau) {
-
-   if (gamma == 1) {
-      m_part1 = std::log(ebreak/emin);
-   } else {
-      m_part1 = (std::pow(ebreak, 1 - gamma) - std::pow(emin, 1 - gamma))
-         /(1 - gamma)/std::pow(ebreak, 1 - gamma);
-   }
-   if (gamma2 == 1) {
-      m_part2 = std::log(emax/ebreak);
-   } else {
-      m_part2 = (std::pow(emax, 1 - gamma2) - std::pow(ebreak, 1 - gamma2))
-         /(1 - gamma2)/std::pow(ebreak, 1 - gamma2);
-   }
-   m_frac = m_part1/(m_part1 + m_part2);
+   setPowerLaw();
 }
 
 SourcePopulation::
-PointSource::~PointSource() {
-   delete m_tau;
+PointSource::PointSource(const std::string & line) 
+   : m_tau(0) {
+   std::vector<std::string> tokens;
+   facilities::Util::stringTokenize(line, ", \n", tokens);
+   double ra = std::atof(tokens.at(1).c_str());
+   double dec = std::atof(tokens.at(2).c_str());
+   m_dir = astro::SkyDir(ra, dec);
+   m_flux = std::atof(tokens.at(3).c_str());
+   m_gamma = std::atof(tokens.at(4).c_str());
+   m_gamma2 = std::atof(tokens.at(5).c_str());
+   m_ebreak = std::atof(tokens.at(6).c_str());
+   m_emin = std::atof(tokens.at(7).c_str());
+   m_emax = std::atof(tokens.at(8).c_str());
+   setPowerLaw();
+}
+
+void 
+SourcePopulation::
+PointSource::setPowerLaw() {
+   if (m_gamma == 1) {
+      m_part1 = std::log(m_ebreak/m_emin);
+   } else {
+      m_part1 = (std::pow(m_ebreak, 1-m_gamma) - std::pow(m_emin, 1-m_gamma))
+         /(1 - m_gamma)/std::pow(m_ebreak, 1 - m_gamma);
+   }
+   if (m_gamma2 == 1) {
+      m_part2 = std::log(m_emax/m_ebreak);
+   } else {
+      m_part2 = (std::pow(m_emax, 1-m_gamma2) - std::pow(m_ebreak, 1-m_gamma2))
+         /(1 - m_gamma2)/std::pow(m_ebreak, 1 - m_gamma2);
+   }
+   m_frac = m_part1/(m_part1 + m_part2);
 }
 
 double SourcePopulation::
