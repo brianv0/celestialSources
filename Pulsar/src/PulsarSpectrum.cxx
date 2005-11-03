@@ -301,7 +301,7 @@ double PulsarSpectrum::interval(double time)
   if (((timeTilde/SecsOneDay) < m_t0Init) || ((timeTilde/SecsOneDay) > m_t0End)) 
     {
       //      if (DEBUG)
-      std::cout << " Warning: time is out of range of validity: for pulsar " << m_PSRname << ": Switchting to new ephemerides set..." << std::endl;
+      std::cout << "Warning!Time is out of range of validity for pulsar " << m_PSRname << ": Switching to new ephemerides set..." << std::endl;
 
 	for (int e=0; e < m_t0Vect.size();e++)
 	  if (((timeTilde/SecsOneDay) > m_t0InitVect[e]) && ((timeTilde/SecsOneDay) < m_t0EndVect[e])) 
@@ -318,10 +318,13 @@ double PulsarSpectrum::interval(double time)
 	      m_phi0 = m_phi0Vect[e];
 
 	      std::cout << "Valid Ephemerides set found:" << std::endl;
-	      std::cout << "MJD("<<m_t0Init<<"-"<<m_t0End<<") --> Epoch t0 = MJD " << m_t0 << std::endl; 
-	      std::cout << "f0 " << m_f0 << " f1 " << m_f1 << " f2 " << m_f2 << std::endl;
-	      std::cout << "per " << m_period << " pdot " << m_pdot << " p2dot " << m_p2dot 
-			<< " phi0 " << m_phi0 << std::endl;
+
+	      if (DEBUG)
+		{
+		  std::cout << "MJD("<<m_t0Init<<"-"<<m_t0End<<") --> Epoch t0 = MJD " << m_t0 << std::endl; 
+		  std::cout << "f0 " << m_f0 << " f1 " << m_f1 << " f2 " << m_f2 << std::endl;
+		  std::cout << "Period " << m_period << " pdot " << m_pdot << " p2dot " << m_p2dot << std::endl;
+		}
 
 	      //Re-instantiate Pulsar
 	      delete m_Pulsar;
@@ -337,12 +340,18 @@ double PulsarSpectrum::interval(double time)
 	       m_N0 = initTurns - getTurns(timeTilde); 
 	       double intN0;
 	       double N0frac = modf(m_N0,&intN0); // Start time for interval
-	       std::cout << " m_phi0 " << m_phi0 << std::endl;
-	       m_phi0 = m_phi0 - N0frac;
-	       std::cout << "N0frac" << N0frac << " m_phi0 " << m_phi0 << std::endl;
+	       m_N0 = m_N0 - N0frac;
+	       std::cout << std::setprecision(20) << " Turns now are " << initTurns << " at t0 " << m_N0 << std::endl;	           
+	       //       initTurns = initTurns - N0frac;
 
 
-	       std::cout << std::setprecision(20) << " At Next t0 #turns will be : " << m_N0 << std::endl;
+	       //m_phi0 = m_phi0 - N0frac;
+	       // std::cout << "N0frac" << N0frac << " m_phi0 " << m_phi0 << std::endl;
+
+	       if (DEBUG)
+		 {
+		   std::cout << std::setprecision(20) << " At Next t0 Number of Turns will be: " << m_N0 << std::endl;
+		 }
 	    }
     }
 
@@ -366,7 +375,7 @@ double PulsarSpectrum::interval(double time)
   double inte = m_spectrum->interval(tStart,m_enphmin); //deltaT (in system where Pdot = 0
   double inteTurns = inte/m_period; // conversion to # of turns
 
-  double totTurns = initTurns + inteTurns;// + m_phi0; //Total turns at the nextTimeTilde
+  double totTurns = initTurns + inteTurns + m_phi0; //Total turns at the nextTimeTilde
 
 
   //  std::cout << " initTurns " << initTurns << " Inte " << inte << " inteTurns " << inteTurns << " totTurns " << totTurns << std::endl;
@@ -375,7 +384,10 @@ double PulsarSpectrum::interval(double time)
 
   //wirte out phase 
 
-  std::cout << "\nPulsarSpectrum Phase is " << std::setprecision(20) << getTurns(nextTimeTilde) << "phi0 is " << m_phi0 << std::endl;
+  std::cout << "PulsarSpectrum Phase is " << std::setprecision(20) << getTurns(nextTimeTilde) << "phi0 is " << m_phi0 << std::endl;
+  //  m_phi0 = 0;
+
+  // std::cout << " con getturns " << getTurns(51904.12*86400.) << std::endl;
 
   double nextTimeDecorr = getDecorrectedTime(nextTimeTilde);
  
@@ -428,7 +440,7 @@ double PulsarSpectrum::interval(double time)
 double PulsarSpectrum::getTurns( double time )
 {
   double dt = time - m_t0*SecsOneDay;
-  return m_N0 + m_f0*dt + 0.5*m_f1*dt*dt + ((m_f2*dt*dt*dt)/6.0);
+  return m_phi0 + m_N0 + m_f0*dt + 0.5*m_f1*dt*dt + ((m_f2*dt*dt*dt)/6.0);
   //m_phi0 + m_f0*dt + 0.5*m_f1*dt*dt + ((m_f2*dt*dt*dt)/6.0);
 }
 
@@ -712,9 +724,24 @@ int PulsarSpectrum::getPulsarFromDataList(std::string sourceFileName)
 	  m_f0Vect.push_back(f0);
 	  m_f1Vect.push_back(f1);
 	  m_f2Vect.push_back(f2);
-	  
-	  phi0 = -1.0*(f0*(txbary-t0) + 0.5*f1*(pow((txbary-t0),2)) + (1/6)*f1*(pow((txbary-t0),2))); 
+
+	  double dt = (txbary-t0)*SecsOneDay;
+
+	  phi0 = -1.0*(f0*dt
+		       + (f1/2.0)*dt*dt
+		       + (f2/6.0)*dt*dt*dt); 
+	
 	  phi0 = modf(phi0,&phas);
+	  /*	
+  std::cout << " computing phi0 " << phi0 << " -->dt " << (txbary-t0)*86400
+		    << " f0 " << f0  
+		    << " f1 " << f1  
+		    << " f2 " << f2  << std::endl;
+	  */
+
+
+
+
 	  if (phi0 < 0. ) 
 	    phi0++;
 
