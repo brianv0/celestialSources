@@ -599,7 +599,7 @@ void PlotGRB(double enph = 0,double z=0,char name[100]="grb_65540.root",TString 
   legL->Draw();
   clc->cd(3);
   legH->Draw();
-
+  
   std::cout<<" Nph LAT ("<<LAT1<<","<<LAT2<<")  = "<<sp->Integral_T(Lct_LAT,0.0,TMAX)<<std::endl;
   if(ExtractPhotons) 
     {

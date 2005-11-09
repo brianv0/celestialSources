@@ -86,6 +86,41 @@ double GetPeakFluxShort(TRandom *rnd)
 //////////////////////////////////////////////////
 void GenerateXMLLibrary(int Nbursts=100)
 {
+
+  //////////////////////////////////////////////////
+  double MinExtractedPhotonEnergy = 30.0; //MeV
+  long FirstBurstTime  =      1000; //1e4
+  double AverageInterval = 86400.0; //s
+  
+  bool  GeneratePF         =   false;//true;// If true: PF is used to normalize Bursts.
+  bool  GenerateRedshift   =   false;// If true: PF is used to normalize Bursts.
+  bool  GenerateGBM        =   false;
+  bool  GLASTCoordinate    =   false;
+  
+  double FL=-1e-5;
+  double PF=-1.0;
+  double Fluence,PeakFlux;
+  double z=0;
+  double Duration;
+  int BURSTtype = 0; // 1->S, 2->L, else S+L
+  // If Glast Coordinae = true:
+  double theta = 45.0;
+  double phi   = 0.0;
+  
+  double alpha0 = 10.0;  //  -3<= a < 1.0 
+  double beta0  = 10.0;   //   b < a && b < -1 
+  double alpha_min = -3.0;  //  -3<= a < 1.0 
+  double alpha_max = 1.0;   //   -3<= a < 1.0 
+  double beta_max = -1.5;   //   b < a && b < -2 
+  double beta_min = -7.2;   //   b < a && b < -2 
+  
+  //////////////////////////////////////////////////
+  int NphLat=0;
+  double DelayTime=0;
+  double ExtraComponent_Duration=0.0;
+  double CO_Energy= 0.0;  
+  //////////////////////////////////////////////////
+  if (GenerateRedshift && (CO_Energy!=0)) std::cout<<" WARNING!!! Generate redshift is true and CO_Energy!=0"<<std::endl;
   TRandom *rnd = new TRandom();
   rnd->SetSeed(65540);
   //  rnd->SetSeed(19741205);
@@ -120,34 +155,7 @@ void GenerateXMLLibrary(int Nbursts=100)
     {
       XS[i]=PS[NentriesS-1-i];
     }
-  
-
-  double MinExtractedPhotonEnergy = 30.0; //MeV
-  long FirstBurstTime  =      1000; //1e4
-  double AverageInterval = 86400.0; //s
-  bool  GeneratePF  =   false;//true;// If true: PF is used to normalize Bursts.
-  double FL=-1e-5;
-  double PF=-1.0;
-  double Fluence,PeakFlux;
-  double z;
-  double Duration;
-  int BURSTtype = 0; // 1->S, 2->L, else S+L
-  bool GLASTCoordinate            = false;
-  double theta = 45.0;
-  double phi   = 0.0;
-  double alpha0 = 10.0;  //  -3<= a < 1.0 
-  double beta0  = 10.0;   //   b < a && b < -1 
-  double alpha_min = -3.0;  //  -3<= a < 1.0 
-  double alpha_max = 1.0;   //   -3<= a < 1.0 
-  double beta_max = -1.5;   //   b < a && b < -2 
-  double beta_min = -7.2;   //   b < a && b < -2 
-  int  GBM                        = 1;
-  
-  int NphLat=0;
-  double DelayTime=0;
-  double ExtraComponent_Duration=0.0;
-  double CO_Energy= 0.0;  
-  
+   
 
   gDirectory->Delete("PFlong");
   gDirectory->Delete("PFshort");
@@ -197,7 +205,7 @@ void GenerateXMLLibrary(int Nbursts=100)
 
   //  FILE osTest("../src/test/GRBParam.txt");
   
-
+  
   if(GeneratePF)
     //    fprint(osTest," T0  T90   Z    PF  alpha   beta   Eco ");
     osTest<<setw(11)<<"T0"<<setw(9)<<"T90"<<setw(9)<<"PF"<<setw(9)<<"z"<<setw(9)<<"alpha"<<setw(9)<<"beta"<<setw(10)<<"Eco"<<std::endl;
@@ -277,8 +285,15 @@ void GenerateXMLLibrary(int Nbursts=100)
 
 	  rnd->SetSeed(seed);
 	  Duration = pow(10.0,(double)rnd->Gaus(log_mean_short,log_sigma_short)); //(Short Bursts)
-	  z = GetRedshiftShort(rnd);
-
+	  if (GenerateRedshift)
+	    {
+	      z = GetRedshiftShort(rnd);
+	    }
+	  else
+	    {
+	      z = GetRedshiftShort(rnd); 
+	      z = 0.0;
+	    }
 	  T90short->Fill(log10(Duration));
 	  alphashort->Fill(alpha);
 	  betashort->Fill(beta); 
@@ -325,12 +340,21 @@ void GenerateXMLLibrary(int Nbursts=100)
 	      Duration*=Stretch;
 	    }
 	  T90long->Fill(log10(Duration));
-	  z = GetRedshiftLong(rnd);
+
+	  if (GenerateRedshift)
+	    {
+	      z = GetRedshiftLong(rnd);
+	    }
+	  else
+	    {
+	      z = GetRedshiftLong(rnd);
+	      z = 0.0;
+	    }
 	  alphalong->Fill(alpha);
 	  betalong->Fill(beta); 
 	  
 	  Nlong++;
-
+	  
 	}
       
       os<<""<<std::endl;
@@ -340,16 +364,16 @@ void GenerateXMLLibrary(int Nbursts=100)
       else if(i<10000) os<<"<source name=\" GRB_0"<<i<<" \">"<<std::endl;
       else os<<"<source name=\" GRB_"<<i<<" \">"<<std::endl;
       os<<"<spectrum escale=\"MeV\">"<<std::endl;
-
+      
       double co_energy = CO_Energy;
       if(co_energy < 0.0) co_energy = floor(rnd->Uniform(1.,10.));
       
       if(GeneratePF)
 	os<<" <SpectrumClass name=\"GRBobsmanager\" params=\""<<BurstTime<<" , "<<Duration<<" , "<<PeakFlux<<" , "<<
-	  z<<" , "<<alpha<<" , "<<beta<<" , "<<MinExtractedPhotonEnergy<<" , "<<GBM;
+	  z<<" , "<<alpha<<" , "<<beta<<" , "<<MinExtractedPhotonEnergy<<" , "<<(int)GenerateGBM;
       else 
 	os<<" <SpectrumClass name=\"GRBobsmanager\" params=\""<<BurstTime<<" , "<<Duration<<" , "<<Fluence<<" , "<<
-	  z<<" , "<<alpha<<" , "<<beta<<" , "<<MinExtractedPhotonEnergy<<" , "<<GBM;
+	  z<<" , "<<alpha<<" , "<<beta<<" , "<<MinExtractedPhotonEnergy<<" , "<<(int)GenerateGBM;
       
       os<<" , "<<NphLat<<" , "<<DelayTime<<" , "<<ExtraComponent_Duration<<" , "<<co_energy<<" \"/>"<<std::endl;
       
