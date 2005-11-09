@@ -11,12 +11,13 @@
  *  EBL model 0: Kneiske et al "Best Fit" (A&A 413, 807-815, 2004)
  *  EBL model 1: Primack, Bullock, Somerville (2005)  astro-ph 0502177
  *  EBL model 2: Kneiske et al "High-UV" (A&A 413, 807-815, 2004)
- *  EBL model 3: Salamon & Stecker (ApJ 1998, 493:547-554)
+ *  EBL model 3: Stecker, Malkan, and Scully (astro-ph 0510449)
 
- // Old model
- *  EBL model 4: Primack & Bullock (1999) Valid for Energies < 500 GeV and Redshift < 5
+ // Old models
+ *  EBL model 4: Salamon & Stecker (ApJ 1998, 493:547-554)
+ *  EBL model 5: Primack & Bullock (1999) Valid for Energies < 500 GeV and Redshift < 5
 
- * For  models 3 and 4 the EBL attenuation turns on abruptly at 10 GeV. This is specially artificial for distant
+ * For  models 4 and 5 the EBL attenuation turns on abruptly at 10 GeV. This is specially artificial for distant
  * blazars z > ~3. This can be improved by extrapolating the models to energies around 1-5 GeV
 
 *************************************************************************************
@@ -49,12 +50,12 @@ These models are valid in redshift and energy ranges not useful for GLAST:
 	 *  Result output is a table of log10 Energy and Tau (optical depth)
 	 *  in file tau_<modelname>_<redshift>.dat.
 	 *
-	 *  EBL model 4:  Stecker and de Jager (ApJ 2002)
+	 *  EBL model :  Stecker and de Jager (ApJ 2002)
 	 *                "baseline"; valid for z<0.3
-	 *  EBL model 5:  Stecker and de Jager (ApJ 2002)
+	 *  EBL model :  Stecker and de Jager (ApJ 2002)
 	 *                "fast evolution"; valid for z<0.3
-	 *  EBL model 6:  Primack's model (1999)
-	 *  EBL model 7:  Primack's model (2004)
+	 *  EBL model :  Primack's model (1999)
+	 *  EBL model :  Primack's model (2004)
 **************************************************************************************
 
 
@@ -79,9 +80,10 @@ void calcIRB(float redshift, int iModel, float minE, float maxE);
 float calcKneiske(float energy, float redshift);
 float calcPrimack05(float energy, float redshift);
 float calcKneiske_HighUV(float energy, float redshift);
-float calcSS(float energy, float redshift);
+float calcStecker05(float energy, float redshift);
 
 //old models
+float calcSS(float energy, float redshift);
 float calcPrimack99(float energy, float redshift);
 float calcSJ1(float energy, float redshift);
 float calcSJ2(float energy, float redshift);
@@ -379,8 +381,69 @@ return tauvalue;
 
 }
 
+
+float calcStecker05(float energy, float redshift){
+//EBL model 3:  Stecker, Malkan, and Scully
+//              Astro-ph 0510449
+//		Valid for opacities  0.01 < tau < 100
+
+
+double tau1, tau2, tauvalue;
+
+int zindex, MAXZINDEX=9;
+
+double zvalue[9] = {0., 0.03, 0.112, 0.2, 0.5, 1., 2., 3., 5.};
+
+double EMIN [9] = {80., 60., 35., 25., 15., 10., 7., 5., 4.};
+
+double coeff[9][5] = {{0., 0., 1., 1., 1.},
+                     {229.021, -2886.11, -48.9451, 1215.529, -7222.76},
+                     {821.897, -9679.05, -138.498, 3518.31, -21256.9},
+		     {125926., -1.44e+06, -14469.8, 379740., -2.33e+06},
+		     {531.759, -5820.68, -37.8721, 1064.03, -6749.95},
+		     {320.272, -3324.34, -40.6947, 1067.11, -6561.12},
+		     {297.859, -3003.72, -22.9643, 646.381, -4106.36},
+		     {1077.53, -10739.3, -48.8784, 1557.5, -10410.4},
+		     {5997.14, -59207.8, -79.8402, 4306.14, -33148.4}};
+
+
+if (redshift < 0.){
+   std::cerr<<"Invalid redshift (z<0) ..."<<std::endl;
+   redshift=0.;
+   } else if (redshift > 5.){
+      std::cerr<<"This model is only valid for z <= 5."<<std::endl;
+      redshift=5.;
+      }
+
+double x = log10(energy*1e+09);
+
+//Find zindex
+ for(int i=0; i<MAXZINDEX-1; i++)
+    if(redshift >= zvalue[i] && redshift < zvalue[i+1]) zindex = i;
+  if(redshift >= zvalue[MAXZINDEX-1]) zindex = MAXZINDEX-1;
+
+if (energy <= EMIN[zindex])
+   return 0.;
+
+if (zindex == 0){
+   tau1 = 0.;
+   tau2 = pow(10., (coeff[1][0]*x+coeff[1][1])/(coeff[1][2]*x*x+coeff[1][3]*x+coeff[1][4]));
+   tauvalue =tau2*redshift/zvalue[1];
+   }
+   else if (zindex < MAXZINDEX-1){
+   tau1 = pow(10., (coeff[zindex][0]*x+coeff[zindex][1])/(coeff[zindex][2]*x*x+coeff[zindex][3]*x+coeff[zindex][4]));
+   tau2 = pow(10., (coeff[zindex+1][0]*x+coeff[zindex+1][1])/(coeff[zindex+1][2]*x*x+coeff[zindex+1][3]*x+coeff[zindex+1][4]));
+   tauvalue =tau1 + (tau2-tau1)*(redshift-zvalue[zindex])/(zvalue[zindex+1]-zvalue[zindex]);
+   } else
+      tauvalue = pow(10., (coeff[MAXZINDEX-1][0]*x+coeff[MAXZINDEX-1][1])/(coeff[MAXZINDEX-1][2]*x*x+coeff[MAXZINDEX-1][3]*x+coeff[MAXZINDEX-1][4]));
+
+return tauvalue;
+
+}
+
+
 float calcSS(float energy, float redshift){
-// EBL model 1: Salamon & Stecker (ApJ 1998, 493:547-554)
+// EBL model 4: Salamon & Stecker (ApJ 1998, 493:547-554)
 //We are using here the model with metallicity correction (see paper)
 //The paper has opacities up to z=3, for z>3 opacity remains constant according to Stecker
 
@@ -458,7 +521,7 @@ return tau1 + (tau2-tau1)*(redshift-zvalue[zindex])/(zvalue[zindex+1]-zvalue[zin
 
 
 float calcPB99(float energy, float redshift){
-// EBL model 4: Primack & Bullock (1999) Valid for Energies < 500 GeV
+// EBL model 5: Primack & Bullock (1999) Valid for Energies < 500 GeV
 //and Redshift < 5 We are using here the LCDM model with Salpeter's
 //stellar Initial Mass Function (IMF) The data provided by Bullock has
 //opacities up to 10.
@@ -569,7 +632,7 @@ if(redshift > 5.) redshift=5.0;
 
 
 float calcSJ1(float energy, float redshift){
-//  EBL model 5:  Stecker and de Jager (ApJ 2002) "baseline"; valid for z<0.3
+//  EBL model :  Stecker and de Jager (ApJ 2002) "baseline"; valid for z<0.3
 //  Returns tau (optical depth)
 //
 
@@ -612,7 +675,7 @@ float calcSJ1(float energy, float redshift){
 
 
 float calcSJ2(float energy, float redshift){
-//  EBL model 6:  Stecker and de Jager (ApJ 2002) "fast evolution"; valid for z<0.3
+//  EBL model :  Stecker and de Jager (ApJ 2002) "fast evolution"; valid for z<0.3
 //  Same as model 1 excpet for z polynomials' coefficients
 //  Returns tau (optical depth)
 //

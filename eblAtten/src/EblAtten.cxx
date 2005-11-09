@@ -19,14 +19,14 @@ std::map<EblModel, std::string> EblAtten::s_model_Ids;
 float calcKneiske(float energy, float redshift);
 float calcPrimack05(float energy, float redshift);
 float calcKneiske_HighUV(float energy, float redshift);
-float calcSS(float energy, float redshift);
+float calcStecker05(float energy, float redshift);
 
 EblAtten::EblAtten(EblModel model) : m_model(model) {
    if (s_model_Ids.size() == 0) {
       s_model_Ids[Kneiske] = "Kneiske et al - Best Fit (2004)";
       s_model_Ids[Primack05] = "Primack et al (2005)";
       s_model_Ids[Kneiske_HighUV] = "Kneiske et al - High UV (2004)";
-      s_model_Ids[Salamon_Stecker] = "Salamon & Stecker (1998)";
+      s_model_Ids[Stecker05] = "Stecker et al (2005)";
       }
    if (s_model_Ids.find(model) == s_model_Ids.end()) {
       std::ostringstream message;
@@ -50,8 +50,8 @@ float EblAtten::operator()(float energy, float redshift) const {
       return calcPrimack05(energy, redshift);
    case Kneiske_HighUV:
       return calcKneiske_HighUV(energy, redshift);
-   case Salamon_Stecker:
-      return calcSS(energy, redshift);
+   case Stecker05:
+      return calcStecker05(energy, redshift);
    }
    return 0;
 }

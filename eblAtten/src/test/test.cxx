@@ -16,7 +16,7 @@
 int main() {
 
    IRB::EblAtten tau0(IRB::Kneiske), tau1(IRB::Primack05),
-      tau2(IRB::Kneiske_HighUV), tau3(IRB::Salamon_Stecker);
+      tau2(IRB::Kneiske_HighUV), tau3(IRB::Stecker05);
 
    double emin(1e4), emax(5e5);
    int npts(50);

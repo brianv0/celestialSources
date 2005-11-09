@@ -5,6 +5,7 @@
   @verbatim
   $Id$
 
+  08-Nov-05 v0r3    LR    Include new Stecker's model for EBL
   21-Sep-05 v0r2p3  JC    Fix line in req file so that compiler warnings are
                           properly suppressed
   08-Sep-05 v0r2p2  LR    Reduce Kneiske's models energy range to GLAST range
