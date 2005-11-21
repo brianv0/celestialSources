@@ -59,10 +59,6 @@ public:
       return m_currentEnergy;
    }
 
-   const std::vector<std::pair<double, double> > & events() const {
-      return m_events;
-   }
-
 private:
 
    double m_flux;
@@ -80,9 +76,7 @@ private:
 
    double m_currentEnergy;
 
-   std::vector<std::pair<double, double> > m_events;
-
-   void createEvents(std::string templateFile);
+   void readModel(std::string templateFile);
 
    class ModelInterval {
    public:
@@ -100,14 +94,19 @@ private:
       /// Fractional start time of the interval; the entire light curve 
       /// will be rescaled to fit the interval [m_tstart, m_tstop]
       double startTime;
-      /// Fraction stop time.
+
+      /// Fractional stop time.
       double stopTime;
+
       /// Energy integrated photon flux (#/cm^2-s)
       double flux;
+
       /// Lower energy photon index
       double gamma1;
+
       /// Higher energy photon index
       double gamma2;
+
       /// Break energy (MeV)
       double ebreak;
 
@@ -131,19 +130,22 @@ private:
 
    std::vector<ModelInterval> m_lightCurve;
 
+   std::vector< std::pair<double, double> > m_eventCache;
+
+   std::vector<ModelInterval>::const_iterator m_currentInterval;
+
    void readLightCurve(const std::string & templateFile);
    void readFitsLightCurve(const std::string & templateFile);
 
    void rescaleLightCurve();
 
-   std::pair<double, double> 
-   drawEvent(const std::vector<double> & integralDist) const;
+   void fillEventCache(double time);
 
    double drawEnergy(const ModelInterval & interval) const;
 
    static bool compareEventTime(const std::pair<double, double> & x,
                                 const std::pair<double, double> & y) {
-      return x.first < y.first;
+      return x.first > y.first;
    }
 };
 

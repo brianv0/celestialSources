@@ -128,7 +128,9 @@ SpectralTransient::SpectralTransient(const std::string & paramString)
       }
    }
 
-   createEvents(templateFile);
+   readModel(templateFile);
+
+   m_currentInterval = m_lightCurve.begin();
 }
 
 SpectralTransient::~SpectralTransient() {
@@ -136,18 +138,43 @@ SpectralTransient::~SpectralTransient() {
 }
 
 double SpectralTransient::interval(double time) {
-   std::vector<std::pair<double, double> >::const_iterator event =
-      std::upper_bound(m_events.begin(), m_events.end(), 
-                       std::make_pair(time, 0), compareEventTime);
-   if (event != m_events.end()) {
-      m_currentEnergy = event->second;
-      return event->first - time;
-   } 
-// There should be a better way to turn off a source than this:
-   return 3.155e8;
+   if (m_eventCache.size() == 0) {
+      fillEventCache(time);
+   }
+   if (!m_eventCache.empty()) {
+      std::pair<double, double> thisEvent = m_eventCache.back();
+      m_eventCache.pop_back();
+      m_currentEnergy = thisEvent.second;
+      return thisEvent.first - time;
+   }
+   return 3.15e8;
 }
 
-void SpectralTransient::createEvents(std::string templateFile) {
+void SpectralTransient::fillEventCache(double time) {
+   for ( ; m_currentInterval != m_lightCurve.end(); ++m_currentInterval) {
+      if (time < m_currentInterval->startTime) {
+         time = m_currentInterval->startTime;
+      }
+      double dt(m_currentInterval->stopTime - time);
+      double flux(m_currentInterval->flux);
+      double npred(flux*EventSource::totalArea()*dt);
+      int nevts(RandPoisson::shoot(npred));
+      if (nevts > 0) {
+         for (int i = 0; i < nevts; i++) {
+            double energy(m_currentInterval->drawEnergy(m_emin, m_emax));
+            double eventTime(RandFlat::shoot()*dt + time);
+            m_eventCache.push_back(std::make_pair(eventTime, energy));
+         }
+         if (m_eventCache.size() > 1) {
+            std::stable_sort(m_eventCache.begin(), m_eventCache.end(),
+                             compareEventTime);
+         }
+         return;
+      }
+   }
+}
+
+void SpectralTransient::readModel(std::string templateFile) {
    facilities::Util::expandEnvVar(&templateFile);
 
    genericSources::Util::file_ok(templateFile);
@@ -158,36 +185,6 @@ void SpectralTransient::createEvents(std::string templateFile) {
       readLightCurve(templateFile);
    }
    rescaleLightCurve();
-
-   unsigned int npts(m_lightCurve.size());
-   std::vector<double> tt(npts+1);
-   std::vector<double> integralDist(npts+1);
-
-   integralDist[0] = 0;
-
-   for (unsigned int i = 0; i < npts; i++) {
-      integralDist[i+1] = integralDist[i] + m_lightCurve[i].flux
-         *(m_lightCurve[i].stopTime - m_lightCurve[i].startTime);
-   }
-   for (unsigned int i = 0; i < npts+1; i++) {
-      integralDist[i] /= integralDist[npts];
-   }
-
-   double npred = m_flux*EventSource::totalArea()*(m_tstop - m_tstart);
-   long nevts = RandPoisson::shoot(npred);
-//    std::cerr << "SpectralTransient: number of events = "
-//              << nevts << std::endl;
-   m_events.clear();
-   m_events.reserve(nevts);
-   for (long i = 0; i < nevts; i++) {
-      std::pair<double, double> my_event = drawEvent(integralDist);
-      if (m_z == 0 || m_tau == 0 ||
-          RandFlat::shoot() < std::exp(-m_tauScale*
-                                       (*m_tau)(my_event.second, m_z))) {
-         m_events.push_back(my_event);
-      }
-   }
-   std::stable_sort(m_events.begin(), m_events.end(), compareEventTime);
 }
 
 void SpectralTransient::
@@ -226,6 +223,10 @@ readFitsLightCurve(const std::string & templateFile) {
                                             nelements, gamma2);
    genericSources::FitsImage::readRowVector(fptr, "Ebreak", m_lc,
                                             nelements, ebreak);
+
+   fits_close_file(fptr, &status);
+   genericSources::FitsImage::fitsReportError(status);
+   
    m_lightCurve.clear();
    m_lightCurve.reserve(nelements);
    for (unsigned int i = 0; i < nelements; i++) {
@@ -255,17 +256,28 @@ void SpectralTransient::rescaleLightCurve() {
                                          m_lightCurve.front().startTime);
    std::vector<ModelInterval>::iterator interval;
    double original_startTime = m_lightCurve.front().startTime;
+   double meanFlux(0);
    for (interval = m_lightCurve.begin(); interval != m_lightCurve.end();
         ++interval) {
       interval->startTime = m_tstart + tscale*(interval->startTime -
                                                original_startTime);
       interval->stopTime = m_tstart + tscale*(interval->stopTime -
                                               original_startTime);
+      meanFlux += interval->flux*(interval->stopTime - interval->startTime);
    }
+
+   meanFlux /= (m_tstop - m_tstart);
+   double fluxScale(m_flux/meanFlux);
+
+   for (interval = m_lightCurve.begin(); interval != m_lightCurve.end();
+        ++interval) {
+      interval->flux *= fluxScale;
+   }
+
    for (unsigned int i = 0; i < m_lightCurve.size()-1; i++) {
       if (m_lightCurve[i].stopTime > m_lightCurve[i+1].startTime) {
          std::ostringstream message;
-         message << "SpectralTransient::readLightCurve:\n" 
+         message << "SpectralTransient::rescaleLightCurve:\n" 
                  << "Found stop time later than start time of "
                  << "subsequent interval:\n"
                  << "stop time: " << m_lightCurve[i-1].stopTime << "\n"
@@ -274,20 +286,6 @@ void SpectralTransient::rescaleLightCurve() {
       }
    }
 }   
-
-std::pair<double, double> SpectralTransient::
-drawEvent(const std::vector<double> & integralDist) const {
-   double xi = RandFlat::shoot();
-   std::vector<double>::const_iterator it = 
-      std::upper_bound(integralDist.begin(), integralDist.end(), xi);
-   int indx = it - integralDist.begin() - 1;
-   double my_time = (xi - integralDist[indx])
-      /(integralDist[indx+1] - integralDist[indx])
-      *(m_lightCurve[indx].stopTime - m_lightCurve[indx].startTime)
-      + m_lightCurve[indx].startTime;
-   return std::make_pair(my_time,
-                         m_lightCurve[indx].drawEnergy(m_emin, m_emax));
-}
 
 double SpectralTransient::ModelInterval::
 drawEnergy(double emin, double emax) const {
