@@ -58,6 +58,8 @@ GRBobsmanager::GRBobsmanager(const std::string& params)
   m_par->SetRedshift(m_z);
   m_theta = -100.0;
   
+  double launch = Spectrum::startTime();
+
   while(m_theta<FOV)
     {
       m_par->SetGalDir(-200,-200); //this generates random direction in the sky
@@ -67,7 +69,7 @@ GRBobsmanager::GRBobsmanager(const std::string& params)
       
       astro::SkyDir sky(m_l,m_b,astro::SkyDir::GALACTIC);
       HepVector3D skydir=sky.dir();
-      HepRotation rottoglast = GPS::instance()->transformToGlast(m_startTime,GPS::CELESTIAL);
+      HepRotation rottoglast = GPS::instance()->transformToGlast(m_startTime+launch,GPS::CELESTIAL);
       HepVector3D scdir = rottoglast * skydir;
       m_ra    = sky.ra();
       m_dec   = sky.dec();
@@ -90,10 +92,9 @@ TString GRBobsmanager::GetGRBname()
   //  else: 
   //  std::cout<<astro::
 
-  astro::JulianDate JD(2007, 1, 1, 0.0); //DC2
+  //This should be replaced by Spectrum::startTime() but it does not work here
+  astro::JulianDate JD(2008, 1, 1, 0.0); //DC2
   astro::EarthOrbit m_EarthOrbit(JD);
-  //  astro::JulianDate JD = m_EarthOrbit.dateFromSeconds(static_cast<double>(mytime));
-  //  JD = m_EarthOrbit.mjdFromSeconds(m_startTime);
   JD = m_EarthOrbit.dateFromSeconds(m_startTime);
   int An,Me,Gio;
   m_Rest=((int) m_startTime % 86400) + m_startTime - floor(m_startTime);

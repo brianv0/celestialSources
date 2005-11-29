@@ -19,7 +19,7 @@
 #include <string>
 #include <map>
 #include <cmath>
-#include "flux/ISpectrum.h"
+#include "flux/Spectrum.h"
 #include "flux/EventSource.h"
 #include "GRBobsSim.h"
 #include "SpectralComponent.h"
@@ -28,9 +28,8 @@
 
 #include "facilities/Util.h"
 
-//class ISpectrum;
 
-class GRBobsmanager : public ISpectrum
+class GRBobsmanager : public Spectrum
 {
   
  public:
@@ -66,7 +65,6 @@ class GRBobsmanager : public ISpectrum
   //! direction, taken from GRBobsSim
   inline std::pair<double,double> dir(double) 
     {
-      (void)(energy);//energy is not used here
       return m_GalDir;
     } 
   
