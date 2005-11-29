@@ -51,6 +51,7 @@ Pulsar::Pulsar(const std::string &paramString)
 }
 
 double Pulsar::interval(double current_time) {
+   current_time -= Spectrum::startTime();
    double time = drawTime();
    double resid = residualTime(time + current_time);
    double my_period = period(time + current_time);

@@ -108,6 +108,7 @@ FitsTransient::~FitsTransient() {
 }
 
 double FitsTransient::interval(double time) {
+   time -= Spectrum::startTime();
    std::vector<std::pair<double, double> >::const_iterator event =
       std::upper_bound(m_events.begin(), m_events.end(), 
                        std::make_pair(time, 0), compareEventTime);

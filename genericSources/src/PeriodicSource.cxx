@@ -62,6 +62,7 @@ double PeriodicSource::energy(double time) {
 }
 
 double PeriodicSource::interval(double time) {
+   time -= Spectrum::startTime();
    double phase = fmod(time, m_period);
    std::vector<double>::const_iterator it 
       = std::upper_bound(m_arrTimes.begin(), m_arrTimes.end(),

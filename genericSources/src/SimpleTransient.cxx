@@ -54,6 +54,7 @@ float SimpleTransient::operator()(float xi) const {
 }
 
 double SimpleTransient::interval(double time) {
+   time -= Spectrum::startTime();
    std::vector<double>::const_iterator eventTime =
       std::upper_bound(m_eventTimes.begin(), m_eventTimes.end(), time);
    if (eventTime != m_eventTimes.end()) {

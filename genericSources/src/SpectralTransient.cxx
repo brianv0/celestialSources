@@ -138,6 +138,7 @@ SpectralTransient::~SpectralTransient() {
 }
 
 double SpectralTransient::interval(double time) {
+   time -= Spectrum::startTime();
    if (m_eventCache.size() == 0) {
       fillEventCache(time);
    }
