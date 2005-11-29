@@ -86,16 +86,14 @@ GRBobsmanager::GRBobsmanager(const std::string& params)
 TString GRBobsmanager::GetGRBname()
 {
   ////DATE AND GRBNAME
-  /// Time from 2005 ,7,18,0.0:
-  //  astro::EarthOrbit m_EarthOrbit;
-  //  astro::JulianDate JD = m_EarthOrbit.dateFromSeconds(time);
-  //  else: 
-  //  std::cout<<astro::
+  /// GRB are named as customary GRBYYMMDDXXXX
+  //  The mission start and launch date are retrieved, 
+  //  and the current burst's start time is added to them to form a Julian Date.
+  //  Note: the argument of the JulianDate constructor is in day.
 
-  //This should be replaced by Spectrum::startTime() but it does not work here
-  astro::JulianDate JD(2008, 1, 1, 0.0); //DC2
-  astro::EarthOrbit m_EarthOrbit(JD);
-  JD = m_EarthOrbit.dateFromSeconds(m_startTime);
+  astro::JulianDate JD(astro::JulianDate::missionStart() +
+		       (Spectrum::startTime()+m_startTime)/astro::JulianDate::secondsPerDay);
+
   int An,Me,Gio;
   m_Rest=((int) m_startTime % 86400) + m_startTime - floor(m_startTime);
   m_Frac=(m_Rest/86400.);
