@@ -30,7 +30,7 @@ GRBobsmanager::GRBobsmanager(const std::string& params)
   m_GenerateGBMOutputs = false;
   facilities::Util::expandEnvVar(&paramFile);  
   
-  m_startTime       = parseParamList(params,0);
+  m_startTime       = parseParamList(params,0)+Spectrum::startTime();
   double duration   = parseParamList(params,1);
   m_fluence         = parseParamList(params,2);
   m_z               = parseParamList(params,3);
