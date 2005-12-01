@@ -13,22 +13,91 @@ bool  GLASTCoordinate    =   false;
 //////////////////////////////////////////////////
 
 
-
-
-
-double GetRedshiftLong(TRandom *rnd)
-{
-  double z=0.0;
-  while(z<=0) z = rnd->Gaus(2.0,1.0);
-  return z;
-}
+//double GetRedshiftLong(TRandom *rnd)
+//{
+//  double z=0.0;
+//  while(z<=0) z = rnd->Gaus(2.0,1.0);
+//  return z;
+//}
 
 double GetRedshiftShort(TRandom *rnd)
 {
-  double z=0.0;
-  while(z<=0) z = rnd->Gaus(.1,.1);
-  return z;
+  do {
+    double z=0.0, y=0.0;
+    double func;
+    z = rnd->Uniform(0.,10.0);
+    y  = rnd->Uniform(0.,1.0);
+    func = binary1(z);
+  } while (y>func);
+ return z;
 }
+
+double GetRedshiftLong(TRandom *rnd)
+{
+  do {
+    double z=0.0, y=0.0;
+    double func;
+    z = rnd->Uniform(0.,10.0);
+    y  = rnd->Uniform(0.,1.0);
+    // you can change the simulated z distrib, by changing GRB_SF1a 
+    // to GRB_SF2a or GRB_SF3a.
+    func = GRB_SF1a(z);
+  } while (y>func);
+ return z;
+}
+
+//double GetRedshiftLong(TRandom *rnd)
+//{
+//  double z=0.0;
+//  while(z<=0) z = rnd->Gaus(2.0,1.0);
+//  return z;
+//}
+
+//double GetRedshiftShort(TRandom *rnd)
+//{
+//  double z=0.0;
+//  while(z<=0) z = rnd->Gaus(.1,.1);
+//  return z;
+//}
+
+double binary1(double z){
+  // implemented by D. Noyes, this is a fit to the redshift distribution
+  // of simuated binary mergers produced by Chris Fryer.
+ 
+  double val;
+  double par1[4] = {1.00690e-01,2.29417e-01,2.04017,8.47315e-01};
+  double par2[4] = {-8.76443e-01,4.07510,1.56548e-01,1.21371};
+  if(z<=1)
+    val = (par1[0]+par1[1]*z+par1[2]*z*z)*exp(-par1[3]*z);
+  else
+    val = (par2[0]+par2[1]*z+par2[2]*z*z)*exp(-par2[3]*z);
+                                                                             
+  return val/4.99383068084716797;
+                                                                              
+}
+
+double GRB_SF1a(double z){
+  // from Porciani and Madau, ApJ, 526,L522 1999.
+  double val;
+  val = 0.3*exp(3.4*z)/(exp(3.8*z)+45.)/7.16974794864654541e-01;
+  return(val);
+}
+
+double GRB_SF2a(double z){
+  // from Porciani and Madau, ApJ, 526,L522 1999.
+  double val;
+  val = 0.15*exp(3.4*z)/(exp(3.4*z)+22.);
+  return(val);
+}
+ 
+double GRB_SF3a(double z){
+  // from Porciani and Madau, ApJ, 526,L522 1999.
+  double val;
+  val = 0.134*exp(3.05*z)/(exp(2.93*z)+15.);
+  val/=2.20879745483398438;
+  return(val);
+}
+
 
 double GetPeakFluxLong(TRandom *rnd)
 {
@@ -174,6 +243,9 @@ void GenerateXMLLibrary(int Nbursts=100)
   gDirectory->Delete("T90long");
   gDirectory->Delete("T90short");
 
+  gDirectory->Delete("Zlong");
+  gDirectory->Delete("Zshort");
+
   TH1D* PFlong  = new TH1D("PFlong","Peak Flux ",NentriesL-1,XL);
   TH1D* PFshort = new TH1D("PFshort","Peak Flux",NentriesS-1,XS);
   
@@ -182,6 +254,9 @@ void GenerateXMLLibrary(int Nbursts=100)
 
   TH1D* T90long  = new TH1D("T90long","Duration",100,-3,3);
   TH1D* T90short = new TH1D("T90short","Duration",100,-3,3);
+
+  TH1D* Zlong  = new TH1D("Zlong","Redshift",100,0,10);
+  TH1D* Zshort = new TH1D("Zshort","Redshift",100,0,10);
 
   TH1D* alphalong  = new TH1D("alphalong","Low energy spectral index",100,alpha_min,alpha_max);
   TH1D* alphashort = new TH1D("alphashort","Low energy spectral index",100,alpha_min,alpha_max);
@@ -197,6 +272,8 @@ void GenerateXMLLibrary(int Nbursts=100)
   FLshort->SetLineColor(2);
   T90long->SetLineColor(4);
   T90short->SetLineColor(2);
+  Zlong->SetLineColor(4);
+  Zshort->SetLineColor(2);
   alphalong->SetLineColor(4);
   alphashort->SetLineColor(2);
   betalong->SetLineColor(4);
@@ -312,6 +389,7 @@ void GenerateXMLLibrary(int Nbursts=100)
 
 	  Duration = Duration_S;
 	  T90short->Fill(log10(Duration));
+	  Zshort->Fill(z);
 	  alphashort->Fill(alpha);
 	  betashort->Fill(beta); 
 	  Nshort++;
@@ -352,6 +430,7 @@ void GenerateXMLLibrary(int Nbursts=100)
 	  
 	  alphalong->Fill(alpha);
 	  betalong->Fill(beta); 
+	  Zlong->Fill(z);
 	  
 	  Nlong++;
 	}
@@ -453,6 +532,15 @@ void GenerateXMLLibrary(int Nbursts=100)
   if(GeneratePF) PeakFluxVsT90->Draw();
   else  FluenceVsT90->Draw();
 
+  TCanvas *Redshifts = new TCanvas("Redshifts","Redshifts",600,400);
+  if(Nlong>Nshort){
+    Zlong->Draw();
+    Zshort->Draw("same");
+  }else{
+    Zshort->Draw();
+    Zlong->Draw("same");
+  }
+      
   TCanvas *Distributions = new TCanvas("Distributions","Distributions",500,800);
   Distributions->SetFillColor(10);
   gStyle->SetOptStat(0);
