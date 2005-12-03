@@ -1,14 +1,12 @@
 package SpectObj
 
-version v0r1p5
+version v1r1p1
 author Nicola Omodei<nicola.omodei@pi.infn.it>
+# $Id$
 #=============================================================
-use GlastPolicy v6r*
+use GlastPolicy *
 use ROOT v* IExternal
 use eblAtten v* celestialSources
-
-#macro_append ROOT_libs " -lHist -lGraf "\
-#                 WIN32 " libHist.lib libGraf.lib "
 
 apply_pattern package_include
 apply_pattern package_linkopts
@@ -18,6 +16,8 @@ private
 
 macro source "*.cxx" WIN32 "*.cxx *.h"
 
-library SpectObj -no_share $(source)
+library SpectObj -no_share\
+  -s=../SpectObj $(source)\
+  -s=../src $(source)
 
 macro_append ROOT_libs " -lGpad " WIN32 " libGpad.lib " 

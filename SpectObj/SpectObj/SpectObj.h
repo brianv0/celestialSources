@@ -1,3 +1,9 @@
+/** @file SpectObj.h
+  @brief declaration n of SpectObj class
+
+  $Header$
+
+*/
 #ifndef SpectObj_H
 #define SpectObj_H
 #include "TH2D.h"
