@@ -7,6 +7,8 @@
 *   $Header$
 *@verbatim
 *
+
+
 *   v0r0    Sep-2004 THB    Initial Phase
 *   v1r0 28-Sep-2004 THB    Version for the ST first checkout
 *   v1r0p1 15-Jan-2005 HMK  Use any version of ROOT
@@ -26,6 +28,6 @@
 *   v1r1    1-Oct-2005 THB   Timing issue solved
 *   v1r1p0  5-Oct-2005 THB   DataList parameterization changed
 *   v1r1p1  3-Nov-2005 THB   Multiple ephemerides implemented;bug on FT2 fixed.
-
+*   v1r1p2  3-dec-2005       (really THB) adjust path for gleam execution
 *@endverbatim
 */

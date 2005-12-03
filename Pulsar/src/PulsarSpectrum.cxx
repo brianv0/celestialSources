@@ -97,6 +97,13 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
   //Retrieve pulsar data from a list of DataList file.
   std::string pulsar_root = ::getenv("PULSARROOT");
   std::string ListFileName = pulsar_root + "/data/PulsarDataList.txt";
+  
+  // if this is in the GLEAM environment, allow for separate path
+  const char * gleam = ::getenv("PULSARDATA");
+  if( gleam!=0) {
+     ListFileName = std::string(gleam)+"/PulsarDataList.txt";
+  }
+  
   std::ifstream ListFile;
   ListFile.open(ListFileName.c_str(), std::ios::in);
   char DataListFileName[200];
@@ -296,9 +303,10 @@ double PulsarSpectrum::interval(double time)
   //Checks whether ephemerides (period,pdot, etc..) are within validity ranges
   if (((timeTilde/SecsOneDay) < m_t0Init) || ((timeTilde/SecsOneDay) > m_t0End)) 
     {
+#if DEBUG
       std::cout << "Warning!Time is out of range of validity for pulsar " << m_PSRname 
 		<< ": Switching to new ephemerides set..." << std::endl;
-
+#endif
 	for (int e=0; e < m_t0Vect.size();e++)
 	  if (((timeTilde/SecsOneDay) > m_t0InitVect[e]) && ((timeTilde/SecsOneDay) < m_t0EndVect[e])) 
 	    {

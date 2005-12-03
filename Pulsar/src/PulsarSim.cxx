@@ -220,6 +220,10 @@ TH2D* PulsarSim::PSRPhenom(double par0, double par1, double par2, double par3, d
       //Look for NAMETimeProfile.txt in the data directory...
       std::string  pulsar_root = ::getenv("PULSARROOT");
       std::string TimeProfileFileName = pulsar_root + "/data/" + m_name + "TimeProfile.txt";
+      const char * gleam = ::getenv("PULSARDATA");
+
+      // override obssim if running in Gleam environment
+      if( gleam!=0) TimeProfileFileName = std::string(gleam)+"/"+ m_name + "TimeProfile.txt";
 
       if (DEBUG)
 	{
