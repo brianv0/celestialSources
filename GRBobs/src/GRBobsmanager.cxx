@@ -58,7 +58,6 @@ GRBobsmanager::GRBobsmanager(const std::string& params)
   m_par->SetRedshift(m_z);
   m_theta = -100.0;
   
-  double launch = Spectrum::startTime();
 
   while(m_theta<FOV)
     {
@@ -69,7 +68,7 @@ GRBobsmanager::GRBobsmanager(const std::string& params)
       
       astro::SkyDir sky(m_l,m_b,astro::SkyDir::GALACTIC);
       HepVector3D skydir=sky.dir();
-      HepRotation rottoglast = GPS::instance()->transformToGlast(m_startTime+launch,GPS::CELESTIAL);
+      HepRotation rottoglast = GPS::instance()->transformToGlast(m_startTime,GPS::CELESTIAL);
       HepVector3D scdir = rottoglast * skydir;
       m_ra    = sky.ra();
       m_dec   = sky.dec();
