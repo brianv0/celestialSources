@@ -1,5 +1,5 @@
 package GRBobs
-version v1r0p1
+version v2r1p3
 author Nicola Omodei<nicola.omodei@pi.infn.it>
 
 # $Id$
@@ -23,7 +23,8 @@ private
 macro source "*.cxx" WIN32 "*.cxx *.h"
 
 library GRBobs -no_share \
-     -s=../src      $(source)
+     -s=../GRBobs $(source)\
+     -s=../src    $(source)
 
 application test_GRB      test/testGRB.cxx 
 
