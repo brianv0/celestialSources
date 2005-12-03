@@ -416,7 +416,8 @@ photon SpectObj::GetPhoton(double t0, double enph)
 	  ProbRest = myP - ProbRest;
 	}
       else 
-	{
+	{ 
+        if( DEBUG)
 	  std::cout << " Next Photon within the same period " << std::endl;
 	}
 
