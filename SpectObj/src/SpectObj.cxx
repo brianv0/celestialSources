@@ -1,3 +1,9 @@
+/** @file SpectObj.cxx
+  @brief implemetation of SpectObj class
+
+  $Header$
+
+*/
 #include <string>
 #include <sstream>
 #include <iostream>
