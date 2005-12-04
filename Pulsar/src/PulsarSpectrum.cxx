@@ -96,13 +96,15 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
 
   //Retrieve pulsar data from a list of DataList file.
   std::string pulsar_root = ::getenv("PULSARROOT");
-  std::string ListFileName = pulsar_root + "/data/PulsarDataList.txt";
   
-  // if this is in the GLEAM environment, allow for separate path
+  // if this is in the GLEAM environment, allow for separate path specified by env var PULSARDATA
+  std::string pulsar_data(pulsar_root+"/data/"); // the default, perhaps overriden
+
   const char * gleam = ::getenv("PULSARDATA");
   if( gleam!=0) {
-     ListFileName = std::string(gleam)+"/PulsarDataList.txt";
+      pulsar_data =  std::string(gleam)+"/";
   }
+  std::string ListFileName = pulsar_data + "PulsarDataList.txt";
   
   std::ifstream ListFile;
   ListFile.open(ListFileName.c_str(), std::ios::in);
@@ -125,7 +127,7 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
 	ListFile >> DataListFileName;
 	while (!ListFile.eof()) 
 	  {	
-	    CompletePathFileName = pulsar_root + "/data/" + std::string(DataListFileName);
+	    CompletePathFileName = pulsar_data + std::string(DataListFileName);
 	    Retrieved = getPulsarFromDataList(CompletePathFileName);
 	    
 	    if (Retrieved == 1)
