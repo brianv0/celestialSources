@@ -7,8 +7,6 @@
 #include "astro/SkyDir.h"
 #include "astro/PointingTransform.h"
 #include "astro/JulianDate.h"
-#include "astro/EarthOrbit.h"
-
 
 #define DEBUG 0
 
@@ -24,7 +22,8 @@ GRBobsmanager::GRBobsmanager(const std::string& params)
   : m_params(params)
 {
   //  Field Of View for generating bursts degrees above the XY plane.
-  const double FOV=-20;
+  const double FOV = -100;
+  if(FOV>-90) std::cout<<"WARNING!! GRBobs: FOV = "<<FOV<<std::endl;
 
   using astro::GPS;
   m_GenerateGBMOutputs = false;
@@ -56,7 +55,7 @@ GRBobsmanager::GRBobsmanager(const std::string& params)
   m_par->SetAlphaBeta(m_alpha,m_beta);
   m_par->SetMinPhotonEnergy(m_MinPhotonEnergy); //keV  
   m_par->SetRedshift(m_z);
-  m_theta = -100.0;
+  m_theta = -1000000.0;
   
 
   while(m_theta<FOV)

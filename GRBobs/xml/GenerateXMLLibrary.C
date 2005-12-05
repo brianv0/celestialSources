@@ -3,22 +3,16 @@
 // OPTIONS FOR GENERATING THE XML LIBRARY:
 double MinExtractedPhotonEnergy = 30.0; //MeV
 long FirstBurstTime  =      1000; //1e4
-double AverageInterval = 86400.0; //s
+//double AverageInterval = 86400.0; //s
+double AverageInterval = 48517; //s
 
 bool  GeneratePF         =   false;//true; // If true: PF is used to normalize Bursts.
                                    // If false Fluence is used to normalize Bursts.
-bool  GenerateRedshift   =   false;
+bool  GenerateRedshift   =   true;
 bool  GenerateGBM        =   false;
 bool  GLASTCoordinate    =   false;
 //////////////////////////////////////////////////
 
-
-//double GetRedshiftLong(TRandom *rnd)
-//{
-//  double z=0.0;
-//  while(z<=0) z = rnd->Gaus(2.0,1.0);
-//  return z;
-//}
 
 double GetRedshiftShort(TRandom *rnd)
 {
@@ -45,20 +39,6 @@ double GetRedshiftLong(TRandom *rnd)
   } while (y>func);
  return z;
 }
-
-//double GetRedshiftLong(TRandom *rnd)
-//{
-//  double z=0.0;
-//  while(z<=0) z = rnd->Gaus(2.0,1.0);
-//  return z;
-//}
-
-//double GetRedshiftShort(TRandom *rnd)
-//{
-//  double z=0.0;
-//  while(z<=0) z = rnd->Gaus(.1,.1);
-//  return z;
-//}
 
 double binary1(double z){
   // implemented by D. Noyes, this is a fit to the redshift distribution
@@ -265,7 +245,10 @@ void GenerateXMLLibrary(int Nbursts=100)
 
   TH2D *FluenceVsT90 = new TH2D("FluenceVsT90","LogFluence vs T90",100,-3,3,100,-9,-2);
   TH2D *PeakFluxVsT90 = new TH2D("PeakFluxVsT90","LogPF vs T90",100,-3,3,100,-2,3);
-  
+
+  FluenceVsT90->SetXTitle("Log_{10}(T_{90})");
+  FluenceVsT90->SetYTitle("Fluence 50-300 keV (erg/cm^{2}) ");
+
   PFlong->SetLineColor(4);
   PFshort->SetLineColor(2);
   FLlong->SetLineColor(4);
@@ -279,7 +262,9 @@ void GenerateXMLLibrary(int Nbursts=100)
   betalong->SetLineColor(4);
   betashort->SetLineColor(2);
 
-  
+  Zlong->SetXTitle("Redshift z");
+  Zshort->SetXTitle("Redshift z");
+
   std::ofstream os("GRBobs_user_library.xml",std::ios::out);
   std::ofstream osTest("../src/test/GRBParam.txt",std::ios::out);
   os.precision(4);
@@ -533,6 +518,7 @@ void GenerateXMLLibrary(int Nbursts=100)
   else  FluenceVsT90->Draw();
 
   TCanvas *Redshifts = new TCanvas("Redshifts","Redshifts",600,400);
+  Redshifts->SetFillColor(10);
   if(Nlong>Nshort){
     Zlong->Draw();
     Zshort->Draw("same");
