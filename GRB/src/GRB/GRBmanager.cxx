@@ -6,7 +6,6 @@
 #include "astro/SkyDir.h"
 #include "astro/PointingTransform.h"
 #include "astro/JulianDate.h"
-#include "astro/EarthOrbit.h"
 
 ISpectrumFactory &GRBmanagerFactory() 
 {
@@ -22,7 +21,7 @@ GRBmanager::GRBmanager(const std::string& params)
   paramFile = "$(GRBROOT)/src/test/GRBParam.txt";
   facilities::Util::expandEnvVar(&paramFile);
   
-  m_startTime   = TMath::Max(0.,parseParamList(params,0));
+  m_startTime       = parseParamList(params,0)+Spectrum::startTime();//m_startTime   = TMath::Max(0.,parseParamList(params,0));
   m_timeToWait  = TMath::Max(0.,parseParamList(params,1));
   m_enph        = TMath::Max(0.,parseParamList(params,2))*1000.0; //keV
 
@@ -54,10 +53,16 @@ double GRBmanager::flux(double time) const
 TString GRBmanager::GetGRBname(double time)
 {
   ////DATE AND GRBNAME
-  astro::EarthOrbit m_EarthOrbit;
-  using astro::JulianDate;
-  JulianDate  JD = m_EarthOrbit.dateFromSeconds(time);
+  /// GRB are named as customary GRBYYMMDDXXXX
+  //  The mission start and launch date are retrieved, 
+  //  and the current burst's start time is added to them to form a Julian Date.
+  //  Note: the argument of the JulianDate constructor is in day.
+  
+  astro::JulianDate JD(astro::JulianDate::missionStart() +
+		       (Spectrum::startTime()+m_startTime)/astro::JulianDate::secondsPerDay);
+
   int An,Me,Gio;
+  
   m_Rest=((int) m_startTime % 86400) + m_startTime - floor(m_startTime);
   m_Frac=(m_Rest/86400.);
   int FracI=(int)(m_Frac*1000.0);
@@ -120,9 +125,10 @@ TString GRBmanager::GetGRBname(double time)
 void GRBmanager::GenerateGRB()
 {
   //  Field Of View for generating bursts degrees above the XY plane.
-  const double FOV=-20;
+  const double FOV = -100;
+  if(FOV>-90) std::cout<<"WARNING!! GRB: FOV = "<<FOV<<std::endl;
+
   using astro::GPS;
-  TString GRBname = GetGRBname(m_startTime);
   //////////////////////////////////////////////////
   m_Nbursts++;
   m_par->ComputeParametersFromFile(paramFile,m_Nbursts);
@@ -135,7 +141,7 @@ void GRBmanager::GenerateGRB()
   m_fluence   = m_GRB->GetFluence();
   m_GRBnumber = m_GRB->GetGRBNumber();
 
-  m_theta = -100.0;
+  m_theta = -10000000.0;
   while(m_theta<FOV)
     {
       m_par->SetGalDir(-200,-200); //this generates random direction in the sky
@@ -152,14 +158,7 @@ void GRBmanager::GenerateGRB()
       m_theta = 90. - scdir.theta()*180.0/M_PI; // theta=0 -> XY plane, theta=90 -> Z
       m_phi   = scdir.phi()*180.0/M_PI;
     }
-
-  /////GRB GRNERATION////////////////////////////////
-  /*
-    TString name = "GRB_";
-    name+=GRBname; 
-    name+="_PAR.txt";
-  */
-
+  TString GRBname = GetGRBname(m_startTime);
   std::ofstream os;
   if(m_Nbursts==1) 
     {

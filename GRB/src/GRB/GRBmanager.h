@@ -20,14 +20,14 @@
 #include <vector>
 #include <string>
 #include <cmath>
-#include "flux/ISpectrum.h"
+#include "flux/Spectrum.h"
 #include "flux/EventSource.h"
 #include "GRBSim.h"
 #include "SpectObj/SpectObj.h"
 
 #include "facilities/Util.h"
 
-class GRBmanager : public ISpectrum
+class GRBmanager : public Spectrum
 {
   
  public:
