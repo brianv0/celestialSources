@@ -5,6 +5,7 @@
   @verbatim
   $Id$
 
+  06-Dec-05 v1r6p2  JC    use Spectrum::startTime() offset
   20-Nov-05 v1r6p1  JC    refactor SpectralTransient to use smaller event cache
   31-Oct-05 v1r6    JC    add FitsTransient, SourcePopulation classes
   01-Sep-05 v1r5p1  JC    allow user to set EBL model in SpectralTransient
