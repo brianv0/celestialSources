@@ -1,7 +1,9 @@
 #include "GRBobs/GRBobsmanager.h"
 #include <iostream>
+#include <iomanip>
 #include <ostream>
 #include <fstream>
+#include <stdexcept>
 #include "flux/SpectrumFactory.h" 
 #include "astro/GPS.h"
 #include "astro/SkyDir.h"
@@ -56,7 +58,6 @@ GRBobsmanager::GRBobsmanager(const std::string& params)
   m_par->SetMinPhotonEnergy(m_MinPhotonEnergy); //keV  
   m_par->SetRedshift(m_z);
   m_theta = -1000000.0;
-  
 
   while(m_theta<FOV)
     {
@@ -67,17 +68,24 @@ GRBobsmanager::GRBobsmanager(const std::string& params)
       
       astro::SkyDir sky(m_l,m_b,astro::SkyDir::GALACTIC);
       HepVector3D skydir=sky.dir();
-      HepRotation rottoglast = GPS::instance()->transformToGlast(m_startTime,GPS::CELESTIAL);
-      HepVector3D scdir = rottoglast * skydir;
-      m_ra    = sky.ra();
-      m_dec   = sky.dec();
-      m_theta = 90. - scdir.theta()*180.0/M_PI; // theta=0 -> XY plane, theta=90 -> Z
-      m_phi   = scdir.phi()*180.0/M_PI;
+      try{
+	HepRotation rottoglast = GPS::instance()->transformToGlast(m_startTime,GPS::CELESTIAL);
+	HepVector3D scdir = rottoglast * skydir;
+	m_ra    = sky.ra();
+	m_dec   = sky.dec();
+	m_theta = 90. - scdir.theta()*180.0/M_PI; // theta=0 -> XY plane, theta=90 -> Z
+	m_phi   = scdir.phi()*180.0/M_PI;
+	m_grbdeleted      = false;
+      }
+      catch(std::exception &e)
+	{
+	  m_grbdeleted=true;
+	  break;
+	}
     }
   
   m_par->SetGRBNumber(m_GRBnumber);
   m_grbGenerated    = false;
-  m_grbdeleted      = false;
   //////////////////////////////////////////////////
 }
 
@@ -90,7 +98,7 @@ TString GRBobsmanager::GetGRBname()
   //  Note: the argument of the JulianDate constructor is in day.
 
   astro::JulianDate JD(astro::JulianDate::missionStart() +
-		       (Spectrum::startTime()+m_startTime)/astro::JulianDate::secondsPerDay);
+		       m_startTime/astro::JulianDate::secondsPerDay);
 
   int An,Me,Gio;
   m_Rest=((int) m_startTime % 86400) + m_startTime - floor(m_startTime);
@@ -158,6 +166,8 @@ GRBobsmanager::~GRBobsmanager()
 
 void GRBobsmanager::GenerateGRB()
 {
+  if(m_grbdeleted) return;
+
   /////GRB GRNERATION////////////////////////////////
   m_GRB      = new GRBobsSim(m_par);
   TH2D *h;
@@ -193,12 +203,12 @@ void GRBobsmanager::GenerateGRB()
   name+="_PAR.txt";
   //..................................................//
   std::ofstream os(name,std::ios::out);  
-  os<<m_startTime<<" "<<m_endTime<<" "<<m_l<<" "<<m_b<<" "<<m_theta<<" "<<m_phi<<" "<<m_fluence<<" "<<m_alpha<<" "<<m_beta<<std::endl;
+  os<<std::setprecision(10)<<m_startTime<<" "<<m_endTime<<" "<<m_l<<" "<<m_b<<" "<<m_theta<<" "<<m_phi<<" "<<m_fluence<<" "<<m_alpha<<" "<<m_beta<<std::endl;
   os.close();
   
   std::cout<<"GRB"<<GRBname;
   if( m_z >0)  std::cout<<" redshift = "<<m_z;
-  std::cout<<" t start "<<m_startTime<<", tend "<<m_endTime
+  std::cout<<std::setprecision(10)<<" t start "<<m_startTime<<", tend "<<m_endTime
 	   <<" l,b = "<<m_l<<", "<<m_b<<" elevation,phi(deg) = "<<m_theta<<", "<<m_phi;
   if(m_par->GetNormType()=='P')
     std::cout<<" Peak Flux = "<<m_fluence<<" 1/cm^2/s "<<std::endl;
@@ -259,6 +269,7 @@ double GRBobsmanager::flux(double time) const
 
 double GRBobsmanager::interval(double time)
 {  
+
   if(DEBUG) std::cout<<"interval at "<<time<<std::endl;
   double inte, inte_prompt, inte_ag;
   inte_ag=1e20;
@@ -299,8 +310,7 @@ double GRBobsmanager::energy(double time)
 {
   if(DEBUG) std::cout<<"energy at "<<time<<std::endl;
   double ene=0.1;
-  double ene_prompt,ene_ag;
-  ene_ag=0.0;
+  double ene_ag=0.0;
   if(m_grbGenerated && !m_grbdeleted)
     {
       if(m_LATphotons>0) ene_ag = AfterGlowEmission->energyMeV(time,m_MinPhotonEnergy);
