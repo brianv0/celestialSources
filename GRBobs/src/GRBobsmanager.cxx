@@ -77,7 +77,7 @@ GRBobsmanager::GRBobsmanager(const std::string& params)
 	m_phi   = scdir.phi()*180.0/M_PI;
 	m_grbdeleted      = false;
       }
-      catch(std::exception &e)
+      catch(const std::exception &e)
 	{
 	  m_grbdeleted=true;
 	  break;
