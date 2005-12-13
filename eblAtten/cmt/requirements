@@ -1,0 +1,25 @@
+package eblAtten
+version v0r3p1
+
+author James Chiang <jchiang@slac.stanford.edu>
+author Luis Reyes <lreyes@milkyway.gsfc.nasa.gov>
+
+# $Id$
+
+use GlastPolicy *
+
+apply_pattern package_include
+apply_pattern package_linkopts
+apply_pattern package_stamps
+
+private
+
+macro eblAtten_cppflags "" \
+      Linux "-I ../src " \
+      WIN32 '/I..\src /wd4290 /wd4305 '
+
+macro source *.cxx WIN32 "*.h *.cxx"
+
+library eblAtten -no_share $(source)
+
+application test_eblAtten test/test.cxx

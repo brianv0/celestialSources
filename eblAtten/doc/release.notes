@@ -1,0 +1,20 @@
+/** 
+  @file release.notes
+  @brief package eblAtten
+
+  @verbatim
+  $Id$
+
+  13-Dec-05 v0r3p1  THB   suppress warning messages
+  08-Nov-05 v0r3    LR    Include new Stecker's model for EBL
+  21-Sep-05 v0r2p3  JC    Fix line in req file so that compiler warnings are
+                          properly suppressed
+  08-Sep-05 v0r2p2  LR    Reduce Kneiske's models energy range to GLAST range
+  07-Sep-05 v0r2p1  LR    Fix version number in requirements file
+  07-Sep-05 v0r2    LR    include 2 new models: Primack05 and Kneiske_HighUV
+  01-Sep-05 v0r1p1  JC    include <cmath> in test.cxx
+  01-Sep-05 v0r1    JC    make EBL models inappropriate for GLAST inaccessible
+  29-Aug-05 v0      JC    initial import from code originally in genericSources
+ 
+  @endverbatim
+*/
