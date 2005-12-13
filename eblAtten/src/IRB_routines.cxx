@@ -132,7 +132,9 @@ if(redshift < 0.){
    std::cerr<<"Invalid redshift (z < 0)..."<<std::endl;
    redshift = 0.;
    } else if (redshift > 5.){
+#ifdef DEBUG
        std::cerr<<"This EBL model is valid only for z <= 5.0"<<std::endl;
+#endif
        redshift=5.;
        }
 if (energy >= 350.) {
@@ -249,7 +251,9 @@ if(redshift < 0.){
      std::cerr<<"Invalid redshift (z < 0)..."<<std::endl;
      redshift = 0.;
      }else if (redshift > 7.) {
+#ifdef DEBUG
            std::cerr<<"Maximum redshift for this model is z = 7.0... Calculating opacity for z = 7.0"<<std::endl;
+#endif
 	   redshift=7.;
 	   }
 
