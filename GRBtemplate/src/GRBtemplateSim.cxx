@@ -64,31 +64,12 @@ TH2D* GRBtemplateSim::MakeGRB()
       for(int ei = 0; ei < m_EnergyBins; ei++)
 	{
 	  double nv;
-	  iFile>>nv;
-	  m_Nv->SetBinContent(ti+1, ei+1, nv*1e4);// [ph/(cm² s keV)]
+	  iFile>>nv; // [ph/(cm² s keV)]
+	  m_Nv->SetBinContent(ti+1, ei+1, nv*1e4);// [ph/(m² s keV)]
 	}
     }
 
-  TH2D *nph = Nph(m_Nv); //ph/cm²
-  //  BATSE NORMALIZATION
-  /*
-    int ei1 = nph->GetYaxis()->FindBin(BATSE1);
-    int ei2 = nph->GetYaxis()->FindBin(BATSE5);
-    double F=0.0;
-    double en;
-    for (int ei = ei1; ei<=ei2; ei++)
-    {
-    en   = nph->GetYaxis()->GetBinCenter(ei);
-    for(int ti = 1; ti<=m_TimeBins; ti++)
-    {
-    F+= nph->GetBinContent(ti, ei) * en;//[keV/cm²]
-    }  
-    }
-    double norm = F*1.0e-3/(erg2meV); //erg/cm²  
-    // IMPORTANT m_Nv has to  be in [ph/(m² s keV)]
-    m_Nv->Scale(1.0e4 * m_fluence/norm);
-    Pulses.erase(Pulses.begin(), Pulses.end());
-  */
+  TH2D *nph = Nph(m_Nv); //ph/m²
   delete e;
   delete nph;
   return m_Nv;
