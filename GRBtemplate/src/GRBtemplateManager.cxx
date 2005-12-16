@@ -38,11 +38,14 @@ GRBtemplateManager::GRBtemplateManager(const std::string& params)
   facilities::Util::expandEnvVar(&m_InputFileName);
   
   m_theta = -90.0;
-  double FOV=20.0; // degrees above the XY plane.
+  const double FOV=85.0; // degrees above the XY plane.
+
   while(m_theta<FOV)
     {
-      m_l = m_rnd->Uniform(-180.0,180.0);
-      m_b = m_rnd->Uniform(-90.0,90.0);
+      double r1 = m_rnd->Uniform();
+      double r2 = m_rnd->Uniform();
+      m_l = 180.-360.*r1;
+      m_b = ((180.0/M_PI)*acos(1.0-2.0*r2)-90.0);
       
       astro::SkyDir sky(m_l,m_b,astro::SkyDir::GALACTIC);
       HepVector3D skydir=sky.dir();
