@@ -1,6 +1,6 @@
 #include <fstream>
 #include <iostream>
-
+# include <string>
 #include "GRBtemplate/GRBtemplateSim.h"
 
 #include "TFile.h"
@@ -10,7 +10,7 @@
 using namespace TmpCst;
 
 //////////////////////////////////////////////////
-GRBtemplateSim::GRBtemplateSim(TString InputFileName)
+GRBtemplateSim::GRBtemplateSim(std::string InputFileName)
   : m_InputFileName(InputFileName)
 {
   std::cout<<m_InputFileName<<std::endl;

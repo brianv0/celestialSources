@@ -7,7 +7,7 @@
 #include "astro/PointingTransform.h"
 #include "astro/JulianDate.h"
 #include "astro/EarthOrbit.h"
-
+#include "facilities/Util.h"
 
 #define DEBUG 0 
 
@@ -25,8 +25,8 @@ GRBtemplateManager::GRBtemplateManager(const std::string& params)
 
   m_rnd = new TRandom();
   m_GenerateGBMOutputs = false;
-
-  facilities::Util::expandEnvVar(&paramFile);  
+  m_InputFileName = "$(GRBTEMPLATEROOT)/data/test.dat";
+  facilities::Util::expandEnvVar(&m_InputFileName);  
   
   m_startTime       = parseParamList(params,0);
   m_MinPhotonEnergy = parseParamList(params,1)*1.0e3; //MeV
@@ -35,7 +35,7 @@ GRBtemplateManager::GRBtemplateManager(const std::string& params)
   
   //  m_par = new GRBtemplateParameters();
   m_GRBnumber = (long) floor(65540+m_startTime);
-  m_InputFileName="test.dat";
+  facilities::Util::expandEnvVar(&m_InputFileName);
   
   m_theta = -90.0;
   double FOV=20.0; // degrees above the XY plane.

@@ -98,7 +98,7 @@ class GRBtemplateManager : public ISpectrum
   bool m_grbdeleted;
   bool m_GenerateGBMOutputs;
 
-  TString m_InputFileName;
+  std::string m_InputFileName;
   double m_l;
   double m_b;
   //  double m_fluence;

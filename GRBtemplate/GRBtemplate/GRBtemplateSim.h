@@ -54,7 +54,7 @@ class GRBtemplateSim
 {
  public:
 
-  GRBtemplateSim(TString InputFileName);
+  GRBtemplateSim(std::string InputFileName);
   //! destructor
   ~GRBtemplateSim()
     {
