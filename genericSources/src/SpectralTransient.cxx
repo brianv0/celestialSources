@@ -141,6 +141,7 @@ double SpectralTransient::interval(double time) {
    time -= Spectrum::startTime();
    if (m_eventCache.size() == 0) {
       fillEventCache(time);
+      ++m_currentInterval;
    }
    if (!m_eventCache.empty()) {
       std::pair<double, double> thisEvent = m_eventCache.back();
