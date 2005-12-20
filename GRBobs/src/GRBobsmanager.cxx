@@ -31,6 +31,7 @@ GRBobsmanager::GRBobsmanager(const std::string& params)
   m_GenerateGBMOutputs = false;
   facilities::Util::expandEnvVar(&paramFile);  
   
+  m_GRBnumber = (long) floor(65540+parseParamList(params,0));
   m_startTime       = parseParamList(params,0)+Spectrum::startTime();
   double duration   = parseParamList(params,1);
   m_fluence         = parseParamList(params,2);
@@ -48,8 +49,6 @@ GRBobsmanager::GRBobsmanager(const std::string& params)
   
   m_par = new GRBobsParameters();
 
-  m_GRBnumber = (long) floor(65540+m_startTime);
-
   m_par->SetGRBNumber(m_GRBnumber);
   m_par->SetFluence(m_fluence);
   m_par->SetPeakFlux(m_fluence);
@@ -58,7 +57,8 @@ GRBobsmanager::GRBobsmanager(const std::string& params)
   m_par->SetMinPhotonEnergy(m_MinPhotonEnergy); //keV  
   m_par->SetRedshift(m_z);
   m_theta = -1000000.0;
-
+  //  std::cout<<m_par->rnd->GetSeed()<<std::endl;
+  //  m_GRBnumber=m_par->rnd->GetSeed();
   while(m_theta<FOV)
     {
       m_par->SetGalDir(-200,-200); //this generates random direction in the sky
@@ -84,7 +84,8 @@ GRBobsmanager::GRBobsmanager(const std::string& params)
 	}
     }
   
-  m_par->SetGRBNumber(m_GRBnumber);
+  //m_par->SetGRBNumber(m_GRBnumber);
+  //  std::cout<<m_par->rnd->GetSeed()<<std::endl;
   m_grbGenerated    = false;
   //////////////////////////////////////////////////
 }
@@ -217,7 +218,7 @@ void GRBobsmanager::GenerateGRB()
   if(m_LATphotons>0) 
     {
       m_endTime = TMath::Max(m_endTime, m_startTime + m_EC_delay  + m_EC_duration);
-      std::cout<<"Generate AFTERGLOW Emission ("<<m_startTime_EC<<" "<<m_endTime_EC<<")"<<std::endl;
+      std::cout<<"Generate AFTERGLOW Emission ("<<std::setprecision(10)<<m_startTime_EC<<" "<<m_endTime_EC<<")"<<std::endl;
     }
   m_grbGenerated=true;
 }
