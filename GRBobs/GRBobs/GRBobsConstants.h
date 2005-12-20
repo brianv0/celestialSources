@@ -194,6 +194,8 @@ class GRBobsParameters
   TRandom *rnd;
  
  private:
+  TRandom *rndGalacticDir;
+
   char m_NormType;
   int m_Type;
   double  m_Peakedness;

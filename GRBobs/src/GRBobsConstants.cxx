@@ -6,6 +6,7 @@ using std::pow;
 GRBobsParameters::GRBobsParameters()
 {
   rnd = new TRandom();
+  rndGalacticDir = new TRandom();
   SetGRBNumber((long) rnd->GetSeed());
   m_Type=0; //1->Short, 2->Long, 0->Both
   m_enph=emin;
@@ -55,8 +56,11 @@ void GRBobsParameters::SetGRBNumber(long GRBnumber)
 {
   m_GRBnumber = GRBnumber;
   rnd->SetSeed(m_GRBnumber);
+  rndGalacticDir->SetSeed(m_GRBnumber);
   double tmp;
   tmp = rnd->Uniform();
+  tmp = rndGalacticDir->Uniform();
+  
 }
 
 void GRBobsParameters::SetMinPhotonEnergy(double enph)
@@ -68,8 +72,8 @@ void GRBobsParameters::SetMinPhotonEnergy(double enph)
 //////////////////////////////////////////////////
 void GRBobsParameters::SetGalDir(double l, double b)
 {
-  double r1 = rnd->Uniform();
-  double r2 = rnd->Uniform();
+  double r1 = rndGalacticDir->Uniform();
+  double r2 = rndGalacticDir->Uniform();
   
   double ll = (l<=180.0 && l>=-180.0) ? l : 180.-360.*r1;
   double bb = (b<=90.0 && b>=-90.0)   ? b : ((180.0/TMath::Pi())*acos(1.0-2.0*r2)-90.0);
