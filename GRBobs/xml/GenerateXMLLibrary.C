@@ -9,7 +9,7 @@ double AverageInterval = 48517; //s
 bool  GeneratePF         =   false;//true; // If true: PF is used to normalize Bursts.
                                    // If false Fluence is used to normalize Bursts.
 bool  GenerateRedshift   =   true;
-bool  GenerateGBM        =   false;
+bool  GenerateGBM        =   true;
 bool  GLASTCoordinate    =   false;
 //////////////////////////////////////////////////
 
