@@ -87,7 +87,7 @@ MapCube::MapCube(const std::string & paramString) : MapSource() {
    facilities::Util::expandEnvVar(&fitsFile);
 
    readFitsFile(fitsFile, createSubMap);
-   checkForNonPositivePixels();
+   checkForNonPositivePixels(fitsFile);
    readEnergyVector(fitsFile);
    makeCumulativeSpectra();
    std::vector<double> totalCounts(m_solidAngles.size());
@@ -100,12 +100,15 @@ MapCube::MapCube(const std::string & paramString) : MapSource() {
 //              << m_mapIntegral << std::endl;
 }
 
-void MapCube::checkForNonPositivePixels() const {
+void MapCube::checkForNonPositivePixels(const std::string & fitsFile) const {
    std::vector<double>::const_iterator pixel = m_image.begin();
    for ( ; pixel != m_image.end(); ++pixel) {
       if (*pixel <= 0) {
-         throw std::runtime_error("MapCube: There are negative or zero-valued"
-                                  " pixels in the FITS image.");
+         std::ostringstream message;
+         message << "MapCube: There are negative or zero-valued"
+                 << " pixels in the FITS image read from" 
+                 << fitsFile;
+         throw std::runtime_error(message.str());
       }
    }
 }
