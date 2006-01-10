@@ -29,7 +29,7 @@ class GRBobsSim
   ~GRBobsSim()
     {
       delete m_GRBengine;
-      delete m_Nv;
+      if(!m_Nv) delete m_Nv;
       if(!m_NvEC) delete m_NvEC;
     }
   /// This method ensures that a unique name is given to the ROOT objects. It is set equal to the pointer address.

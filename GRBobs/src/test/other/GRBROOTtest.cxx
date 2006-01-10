@@ -125,6 +125,7 @@ TH2D *Load(char name[100]="grb_65540.root")
 
 void PlotGRB(double enph = 0,double z=0,char name[100]="grb_65540.root",TString name2="GRB_")
 {
+  std::cout<<name<<std::endl;
   gStyle->SetCanvasColor(10);
   
   TCanvas *cNv = new TCanvas("cNv","Nv");
@@ -659,6 +660,8 @@ void MakeGRB(int NGRB=1, double enph=0, bool gbm=false)
   params->ReadParametersFromFile(paramFile,NGRB);
   params->PrintParameters();
   GRBobsSim* m_grb = new GRBobsSim(params);
+
+  double z = params->GetRedshift();
   double Eco = params->GetCutOffEnergy();
   if(ExtraComponent) 
     {
@@ -666,7 +669,6 @@ void MakeGRB(int NGRB=1, double enph=0, bool gbm=false)
       m_grb->CutOff(h,Eco);
       m_grb->SaveNvEC();
     }
-  
   else
     {
       TH2D *h = m_grb->MakeGRB();
@@ -676,15 +678,17 @@ void MakeGRB(int NGRB=1, double enph=0, bool gbm=false)
   char GRBname[100];
   sprintf(GRBname,"%d",(int) params->GetGRBNumber());
   if (gbm)  m_grb->GetGBMFlux(GRBname);
+
   delete m_grb;
   char name[100];
   sprintf(name,"grbobs_%d.root",(int) params->GetGRBNumber());
   if(ExtraComponent)  sprintf(name,"grbobs_%d_EC.root",(int) params->GetGRBNumber());
 
   extension=params->GetGRBNumber();
-  double z = params->GetRedshift();
 
   delete params; //??
+
+
   PlotGRB(enph,z,name);
   
  }

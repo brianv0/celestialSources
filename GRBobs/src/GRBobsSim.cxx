@@ -29,6 +29,7 @@ void GRBobsSim::GetUniqueName(const void *ptr, std::string & name)
 TH2D* GRBobsSim::MakeGRB()
 {
   double z = m_params->GetRedshift();
+  double duration =  m_params->GetDuration();
   double *e = new double[Ebin +1];
   for(int i = 0; i<=Ebin; i++)
     {
@@ -41,12 +42,12 @@ TH2D* GRBobsSim::MakeGRB()
   m_tfinal=0.0;
   if(DEBUG) std::cout<<Pulses.size()<<std::endl;
   std::vector<GRBobsPulse*>::iterator pos;
-  for(pos = Pulses.begin(); pos !=  Pulses.end(); ++pos)
-    {
-      m_tfinal= TMath::Max(m_tfinal,(*pos)->GetEndTime());      
-      if(DEBUG) (*pos)->Print();
-    }
-  m_tfinal*=(1.0+z)*1.5; 
+  //  for(pos = Pulses.begin(); pos !=  Pulses.end(); ++pos)
+  //    {
+  //      m_tfinal= TMath::Max(m_tfinal,(*pos)->GetEndTime());      
+  //      if(DEBUG) (*pos)->Print();
+  //    }
+  m_tfinal=(1.0+z) * duration; //this is the final time
   m_tbin = TMath::Max(10,int(m_tfinal/s_TimeBinWidth));
   m_tbin = TMath::Min(10000,m_tbin);
   s_TimeBinWidth = m_tfinal/m_tbin;

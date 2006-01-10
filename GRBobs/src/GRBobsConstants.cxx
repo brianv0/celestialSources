@@ -11,6 +11,7 @@ GRBobsParameters::GRBobsParameters()
   m_Type=0; //1->Short, 2->Long, 0->Both
   m_enph=emin;
   m_NormType='P';
+  m_Stretch=1.0;
 }
 
 //////////////////////////////////////////////////
