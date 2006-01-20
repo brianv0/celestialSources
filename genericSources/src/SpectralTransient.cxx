@@ -164,8 +164,12 @@ void SpectralTransient::fillEventCache(double time) {
       if (nevts > 0) {
          for (int i = 0; i < nevts; i++) {
             double energy(m_currentInterval->drawEnergy(m_emin, m_emax));
-            double eventTime(RandFlat::shoot()*dt + time);
-            m_eventCache.push_back(std::make_pair(eventTime, energy));
+            if (m_z == 0 || m_tau == 0 || 
+                RandFlat::shoot() < std::exp(-m_tauScale*
+                                             (*m_tau)(energy, m_z))) {
+               double eventTime(RandFlat::shoot()*dt + time);
+               m_eventCache.push_back(std::make_pair(eventTime, energy));
+            }
          }
          if (m_eventCache.size() > 1) {
             std::stable_sort(m_eventCache.begin(), m_eventCache.end(),
