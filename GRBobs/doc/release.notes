@@ -4,6 +4,7 @@
 
   @verbatim
   $Id$
+  26-jan-06 v2r1p8     THB   GBM long burst's bug solved
   21-dec-05 v2r1p7     THB   GBM generation on
   13-dec-05 v2r1p6     THB   tag Johann's fixes
   03-dec-05 v2r1p3     THB   fix bug in applying launch offset
