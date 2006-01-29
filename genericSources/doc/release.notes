@@ -5,6 +5,8 @@
   @verbatim
   $Id$
 
+  28-Jan-06 v1r6p5  JC    remove duplicate event times in SpectralTransient
+                          that may occur for high flux sources
   27-Jan-06 v1r6p4  THB   special tag at J. McEnery request.
   15-Dec-05 v1r6p3  JC    fix off-by-one error in SpectralTransient
   06-Dec-05 v1r6p2  JC    use Spectrum::startTime() offset

@@ -11,6 +11,7 @@
 #include <cstdlib>
 
 #include <algorithm>
+#include <iomanip>
 #include <sstream>
 #include <stdexcept>
 
@@ -162,18 +163,26 @@ void SpectralTransient::fillEventCache(double time) {
       double npred(flux*EventSource::totalArea()*dt);
       int nevts(RandPoisson::shoot(npred));
       if (nevts > 0) {
+         std::vector< std::pair<double, double> > my_cache;
          for (int i = 0; i < nevts; i++) {
             double energy(m_currentInterval->drawEnergy(m_emin, m_emax));
             if (m_z == 0 || m_tau == 0 || 
                 RandFlat::shoot() < std::exp(-m_tauScale*
                                              (*m_tau)(energy, m_z))) {
                double eventTime(RandFlat::shoot()*dt + time);
-               m_eventCache.push_back(std::make_pair(eventTime, energy));
+               my_cache.push_back(std::make_pair(eventTime, energy));
             }
          }
-         if (m_eventCache.size() > 1) {
-            std::stable_sort(m_eventCache.begin(), m_eventCache.end(),
+         if (my_cache.size() > 1) {
+            std::stable_sort(my_cache.begin(), my_cache.end(),
                              compareEventTime);
+         }
+// Remove duplicate times
+         m_eventCache.push_back(my_cache.front());
+         for (size_t i = 1; i < my_cache.size(); i++) {
+            if (m_eventCache.back().first != my_cache.at(i).first) {
+               m_eventCache.push_back(my_cache.at(i));
+            }
          }
          return;
       }
