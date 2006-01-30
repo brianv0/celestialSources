@@ -97,8 +97,9 @@ TH2D* PulsarSim::PSRPhenom(double par0, double par1, double par2, double par3, d
   double HighEnBound = TMath::Max(cst::EnNormMax,m_enphmax); 
 
   //Writes out an output log file for the pulsar
-
-  std::string logSimLabel = m_name + "Log.txt"; 
+ 
+  //Redirect output to a subdirectory
+  std::string logSimLabel = "PsrOutput/" + m_name + "Log.txt"; 
   ofstream PulsarLogSim;
   PulsarLogSim.open(logSimLabel.c_str(),std::ios::app);
 
@@ -365,7 +366,8 @@ void PulsarSim::SaveNv(TH2D *Nv)
   Nv->GetYaxis()->CenterTitle();
   Nv->GetZaxis()->CenterTitle();
   
-  std::string root_name = m_name + "root.root";
+  //Redirect output to a subdirectory
+  std::string root_name = "PsrOutput/" + m_name + "root.root";
   
   TFile mod(root_name.c_str(),"RECREATE");
   Nv->Write();
@@ -386,7 +388,8 @@ void PulsarSim::SaveNv(TH2D *Nv)
 void PulsarSim::SaveTimeProfile(TH2D *Nv)
 {
 
-  std::string nameProfile = m_name + "TimeProfile.txt";
+  //Redirect output to a subdirectory
+  std::string nameProfile = "PsrOutput/" + m_name + "TimeProfile.txt";
 
   ofstream OutTimeProf(nameProfile.c_str());
 
