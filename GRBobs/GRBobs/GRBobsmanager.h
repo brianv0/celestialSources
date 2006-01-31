@@ -110,7 +110,7 @@ class GRBobsmanager : public Spectrum
 
   double m_l;
   double m_b;
-  double m_GRB_duration_z0,m_GRB_duration_z;
+  double m_GRB_duration;
   double m_fluence;
   double m_z;
   long   m_GRBnumber;
@@ -119,8 +119,7 @@ class GRBobsmanager : public Spectrum
   double m_MinPhotonEnergy;
   double m_CutOffEnergy;
   double m_LATphotons;
-  double m_EC_delay_z0,m_EC_delay_z ;
-  double m_EC_duration_z0,m_EC_duration_z;
+  double m_EC_delay,m_EC_duration;
 
   double m_startTime;
   double m_endTime;

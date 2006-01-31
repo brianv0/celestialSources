@@ -9,6 +9,7 @@
 #include "TFile.h"
 #include "TCanvas.h"
 #define DEBUG 0
+#define APPLY_REDSHIFT 0
 
 using namespace ObsCst;
 //////////////////////////////////////////////////
@@ -42,16 +43,20 @@ TH2D* GRBobsSim::MakeGRB()
   m_tfinal=0.0;
   if(DEBUG) std::cout<<Pulses.size()<<std::endl;
   std::vector<GRBobsPulse*>::iterator pos;
+  
   //  for(pos = Pulses.begin(); pos !=  Pulses.end(); ++pos)
   //    {
   //      m_tfinal= TMath::Max(m_tfinal,(*pos)->GetEndTime());      
   //      if(DEBUG) (*pos)->Print();
   //    }
-  m_tfinal=(1.0+z) * duration; //this is the final time
+  
+  if(APPLY_REDSHIFT) m_tfinal=(1.0+z) * duration; // duration is in the intrinsic frame;
+  else m_tfinal= duration; // duration is in the observer frame;
+  
   m_tbin = TMath::Max(10,int(m_tfinal/s_TimeBinWidth));
   //  m_tbin = TMath::Min(10000,m_tbin);
   s_TimeBinWidth = m_tfinal/m_tbin;
-
+  
   gDirectory->Delete("Nv");
   m_Nv = new TH2D("Nv","Nv",m_tbin,0.,m_tfinal,Ebin, e);
   
@@ -68,14 +73,15 @@ TH2D* GRBobsSim::MakeGRB()
 	  double nv = 0.0;//m_Nv->GetBinContent(ti+1, ei+1);
 	  
 	  for(pos = Pulses.begin(); pos !=  Pulses.end(); ++pos)
-	    {	
-	      nv += (*pos)->PulseShape(t/(1.+z),e[ei]*(1.+z));
+	    {
+	      if(APPLY_REDSHIFT) nv += (*pos)->PulseShape(t/(1.+z),e[ei]*(1.+z)); //t/(1.+z) and e[ei]*(1.+z) are intrinsic
+	      else nv += (*pos)->PulseShape(t,e[ei]); //t and e[ei] are observed
 	    }
 	  m_Nv->SetBinContent(ti+1, ei+1, nv);
 	  // [ph/(cm² s keV)]
 	}
     }
-
+  
   TH2D *nph = Nph(m_Nv); //ph/cm²
   // Scale AT BATSE FLUENCE:
   double norm=0;

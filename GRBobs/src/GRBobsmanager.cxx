@@ -33,10 +33,9 @@ GRBobsmanager::GRBobsmanager(const std::string& params)
   
   m_GRBnumber = (long) floor(65540+parseParamList(params,0));
   m_startTime       = parseParamList(params,0)+Spectrum::startTime();
-  m_GRB_duration_z0 = parseParamList(params,1);
+  m_GRB_duration    = parseParamList(params,1);
   m_fluence         = parseParamList(params,2);
   m_z               = parseParamList(params,3);
-  m_GRB_duration_z  = m_GRB_duration_z0*(1.0+m_z);               
   m_alpha           = parseParamList(params,4);
   m_beta            = parseParamList(params,5);
   m_MinPhotonEnergy = parseParamList(params,6)*1.0e3; //MeV
@@ -44,19 +43,16 @@ GRBobsmanager::GRBobsmanager(const std::string& params)
   if(parseParamList(params,7)!=0) m_GenerateGBMOutputs = true;
 
   m_LATphotons     = parseParamList(params,8);
-  m_EC_delay_z0    = parseParamList(params,9);
-  m_EC_duration_z0 = parseParamList(params,10);
+  m_EC_delay       = parseParamList(params,9);
+  m_EC_duration    = parseParamList(params,10);
   m_CutOffEnergy   = parseParamList(params,11);
-
-  m_EC_delay_z    = m_EC_delay_z0    * (1.0+m_z);
-  m_EC_duration_z = m_EC_duration_z0 * (1.0+m_z);
 
   m_par = new GRBobsParameters();
 
   m_par->SetGRBNumber(m_GRBnumber);
   m_par->SetFluence(m_fluence);
   m_par->SetPeakFlux(m_fluence);
-  m_par->SetDuration(m_GRB_duration_z0);
+  m_par->SetDuration(m_GRB_duration);
   m_par->SetAlphaBeta(m_alpha,m_beta);
   m_par->SetMinPhotonEnergy(m_MinPhotonEnergy); //keV  
   m_par->SetRedshift(m_z);
@@ -88,13 +84,13 @@ GRBobsmanager::GRBobsmanager(const std::string& params)
 	}
     }
   //PROMPT
-  m_endTime    = m_startTime  +    m_GRB_duration_z; //check this in GRBobsSim !!!!!
+  m_endTime    = m_startTime  +    m_GRB_duration; //check this in GRBobsSim !!!!!
   m_GRBend     = m_endTime;
   //AG
   if(m_LATphotons>0)
     {
-      m_startTime_EC = m_startTime    + m_EC_delay_z;
-      m_endTime_EC   = m_startTime_EC + m_EC_duration_z;
+      m_startTime_EC = m_startTime    + m_EC_delay;
+      m_endTime_EC   = m_startTime_EC + m_EC_duration;
       m_GRBend = TMath::Max(m_endTime_EC,m_GRBend);  
     }
   
@@ -197,7 +193,7 @@ void GRBobsmanager::GenerateGRB()
     {
       //      m_startTime_EC = m_startTime    + m_EC_delay;
       //      m_endTime_EC   = m_startTime_EC + m_EC_duration;
-      h = m_GRB->MakeGRB_ExtraComponent(m_EC_duration_z,m_LATphotons);
+      h = m_GRB->MakeGRB_ExtraComponent(m_EC_duration,m_LATphotons);
       m_spectrum1 = new SpectObj(m_GRB->CutOff(h,m_CutOffEnergy),0, m_z);
       m_spectrum1->SetAreaDetector(EventSource::totalArea());
       AfterGlowEmission = new SpectralComponent(m_spectrum1,m_startTime_EC,m_endTime_EC);
