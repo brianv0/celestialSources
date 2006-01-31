@@ -5,6 +5,7 @@
 #include <fstream>
 #include <stdexcept>
 #include "flux/SpectrumFactory.h" 
+#include "astro/EarthCoordinate.h"
 #include "astro/GPS.h"
 #include "astro/SkyDir.h"
 #include "astro/PointingTransform.h"
@@ -73,9 +74,11 @@ GRBobsmanager::GRBobsmanager(const std::string& params)
 	HepVector3D scdir = rottoglast * skydir;
 	m_ra    = sky.ra();
 	m_dec   = sky.dec();
+	double zenithCosTheta=cos(scdir.theta());
 	m_theta = 90. - scdir.theta()*180.0/M_PI; // theta=0 -> XY plane, theta=90 -> Z
 	m_phi   = scdir.phi()*180.0/M_PI;
 	m_grbdeleted      = false;
+	m_grbocculted = (zenithCosTheta < -0.4); // this is hardcoded  in FluxSource.cxx
       }
       catch(const std::exception &e)
 	{
@@ -84,6 +87,11 @@ GRBobsmanager::GRBobsmanager(const std::string& params)
 	}
     }
   //PROMPT
+
+  //  astro::EarthCoordinate earthpos()
+
+
+  //  m_inSAA =   astro::EarthCoordinate::insideSAA();
   m_endTime    = m_startTime  +    m_GRB_duration; //check this in GRBobsSim !!!!!
   m_GRBend     = m_endTime;
   //AG
@@ -202,13 +210,17 @@ void GRBobsmanager::GenerateGRB()
   
   //////////////////////////////////////////////////
   TString GRBname = GetGRBname();
-
-  if(m_GenerateGBMOutputs)
+  
+  if(m_grbocculted)
+    {
+      std::cout<<"This GRB is occulted by the Earth"<<std::endl;
+    }
+  else if(m_GenerateGBMOutputs)
     {
       m_GRB->SaveGBMDefinition(GRBname,m_ra,m_dec,m_theta,m_phi,m_Rest);
       m_GRB->GetGBMFlux(GRBname);
     }
-  
+
   TString name = "GRBOBS_";
   name+=GRBname; 
   name+="_PAR.txt";

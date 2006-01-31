@@ -106,6 +106,8 @@ class GRBobsmanager : public Spectrum
   std::pair<double,double> m_GalDir;
   bool m_grbGenerated;
   bool m_grbdeleted;
+  bool m_grbocculted;
+  bool m_inSAA;
   bool m_GenerateGBMOutputs;
 
   double m_l;
