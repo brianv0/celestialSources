@@ -22,6 +22,8 @@ FILESpectrumMap::FILESpectrumMap(const std::string& params)
   facilities::Util::expandEnvVar(&file_name);
   std::string islog=m_parmap["log"];
 
+  m_flux = std::atof(m_parmap["flux"].c_str());
+
   double e_min = std::atof(m_parmap["emin"].c_str());
   double e_max = std::atof(m_parmap["emax"].c_str());
 
