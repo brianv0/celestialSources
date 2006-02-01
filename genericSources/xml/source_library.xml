@@ -242,4 +242,12 @@
       </spectrum>
    </source>
 
+   <source name="filespectrummap_test">
+      <spectrum escale="GeV">
+         <SpectrumClass name="FILESpectrumMap"
+          params="flux=17.,fitsFile=$(FLUXROOT)/sources/gas_gal.fits,fileName=$(GENERICSOURCESROOT)/data/dm120gev.dat,log=no,emin=100.,emax=1100,gamma=2,lonMin=-180,lonMax=180,latMin=-90,latMax=90"/>
+         <use_spectrum frame="galaxy"/>
+      </spectrum>
+   </source>
+
 </source_library>
