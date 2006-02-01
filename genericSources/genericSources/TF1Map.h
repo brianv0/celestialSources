@@ -36,7 +36,7 @@ class TF1Map : public MapSource
 
 
  private:
-  TF1  p_tf1;
+   mutable TF1  p_tf1;
   std::map<std::string,std::string> m_parmap;
 };
 

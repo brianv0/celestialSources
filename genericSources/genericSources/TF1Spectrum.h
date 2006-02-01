@@ -33,7 +33,7 @@ class TF1Spectrum : public Spectrum
     }
 
  private:
-  TF1  p_tf1;
+   mutable TF1  p_tf1;
   std::map<std::string,std::string> m_parmap;
 };
 

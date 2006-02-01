@@ -167,11 +167,16 @@ namespace genericSources {
 
    double Util::drawFromPowerLaw(double emin, double emax, double gamma) {
       double xi = RandFlat::shoot();
-      double one_m_gamma = 1. - gamma;
-      double arg = xi*(std::pow(emax, one_m_gamma) - 
-                       std::pow(emin, one_m_gamma)) 
-         + std::pow(emin, one_m_gamma);
-      double energy = std::pow(arg, 1./one_m_gamma);
+      double energy;
+      if (gamma == 1) {
+         energy = emin*std::exp(xi*std::log(emax/emin));
+      } else {
+         double one_m_gamma = 1. - gamma;
+         double arg = xi*(std::pow(emax, one_m_gamma) - 
+                          std::pow(emin, one_m_gamma)) 
+            + std::pow(emin, one_m_gamma);
+         energy = std::pow(arg, 1./one_m_gamma);
+      }
       return energy;
    }
 

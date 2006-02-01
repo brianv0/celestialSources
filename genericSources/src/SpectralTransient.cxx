@@ -406,12 +406,22 @@ fillEnergies(double emin, double emax) {
 
 void SpectralTransient::ModelInterval::
 brokenPowerLawFractions(double emin, double emax) {
-   double one_m_g1 = 1. - gamma1;
-   double one_m_g2 = 1. - gamma2;
+   double lowerIntegral;
+   double upperIntegral;
    if (emin < ebreak && ebreak < emax) {
-      m_lowerFraction = (1. - std::pow(emin/ebreak, one_m_g1))/one_m_g1;
-      m_lowerFraction = m_lowerFraction
-         /(m_lowerFraction + (std::pow(emax/ebreak, one_m_g2)-1.)/one_m_g2);
+      if (gamma1 == 1) {
+         lowerIntegral = std::log(ebreak/emin);
+      } else {
+         double one_m_g1(1. - gamma1);
+         lowerIntegral = (1. - std::pow(emin/ebreak, one_m_g1))/one_m_g1;
+      }
+      if (gamma2 == 1) {
+         upperIntegral = std::log(emax/ebreak);
+      } else {
+         double one_m_g2(1. - gamma2);
+         upperIntegral = (std::pow(emax/ebreak, one_m_g2) - 1.)/one_m_g2;
+      }
+      m_lowerFraction = lowerIntegral/(lowerIntegral + upperIntegral);
    } else if (emin > ebreak) {
       m_lowerFraction = 0;
    } else if (emax < ebreak) {
