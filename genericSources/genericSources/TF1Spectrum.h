@@ -32,10 +32,6 @@ class TF1Spectrum : public Spectrum
       return (*this)(time);
     }
 
-
-
-  void initialize(const std::string& params);
-  void createStringMap(const std::vector<std::string>& input);
  private:
   TF1  p_tf1;
   std::map<std::string,std::string> m_parmap;

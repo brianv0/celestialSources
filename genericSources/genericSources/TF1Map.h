@@ -35,10 +35,6 @@ class TF1Map : public MapSource
   virtual double flux(double ) const  { return m_flux; } 
 
 
-
-
-  void initialize(const std::string& params);
-  //  void createStringMap(const std::vector<std::string>& input);
  private:
   TF1  p_tf1;
   std::map<std::string,std::string> m_parmap;
