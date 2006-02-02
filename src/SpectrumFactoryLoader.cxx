@@ -28,6 +28,7 @@ ISpectrumFactory & SpectralTransientFactory();
 ISpectrumFactory & TransientTemplateFactory();
 ISpectrumFactory & TF1SpectrumFactory();
 ISpectrumFactory & TF1MapFactory();
+ISpectrumFactory & FILESpectrumMapFactory();
 
 SpectrumFactoryLoader::SpectrumFactoryLoader()
 {
@@ -48,6 +49,7 @@ SpectrumFactoryLoader::SpectrumFactoryLoader()
    load(PulsarSpectrumFactory());
    load(TF1SpectrumFactory());
    load(TF1MapFactory());
+   load(FILESpectrumMapFactory());
 }
 void SpectrumFactoryLoader::load(ISpectrumFactory& factory)
 {
