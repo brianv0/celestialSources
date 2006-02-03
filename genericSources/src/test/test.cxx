@@ -33,7 +33,8 @@ ISpectrumFactory & SourcePopulationFactory();
 ISpectrumFactory & TransientTemplateFactory();
 ISpectrumFactory & TF1SpectrumFactory();
 ISpectrumFactory & TF1MapFactory();
-ISpectrumFactory & FILESpectrumMapFactory();
+ISpectrumFactory & FileSpectrumFactory();
+ISpectrumFactory & FileSpectrumMapFactory();
 
 class TestApp {
 
@@ -128,8 +129,9 @@ void TestApp::setSources() {
                         "source_population",
 			"tf1spectrum_test",
 			"tf1map_test",
+			"filespectrum_test",
 			"filespectrummap_test"};
-   std::vector<std::string> sourceNames(srcNames, srcNames+18);
+   std::vector<std::string> sourceNames(srcNames, srcNames+19);
 
    m_compositeSource = new CompositeSource();
    unsigned long nsrcs(0);
@@ -186,7 +188,8 @@ void TestApp::load_sources() {
    TransientTemplateFactory();
    TF1SpectrumFactory();
    TF1MapFactory();
-   FILESpectrumMapFactory();
+   FileSpectrumFactory();
+   FileSpectrumMapFactory();
 }
 
 HepRotation TestApp::instrumentToCelestial(double time) {

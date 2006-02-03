@@ -1,15 +1,15 @@
 #ifndef FILESPECTRUMMAP_H
 #define FILESPECTRUMMAP_H
 
-#include "src/FILESpectrum.h"   //UGLY : MOVE FILESpectrum in flux
+#include "genericSources/FileSpectrum.h"
 #include "genericSources/MapSource.h"
 #include<map>
 
-class FILESpectrumMap : public MapSource
+class FileSpectrumMap : public MapSource
 {
  public:
-  FILESpectrumMap(const std::string& /*params*/);
-  ~FILESpectrumMap() {delete m_filespectrum;}
+  FileSpectrumMap(const std::string& /*params*/);
+  ~FileSpectrumMap() {delete m_filespectrum;}
   
 
   /// Overload of operator method
@@ -34,7 +34,7 @@ class FILESpectrumMap : public MapSource
 
 
  private:
-  FILESpectrum*  m_filespectrum;
+  FileSpectrum*  m_filespectrum;
   std::map<std::string,std::string> m_parmap;
 };
 

@@ -225,15 +225,6 @@
    </source>
 
 
-<!-- MapSource version of the Galactic Diffuse model -->
-   <source name="tf1map_test">
-      <spectrum escale="MeV">
-         <SpectrumClass name="TF1Map"
-          params="flux=17.,tf1name=FT1Map_TEST,formula=-0.0001*(100.-x)*(1100.-x),fitsFile=$(FLUXROOT)/sources/gas_gal.fits,emin=100.,emax=1100,tf1precision=100,gamma=2,lonMin=-180,lonMax=180,latMin=-90,latMax=90"/>
-         <use_spectrum frame="galaxy"/>
-      </spectrum>
-   </source>
-
    <source name="tf1spectrum_test">
       <spectrum escale="MeV">
          <SpectrumClass name="TF1Spectrum"
@@ -242,10 +233,26 @@
       </spectrum>
    </source>
 
+   <source name="tf1map_test">
+      <spectrum escale="MeV">
+         <SpectrumClass name="TF1Map"
+          params="flux=17.,tf1name=FT1Map_TEST,formula=-0.0001*(100.-x)*(1100.-x),fitsFile=$(FLUXROOT)/sources/gas_gal.fits,emin=100.,emax=1100,tf1precision=100,gamma=2,lonMin=-180,lonMax=180,latMin=-90,latMax=90"/>
+         <use_spectrum frame="galaxy"/>
+      </spectrum>
+   </source>
+
+   <source name="filespectrum_test">
+      <spectrum escale="GeV" flux="1.">
+         <SpectrumClass name="FileSpectrum"
+          params="flux=0.,specFile=$(GENERICSOURCESROOT)/data/dm120gev.dat,log=no"/>
+         <use_spectrum frame="galaxy"/>
+      </spectrum>
+   </source>
+
    <source name="filespectrummap_test">
-      <spectrum escale="GeV">
-         <SpectrumClass name="FILESpectrumMap"
-          params="flux=17.,fitsFile=$(FLUXROOT)/sources/gas_gal.fits,fileName=$(GENERICSOURCESROOT)/data/dm120gev.dat,log=no,emin=100.,emax=1100,tf1precision=100,gamma=2,lonMin=-180,lonMax=180,latMin=-90,latMax=90"/>
+      <spectrum escale="GeV" flux="1.">
+         <SpectrumClass name="FileSpectrumMap"
+          params="flux=17.,fitsFile=$(FLUXROOT)/sources/gas_gal.fits,specFile=$(GENERICSOURCESROOT)/data/dm120gev.dat,log=no,emin=100.,emax=1100,tf1precision=100,gamma=2,lonMin=-180,lonMax=180,latMin=-90,latMax=90"/>
          <use_spectrum frame="galaxy"/>
       </spectrum>
    </source>
