@@ -81,10 +81,7 @@ FileSpectrum::FileSpectrum(const std::string& params) :
 
   //set the flux to the file integral, if not set by XML
   if(m_flux==0){
-    float scale =1.;
-    if(parmap["cm2"].find("yes")!=std::string::npos){
-      scale=10000.;}
-    m_flux = scale*m_fileflux;
+    m_flux = m_fileflux;
   }
 }
 

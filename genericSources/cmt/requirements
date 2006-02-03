@@ -19,6 +19,8 @@ apply_pattern package_linkopts
 apply_pattern package_stamps
 
 private
+macro_append ROOT_libs " -lHist "\
+                 WIN32 " libHist.lib "
 
 macro genericSources_cppflags "" \
       Linux "-I ../src  -DTRAP_FPE" \

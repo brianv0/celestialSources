@@ -244,7 +244,7 @@
    <source name="filespectrum_test">
       <spectrum escale="GeV" flux="1.">
          <SpectrumClass name="FileSpectrum"
-          params="flux=0.,specFile=$(GENERICSOURCESROOT)/data/dm120gev.dat,log=no"/>
+          params="flux=0.,specFile=$(GENERICSOURCESROOT)/data/dm120gev.dat"/>
          <use_spectrum frame="galaxy"/>
       </spectrum>
    </source>
@@ -252,7 +252,7 @@
    <source name="filespectrummap_test">
       <spectrum escale="GeV" flux="1.">
          <SpectrumClass name="FileSpectrumMap"
-          params="flux=17.,fitsFile=$(FLUXROOT)/sources/gas_gal.fits,specFile=$(GENERICSOURCESROOT)/data/dm120gev.dat,log=no,emin=100.,emax=1100,tf1precision=100,gamma=2,lonMin=-180,lonMax=180,latMin=-90,latMax=90"/>
+          params="flux=17.,fitsFile=$(FLUXROOT)/sources/gas_gal.fits,specFile=$(GENERICSOURCESROOT)/data/dm120gev.dat,emin=100.,emax=1100,tf1precision=100,gamma=2,lonMin=-180,lonMax=180,latMin=-90,latMax=90"/>
          <use_spectrum frame="galaxy"/>
       </spectrum>
    </source>
