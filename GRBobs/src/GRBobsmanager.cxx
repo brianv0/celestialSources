@@ -109,7 +109,7 @@ GRBobsmanager::GRBobsmanager(const std::string& params)
   //////////////////////////////////////////////////
 }
 
-TString GRBobsmanager::GetGRBname()
+std::string GRBobsmanager::GetGRBname()
 {
   ////DATE AND GRBNAME
   /// GRB are named as customary GRBYYMMDDXXXX
@@ -127,7 +127,7 @@ TString GRBobsmanager::GetGRBname()
   double utc;
   JD.getGregorianDate(An,Me,Gio,utc);
 
-  TString GRBname="";
+  std::string GRBname="";
 
   An-=2000;
   
@@ -209,7 +209,7 @@ void GRBobsmanager::GenerateGRB()
     }
   
   //////////////////////////////////////////////////
-  TString GRBname = GetGRBname();
+  std::string GRBname = GetGRBname();
   
   if(m_grbocculted)
     {
@@ -221,11 +221,11 @@ void GRBobsmanager::GenerateGRB()
       m_GRB->GetGBMFlux(GRBname);
     }
 
-  TString name = "GRBOBS_";
+  std::string name = "GRBOBS_";
   name+=GRBname; 
   name+="_PAR.txt";
   //..................................................//
-  std::ofstream os(name,std::ios::out);  
+  std::ofstream os(name.c_str(),std::ios::out);  
   os<<std::setprecision(10)<<m_startTime<<" "<<  m_GRBend <<" "<<m_l<<" "<<m_b<<" "<<m_theta<<" "<<m_phi<<" "<<m_fluence<<" "<<m_alpha<<" "<<m_beta<<std::endl;
   os.close();
   

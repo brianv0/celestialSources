@@ -13,8 +13,6 @@
 #define GRBobsmanager_H
 #include "GRBobsConstants.h"
 
-#include "TString.h"
-
 #include <vector>
 #include <string>
 #include <map>
@@ -73,7 +71,7 @@ class GRBobsmanager : public Spectrum
   std::string title() const {return "GRBobsmanager";} 
   const char * particleName() const {return "gamma";}
   const char * nameOf() const {return "GRBobsmanager";}
-  TString GetGRBname();
+  std::string GetGRBname();
   void GenerateGRB();  
   void DeleteGRB();  
   /*! 

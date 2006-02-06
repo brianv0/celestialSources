@@ -273,12 +273,12 @@ void GRBobsSim::SaveNv()
 };
 
 //////////////////////////////////////////////////
-void GRBobsSim::SaveGBMDefinition(TString GRBname, double ra, double dec, double theta, double phi, double tstart)
+void GRBobsSim::SaveGBMDefinition(std::string GRBname, double ra, double dec, double theta, double phi, double tstart)
 {
-  TString name = "GRBOBS_";
+  std::string name = "GRBOBS_";
   name+=GRBname; 
   name+=".DEF";
-  std::ofstream os(name,std::ios::out);
+  std::ofstream os(name.c_str(),std::ios::out);
   os<<"BURST DEFINITION FILE"<<std::endl;
   os<<"Burst Name"<<std::endl;
   os<<GRBname<<std::endl;
@@ -324,7 +324,7 @@ double LogFBOBS(double *var, double *par)
 
 
 
-void GRBobsSim::GetGBMFlux(TString GRBname)
+void GRBobsSim::GetGBMFlux(std::string GRBname)
 {
   //  double *e = new double[Ebin +1];
   //  for(int i = 0; i<=Ebin; i++)
@@ -350,10 +350,10 @@ void GRBobsSim::GetGBMFlux(TString GRBname)
   double dt   = m_Nv->GetXaxis()->GetBinWidth(1);
   double tbin = m_Nv->GetXaxis()->GetNbins();
   
-  TString name = "GRBOBS_";
+  std::string name = "GRBOBS_";
   name+=GRBname; 
   name+=".lc";
-  std::ofstream os(name,std::ios::out);
+  std::ofstream os(name.c_str(),std::ios::out);
   os<<"Sample Spectrum File "<<std::endl;
   os<<tbin<<" bins"<<std::endl;
   os<<"Norm   alf   beta  E_p "<<std::endl;
@@ -413,10 +413,10 @@ void GRBobsSim::GetGBMFlux(TString GRBname)
 	  //	  gPad->SetLogx();
 	  //	  gPad->SetLogy();
 	  gPad->Update();
-	  TString gbmFlux= "GBMFlux";
+	  std::string gbmFlux= "GBMFlux";
 	  gbmFlux+=ti;
 	  gbmFlux+=".gif";
-	  if(ti%10==0) gPad->Print(gbmFlux);
+	  if(ti%10==0) gPad->Print(gbmFlux.c_str());
 	}
     }   
   os.close();
