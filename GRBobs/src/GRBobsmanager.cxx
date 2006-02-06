@@ -112,7 +112,7 @@ GRBobsmanager::GRBobsmanager(const std::string& params)
 std::string GRBobsmanager::GetGRBname()
 {
   ////DATE AND GRBNAME
-  /// GRB are named as customary GRBYYMMDDXXXX
+  /// GRB are named as customary GRBOBSYYMMDDXXXX
   //  The mission start and launch date are retrieved, 
   //  and the current burst's start time is added to them to form a Julian Date.
   //  Note: the argument of the JulianDate constructor is in day.
@@ -125,53 +125,55 @@ std::string GRBobsmanager::GetGRBname()
   m_Frac=(m_Rest/86400.);
   int FracI=(int)(m_Frac*1000.0);
   double utc;
-  JD.getGregorianDate(An,Me,Gio,utc);
-
-  std::string GRBname="";
-
+  JD.getGregorianDate(An,Me,Gio,utc);  
   An-=2000;
+
+  std::ostringstream ostr;
   
   if(An<10) 
     {
-      GRBname+="0";
-      GRBname+=An;
+      ostr<<"0";
+      ostr<<An;
     }
   else
     {
-      GRBname+=An;
-    }
-  if(Me<10) 
-    {
-      GRBname+="0";
-      GRBname+=Me;
-    }
-  else
-    {
-      GRBname+=Me;
-    }
-  if(Gio<10) 
-    {
-      GRBname+="0";
-      GRBname+=Gio;
-    }
-  else
-    {
-      GRBname+=Gio;
+      ostr<<An;
     }
   
+  if(Me<10) 
+    {
+      ostr<<"0";
+      ostr<<Me;
+    }
+  else
+    {
+      ostr<<Me;
+    }
+  
+  if(Gio<10) 
+    {
+      ostr<<"0";
+      ostr<<Gio;
+    }
+  else
+    {
+      ostr<<Gio;
+    }
   
   if (FracI<10)
     {
-      GRBname+="00";
-      GRBname+=FracI;
+      ostr<<"00";
+      ostr<<FracI;
     }
   else if(FracI<100) 
     {
-      GRBname+="0";
-      GRBname+=FracI;
+      ostr<<"0";
+      ostr<<FracI;
     }
   else 
-    GRBname+=FracI;
+    ostr<<FracI;
+
+  std::string GRBname = ostr.str();
   
   if(DEBUG) std::cout<<"GENERATE GRB ("<<GRBname<<")"<<std::endl;
   
@@ -351,7 +353,7 @@ double GRBobsmanager::parseParamList(std::string input, unsigned int index)
     i=input.find_first_of(",");
     input= input.substr(i+1);
   } 
-  if(index>=(int)output.size()) return 0.0;
+  if(index>=output.size()) return 0.0;
   return output[index];
 }
 
