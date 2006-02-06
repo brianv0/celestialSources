@@ -27,10 +27,10 @@ library GRBobs -no_share \
      -s=../GRBobs $(source)\
      -s=../src    $(source)
 
-application test_GRB      test/testGRB.cxx 
+application test_GRBobs      test/testGRB.cxx 
 
 macro_append ROOT_libs " -lGpad " \
 		WIN32 " libGpad.lib "\
                 Darwin " -lHist -lfreetype -lGraf "
 
-application test_GRBROOT  test/other/GRBROOTtest.cxx 
+application test_GRBobsROOT  test/other/GRBROOTtest.cxx 
