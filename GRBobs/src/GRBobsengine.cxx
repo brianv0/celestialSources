@@ -65,8 +65,8 @@ std::vector<GRBobsPulse*> GRBobsengine::CreatePulsesVector()
   
   if(BurstEndTime < 0.99 * duration)
     {
-      for(int i =0; i<(int) thePulses.size();i++)
-	delete thePulses[i];
+      thePulses.erase(thePulses.begin(), thePulses.end());
+      for(int i =0; i<(int) thePulses.size();i++) delete thePulses[i];
       return CreatePulsesVector();
     }
   return thePulses;

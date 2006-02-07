@@ -178,10 +178,10 @@ int main(int argn, char * argc[]) {
   std::ostream* m_out = new std::ofstream(testfilename.c_str());
   std::ostream& out = *m_out;
   std::cout << "Writing test results to the file " << testfilename << std::endl;
-  
-  for(abc= allTheSources.begin() ; abc != allTheSources.end() ; abc++)
+  int n=0;
+  for(abc= allTheSources.begin() ; abc != allTheSources.end() && n++<5; abc++)
     {
-      std::cout << "Source:  " << *abc << std::endl;
+      std::cout << "Source ["<<n<<"]: " << *abc << std::endl;
       out << "Source:  " << *abc <<std::endl;
       fm.test(out, (*abc), count);
       out << std::endl << std::endl << std::endl;

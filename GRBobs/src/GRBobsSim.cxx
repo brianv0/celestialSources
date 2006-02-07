@@ -129,7 +129,8 @@ TH2D* GRBobsSim::MakeGRB()
   
   m_Nv->Scale(norm);
   Pulses.erase(Pulses.begin(), Pulses.end());
-  delete e;
+  for(int i =0; i<(int) Pulses.size();i++) delete Pulses[i];
+  delete[] e;
   delete nph;
   return m_Nv;
 }
@@ -176,7 +177,7 @@ TH2D* GRBobsSim::MakeGRB_ExtraComponent(double duration, double LATphotons)
     }
   //  std::cout<<LATphotons<<" "<<norm<<std::endl;
   m_NvEC->Scale(LATphotons/norm);
-  delete e;
+  delete[] e;
   return m_NvEC;
 }
 //////////////////////////////////////////////////

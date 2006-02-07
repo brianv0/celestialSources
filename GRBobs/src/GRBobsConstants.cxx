@@ -108,6 +108,7 @@ double GRBobsParameters::GetBATSEFWHM()
   else if (wid_lo <= 0.40)
     alpha = 0.25;
   else alpha =  0.6;
+  delete[] LogWidth;
   return wid_lo * pow(1. - rnd->Uniform() *(1. - pow(wid_hi/wid_lo,-alpha)),-1./alpha);
 }
 
