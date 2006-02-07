@@ -4,6 +4,7 @@
 
   @verbatim
   $Id$
+  07-feb-06 v2r1p11    NO    Cleaned mem leaks
   06-feb-06 v2r1p11    NO    TString removed.
   31-jan-06 v2r1p10    NO    Earth occultation avoid GBM generation file
   26-jan-06 v2r1p8     NO    GBM long burst's bug solved
