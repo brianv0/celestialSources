@@ -1,12 +1,13 @@
 package SpectObj
 
-version v1r1p1
+version v1r1p3
 author Nicola Omodei<nicola.omodei@pi.infn.it>
 # $Id$
 #=============================================================
 use GlastPolicy *
 use ROOT v* IExternal
 use eblAtten v* celestialSources
+use CLHEP v* IExternal
 
 apply_pattern package_include
 apply_pattern package_linkopts

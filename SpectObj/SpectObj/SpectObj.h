@@ -104,5 +104,8 @@ class SpectObj
   bool ProbabilityIsComputed, PeriodicSpectrumIsComputed;
   IRB::EblAtten * m_tau;
 
+   static bool s_gRandom_seed_set;
+
 };
 #endif
+

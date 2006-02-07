@@ -16,9 +16,13 @@
 #include "SpectObj/SpectObj.h"
 #include "eblAtten/EblAtten.h"
 
+#include "CLHEP/Random/RandFlat.h"
+
 #define DEBUG 0
 
 const double erg2meV      = 624151.0;
+
+bool SpectObj::s_gRandom_seed_set(false);
 
 SpectObj::SpectObj(const TH2D* In_Nv, int type, double z)
 {
@@ -32,6 +36,16 @@ SpectObj::SpectObj(const TH2D* In_Nv, int type, double z)
   
   counts=0;
   m_SpRandGen = new TRandom();
+
+// Set the TRandom seeds using the CLHEP generator.
+  int bigInt(1000000);
+  m_SpRandGen->SetSeed(int(RandFlat::shoot()*bigInt));
+  if (!s_gRandom_seed_set) { 
+// Set the global generator once for all SpectObjs
+     gRandom->SetSeed(int(RandFlat::shoot()*bigInt));
+     s_gRandom_seed_set = true;
+  }
+
   sourceType = type; //Max
   
   ne   = Nv->GetNbinsY();
@@ -513,26 +527,15 @@ double SpectObj::GetPeakFlux(double BL, double BH)
   if(BH<=0) BH = emax;
   int ei1 = Nv->GetYaxis()->FindBin(TMath::Max(emin,BL));
   int ei2 = Nv->GetYaxis()->FindBin(TMath::Min(emax,BH));
-  double PFM=0.0;
-  for(int ti = 1; ti<=nt; ti++)
+  double PF=0.0;
+  for (int ei = ei1; ei<=ei2; ei++)
     {
-      double PF=0.0;
-      for (int ei = ei1; ei<=ei2; ei++)
-	{
-	  PF+= Nv->GetBinContent(ti, ei);//[ph/cm^2]
-	}
-      PFM= TMath::Max(PF,PFM);//[ph/cm^2]
-    }
-  //  norm = 1.0e4 * BATSEPeakFlux/PFM;  double PF=0.0;
-  /*  for (int ei = ei1; ei<=ei2; ei++)
-      {
       for(int ti = 1; ti<=nt; ti++)
-      {
-      PF= TMath::Max(PF,Nv->GetBinContent(ti, ei));//[ph]
-      }  
-      }
-  */
-  return PFM*1e-4/(m_AreaDetector*m_TimeBinWidth); //ph/cm²/s
+	{
+	  PF= TMath::Max(PF,Nv->GetBinContent(ti, ei));//[ph]
+	}  
+    }
+  return PF*1e-4/(m_AreaDetector*m_TimeBinWidth); //ph/cm²/s
 }
 
 
