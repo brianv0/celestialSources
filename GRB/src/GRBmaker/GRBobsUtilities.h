@@ -20,7 +20,7 @@
 
 using namespace grbobstypes;
 
-class HepRandomEngine;
+namespace CLHEP {class HepRandomEngine;}
 
 
 
@@ -30,7 +30,7 @@ public:
     /*!
      * \breif Return interpolated value from hi and lo.
      */
-    static double result(HepRandomEngine *engine, const double lo, 
+    static double result(CLHEP::HepRandomEngine *engine, const double lo, 
         const double hi, const double p);
     
     /*!
@@ -56,10 +56,10 @@ public:
      */
     struct randGen : public std::unary_function<double, double>
     {
-        randGen(HepRandomEngine *engine) : m_engine(engine) {}
+        randGen(CLHEP::HepRandomEngine *engine) : m_engine(engine) {}
         double operator() (double x); 
         
-        HepRandomEngine *m_engine;
+        CLHEP::HepRandomEngine *m_engine;
     };
     
     
