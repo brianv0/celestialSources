@@ -73,19 +73,19 @@ GRBobsmanager::GRBobsmanager(const std::string& params)
       astro::SkyDir sky(m_l,m_b,astro::SkyDir::GALACTIC);
       HepVector3D skydir=sky.dir();
       try{
-	HepRotation rottoglast = GPS::instance()->transformToGlast(m_startTime,GPS::CELESTIAL);
-	HepVector3D scdir = rottoglast * skydir;
-	m_ra    = sky.ra();
-	m_dec   = sky.dec();
-	m_theta = 90. - scdir.theta()*180.0/M_PI; // theta=0 -> XY plane, theta=90 -> Z
-	m_phi   = scdir.phi()*180.0/M_PI;
-	m_grbdeleted      = false;
+        CLHEP::HepRotation rottoglast = GPS::instance()->transformToGlast(m_startTime,GPS::CELESTIAL);
+        HepVector3D scdir = rottoglast * skydir;
+        m_ra    = sky.ra();
+        m_dec   = sky.dec();
+        m_theta = 90. - scdir.theta()*180.0/M_PI; // theta=0 -> XY plane, theta=90 -> Z
+        m_phi   = scdir.phi()*180.0/M_PI;
+        m_grbdeleted      = false;
       }
       catch(const std::exception &e)
-	{
-	  m_grbdeleted=true;
-	  break;
-	}
+    {
+      m_grbdeleted=true;
+      break;
+    }
     }
   //PROMPT
   m_endTime    = m_startTime  +    m_GRB_duration_z; //check this in GRBobsSim !!!!!
@@ -114,7 +114,7 @@ TString GRBobsmanager::GetGRBname()
   //  Note: the argument of the JulianDate constructor is in day.
 
   astro::JulianDate JD(astro::JulianDate::missionStart() +
-		       m_startTime/astro::JulianDate::secondsPerDay);
+               m_startTime/astro::JulianDate::secondsPerDay);
 
   int An,Me,Gio;
   m_Rest=((int) m_startTime % 86400) + m_startTime - floor(m_startTime);
@@ -224,7 +224,7 @@ void GRBobsmanager::GenerateGRB()
   std::cout<<"GRB"<<GRBname;
   if( m_z >0)  std::cout<<" redshift = "<<m_z;
   std::cout<<std::setprecision(10)<<" t start "<<m_startTime<<", tend "<<m_endTime
-	   <<" l,b = "<<m_l<<", "<<m_b<<" elevation,phi(deg) = "<<m_theta<<", "<<m_phi;
+       <<" l,b = "<<m_l<<", "<<m_b<<" elevation,phi(deg) = "<<m_theta<<", "<<m_phi;
   if(m_par->GetNormType()=='P')
     std::cout<<" Peak Flux = "<<m_fluence<<" 1/cm^2/s "<<std::endl;
   else 
@@ -245,10 +245,10 @@ void GRBobsmanager::DeleteGRB()
       delete m_spectrum;
       delete PromptEmission;
       if(m_LATphotons>0) 
-	{
-	  delete AfterGlowEmission;
-	  delete m_spectrum1;
-	}
+    {
+      delete AfterGlowEmission;
+      delete m_spectrum1;
+    }
     }
   m_grbdeleted=true;
 }
@@ -297,17 +297,17 @@ double GRBobsmanager::interval(double time)
       
       if(m_LATphotons>0) inte_ag = AfterGlowEmission->interval(time,m_MinPhotonEnergy);
       if (inte_prompt<=inte_ag) 
-	{ 
-	  inte  = inte_prompt;
-	  PromptEmission->SetResiduals(0.0);
-	  if(m_LATphotons>0) AfterGlowEmission->SetResiduals(inte);
-	}
+	  { 
+	    inte  = inte_prompt;
+	    PromptEmission->SetResiduals(0.0);
+	    if(m_LATphotons>0) AfterGlowEmission->SetResiduals(inte);
+	  }
       else
-	{ 
-	  inte  = inte_ag;
-	  PromptEmission->SetResiduals(inte);
-	  if(m_LATphotons>0) AfterGlowEmission->SetResiduals(0.0);
-	}
+	  { 
+	    inte  = inte_ag;
+	    PromptEmission->SetResiduals(inte);
+	    if(m_LATphotons>0) AfterGlowEmission->SetResiduals(0.0);
+	  }
     }
   else  
     {
