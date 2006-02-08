@@ -1,8 +1,7 @@
 /** @file SpectObj.cxx
-  @brief implemetation of SpectObj class
-
-  $Header$
-
+    @brief implemetation of SpectObj class
+    
+    $Header$
 */
 #include <string>
 #include <sstream>
@@ -17,6 +16,8 @@
 #include "eblAtten/EblAtten.h"
 
 #include "CLHEP/Random/RandFlat.h"
+
+#include "TH1.h"
 
 #define DEBUG 0
 
@@ -33,7 +34,7 @@ SpectObj::SpectObj(const TH2D* In_Nv, int type, double z)
   std::string name;
   GetUniqueName(Nv,name);
   Nv->SetName(name.c_str());
-  
+  //  Nv->SetDirectory(0);
   counts=0;
   m_SpRandGen = new TRandom();
 
@@ -41,9 +42,9 @@ SpectObj::SpectObj(const TH2D* In_Nv, int type, double z)
   int bigInt(1000000);
   m_SpRandGen->SetSeed(int(RandFlat::shoot()*bigInt));
   if (!s_gRandom_seed_set) { 
-// Set the global generator once for all SpectObjs
-     gRandom->SetSeed(int(RandFlat::shoot()*bigInt));
-     s_gRandom_seed_set = true;
+    // Set the global generator once for all SpectObjs
+    gRandom->SetSeed(int(RandFlat::shoot()*bigInt));
+    s_gRandom_seed_set = true;
   }
 
   sourceType = type; //Max
@@ -153,6 +154,7 @@ void SpectObj::GetUniqueName(const void *ptr, std::string & name)
   my_name << reinterpret_cast<int> (ptr);
   name = my_name.str();
   gDirectory->Delete(name.c_str());
+  reinterpret_cast<TH1*> (ptr)->SetDirectory(0);
 }
 
 TH1D *SpectObj::CloneSpectrum()
@@ -329,7 +331,6 @@ void SpectObj::ComputeProbability(double enph)
 //////////////////////////////////////////////////
 photon SpectObj::GetPhoton(double t0, double enph)
 {
-  
   //  photon ph;
   int ei  = TMath::Max(1,Nv->GetYaxis()->FindBin(enph));
   
@@ -345,7 +346,7 @@ photon SpectObj::GetPhoton(double t0, double enph)
 	{
 	  ph.time   = time;
 	  ph.energy = energy;
-  	  return ph;
+	  return ph;
 	}
       
       int t1 = Probability->FindBin(t0);
@@ -363,7 +364,7 @@ photon SpectObj::GetPhoton(double t0, double enph)
 	  dP0 = (Probability->GetBinContent(t1) - Probability->GetBinContent(t1-1))*dt0/m_TimeBinWidth;
 	}
       double P0  = Probability->GetBinContent(t1) + dP0;
-
+      
       while(Probability->GetBinContent(t2) < P0 + myP && t2 < nt)
 	{
 	  t2++;
@@ -496,11 +497,14 @@ photon SpectObj::GetPhoton(double t0, double enph)
             
     }
   
-  if(DEBUG)  std::cout<< " New Photon at ("<<t0<<"): Internal time =  " << ph.time << " Energy  (KeV) " << ph.energy << std::endl;
+  if(DEBUG)  std::cout<< " T0 =  ("<<t0<<"), Next  " << ph.time << " Energy  (KeV) " << ph.energy << std::endl;
   if (m_z == 0 || m_tau == 0 || m_SpRandGen->Uniform() < std::exp(-(*m_tau)(ph.energy/1000.0, m_z)))
     return ph;
   else
-    return GetPhoton( ph.time, enph);
+    {
+      if(DEBUG)  std::cout<< "Absorbed"<< std::endl;
+      return GetPhoton( ph.time, enph);
+    }
 }
 
 double SpectObj::GetFluence(double BL, double BH)
@@ -600,7 +604,7 @@ double SpectObj::flux(double time, double enph)
 
 double SpectObj::interval(double time, double enph)
 {
-  return  GetPhoton(time,enph).time - time;
+  return GetPhoton(time,enph).time - time;
 }
 
 double SpectObj::energy(double time, double enph)
