@@ -25,6 +25,7 @@ void GRBobsSim::GetUniqueName(const void *ptr, std::string & name)
   my_name << reinterpret_cast<int> (ptr);
   name = my_name.str();
   gDirectory->Delete(name.c_str());
+  reinterpret_cast<TH1*> (ptr)->SetDirectory(0);
 }
 
 TH2D* GRBobsSim::MakeGRB()
@@ -63,7 +64,6 @@ TH2D* GRBobsSim::MakeGRB()
   std::string name;
   GetUniqueName(m_Nv,name);
   m_Nv->SetName(name.c_str());
-  
   double t = 0.0;
   for(int ti = 0; ti<m_tbin; ti++)
     {
@@ -207,7 +207,7 @@ TH2D *GRBobsSim::Nph(const TH2D *Nv)
   std::string name;
   GetUniqueName(Nph,name);
   Nph->SetName(name.c_str());
-  
+
   double dei;
   double deltat = Nv->GetXaxis()->GetBinWidth(1);
   
@@ -246,6 +246,7 @@ void GRBobsSim::SaveNvEC()
   m_NvEC->Write();
   mod.Close();
   m_NvEC->SetName(name.c_str());
+
 };
 
 void GRBobsSim::SaveNv()
@@ -270,7 +271,7 @@ void GRBobsSim::SaveNv()
   m_Nv->Write();
   mod.Close();
   m_Nv->SetName(name.c_str());
-  
+
 };
 
 //////////////////////////////////////////////////

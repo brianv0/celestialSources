@@ -65,7 +65,7 @@ double GRBobsengine::generatePulses(std::vector<GRBobsPulse*> &thePulses, double
 	}
     }
   
-  return endTime;
+  return BurstEndTime;
 }
 
 std::vector<GRBobsPulse*> GRBobsengine::CreatePulsesVector()  
