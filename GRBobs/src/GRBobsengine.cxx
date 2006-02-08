@@ -14,16 +14,14 @@ GRBobsengine::GRBobsengine(GRBobsParameters *params)
   m_dir = m_params->GetGalDir(); 
 }
 
-std::vector<GRBobsPulse*> GRBobsengine::CreatePulsesVector()
+double GRBobsengine::generatePulses(std::vector<GRBobsPulse*> &thePulses, double duration)
 {
   //////////////////////////////////////////////////
-  std::vector<GRBobsPulse*> thePulses;
-  double tau, pt1,pt,rt, dt, ph, nu, ep, a, b,duration,endTime,BurstEndTime;
+  double tau, pt1,pt,rt, dt, ph, nu, ep, a, b,endTime,BurstEndTime;
 
   pt=0.0;
   
   GRBobsPulse *aPulse;
-  duration = m_params->GetDuration();
   endTime=0.0;
   BurstEndTime=0.0;
   int npulses=0;
@@ -61,17 +59,35 @@ std::vector<GRBobsPulse*> GRBobsengine::CreatePulsesVector()
 	  npulses++;
 	  BurstEndTime = TMath::Max(BurstEndTime,endTime);
       	}
+      else
+	{
+	  delete aPulse;
+	}
     }
   
-  if(BurstEndTime < 0.99 * duration)
-    {
-      thePulses.erase(thePulses.begin(), thePulses.end());
-      for(int i =0; i<(int) thePulses.size();i++) delete thePulses[i];
-      return CreatePulsesVector();
-    }
-  return thePulses;
+  return endTime;
 }
 
+std::vector<GRBobsPulse*> GRBobsengine::CreatePulsesVector()  
+{
+  // get goal duration value;
+  double duration = m_params->GetDuration();
+
+  double burstEndTime;
+  std::vector<GRBobsPulse*> thePulses;
+  bool done = false;
+
+  do {
+    burstEndTime = generatePulses(thePulses, duration);
+    if (burstEndTime < 0.99 * duration) 
+      {    // return resources and start over
+	for (unsigned i = 0; i < thePulses.size(); i++) delete thePulses[i];
+	thePulses.erase(thePulses.begin(), thePulses.end());
+      }
+    else done = true;
+  }  while (!done) ;
+  return thePulses;
+}
 
 //////////////////////////////////////////////////
 
