@@ -133,7 +133,7 @@ float MapCube::operator()(float xi) const {
 
 double MapCube::energy(double time) {
    (void)(time);
-   double xi = RandFlat::shoot();
+   double xi = CLHEP::RandFlat::shoot();
    return (*this)(xi);
 }
 
@@ -202,7 +202,7 @@ double MapCube::powerLawIntegral(double x1, double x2,
 
 double MapCube::
 drawEnergy(const std::vector<std::pair<double, double> > & spectrum) const {
-   double xi = RandFlat::shoot()*spectrum.back().first;
+   double xi = CLHEP::RandFlat::shoot()*spectrum.back().first;
    std::vector<std::pair<double, double> >::const_iterator it 
       = std::upper_bound(spectrum.begin(), spectrum.end(),
                          std::make_pair(xi, 0), cmpPair);

@@ -56,23 +56,23 @@ double Isotropic::solidAngle() const {
 
 double Isotropic::interval(double time) {
    double rate = flux(time)*EventSource::totalArea();
-   double xi = RandFlat::shoot();
+   double xi = CLHEP::RandFlat::shoot();
    return -log(1. - xi)/rate;
 }
 
 double Isotropic::energy(double time) {
    (void)(time);
-   double xi = RandFlat::shoot();
+   double xi = CLHEP::RandFlat::shoot();
    return (*this)(xi);
 }
 
 std::pair<double, double> Isotropic::dir(double energy) {
    (void)(energy);
 
-   double xi = RandFlat::shoot();
+   double xi = CLHEP::RandFlat::shoot();
    double lon = 360.*xi - 180.;
 
-   xi = RandFlat::shoot();
+   xi = CLHEP::RandFlat::shoot();
    double mu = 2.*xi - 1.;
    double theta;
    if (fabs(mu) <= 1.) {

@@ -128,13 +128,13 @@ float SourcePopulation::operator()(float xi) {
 
 double SourcePopulation::energy(double time) {
    (void)(time);
-   double xi = RandFlat::shoot();
+   double xi = CLHEP::RandFlat::shoot();
    return this->operator()(xi);
 }
 
 double SourcePopulation::interval(double time) {
    (void)(time);
-   return -std::log(1. - RandFlat::shoot())/m_flux/EventSource::totalArea();
+   return -std::log(1. - CLHEP::RandFlat::shoot())/m_flux/EventSource::totalArea();
 }
 
 SourcePopulation::PointSource * SourcePopulation::PointSource::Self::s_self(0);
@@ -178,21 +178,21 @@ PointSource::setPowerLaw() {
 double SourcePopulation::
 PointSource::energy() const {
    double my_energy;
-   double xi(RandFlat::shoot());
+   double xi(CLHEP::RandFlat::shoot());
    if (xi < m_frac) {
       do {
-         xi = RandFlat::shoot();
+         xi = CLHEP::RandFlat::shoot();
          double aa(1. - m_gamma);
          double bb(std::pow(m_ebreak, aa) - std::pow(m_emin, aa));
          my_energy = std::pow(xi*bb + std::pow(m_emin, aa), 1./aa);
-      } while (RandFlat::shoot() > attenuation(my_energy));
+      } while (CLHEP::RandFlat::shoot() > attenuation(my_energy));
    } else {
       do {
-         xi = RandFlat::shoot();
+         xi = CLHEP::RandFlat::shoot();
          double aa(1. - m_gamma2);
          double bb(std::pow(m_emax, aa) - std::pow(m_ebreak, aa));
          my_energy = std::pow(xi*bb + std::pow(m_ebreak, aa), 1./aa);
-      } while (RandFlat::shoot() > attenuation(my_energy));
+      } while (CLHEP::RandFlat::shoot() > attenuation(my_energy));
    }
    return my_energy;
 }

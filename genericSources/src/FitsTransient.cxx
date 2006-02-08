@@ -148,7 +148,7 @@ drawEvents(const std::vector<double> & times,
            const std::vector< std::vector<double> > & integralDist,
            const std::vector<double> & lightCurve) {
    double npred = m_flux*EventSource::totalArea()*(m_tstop - m_tstart);
-   long nevts = RandPoisson::shoot(npred);
+   long nevts = CLHEP::RandPoisson::shoot(npred);
    for (long i = 0; i < nevts; i++) {
       std::pair<long, double> arrTime = draw(times, lightCurve);
       std::pair<long, double> energy = draw(energies,
@@ -160,7 +160,7 @@ drawEvents(const std::vector<double> & times,
 std::pair<long, double> FitsTransient::
 draw(const std::vector<double> & x,
      const std::vector<double> & integralDist) const {
-   double xi = RandFlat::shoot()*integralDist.back();
+   double xi = CLHEP::RandFlat::shoot()*integralDist.back();
    std::vector<double>::const_iterator it = 
       std::upper_bound(integralDist.begin(), integralDist.end(), xi);
    long indx = it - integralDist.begin() - 1;

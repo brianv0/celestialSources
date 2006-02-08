@@ -124,20 +124,20 @@ double MapSource::solidAngle() const {
 
 double MapSource::interval(double time) {
    double rate = flux(time)*EventSource::totalArea();
-   double xi = RandFlat::shoot();
+   double xi = CLHEP::RandFlat::shoot();
    return -log(1. - xi)/rate;
 }
 
 double MapSource::energy(double time) {
    (void)(time);
-   double xi = RandFlat::shoot();
+   double xi = CLHEP::RandFlat::shoot();
    return (*this)(xi);
 }
 
 std::pair<double, double> MapSource::dir(double energy) {
    (void)(energy);
 
-   double xi = RandFlat::shoot();
+   double xi = CLHEP::RandFlat::shoot();
    std::vector<double>::const_iterator it 
       = std::upper_bound(m_integralDist.begin(), m_integralDist.end(), xi);
    unsigned int indx = it - m_integralDist.begin();
@@ -161,7 +161,7 @@ samplePixel(unsigned int indx, double &lon, double &lat) const {
    unsigned int j = indx/m_lon.size();
 
 // Sample uniformly in longitude
-   double xi = RandFlat::shoot();
+   double xi = CLHEP::RandFlat::shoot();
    double lon_step;
    if (i == m_lon.size()-1) {
       lon_step = m_lon.at(i) - m_lon.at(i-1);
@@ -172,7 +172,7 @@ samplePixel(unsigned int indx, double &lon, double &lat) const {
    lon = xi*lon_step + m_lon.at(i);
 
 // Sample as cos(lat) in latitude
-   xi = RandFlat::shoot();
+   xi = CLHEP::RandFlat::shoot();
    double lat_step;
    if (j == m_lat.size()-1) {
       lat_step = m_lat.at(j) - m_lat.at(j-1);
