@@ -513,7 +513,7 @@ double PulsarSpectrum::getBaryCorr( double ttInput )
   double tdb_min_tt = m_earthOrbit->tdb_minus_tt(ttJD);
 
   double timeMET = ttInput - (StartMissionDateMJD)*SecsOneDay;
-  Hep3Vector scPos;
+  CLHEP::Hep3Vector scPos;
 
   //Exception error in case of time not in the range of available position (when using a FT2 file)
 
@@ -529,11 +529,11 @@ double PulsarSpectrum::getBaryCorr( double ttInput )
   }
 
   //Correction due to geometric time delay of light propagation 
-  Hep3Vector GeomVect = (scPos/clight) - m_solSys.getBarycenter(ttJD);
+  CLHEP::Hep3Vector GeomVect = (scPos/clight) - m_solSys.getBarycenter(ttJD);
   double GeomCorr = GeomVect.dot(m_PulsarVectDir);
 
   //Correction due to Shapiro delay.
-  Hep3Vector sunV = m_solSys.getSolarVector(ttJD);
+  CLHEP::Hep3Vector sunV = m_solSys.getSolarVector(ttJD);
 
   // Angle of source-sun-observer
   double costheta = - sunV.dot(m_PulsarVectDir) / ( sunV.mag() * m_PulsarVectDir.mag() );
