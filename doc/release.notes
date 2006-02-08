@@ -4,6 +4,7 @@
 
   @verbatim
   $Id$
+   8-Feb-06 v1r1cl0  TU    Branch for new externals
   31-Oct-05 v1r1     JC    add FitsTransient, SourcePopulation
   28-Aug-05 v1r0p5   JC    tag for GRBobsmanager
   27-Apr-05 v1r0p4   THB   restore GRBobs 
