@@ -51,7 +51,7 @@ class SpectObj
       delete PeriodicSpectrum;
       std::cout<<" SpectObj: Generated photons : "<<counts<<" over "<<m_AreaDetector<<" m^2 "<<std::endl;
     }
-  void GetUniqueName(const void *ptr, std::string & name);
+  void GetUniqueName(void *ptr, std::string & name);
   
   TH1D *Integral_E(double e1, double e2);
   TH1D *Integral_E(int ei1, int ei2); 

@@ -148,7 +148,7 @@ void SpectObj::SetAreaDetector(double AreaDetector)
   m_AreaDetector = AreaDetector;
 }
 
-void SpectObj::GetUniqueName(const void *ptr, std::string & name)
+void SpectObj::GetUniqueName(void *ptr, std::string & name)
 {
   std::ostringstream my_name;
   my_name << reinterpret_cast<int> (ptr);
