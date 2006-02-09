@@ -21,9 +21,20 @@
 
 #define DEBUG 0
 
-const double erg2meV      = 624151.0;
+static const double erg2meV      = 624151.0;
 
 bool SpectObj::s_gRandom_seed_set(false);
+#if 0 //THB
+#else
+class SpectObj::UniformRandom {
+public:
+    UniformRandom(){}
+    double Uniform(double a=0, double b=1)
+    {
+        return RandFlat::shoot(a,b);
+    }
+};
+#endif
 
 SpectObj::SpectObj(const TH2D* In_Nv, int type, double z)
 {
@@ -36,6 +47,7 @@ SpectObj::SpectObj(const TH2D* In_Nv, int type, double z)
   Nv->SetName(name.c_str());
   //  Nv->SetDirectory(0);
   counts=0;
+#if 0 //THB
   m_SpRandGen = new TRandom();
 
 // Set the TRandom seeds using the CLHEP generator.
@@ -46,7 +58,9 @@ SpectObj::SpectObj(const TH2D* In_Nv, int type, double z)
     gRandom->SetSeed(int(RandFlat::shoot()*bigInt));
     s_gRandom_seed_set = true;
   }
-
+#else
+  m_SpRandGen = new UniformRandom();
+#endif
   sourceType = type; //Max
   
   ne   = Nv->GetNbinsY();

@@ -9,7 +9,9 @@
 #include "TH2D.h"
 #include "TH1D.h"
 #include "TROOT.h"
+#if 0 //THB
 #include "TRandom.h"
+#endif
 #include <vector>
 #include <iostream>
 
@@ -89,7 +91,12 @@ class SpectObj
  private:
   int counts;
   double  m_AreaDetector;
+#if 0 //THB
   TRandom *m_SpRandGen;
+#else
+  class UniformRandom;
+  UniformRandom * m_SpRandGen;
+#endif
   TH2D* Nv;
   int ne,nt;
   int sourceType; //"0=Transient,1=Periodic"
