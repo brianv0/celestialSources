@@ -39,6 +39,15 @@ struct photon
 */
 class SpectObj
 {
+#if 0 //THB
+#else
+  class UniformRandom {
+  public:
+    UniformRandom(){}
+    double Uniform(double a=0, double b=1);
+  };
+#endif
+
  public:
   SpectObj(const TH2D* In_Nv, int type, double z=0.0); //Max
   
@@ -94,7 +103,6 @@ class SpectObj
 #if 0 //THB
   TRandom *m_SpRandGen;
 #else
-  class UniformRandom;
   UniformRandom * m_SpRandGen;
 #endif
   TH2D* Nv;

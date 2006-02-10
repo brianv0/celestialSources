@@ -24,17 +24,6 @@
 static const double erg2meV      = 624151.0;
 
 bool SpectObj::s_gRandom_seed_set(false);
-#if 0 //THB
-#else
-class SpectObj::UniformRandom {
-public:
-    UniformRandom(){}
-    double Uniform(double a=0, double b=1)
-    {
-        return RandFlat::shoot(a,b);
-    }
-};
-#endif
 
 SpectObj::SpectObj(const TH2D* In_Nv, int type, double z)
 {
@@ -656,6 +645,13 @@ void SpectObj::SaveParameters(double tstart, std::pair<double,double> direction)
   std::cout<<" GRB   flux ("<< emin <<","<< emax <<") = "<<fTOT<<" erg/cm^2"<<std::endl;
   std::cout<<"**************************************************"<<std::endl;
 }
+
+#if 0  //THB
+#else
+double SpectObj::UniformRandom::Uniform(double a, double b) {
+  return RandFlat::shoot(a,b);
+}
+#endif
 
 void SpectObj::GetGBM()
 {
