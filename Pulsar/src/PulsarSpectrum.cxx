@@ -308,7 +308,6 @@ double PulsarSpectrum::interval(double time)
 	  tff+=interval(tff);
       }
       while(tff<time);
-      //      std::cout<<"FAVA LESSA"<<tff+interval(tff)-time<<std::endl;
       return tff+interval(tff)-time;
     }
   
