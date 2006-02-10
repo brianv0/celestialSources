@@ -17,7 +17,7 @@
 #include "PulsarConstants.h"
 #include "PulsarSim.h"
 #include "SpectObj/SpectObj.h"
-#include "flux/ISpectrum.h"
+#include "flux/Spectrum.h"
 #include "CLHEP/Vector/ThreeVector.h"
 #include "flux/EventSource.h"
 #include "facilities/Util.h"
@@ -109,6 +109,8 @@ class PulsarSpectrum : public ISpectrum
   const std::string& m_params; 
   
   std::string m_PSRname;
+  
+  bool m_ff;
 
   double m_RA, m_dec, m_l, m_b;  
   double m_period, m_pdot, m_p2dot, m_t0, m_t0Init, m_t0End, m_phi0, m_f0, m_f1, m_f2,m_N0;

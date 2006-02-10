@@ -57,7 +57,7 @@ ISpectrumFactory &PulsarSpectrumFactory()
 PulsarSpectrum::PulsarSpectrum(const std::string& params)
   : m_solSys(astro::SolarSystem::EARTH), m_params(params) 
 {
-
+  m_ff=false;
   // Reset all variables;
   m_RA = 0.0;
   m_dec = 0.0;
@@ -78,6 +78,7 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
   m_phi0 = 0.0;
   m_model = 0;
   m_seed = 0;
+  //
 
   //Read from XML file
   m_PSRname    = parseParamList(params,0).c_str();            // Pulsar name
@@ -292,9 +293,25 @@ double PulsarSpectrum::flux(double time) const
  * This method also calls the interval method in SpectObj class to determine the next photon in a rest-frame without 
  * ephemerides effects.
  */
+
+
+
+
 double PulsarSpectrum::interval(double time)
 {  
-
+  
+  if(!m_ff)
+    {
+      double tff =  Spectrum::startTime();
+      m_ff=true;
+      do{
+	  tff+=interval(tff);
+      }
+      while(tff<time);
+      //      std::cout<<"FAVA LESSA"<<tff+interval(tff)-time<<std::endl;
+      return tff+interval(tff)-time;
+    }
+  
   double timeTildeDecorr = time + (StartMissionDateMJD)*SecsOneDay; //Arrival time decorrected
   double timeTilde = timeTildeDecorr + getBaryCorr(timeTildeDecorr); //should be corrected before applying ephem de-corrections
   
