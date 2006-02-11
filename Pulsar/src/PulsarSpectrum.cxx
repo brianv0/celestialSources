@@ -304,10 +304,19 @@ double PulsarSpectrum::interval(double time)
     {
       double tff =  Spectrum::startTime();
       m_ff=true;
+
       do{
-	  tff+=interval(tff);
+	
+	if (tff+interval(tff) > time) 
+	  break;
+	
+	tff+=interval(tff);
+	
       }
       while(tff<time);
+
+      std::cout <<"Concluding.." << tff - Spectrum::startTime() << " then " << tff+interval(tff)-time << std::endl;
+
       return tff+interval(tff)-time;
     }
   
