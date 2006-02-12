@@ -299,7 +299,8 @@ double PulsarSpectrum::flux(double time) const
 
 double PulsarSpectrum::interval(double time)
 {  
-  
+
+  /*
   if(!m_ff)
     {
       double tff =  Spectrum::startTime();
@@ -319,6 +320,10 @@ double PulsarSpectrum::interval(double time)
 
       return tff+interval(tff)-time;
     }
+
+  */
+
+
   
   double timeTildeDecorr = time + (StartMissionDateMJD)*SecsOneDay; //Arrival time decorrected
   double timeTilde = timeTildeDecorr + getBaryCorr(timeTildeDecorr); //should be corrected before applying ephem de-corrections

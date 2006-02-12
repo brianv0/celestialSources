@@ -153,8 +153,9 @@ void PlotPulsar(double enph = 0,char name[100]="pulsar.root")
   cInt->Divide(1,2);
   cInt->cd(1);
   cInt->SetLogy();
+
   double RunLength = 150.; //lenght of single run in seconds
-  int RunCounts =0.; // count in a Single Run;
+  int RunCounts =0; // count in a Single Run;
   double RunTime = 0.; //current time in a single run;
   TH1D *hInt = new TH1D("hInt","Interval Distribution",250,0.,500);
   TH1D *hRun = new TH1D("hRun","Counts in a Run",50,0.,100.);
@@ -164,10 +165,6 @@ void PlotPulsar(double enph = 0,char name[100]="pulsar.root")
   pois->SetParName(1,"#mu");    
   pois->SetParameter(0,1);                                              
   pois->SetParameter(1,18); 
-     
- 
-
-
 
   //Init lightCurves
 
@@ -370,8 +367,8 @@ void PlotPulsar(double enph = 0,char name[100]="pulsar.root")
 
 
   
-      int en2 = Fv->GetXaxis()->FindBin(EnNormMin);
-      int en3 = Fv->GetXaxis()->FindBin(EnNormMax);
+      //      int en2 = Fv->GetXaxis()->FindBin(EnNormMin);
+      //  int en3 = Fv->GetXaxis()->FindBin(EnNormMax);
       std::cout<<" Photons Extracted : = "<<Lc->GetEntries()<<std::endl;
       //std::cout<<" flux (exp)        : = "<<Counts->Integral(en2,en3)/(1e4*nLoops*AreaDetector)<<" ph/m^2"<<std::endl;
       //std::cout<<" flux (exp)        : = "<<Counts->Integral(0,EBIN,"width")*1.0e-7/erg2meV<<" erg/cm^2"<<std::endl;
