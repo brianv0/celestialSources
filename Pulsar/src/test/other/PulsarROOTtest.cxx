@@ -65,6 +65,12 @@ void MakePulsar()
 }//[in-charge]
 
 
+//Make a Poisson distribution
+Double_t poissonf(Double_t*x,Double_t*par)                                         
+{                                                                              
+  return par[0]*TMath::Poisson(x[0],par[1]);
+} 
+
 void PlotPulsar(double enph = 0,char name[100]="pulsar.root")
 {
 
@@ -141,6 +147,27 @@ void PlotPulsar(double enph = 0,char name[100]="pulsar.root")
   TCanvas *csp = new TCanvas("csp","csp");
   csp->SetLogx();
   csp->SetLogy();
+
+  //Canvas for intervl distribution
+  TCanvas *cInt = new TCanvas("cInt","Interval",600,800);
+  cInt->Divide(1,2);
+  cInt->cd(1);
+  cInt->SetLogy();
+  double RunLength = 150.; //lenght of single run in seconds
+  int RunCounts =0.; // count in a Single Run;
+  double RunTime = 0.; //current time in a single run;
+  TH1D *hInt = new TH1D("hInt","Interval Distribution",250,0.,500);
+  TH1D *hRun = new TH1D("hRun","Counts in a Run",50,0.,100.);
+
+  TF1 *pois = new TF1("pois",poissonf,0,100,2); // x in [0;10], 2parameters                  
+  pois->SetParName(0,"Const");                                                
+  pois->SetParName(1,"#mu");    
+  pois->SetParameter(0,1);                                              
+  pois->SetParameter(1,18); 
+     
+ 
+
+
 
   //Init lightCurves
 
@@ -226,6 +253,11 @@ void PlotPulsar(double enph = 0,char name[100]="pulsar.root")
       double flux;
       int i = 0;
       time = sp->interval(0.0,enph); // s
+      //Fill histogram with first interval 
+      hInt->Fill(time);
+      RunTime+=time;
+      RunCounts++;
+
       std::cout << "Extracting photon above " << enph << std::endl;
 
 
@@ -233,6 +265,22 @@ void PlotPulsar(double enph = 0,char name[100]="pulsar.root")
       while(time < nLoops*TMAX && time>=0)
 	{
 	  Interval = sp->interval(time,enph); // s  
+	  //Fill Interval distribution
+	  hInt->Fill(Interval);
+
+	  //test poisson distribution
+	  if (RunTime > RunLength)
+	    {
+	      RunTime =0.;
+	      hRun->Fill(RunCounts);
+	      RunCounts=0;
+	    }
+
+	  RunTime+=Interval;
+	  RunCounts++;
+
+
+
 	  energy   = sp->energy(time,enph);   // keV
 	  flux     = sp->flux(time,enph);     // ph/s
 	  
@@ -280,6 +328,17 @@ void PlotPulsar(double enph = 0,char name[100]="pulsar.root")
       Counts->SetStats(1);
       Counts->Draw("E1same");
       Counts->SetStats(1);
+
+      cInt->cd(1);
+      gStyle->SetOptFit(1111);
+      hInt->Fit("expo");
+      hInt->Draw();
+
+      cInt->cd(2);
+      gStyle->SetOptFit(1111);
+      hRun->Fit("pois");
+      hRun->Draw();
+      
     }
 
   TLegend *lcleg = new TLegend(0.30,0.89,0.88,1.0);
@@ -392,7 +451,7 @@ int main(int argc, char** argv)
   
 
   char name[100];
-  sprintf(name,"PSRVELAroot.root");
+  sprintf(name,"PsrOutput/PSRVELAroot.root");
   
   std::cout << "**  Photons simulated on a period of " << Period*nLoops << " s. " << std::endl;
   PlotPulsar(enph,name);  
