@@ -58,8 +58,11 @@ class SpectObj
       delete Probability;
       delete Nv;
       delete m_SpRandGen;
-      //      if (PeriodicSpectrumIsComputed == true ) 
-      delete PeriodicSpectrum;
+      if (PeriodicSpectrumIsComputed == true ) 
+	{
+	  delete PeriodicSpectrum;
+	  delete PeriodicLightCurve;
+	}
       std::cout<<" SpectObj: Generated photons : "<<counts<<" over "<<m_AreaDetector<<" m^2 "<<std::endl;
     }
   void GetUniqueName(void *ptr, std::string & name);
@@ -113,8 +116,9 @@ class SpectObj
   double m_Tmin,m_Tmax, m_TimeBinWidth;
   double Ptot;
   double m_z;
+  double m_meanRate;
   
-  TH1D *spec,*times,*Probability,*PeriodicSpectrum;
+  TH1D *spec,*times,*Probability,*PeriodicSpectrum,*PeriodicLightCurve;
   photon ph;
   bool ProbabilityIsComputed, PeriodicSpectrumIsComputed;
   IRB::EblAtten * m_tau;

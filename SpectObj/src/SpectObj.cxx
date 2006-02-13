@@ -137,6 +137,8 @@ EBL model 2: Kneiske, Bretz, Mannheim, Hartmann (A&A 413, 807-815, 2004)
   ProbabilityIsComputed=false;
   PeriodicSpectrumIsComputed = false;
 
+  m_meanRate=0.;
+
   delete[] en;
       
   if(DEBUG)  std::cout<<" SpectObj initialized ! ( " << sourceType <<")"<<std::endl;
@@ -398,106 +400,53 @@ photon SpectObj::GetPhoton(double t0, double enph)
   else if (sourceType == 1) //Periodic //Max
     {
       m_z=0.0;
+
       if (!PeriodicSpectrumIsComputed)
 	{
 	  PeriodicSpectrum = Integral_T(1,nt,ei);
+
+	  //Integral over energies of interest.
+	  PeriodicLightCurve = Integral_E(ei,Nv->GetYaxis()->FindBin(emax)); //ph
+	  PeriodicLightCurve->Scale(1./m_TimeBinWidth);
+
+	  //Compute also mean flux over bins
+	  m_meanRate=0;
+
+	  for (int tt=0; tt < nt; tt++)
+ 	    {
+	      m_meanRate = m_meanRate + PeriodicLightCurve->GetBinContent(tt+1);
+	    }
+	  m_meanRate=m_meanRate/nt;
+	  // std::cout << "***mF is " << m_meanRate*1e-4/m_AreaDetector << std::endl;
+	  // std::cout << "***mR is " << m_meanRate << std::endl;
+	   
+	  //Normalize PeriodicSpectrum
+	  //int binT0 = Nv->GetXaxis()->FindBin(0.);
+	  //int binTmax = Nv->GetXaxis()->FindBin(m_Tmax);
+   	  //	  double TotalCounts = PeriodicLightCurve->Integral(binT0,binTmax);
+	  //      PeriodicLightCurve->Scale(1./TotalCounts);
+
 	  PeriodicSpectrumIsComputed = true;
 	}
-      
-      double TimeToFirstPeriod = 0.0;
-      double TimeFromLastPeriod = 0.0;
-      double IntNumPer = 0.0;
-      double ProbRest = 1.0;
-      double InternalTime = t0 - Int_t(t0/m_Tmax)*m_Tmax; // InternalTime is t0 reduced to a period
-      double Pnt = Probability->GetBinContent(nt);
-      double Ptot = Pnt - Probability->GetBinContent(1); //Total proability in a period 
-      
-      if (DEBUG)
-	{
-	  std::cout << std::setprecision(30) << "\n\n**t0 is " << t0 << std::endl;
-	  std::cout << std::setprecision(30) << "Interval start : Ptot in a period is :" << Ptot << std::endl; 
-	}
 
 
-
-      //Step 1 
-
-      int InternalBin = Nv->GetXaxis()->FindBin(InternalTime) ;  
-      double InternalBinProbCont = Probability->GetBinContent(InternalBin) - Probability->GetBinContent(InternalBin-1);
-      double LowEdge = (Nv->GetXaxis()->GetBinCenter(InternalBin)-m_TimeBinWidth/2);
-      if (InternalBin == 1) 
-	LowEdge = 0.0;
-
-      ProbRest =  InternalBinProbCont*(1.0 - ((InternalTime - LowEdge)/(2*m_TimeBinWidth)));
-      
-      ProbRest = ProbRest + (Probability->GetBinContent(nt) - Probability->GetBinContent(InternalBin));
-      
-      double myP = m_SpRandGen->Uniform(0.9,1.1);
-
-      if (ProbRest <  myP)
-	{
-	  TimeToFirstPeriod = m_Tmax - InternalTime;
-	  ProbRest = myP - ProbRest;
-	}
-      else 
-	{ 
-        if( DEBUG)
-	  std::cout << " Next Photon within the same period " << std::endl;
-	}
-
-      
-      //Step 2;
-      if (ProbRest/Ptot >= 1.0)
-	{
- 		
-	  IntNumPer = floor(ProbRest/Ptot);	
-	  ProbRest = ProbRest - IntNumPer*Ptot;
-	}
-
-      int tBinCurrent = 1;
-
-      while ((Probability->GetBinContent(tBinCurrent) - Probability->GetBinContent(1)) <  ProbRest )
-	{
-	  tBinCurrent++;
-	}
-    
-      //      ProbRest = ProbRest - (Probability->GetBinContent(tBinCurrent-1) - Probability->GetBinContent(1));
-	 
-      TimeFromLastPeriod = Nv->GetXaxis()->GetBinCenter(tBinCurrent) - m_TimeBinWidth/2 +  m_TimeBinWidth*m_SpRandGen->Uniform(); 
-      //     std::cout << "TimeForm " << TimeFromLastPeriod << " width " << m_TimeBinWidth/2 
-      //	<< " --> " << TimeFromLastPeriod - Nv->GetXaxis()->GetBinCenter(tBinCurrent) 
-      //	<< " phase " << TimeFromLastPeriod/m_Tmax << std::endl;
-      
-      
-      if(DEBUG)
-     	{
-	  std::cout << "\n\n First Step " << t0 
- 		    << " to " << t0 + TimeToFirstPeriod 
-	 	    << " (" << TimeToFirstPeriod << ")" << std::endl;  
-	  std::cout << " Second Step " << t0 + TimeToFirstPeriod 
-		    << " to " << t0 + TimeToFirstPeriod + IntNumPer*m_Tmax 
-		    << " (" << IntNumPer*m_Tmax << "," << IntNumPer << " periods)" << std::endl;  
-	  std::cout << " Third Step " << t0 + TimeToFirstPeriod + IntNumPer*m_Tmax 
-		    << " to " << t0 + TimeToFirstPeriod + IntNumPer*m_Tmax + TimeFromLastPeriod 
-		    << " (" << TimeFromLastPeriod << ")" << std::endl;  
-	  
-
-	  }
-      
-      // Now evaluate the Spectrum Histogram
-      
-      ph.time   = t0 + TimeToFirstPeriod + IntNumPer*m_Tmax +TimeFromLastPeriod;
+      //Extract energyfrom Profile.
       ph.energy = PeriodicSpectrum->GetRandom();
 
-      if (IntNumPer == -1.0)
-	{
-	  if (DEBUG)
-	    {		
-	      std::cout << " Warning! No photons within the mission lifetime ! " << std::endl;
-	    }
-	  ph.time = t0 + 2.0e8;
-	}
-            
+      double InternalTime = t0 - Int_t(t0/m_Tmax)*m_Tmax; // InternalTime is t0 reduced to a period
+        
+      double deltaTPoisson =  -log(1.-RandFlat::shoot(1.0))/m_meanRate; //interval according to Poisson statistics
+      int deltaPer = Int_t((deltaTPoisson - (m_Tmax-InternalTime))/m_Tmax); //number of period up to next photon
+      //Computes PerResid ,i.e. the residual time from deltaTPoisson
+      //after removing the time up to the beginning of the period that contains the next photon  
+      double PerResid = deltaTPoisson - deltaPer*m_Tmax - (m_Tmax-InternalTime); // Residual of
+      //Time added by hand to be compatible with the lightcurve
+      double InternalDelta =  PeriodicLightCurve->GetRandom();
+
+      ph.time = t0 + deltaTPoisson - PerResid + InternalDelta;
+
+      //Warning:check for extremely low sources, if it is ok.It should be ok, but we need a test
+    
     }
   
   if(DEBUG)  std::cout<< " T0 =  ("<<t0<<"), Next  " << ph.time << " Energy  (KeV) " << ph.energy << std::endl;
