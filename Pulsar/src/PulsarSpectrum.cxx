@@ -299,34 +299,10 @@ double PulsarSpectrum::flux(double time) const
 
 double PulsarSpectrum::interval(double time)
 {  
-
-  /*
-  if(!m_ff)
-    {
-      double tff =  Spectrum::startTime();
-      m_ff=true;
-
-      do{
-	
-	if (tff+interval(tff) > time) 
-	  break;
-	
-	tff+=interval(tff);
-	
-      }
-      while(tff<time);
-
-      std::cout <<"Concluding.." << tff - Spectrum::startTime() << " then " << tff+interval(tff)-time << std::endl;
-
-      return tff+interval(tff)-time;
-    }
-
-  */
-
-
   
   double timeTildeDecorr = time + (StartMissionDateMJD)*SecsOneDay; //Arrival time decorrected
-  double timeTilde = timeTildeDecorr + getBaryCorr(timeTildeDecorr); //should be corrected before applying ephem de-corrections
+  //this should be corrected before applying barycentryc decorr + ephem de-corrections
+  double timeTilde = timeTildeDecorr + getBaryCorr(timeTildeDecorr); 
   
   double initTurns = getTurns(timeTilde); //Turns made at this time
   double intPart; //Integer part

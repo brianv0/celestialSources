@@ -149,10 +149,11 @@ void PlotPulsar(double enph = 0,char name[100]="pulsar.root")
   csp->SetLogy();
 
   //Canvas for intervl distribution
+
   TCanvas *cInt = new TCanvas("cInt","Interval",600,800);
   cInt->Divide(1,2);
   cInt->cd(1);
-  cInt->SetLogy();
+  gPad->SetLogy();
 
   double RunLength = 150.; //lenght of single run in seconds
   int RunCounts =0; // count in a Single Run;
@@ -327,6 +328,7 @@ void PlotPulsar(double enph = 0,char name[100]="pulsar.root")
       Counts->SetStats(1);
 
       cInt->cd(1);
+      gStyle->SetStatFontSize(0.05);
       gStyle->SetOptFit(1111);
       hInt->Fit("expo");
       hInt->Draw();
@@ -367,7 +369,7 @@ void PlotPulsar(double enph = 0,char name[100]="pulsar.root")
 
 
   
-      //      int en2 = Fv->GetXaxis()->FindBin(EnNormMin);
+      //  int en2 = Fv->GetXaxis()->FindBin(EnNormMin);
       //  int en3 = Fv->GetXaxis()->FindBin(EnNormMax);
       std::cout<<" Photons Extracted : = "<<Lc->GetEntries()<<std::endl;
       //std::cout<<" flux (exp)        : = "<<Counts->Integral(en2,en3)/(1e4*nLoops*AreaDetector)<<" ph/m^2"<<std::endl;
@@ -386,7 +388,7 @@ void PlotPulsar(double enph = 0,char name[100]="pulsar.root")
 
       Lc->Draw("epsame");            
 
-      std::cout << " Photon expecteed : " << Lct_EXT->Integral(0,TBIN) << " ph. " << std::endl;  
+      std::cout << " Photon expecteed : " << Lct_EXT->Integral(0,TBIN) << "+/-" << sqrt(Lct_EXT->Integral(0,TBIN)) << " ph." << std::endl;  
 
     } 
   else
