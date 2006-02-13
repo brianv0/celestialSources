@@ -29,6 +29,6 @@
 *   v1r1p0  5-Oct-2005 THB   DataList parameterization changed
 *   v1r1p1  3-Nov-2005 THB   Multiple ephemerides implemented;bug on FT2 fixed.
 *   v1r1p2  3-dec-2005       (really THB) adjust path for gleam execution
-*   v1r1p6  12-feb-2006 JC   tag request from Julie
+*   v1r1p7  12-feb-2006 JC   tag request from Julie
 *@endverbatim
 */
