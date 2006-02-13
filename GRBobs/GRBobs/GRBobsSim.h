@@ -32,7 +32,7 @@ class GRBobsSim
       if(!m_NvEC) delete m_NvEC;
     }
   /// This method ensures that a unique name is given to the ROOT objects. It is set equal to the pointer address.
-  void GetUniqueName(const void *ptr, std::string & name);
+  void GetUniqueName(void *ptr, std::string & name);
     
   /*!
    * \brief Starts the GRBobs simulation

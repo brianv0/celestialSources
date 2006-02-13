@@ -19,7 +19,7 @@ GRBobsSim::GRBobsSim(GRBobsParameters *params)
   m_GRBengine = new GRBobsengine(params);
 }
 
-void GRBobsSim::GetUniqueName(const void *ptr, std::string & name)
+void GRBobsSim::GetUniqueName(void *ptr, std::string & name)
 {
   std::ostringstream my_name;
   my_name << reinterpret_cast<int> (ptr);
