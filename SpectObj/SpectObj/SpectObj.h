@@ -58,9 +58,11 @@ class SpectObj
       delete Probability;
       delete Nv;
       delete m_SpRandGen;
-      //      if (PeriodicSpectrumIsComputed == true ) 
-      delete PeriodicSpectrum;
-      //delete PeriodicLightCurve;
+      if (PeriodicSpectrumIsComputed == true ) 
+	{
+	  delete PeriodicSpectrum;
+	  delete PeriodicLightCurve;
+	}
       std::cout<<" SpectObj: Generated photons : "<<counts<<" over "<<m_AreaDetector<<" m^2 "<<std::endl;
     }
   void GetUniqueName(void *ptr, std::string & name);
