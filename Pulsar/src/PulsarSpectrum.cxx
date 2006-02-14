@@ -175,8 +175,26 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
 
 
   //writes out an output log file
+  //  std::string logLabel = "PsrOutput/" + m_PSRname + "Log.txt";
 
-  std::string logLabel = "PsrOutput/" + m_PSRname + "Log.txt";
+  //Redirect output to a subdirectory
+  const char * pulsarOutDir = ::getenv("PULSAROUTFILES");
+
+  std::string logLabel;
+  // override obssim if running in Gleam environment
+  if( pulsarOutDir!=0) 
+    logLabel = std::string(pulsarOutDir) + "/" + m_PSRname + "Log.txt";
+  else
+    logLabel = m_PSRname + "Log.txt";
+
+  //  std::string nameProfile = "PsrOutput/" + m_name + "TimeProfile.txt";
+
+
+
+
+
+
+
   ofstream PulsarLog(logLabel.c_str());
   
   PulsarLog << "\n********   PulsarSpectrum Log for pulsar" << m_PSRname << std::endl;

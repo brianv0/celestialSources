@@ -449,11 +449,22 @@ int main(int argc, char** argv)
 
   
 
-  char name[100];
-  sprintf(name,"PsrOutput/PSRVELAroot.root");
+  //  char name[100];
+  //  sprintf(name,"PsrOutput/PSRVELAroot.root");
   
+  //Redirect output to a subdirectory
+  const char * pulsarOutDir = ::getenv("PULSAROUTFILES");
+
+  std::string name;
+
+  // override obssim if running in Gleam environment
+  if( pulsarOutDir!=0) 
+    name = std::string(pulsarOutDir) + "/PSRVELAroot.root";
+  else
+    name = "PSRVELAroot.root";
+
   std::cout << "**  Photons simulated on a period of " << Period*nLoops << " s. " << std::endl;
-  PlotPulsar(enph,name);  
+  PlotPulsar(enph,name.c_str());  
 
   theApp.Run();
 }

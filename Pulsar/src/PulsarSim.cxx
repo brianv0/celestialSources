@@ -99,7 +99,22 @@ TH2D* PulsarSim::PSRPhenom(double par0, double par1, double par2, double par3, d
   //Writes out an output log file for the pulsar
  
   //Redirect output to a subdirectory
-  std::string logSimLabel = "PsrOutput/" + m_name + "Log.txt"; 
+  const char * pulsarOutDir = ::getenv("PULSAROUTFILES");
+
+  std::string logSimLabel;
+  // override obssim if running in Gleam environment
+  if( pulsarOutDir!=0) 
+    logSimLabel = std::string(pulsarOutDir) + "/" + m_name + "Log.txt"; 
+  else
+    logSimLabel = m_name + "Log.txt"; 
+
+  //TimeProfileFileName = std::string(gleam)+"/"+ m_name + "TimeProfile.txt";
+
+
+
+
+
+
   ofstream PulsarLogSim;
   PulsarLogSim.open(logSimLabel.c_str(),std::ios::app);
 
@@ -367,7 +382,20 @@ void PulsarSim::SaveNv(TH2D *Nv)
   Nv->GetZaxis()->CenterTitle();
   
   //Redirect output to a subdirectory
-  std::string root_name = "PsrOutput/" + m_name + "root.root";
+
+  //Redirect output to a subdirectory
+  const char * pulsarOutDir = ::getenv("PULSAROUTFILES");
+
+  // override obssim if running in Gleam environment
+  std::string root_name;
+  if( pulsarOutDir!=0) 
+    root_name = std::string(pulsarOutDir) + "/" + m_name + "root.root";
+  else
+    root_name =  m_name + "root.root";
+
+  //  std::string root_name = "PsrOutput/" + m_name + "root.root";
+
+
   
   TFile mod(root_name.c_str(),"RECREATE");
   Nv->Write();
@@ -389,7 +417,21 @@ void PulsarSim::SaveTimeProfile(TH2D *Nv)
 {
 
   //Redirect output to a subdirectory
-  std::string nameProfile = "PsrOutput/" + m_name + "TimeProfile.txt";
+  const char * pulsarOutDir = ::getenv("PULSAROUTFILES");
+
+  // override obssim if running in Gleam environment
+  std::string nameProfile;
+  if( pulsarOutDir!=0) 
+    nameProfile = std::string(pulsarOutDir) + "/" + m_name + "TimeProfile.txt";
+  else
+    nameProfile = m_name + "TimeProfile.txt";
+
+  //  std::string nameProfile = "PsrOutput/" + m_name + "TimeProfile.txt";
+
+
+
+
+
 
   ofstream OutTimeProf(nameProfile.c_str());
 
