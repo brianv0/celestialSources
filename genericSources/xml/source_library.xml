@@ -1,4 +1,16 @@
 <source_library>
+<!-- MapCube source model -->
+   <source name="DC2_GALPROP_diffuse">
+      <spectrum escale="MeV">
+<!-- Total photon flux from the map (#/m^2/s) = 18.58 from 10 MeV-655 GeV
+     Fits file (plate-carree only) = GP_gamma.fits
+-->
+         <SpectrumClass name="MapCube"
+          params="18.58, $(EXTFILESSYS)/galdiffuse/GP_gamma.fits"/>
+         <use_spectrum frame="galaxy"/>
+      </spectrum>
+   </source>
+
 <!-- MapSource version of the Galactic Diffuse model -->
    <source name="Galactic_diffuse_0">
       <spectrum escale="MeV">
