@@ -84,7 +84,7 @@ void PlotPulsar(double enph = 0,std::string name="pulsar.root")
   cNv->SetLogy();
   cNv->SetLogz();
   
-  TH2D *Nv = Load(name.c_str()); //Nv = ph/m2/s/keV
+  TH2D *Nv = Load(name); //Nv = ph/m2/s/keV
 
   // Ne =  [ph/m²/s/keV]
   gDirectory->Delete("Ne");
