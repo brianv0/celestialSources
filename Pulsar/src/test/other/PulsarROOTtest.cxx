@@ -3,6 +3,8 @@
 #include <vector>
 #include <fstream>
 #include <time.h>
+//#include <strings.h>
+
 
 #include "TROOT.h"
 #include "TApplication.h"
@@ -28,9 +30,9 @@ const double nLoops = 970787;//=1day of Vela;
 
 //////////////////////////////////////////////////
 
-TH2D *Load(char name[100]="pulsar.root")
+TH2D *Load(std::string name="pulsar.root")
 {
-  TFile *mod = new TFile(name);
+  TFile *mod = new TFile(name.c_str());
   TH2D *Nv = (TH2D*) mod->Get("Nv"); //ph m^(-2) s^(-1) keV^(-1)
     
   TMIN = Nv->GetXaxis()->GetXmin();
@@ -71,7 +73,8 @@ Double_t poissonf(Double_t*x,Double_t*par)
   return par[0]*TMath::Poisson(x[0],par[1]);
 } 
 
-void PlotPulsar(double enph = 0,char name[100]="pulsar.root")
+//void PlotPulsar(double enph = 0,char name[100]="pulsar.root")
+void PlotPulsar(double enph = 0,std::string name="pulsar.root")
 {
 
   std::cout << "\n**** Plotting Pulsar Simulator Results..." << std::endl;
@@ -81,7 +84,7 @@ void PlotPulsar(double enph = 0,char name[100]="pulsar.root")
   cNv->SetLogy();
   cNv->SetLogz();
   
-  TH2D *Nv = Load(name); //Nv = ph/m2/s/keV
+  TH2D *Nv = Load(name.c_str()); //Nv = ph/m2/s/keV
 
   // Ne =  [ph/m²/s/keV]
   gDirectory->Delete("Ne");
@@ -453,18 +456,19 @@ int main(int argc, char** argv)
   //  sprintf(name,"PsrOutput/PSRVELAroot.root");
   
   //Redirect output to a subdirectory
-  const char * pulsarOutDir = ::getenv("PULSAROUTFILES");
+  //const char * pulsarOutDir = ::getenv("PULSAROUTFILES");
+  std::string pulsarOutDir = ::getenv("PULSAROUTFILES");
 
   std::string name;
 
   // override obssim if running in Gleam environment
   if( pulsarOutDir!=0) 
-    name = std::string(pulsarOutDir) + "/PSRVELAroot.root";
+    name = pulsarOutDir + "/PSRVELAroot.root";
   else
     name = "PSRVELAroot.root";
 
   std::cout << "**  Photons simulated on a period of " << Period*nLoops << " s. " << std::endl;
-  PlotPulsar(enph,name.c_str());  
+  PlotPulsar(enph,name);  
 
   theApp.Run();
 }

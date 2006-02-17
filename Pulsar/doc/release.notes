@@ -34,5 +34,10 @@
 *   v1r1p5  10-feb-2006 MR   Faint pulsar fix - part 1
 *   v1r1p6  10-feb-2006 MR   Faint pulsar fix - part 2
 *   v1r1p7  12-feb-2006 JC   tag request from Julie
+*   v1r1p8  14-feb-2006 MR   poisson fix
+*   v1r1p9  15-feb-2006 MR   set env variables for outfiles
+*   v1r1p10 17-feb-2006 MR   fix VC8 compilation problems
+
+
 *@endverbatim
 */

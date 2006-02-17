@@ -78,6 +78,7 @@ class PulsarSpectrum : public ISpectrum
 
   //! direction, taken from PulsarSim
   inline std::pair<double,double>
+    
     dir(double energy) 
     {
       return m_GalDir;
