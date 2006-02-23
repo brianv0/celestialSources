@@ -18,7 +18,7 @@ GRBmanager::GRBmanager(const std::string& params)
   : m_params(params)
 {
   m_Nbursts=0;
-  paramFile = "$(GRBROOT)/src/test/GRBParam.txt";
+  paramFile = "$(GRBROOT)/data/GRBParam.txt";
   facilities::Util::expandEnvVar(&paramFile);
   
   m_startTime       = parseParamList(params,0)+Spectrum::startTime();//m_startTime   = TMath::Max(0.,parseParamList(params,0));

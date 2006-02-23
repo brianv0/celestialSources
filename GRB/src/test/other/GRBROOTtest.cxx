@@ -536,7 +536,7 @@ void ScanParameters(int Ngrb)
 {
   
   std::string path = ::getenv("GRBROOT");
-  std::string paramFile = path+"/src/test/GRBParam.txt";  
+  std::string paramFile = path+"/data/GRBParam.txt";  
   Parameters *params = new Parameters();  
 
   //////////////////////////////////////////////////
@@ -686,7 +686,7 @@ void MakeGRB(int NGRB=1, double enph=0, bool gbm = false)
   std::cout<<" ****** GRB and ROOT test ****** "<<std::endl;
   
   std::string path = ::getenv("GRBROOT");
-  std::string paramFile = path+"/src/test/GRBParam.txt";
+  std::string paramFile = path+"/data/GRBParam.txt";
   Parameters *params = new Parameters();  
   //////////////////////////////////////////////////
   params->ComputeParametersFromFile(paramFile,NGRB);
