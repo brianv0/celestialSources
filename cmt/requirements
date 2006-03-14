@@ -12,6 +12,7 @@ use SpectObj v* celestialSources
 use GRB v* celestialSources
 use GRBobs v* celestialSources
 use Pulsar v* celestialSources
+use eblAtten v* celestialSources
 
 apply_pattern package_include
 apply_pattern package_linkopts
