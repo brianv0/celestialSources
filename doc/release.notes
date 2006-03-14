@@ -4,6 +4,7 @@
 
   @verbatim
   $Id$
+  14-mar-06 v1r1p3   THB   fix req file to include eblAtten
   02-Feb-06 v1r1p2     JCT   add 3 sources, based on a flux file and ROOT TF1 in genericSources
   31-Oct-05 v1r1     JC    add FitsTransient, SourcePopulation
   28-Aug-05 v1r0p5   JC    tag for GRBobsmanager
