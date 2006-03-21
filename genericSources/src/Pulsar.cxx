@@ -119,7 +119,7 @@ double Pulsar::period(double time) const {
 }
 
 double Pulsar::drawTime() const {
-   double xi = RandFlat::shoot();
+   double xi = CLHEP::RandFlat::shoot();
    double time = -std::log(xi)/m_meanFlux/EventSource::totalArea();
    return time;
 }

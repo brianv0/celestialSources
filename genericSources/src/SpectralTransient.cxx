@@ -161,16 +161,16 @@ void SpectralTransient::fillEventCache(double time) {
       double dt(m_currentInterval->stopTime - time);
       double flux(m_currentInterval->flux);
       double npred(flux*EventSource::totalArea()*dt);
-      int nevts(RandPoisson::shoot(npred));
+      int nevts(CLHEP::RandPoisson::shoot(npred));
       if (nevts > 0) {
          std::vector< std::pair<double, double> > my_cache;
          for (int i = 0; i < nevts; i++) {
             double energy(m_currentInterval->drawEnergy(m_emin, m_emax));
             if (m_z == 0 || m_tau == 0 || 
-                RandFlat::shoot() < std::exp(-m_tauScale*
+                CLHEP::RandFlat::shoot() < std::exp(-m_tauScale*
                                              (*m_tau)(energy, m_z))) {
-               double eventTime(RandFlat::shoot()*dt + time);
-               my_cache.push_back(std::make_pair(eventTime, energy));
+               double eventTime(CLHEP::RandFlat::shoot()*dt + time);
+               m_eventCache.push_back(std::make_pair(eventTime, energy));
             }
          }
          if (my_cache.size() > 1) {
@@ -304,7 +304,7 @@ void SpectralTransient::rescaleLightCurve() {
 
 double SpectralTransient::ModelInterval::
 drawEnergy(double emin, double emax) const {
-   double xi = RandFlat::shoot();
+   double xi = CLHEP::RandFlat::shoot();
    double energy;
    if (s_energies.size() > 0) {
       size_t k = std::upper_bound(m_integral.begin(), m_integral.end(), xi)

@@ -53,7 +53,7 @@ GRBurst::GRBurst(const std::vector<std::string> &paramVector)
 
 
 
-GRBurst::GRBurst(HepRandomEngine *engine, const double duration, const int npuls, 
+GRBurst::GRBurst(CLHEP::HepRandomEngine *engine, const double duration, const int npuls, 
          const double flux, const double fraction, const double alpha, 
          const double beta, const double epeak, const double specnorm, 
          const bool flag)
@@ -127,7 +127,7 @@ GRBurst &GRBurst::operator=(const GRBurst &right)
 //
 //		Generates "nbsim" number of bursts.  Loops through each burst, creates a photon list (time,energy) 
 //      and records the list in an output file.
-void GRBurst::createGRB(HepRandomEngine *engine, const std::string &prefix, 
+void GRBurst::createGRB(CLHEP::HepRandomEngine *engine, const std::string &prefix, 
                         const std::string &dir)
 {
     // Choose from the distributions for durations, peak fluxes, and spectral power-law indices
@@ -189,7 +189,7 @@ void GRBurst::createGRB(HepRandomEngine *engine, const std::string &prefix,
 //			   const bool flag)
 // Creates the photon list (time,energy) for the burst specified by the input parameters 
 //		and records it in a file if the flag is set.
-void GRBurst::createGRB(HepRandomEngine *engine, const double duration, 
+void GRBurst::createGRB(CLHEP::HepRandomEngine *engine, const double duration, 
                         const int npuls, const double flux, const double fraction, 
                         const double alpha, const double beta, const double epeak, 
                         const double specnorm, const bool flag)
@@ -336,7 +336,7 @@ std::string GRBurst::outputFilename(const std::string &base, const long isim) co
 
 // direction(engine)
 // Calculates the direction of the burst.
-std::pair<float,float> GRBurst::direction(HepRandomEngine *engine) const
+std::pair<float,float> GRBurst::direction(CLHEP::HepRandomEngine *engine) const
 {
     float coszenith = 1.0 - engine->flat() * grbcst::zenNorm;
     float azimuth    = 2. * M_PI * engine->flat();
@@ -350,7 +350,7 @@ std::pair<float,float> GRBurst::direction(HepRandomEngine *engine) const
 // getTimes(HepRandomEngine *engine, const double ethres, const long nphots, const long deltbinsleft, const long iphotoff, 
 //				   const double tmax, const std::vector<double> &pulse)
 // Uses pulse data to generate list of photon times
-void GRBurst::getTimes(HepRandomEngine *engine, const double ethres, 
+void GRBurst::getTimes(CLHEP::HepRandomEngine *engine, const double ethres, 
                        const long nphots, const long deltbinsleft, 
                        const long iphotoff, const double tmax, 
                        const std::vector<double> &pulse)
@@ -401,7 +401,7 @@ void GRBurst::getTimes(HepRandomEngine *engine, const double ethres,
 //		(9)	offset the photon times according to
 //			(a) energy dependence, width ~E^-0.333 and
 //			(b) time of peak, also proportional to E^-0.333.
-void GRBurst::makeTimes(HepRandomEngine *engine, bool first, double ethres)
+void GRBurst::makeTimes(CLHEP::HepRandomEngine *engine, bool first, double ethres)
 {
     if (m_globalData->npuls() == 0)
         m_globalData->setNpuls(std::max(int(15 * m_globalData->duration()/30 + 0.5), 1));

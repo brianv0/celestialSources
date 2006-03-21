@@ -166,7 +166,7 @@ namespace genericSources {
    }
 
    double Util::drawFromPowerLaw(double emin, double emax, double gamma) {
-      double xi = RandFlat::shoot();
+      double xi = CLHEP::RandFlat::shoot();
       double energy;
       if (gamma == 1) {
          energy = emin*std::exp(xi*std::log(emax/emin));

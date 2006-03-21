@@ -151,7 +151,7 @@ void GRBmanager::GenerateGRB()
       
       astro::SkyDir sky(m_l,m_b,astro::SkyDir::GALACTIC);
       HepVector3D skydir=sky.dir();
-      HepRotation rottoglast = GPS::instance()->transformToGlast(m_startTime,GPS::CELESTIAL);
+      CLHEP::HepRotation   rottoglast = GPS::instance()->transformToGlast(m_startTime,GPS::CELESTIAL);
       HepVector3D scdir = rottoglast * skydir;
       m_ra    = sky.ra();
       m_dec   = sky.dec();

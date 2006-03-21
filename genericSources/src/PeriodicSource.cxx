@@ -57,7 +57,7 @@ float PeriodicSource::operator()(float xi) const {
 
 double PeriodicSource::energy(double time) {
    (void)(time);
-   double xi = RandFlat::shoot();
+   double xi = CLHEP::RandFlat::shoot();
    return (*this)(xi);
 }
 
@@ -74,7 +74,7 @@ double PeriodicSource::interval(double time) {
                   m_integralDist.begin() + imin +  npts,
                   newDist.begin(), 
                   std::bind2nd(std::minus<double>(), m_integralDist[imin]));
-   double xi = -log(RandFlat::shoot());
+   double xi = -log(CLHEP::RandFlat::shoot());
    unsigned int turns = static_cast<unsigned int>(xi/newDist[npts-1]);
    double resid = fmod(xi, newDist[npts-1]);
    double my_interval = interpolate(newDist, m_arrTimes, resid) 

@@ -41,10 +41,10 @@ SpectObj::SpectObj(const TH2D* In_Nv, int type, double z)
 
 // Set the TRandom seeds using the CLHEP generator.
   int bigInt(1000000);
-  m_SpRandGen->SetSeed(int(RandFlat::shoot()*bigInt));
+  m_SpRandGen->SetSeed(int(CLHEP::RandFlat::shoot()*bigInt));
   if (!s_gRandom_seed_set) { 
     // Set the global generator once for all SpectObjs
-    gRandom->SetSeed(int(RandFlat::shoot()*bigInt));
+      gRandom->SetSeed(int(CLHEP::RandFlat::shoot()*bigInt));
     s_gRandom_seed_set = true;
   }
 #else
@@ -435,7 +435,7 @@ photon SpectObj::GetPhoton(double t0, double enph)
 
       double InternalTime = t0 - Int_t(t0/m_Tmax)*m_Tmax; // InternalTime is t0 reduced to a period
         
-      double deltaTPoisson =  -log(1.-RandFlat::shoot(1.0))/m_meanRate; //interval according to Poisson statistics
+      double deltaTPoisson =  -log(1.-CLHEP::RandFlat::shoot(1.0))/m_meanRate; //interval according to Poisson statistics
       int deltaPer = Int_t((deltaTPoisson - (m_Tmax-InternalTime))/m_Tmax); //number of period up to next photon
       //Computes PerResid ,i.e. the residual time from deltaTPoisson
       //after removing the time up to the beginning of the period that contains the next photon  
@@ -598,7 +598,7 @@ void SpectObj::SaveParameters(double tstart, std::pair<double,double> direction)
 #if 0  //THB
 #else
 double SpectObj::UniformRandom::Uniform(double a, double b) {
-  return RandFlat::shoot(a,b);
+  return CLHEP::RandFlat::shoot(a,b);
 }
 #endif
 

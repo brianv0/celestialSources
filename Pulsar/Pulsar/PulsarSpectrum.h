@@ -103,7 +103,7 @@ class PulsarSpectrum : public ISpectrum
   astro::SolarSystem m_solSys;
  
   astro::SkyDir m_PulsarDir;
-  Hep3Vector m_PulsarVectDir;
+  CLHEP::Hep3Vector m_PulsarVectDir;
 
   std::pair<double,double> m_GalDir;
   

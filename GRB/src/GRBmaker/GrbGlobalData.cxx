@@ -24,7 +24,7 @@ GrbGlobalData	*GrbGlobalData::s_instance = 0;
 
 
 // default constructor
-GrbGlobalData::GrbGlobalData(HepRandomEngine *engine) 
+GrbGlobalData::GrbGlobalData(CLHEP::HepRandomEngine *engine) 
 {
     grbGlobal(engine);	
 }
@@ -41,7 +41,7 @@ GrbGlobalData::~GrbGlobalData ()
 
 // instance()
 // Returns the singleton instance of the class
-GrbGlobalData	*GrbGlobalData::instance(HepRandomEngine *engine) 
+GrbGlobalData	*GrbGlobalData::instance(CLHEP::HepRandomEngine *engine) 
 { 
     return (s_instance != 0) ? s_instance : (s_instance = new GrbGlobalData(engine)); 
 }
@@ -62,7 +62,7 @@ void GrbGlobalData::kill()
 
 // grbGlobal(engine)
 // Generates samples from global distributions for GRBs: duration, peak flux and spectral power-law index.
-void GrbGlobalData::grbGlobal(HepRandomEngine *engine)
+void GrbGlobalData::grbGlobal(CLHEP::HepRandomEngine *engine)
 {
     long nlong = 0L;
     getDuration(engine, nlong);
@@ -80,7 +80,7 @@ void GrbGlobalData::grbGlobal(HepRandomEngine *engine)
 
 // index(HepRandomEngine *engine, const long diff, const long minval, const std::vector<long> &in)
 // returns the index i to the last element of "in" vector such that in[i] < some random value.
-long GrbGlobalData::index(HepRandomEngine *engine, const long diff, 
+long GrbGlobalData::index(CLHEP::HepRandomEngine *engine, const long diff, 
                           const long minval, const std::vector<long> &in) const
 {
     bool found=0;
@@ -106,7 +106,7 @@ long GrbGlobalData::index(HepRandomEngine *engine, const long diff,
 // evaluate(HepRandomEngine *engine, const long diff, const long minval, const std::vector<long> &in,
 //			const std::vector<double> &v)
 // Picks hi and lo values from the vector "v" and interpolates these to generate the return value.
-double GrbGlobalData::evaluate(HepRandomEngine *engine, const long diff, 
+double GrbGlobalData::evaluate(CLHEP::HepRandomEngine *engine, const long diff, 
                                const long minval, const std::vector<long> &in,
                                const std::vector<double> &v) const
 {
@@ -126,7 +126,7 @@ double GrbGlobalData::evaluate(HepRandomEngine *engine, const long diff,
 //			   const std::vector<double> &v)
 // Picks hi and lo values from the vector "v" and uses the method "result" to interpolate these 
 // to generate the return value.
-double GrbGlobalData::computeFlux(HepRandomEngine *engine, const long diff, 
+double GrbGlobalData::computeFlux(CLHEP::HepRandomEngine *engine, const long diff, 
                                   const long minval, const std::vector<long> &in,
                                   const std::vector<double> &v) const
 {
@@ -147,7 +147,7 @@ double GrbGlobalData::computeFlux(HepRandomEngine *engine, const long diff,
 //		Bonnell et al. (1997, ApJ, 490, 79).  The parent sample is same as for peak fluxes: from GRB 910421 (trig #105)
 //		to GRB 990123 (trig #7343).  This partial sample (1262) includes bursts where backgrounds could be fitted, and
 //		peak fluxes subsequently measured.  The sample spans 7.75 years.
-void GrbGlobalData::getDuration(HepRandomEngine *engine, long &nlong)
+void GrbGlobalData::getDuration(CLHEP::HepRandomEngine *engine, long &nlong)
 {
     std::vector<double>  loEdges = GRBsimvecCreator::instance()->dur_loEdge();	
     std::vector<int>     longs   = GRBsimvecCreator::instance()->dur_long();
@@ -191,7 +191,7 @@ void GrbGlobalData::getDuration(HepRandomEngine *engine, long &nlong)
 //		in Bonnell et al. is for 256-ms accumulations.
 //
 //		*Pendleton used a different PF estimation technique for the initial BATSE Catalog.
-void GrbGlobalData::getFlux(HepRandomEngine *engine, long nlong)
+void GrbGlobalData::getFlux(CLHEP::HepRandomEngine *engine, long nlong)
 {
     std::vector<long>    m = GRBsimvecCreator::instance()->flux_m();
     std::vector<long>    n = GRBsimvecCreator::instance()->flux_n();
@@ -239,7 +239,7 @@ void GrbGlobalData::getFlux(HepRandomEngine *engine, long nlong)
 //                                  const std::vector<double> &loEdges, 
 //                                  const double factor, 
 //                                  std::vector<double> &vect)
-void GrbGlobalData::powerLawIndex(HepRandomEngine *engine, 
+void GrbGlobalData::powerLawIndex(CLHEP::HepRandomEngine *engine, 
 const std::vector<int> &histpl, const double factor, std::vector<double> &vect)
 {
     std::vector<long>  intgplawdist;
@@ -266,7 +266,7 @@ const std::vector<int> &histpl, const double factor, std::vector<double> &vect)
 // getPowerLawIndex(HepRandomEngine *engine)
 //		Chooses spectral power-law indices from the BATSE power-law distribution, 
 //		as measured by Preece et al. (ApJS 2000, 126, 19)
-void GrbGlobalData::getPowerLawIndex(HepRandomEngine *engine)
+void GrbGlobalData::getPowerLawIndex(CLHEP::HepRandomEngine *engine)
 {
     // Code for OLD LAT
     //std::vector<double>  loEdges  = GRBsimvecCreator::instance()->pl_loEdge();
