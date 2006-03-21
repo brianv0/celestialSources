@@ -5,8 +5,11 @@
   @verbatim
   $Id$
 
-  02-Feb-06 v1r6p8  JCT   fix windows build and remove parameter for flux in cm-2
-  01-Feb-06 v1r6p6  JCT	  add 3 new sources : TF1Map, TF1Spectrum, FILESpectrumMap
+  21-Mar-06 v1r6p9  JC    Tracy's changes for new CLHEP
+  02-Feb-06 v1r6p8  JCT   fix windows build and remove parameter for flux 
+                          in cm-2
+  01-Feb-06 v1r6p6  JCT	  add 3 new sources : TF1Map, TF1Spectrum,
+                          FILESpectrumMap
   28-Jan-06 v1r6p5  JC    remove duplicate event times in SpectralTransient
                           that may occur for high flux sources
   27-Jan-06 v1r6p4  THB   special tag at J. McEnery request.
