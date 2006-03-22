@@ -75,19 +75,27 @@ MapSource::MapSource(const std::string & paramString)
       facilities::Util::keyValueTokenize(paramString, ", ", my_parmap);
       
       genericSources::ConstParMap parmap(my_parmap);
+
+      //fitFile and flux return a runtime error if absent
       m_flux = parmap.value("flux");
-      m_gamma = parmap.value("gamma");
       fitsFile = parmap["fitsFile"];
-      if (parmap.size() > 3) {
-         m_emin = parmap.value("emin");
-      }
-      if (parmap.size() > 4) {
-         m_emax = parmap.value("emax");
-      }
-      if (parmap.size() > 5) {
-         try {
-            m_lonMin = parmap.value("lonMin");
-            m_lonMax = parmap.value("lonMax");
+
+      //gamma, emin and emax remain set to default values
+      //if absent from the XML file
+      try {
+	m_gamma = parmap.value("gamma");
+	m_emin = parmap.value("emin");
+	m_emax = parmap.value("emax");
+      } catch (...)
+	{
+	   ;
+	}
+      //these 4 should be all absent or all present. Code is incorrect as is
+      if (my_parmap.find("lonMin")!=my_parmap.end()||my_parmap.find("lonMax")!=my_parmap.end()||
+	  my_parmap.find("latMin")!=my_parmap.end()||my_parmap.find("latMax")!=my_parmap.end()) {
+	try {
+	    m_lonMin = parmap.value("lonMin");
+	    m_lonMax = parmap.value("lonMax");
             m_latMin = parmap.value("latMin");
             m_latMax = parmap.value("latMax");
             createSubMap = true;
@@ -98,6 +106,10 @@ MapSource::MapSource(const std::string & paramString)
          }
       }
    }
+
+   std::cout<<m_gamma<<" "<<m_emin<<" "<<m_emax<<" "<<m_lonMin<<" "<<m_lonMax<<" "<<m_latMin<<" "<<m_latMax<<std::endl;
+
+
    readFitsFile(fitsFile, createSubMap);
    makeIntegralDistribution(m_image);
 
@@ -202,7 +214,7 @@ void MapSource::readFitsFile(std::string fitsFile, bool createSubMap) {
       fitsImage = genericSources::FitsImage::
          sampledImage(fitsImage, m_lon, m_lat, fitsImage.coordSys());
 
-// rescale the flux by the sub-map integral
+      // rescale the flux by the sub-map integral
       double new_integral = fitsImage.mapIntegral();
       m_flux *= new_integral/m_mapIntegral;
       m_mapIntegral = new_integral;
@@ -223,11 +235,41 @@ void MapSource::getSubMapAxes(const genericSources::FitsImage & fitsImage) {
    fitsImage.getAxisVector(0, axis);
    double dx = std::fabs(axis.at(1) - axis.at(0));
    m_lon.clear();
-   for (size_t i = 0; i < axis.size(); i++) {
-      if (m_lonMin - dx < axis.at(i) && axis.at(i) < m_lonMax + dx) {
-         m_lon.push_back(axis.at(i));
-      }
-   }
+
+   double img_lonMin = axis.at(0)-0.5*dx;
+   double img_lonMax = axis.at(axis.size()-1)+0.5*dx;
+
+   //standard case : the subRange is included inside the map boundaries
+   if(m_lonMin>=img_lonMin && m_lonMax<=img_lonMax)
+     {
+       for (size_t i = 0; i < axis.size(); i++) {
+	 if (m_lonMin - dx < axis.at(i) && axis.at(i) < m_lonMax + dx) {
+	   m_lon.push_back(axis.at(i));
+	 }
+       }
+     } else {
+       // non standard case : we need to wrap the longitude  boundaries
+       double wrapped_lonMin = m_lonMin;
+       double wrapped_lonMax = m_lonMax;
+       if(m_lonMin<img_lonMin)
+	 {
+	   //this is the case where the map is [-180,180] or [0,360] and the request
+	   //is [-190,-170] or [-10,10] respectively
+	   wrapped_lonMin = 360. + m_lonMin;
+	 }
+       if(m_lonMax>img_lonMax)
+	 {
+	   //this is the case where the map is [-180,180] or [0,360] and the request
+	   //is [170,-190] or [350,370] respectively
+	   wrapped_lonMax=m_lonMax-360.;
+	 }
+       for (size_t i = 0; i < axis.size(); i++) {
+	 if (wrapped_lonMin - dx < axis.at(i) || axis.at(i) < wrapped_lonMax + dx) {
+	   m_lon.push_back(axis.at(i));
+	 }
+       }
+     }
+   
    fitsImage.getAxisVector(1, axis);
    dx = std::fabs(axis.at(1) - axis.at(0));
    m_lat.clear();
