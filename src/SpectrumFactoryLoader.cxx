@@ -9,6 +9,8 @@
 
 #include "celestialSources/SpectrumFactoryLoader.h"
 #include "flux/ISpectrumFactory.h"
+#include "TRandom.h"
+#include "CLHEP/Random/Random.h"
 
 // declare the external factories.
 ISpectrumFactory & FitsTransientFactory();
@@ -33,6 +35,10 @@ ISpectrumFactory & FileSpectrumMapFactory();
 
 SpectrumFactoryLoader::SpectrumFactoryLoader()
 {
+  //Set the ROOT engine's seed for all the ROOT based classes
+  long int theSeed = CLHEP::HepRandom::getTheSeed();
+  gRandom->SetSeed(theSeed);
+
    load(FitsTransientFactory());
    load(GRBmanagerFactory());
    load(GRBobsmanagerFactory());
