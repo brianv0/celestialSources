@@ -5,6 +5,8 @@
   @verbatim
   $Id$
 
+  30-Mar-06 v1r6p10 JC    fix for bug in SpectralTransient introduced in
+                          CLHEP namespace conversion
   21-Mar-06 v1r6p9  JC    Tracy's changes for new CLHEP
   02-Feb-06 v1r6p8  JCT   fix windows build and remove parameter for flux 
                           in cm-2
