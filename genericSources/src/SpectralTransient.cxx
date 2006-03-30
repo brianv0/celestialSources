@@ -170,7 +170,7 @@ void SpectralTransient::fillEventCache(double time) {
                 CLHEP::RandFlat::shoot() < std::exp(-m_tauScale*
                                              (*m_tau)(energy, m_z))) {
                double eventTime(CLHEP::RandFlat::shoot()*dt + time);
-               m_eventCache.push_back(std::make_pair(eventTime, energy));
+               my_cache.push_back(std::make_pair(eventTime, energy));
             }
          }
          if (my_cache.size() > 1) {
