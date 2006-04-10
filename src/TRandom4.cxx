@@ -11,9 +11,7 @@
 #include "celestialSources/TRandom4.h"
 
 TRandom4::TRandom4(UInt_t seed) {
-   if (seed != 0) {
-      SetSeed(seed);
-   }
+   SetSeed(seed);
 }
 
 TRandom4::~TRandom4() {
@@ -37,5 +35,7 @@ void TRandom4::RndmArray(Int_t n, Double_t *array) {
 }
 
 void TRandom4::SetSeed(UInt_t seed) {
-   HepRandom hepRandom(seed);
+   if (seed != 0) {
+      HepRandom hepRandom(seed);
+   }
 }
