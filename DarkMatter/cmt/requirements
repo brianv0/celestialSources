@@ -5,6 +5,5 @@ author Johann Cohen-Tanugi <cohen@slac.stanford.edu>
  
 # $Id$
  
- 
-use flux       v9r*
+set DARKMATTERROOT "/data1/DM/DarkMatter/JCT"
 
