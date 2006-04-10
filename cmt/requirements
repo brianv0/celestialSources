@@ -20,7 +20,8 @@ apply_pattern package_stamps
 
 macro source *.cxx WIN32 "*.h *.cxx"
 
-library celestialSources -no_share -s=../celestialSources $(source) -s=../src $(source)
+library celestialSources -no_share -s=../celestialSources \
+        $(source) -s=../src $(source)
 
 application test_celestialSources test/*.cxx
 

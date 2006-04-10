@@ -5,12 +5,16 @@
 *  $Header$
 */
 
+#include <iostream>
 #include <vector>
 
 #include "celestialSources/SpectrumFactoryLoader.h"
+#include "celestialSources/TRandom4.h"
+
 #include "flux/ISpectrumFactory.h"
-#include "TRandom.h"
-#include "CLHEP/Random/Random.h"
+
+// #include "TRandom.h"
+// #include "CLHEP/Random/Random.h"
 
 // declare the external factories.
 ISpectrumFactory & FitsTransientFactory();
@@ -29,15 +33,14 @@ ISpectrumFactory & SimpleTransientFactory();
 ISpectrumFactory & SpectralTransientFactory();
 ISpectrumFactory & TransientTemplateFactory();
 ISpectrumFactory & TF1SpectrumFactory();
-ISpectrumFactory & TF1MapFactory();
-ISpectrumFactory & FileSpectrumFactory();
-ISpectrumFactory & FileSpectrumMapFactory();
+ISpectrumFactory & TF1MapFactory(ISpectrumFactory & FileSpectrumMapFactory();
 
-SpectrumFactoryLoader::SpectrumFactoryLoader()
-{
-  //Set the ROOT engine's seed for all the ROOT based classes
-  long int theSeed = CLHEP::HepRandom::getTheSeed();
-  gRandom->SetSeed(theSeed);
+SpectrumFactoryLoader::SpectrumFactoryLoader() {
+// // Set the ROOT engine's seed for all the ROOT based classes
+//    long int theSeed = CLHEP::HepRandom::getTheSeed();
+//    gRandom->SetSeed(theSeed);
+
+   gRandom = new TRandom4();
 
    load(FitsTransientFactory());
    load(GRBmanagerFactory());
@@ -59,8 +62,8 @@ SpectrumFactoryLoader::SpectrumFactoryLoader()
    load(FileSpectrumFactory());
    load(FileSpectrumMapFactory());
 }
-void SpectrumFactoryLoader::load(ISpectrumFactory& factory)
-{
+
+void SpectrumFactoryLoader::load(ISpectrumFactory& factory) {
        m_names.push_back( factory.name() );
 }
 
