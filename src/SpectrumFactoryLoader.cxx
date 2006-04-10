@@ -12,7 +12,6 @@
 #include "celestialSources/TRandom4.h"
 
 #include "flux/ISpectrumFactory.h"
-
 // #include "TRandom.h"
 // #include "CLHEP/Random/Random.h"
 
@@ -33,7 +32,9 @@ ISpectrumFactory & SimpleTransientFactory();
 ISpectrumFactory & SpectralTransientFactory();
 ISpectrumFactory & TransientTemplateFactory();
 ISpectrumFactory & TF1SpectrumFactory();
-ISpectrumFactory & TF1MapFactory(ISpectrumFactory & FileSpectrumMapFactory();
+ISpectrumFactory & TF1MapFactory();
+ISpectrumFactory & FileSpectrumFactory();
+ISpectrumFactory & FileSpectrumMapFactory();
 
 SpectrumFactoryLoader::SpectrumFactoryLoader() {
 // // Set the ROOT engine's seed for all the ROOT based classes
