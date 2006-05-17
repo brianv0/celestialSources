@@ -5,9 +5,12 @@
 *  $Header$
 */
 
+#include <iostream>
 #include <vector>
 
 #include "celestialSources/SpectrumFactoryLoader.h"
+#include "celestialSources/TRandom4.h"
+
 #include "flux/ISpectrumFactory.h"
 
 // declare the external factories.
@@ -31,8 +34,11 @@ ISpectrumFactory & TF1MapFactory();
 ISpectrumFactory & FileSpectrumFactory();
 ISpectrumFactory & FileSpectrumMapFactory();
 
-SpectrumFactoryLoader::SpectrumFactoryLoader()
-{
+SpectrumFactoryLoader::SpectrumFactoryLoader() {
+// Replace ROOT's global TRandom instance with our local version that
+// uses the CLHEP engines underneath.
+   gRandom = new TRandom4();
+
    load(FitsTransientFactory());
    load(GRBmanagerFactory());
    load(GRBobsmanagerFactory());
@@ -53,8 +59,7 @@ SpectrumFactoryLoader::SpectrumFactoryLoader()
    load(FileSpectrumFactory());
    load(FileSpectrumMapFactory());
 }
-void SpectrumFactoryLoader::load(ISpectrumFactory& factory)
-{
+
+void SpectrumFactoryLoader::load(ISpectrumFactory& factory) {
        m_names.push_back( factory.name() );
 }
-
