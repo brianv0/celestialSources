@@ -14,4 +14,9 @@ path_remove PYTHONPATH pySources
 path_append PYTHONPATH $(PYSOURCESROOT)/$(BINDIR)
 path_append PYTHONPATH $(PYSOURCESROOT)/python
 
+path_remove PYTHONPATH "" Linux "${pySources_cmtpath}/lib" \
+                          WIN32 "${pySources_cmtpath}\lib"
+path_append PYTHONPATH "" Linux "${pySources_cmtpath}/lib" \
+                          WIN32 "${pySources_cmtpath}\lib"
+
 apply_pattern swig_module name="pySources"

@@ -33,8 +33,8 @@
 %include $(GENERICSOURCESROOT)/src/Util.h
 %include $(GENERICSOURCESROOT)/src/FitsImage.h
 %include $(GENERICSOURCESROOT)/genericSources/FitsTransient.h
-%include $(GENERICSOURCESROOT)/genericSources/MapCube.h
 %include $(GENERICSOURCESROOT)/genericSources/MapSource.h
+%include $(GENERICSOURCESROOT)/genericSources/MapCube.h
 %include $(GENERICSOURCESROOT)/genericSources/SourcePopulation.h
 %include $(GENERICSOURCESROOT)/genericSources/SpectralTransient.h
 //%include $(PULSARROOT)/Pulsar/PulsarSpectrum.h
