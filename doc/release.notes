@@ -5,6 +5,9 @@
   @verbatim
   $Id$
   
+  17-May-06 v1r1p5   JC    Replace ROOT's default gRandom instance with
+                           a TRandom4 instance so that CLHEP random engines
+                           are used by TH1::GetRandom methods et al.
   29-Mar-06 v1r1p4   JC    Johann's addition to SpectrumFactoryLoader to
                            set the ROOT gRandom seed from the CLHEP engine
   14-mar-06 v1r1p3   THB   fix req file to include eblAtten

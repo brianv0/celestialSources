@@ -16,7 +16,8 @@
  * @class TRandom4
  * @brief Replace ROOT uniform random number generator with CLHEP
  * RandFlat.  Do not reimplement sampling of other standard
- * distributions.
+ * distributions since they appear to rely on the four virtual methods
+ * here for generating the needed uniform deviates.
  */
 
 class TRandom4 : public TRandom3 {

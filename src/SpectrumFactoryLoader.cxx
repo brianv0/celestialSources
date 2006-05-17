@@ -12,8 +12,6 @@
 #include "celestialSources/TRandom4.h"
 
 #include "flux/ISpectrumFactory.h"
-// #include "TRandom.h"
-// #include "CLHEP/Random/Random.h"
 
 // declare the external factories.
 ISpectrumFactory & FitsTransientFactory();
@@ -37,10 +35,8 @@ ISpectrumFactory & FileSpectrumFactory();
 ISpectrumFactory & FileSpectrumMapFactory();
 
 SpectrumFactoryLoader::SpectrumFactoryLoader() {
-// // Set the ROOT engine's seed for all the ROOT based classes
-//    long int theSeed = CLHEP::HepRandom::getTheSeed();
-//    gRandom->SetSeed(theSeed);
-
+// Replace ROOT's global TRandom instance with our local version that
+// uses the CLHEP engines underneath.
    gRandom = new TRandom4();
 
    load(FitsTransientFactory());
@@ -67,4 +63,3 @@ SpectrumFactoryLoader::SpectrumFactoryLoader() {
 void SpectrumFactoryLoader::load(ISpectrumFactory& factory) {
        m_names.push_back( factory.name() );
 }
-
