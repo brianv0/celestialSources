@@ -238,7 +238,7 @@
 
 
    <source name="tf1spectrum_test">
-      <spectrum escale="MeV">
+      <spectrum escale="MeV" particle_name="gamma">
          <SpectrumClass name="TF1Spectrum"
           params="flux=17.,tf1name=TF1Spectrum_TEST,formula=-0.0001*(100.-x)*(1100.-x),emin=100.,emax=1100"/>
          <use_spectrum frame="galaxy"/>
@@ -246,7 +246,7 @@
    </source>
 
    <source name="tf1map_test">
-      <spectrum escale="MeV">
+      <spectrum escale="MeV" particle_name="gamma">
          <SpectrumClass name="TF1Map"
           params="flux=17.,tf1name=FT1Map_TEST,formula=-0.0001*(100.-x)*(1100.-x),fitsFile=$(FLUXROOT)/sources/gas_gal.fits,emin=100.,emax=1100,tf1precision=100,gamma=2,lonMin=-180,lonMax=180,latMin=-90,latMax=90"/>
          <use_spectrum frame="galaxy"/>
@@ -254,7 +254,7 @@
    </source>
 
    <source name="filespectrum_test">
-      <spectrum escale="GeV" flux="1.">
+      <spectrum escale="GeV" flux="1." particle_name="gamma">
          <SpectrumClass name="FileSpectrum"
           params="flux=0.,specFile=$(GENERICSOURCESROOT)/data/dm120gev.dat"/>
          <use_spectrum frame="galaxy"/>
@@ -262,9 +262,9 @@
    </source>
 
    <source name="filespectrummap_test">
-      <spectrum escale="GeV" flux="1.">
+      <spectrum escale="GeV" flux="1." particle_name="gamma">
          <SpectrumClass name="FileSpectrumMap"
-          params="flux=17.,fitsFile=$(FLUXROOT)/sources/gas_gal.fits,specFile=$(GENERICSOURCESROOT)/data/dm120gev.dat,emin=100.,emax=1100,tf1precision=100,gamma=2,lonMin=-180,lonMax=180,latMin=-90,latMax=90"/>
+          params="flux=17.,fitsFile=$(FLUXROOT)/sources/gas_gal.fits,specFile=$(GENERICSOURCESROOT)/data/dm120gev.dat,emin=100.,emax=1000,lonMin=-180,lonMax=180,latMin=-90,latMax=90"/>
          <use_spectrum frame="galaxy"/>
       </spectrum>
    </source>

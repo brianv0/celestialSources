@@ -1,6 +1,8 @@
 /**
- *
- */
+  * @file TF1Map.cxx
+  * @author Johann Cohen-Tanugi
+  * $Header$
+  */
 
 #include "genericSources/TF1Map.h"
 #include "flux/SpectrumFactory.h"
@@ -34,5 +36,3 @@ TF1Map::TF1Map(const std::string& params)
   if(m_flux==0.)
     m_flux = p_tf1.Integral(e_min,e_max);
 }
-
-

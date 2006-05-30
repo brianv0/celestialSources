@@ -1,3 +1,17 @@
+/**
+ * @file FileSpectrumMap.h
+ * @brief A source class that uses a FileSpectrum instance to define a spectrum via an ascii file,
+ * and its localization in space via a Fits map, encapsulated in the MapSource base class
+ * The class is instantiated based on the information parsed from
+ * the params string, passed to the object vi the constructor. Here is an example of
+ * such params string :
+ * params="flux=17.,fitsFile=$(FLUXROOT)/sources/gas_gal.fits,specFile=$(GENERICSOURCESROOT)/data/dm120gev.dat,emin=100.,emax=1100,lonMin=-180,lonMax=180,latMin=-90,latMax=90"/>
+ * emin,emax,lonMin,lonMax,latMin,latMax are used by MapSource.
+ * @author Johann Cohen-Tanugi
+ *
+ * $Header$
+ */
+
 #ifndef FILESPECTRUMMAP_H
 #define FILESPECTRUMMAP_H
 
@@ -20,7 +34,7 @@ class FileSpectrumMap : public MapSource
 
   std::string title() const 
     {
-      return "Class creating a spectrum based on a formula";
+      return "FileSpectrumMap";
     }
 
   const char * particleName() const    { return m_particle_name.c_str(); }

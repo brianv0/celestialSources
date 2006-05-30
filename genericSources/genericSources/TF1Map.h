@@ -1,3 +1,20 @@
+/**
+ * @file TF1Map.h
+ * @brief A source class that uses ROOT TF1 object to define a spectrum symbolically
+ * id est with a formula. Besides, the spatial localization of the source is based on a FITS map image, encapsulated in 
+ * the MapSource base class. 
+ * The TF1Map class is instantiated based on the information parsed from
+ * the params string, passed to the object vi the constructor. Here is an example of
+ * such params string :
+ * params="flux=17.,tf1name=FT1Map_TEST,formula=-0.0001*(100.-x)*(1100.-x),fitsFile=$(FLUXROOT)/sources/gas_gal.fits,emin=100.,emax=1100,tf1precision=100,gamma=2,lonMin=-180,lonMax=180,latMin=-90,latMax=90"/>
+ * tf1name is needed to let the user make sure that the ROOT object has a unique name identifier in ROOT internal memory.
+ * tf1precision defines the granularity with which TF1 will approximate the formula.
+ * @author Johann Cohen-Tanugi
+ *
+ * $Header$
+ */
+ 
+
 #ifndef TF1MAP_H
 #define TF1MAP_H
 
@@ -12,7 +29,8 @@ class TF1Map : public MapSource
   ~TF1Map() {;}//{delete p_tf1;}
   
 
-  /// Overload of operator method
+  ///The TF1 object manages the random draw, so that the float argument, normally a
+  /// random draw from a [0,1[ distribution, is unused.
   float operator()(float )const 
     {
       return p_tf1.GetRandom();
@@ -20,12 +38,13 @@ class TF1Map : public MapSource
 
   std::string title() const 
     {
-      return "Class creating a spectrum based on a formula";
+      return "TF1Map";
     }
 
   const char * particleName() const    {      return m_particle_name.c_str();    }
 
   
+  ///Return an energy sampled from the TF1 distribution. 
   double energy(double time)    {      return (*this)(time);    }
 
 
@@ -36,7 +55,8 @@ class TF1Map : public MapSource
 
 
  private:
-   mutable TF1  p_tf1;
+  ///pointer to the TF1 object that reads the symbolic formula and does all the job
+  mutable TF1  p_tf1;
   std::map<std::string,std::string> m_parmap;
 };
 

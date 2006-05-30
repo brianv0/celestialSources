@@ -1,5 +1,7 @@
 /**
- *
+ * @file FileSpectrumMap.cxx
+ * @author Johann Cohen-Tanugi
+ * $Header$
  */
 
 #include "genericSources/FileSpectrumMap.h"
@@ -22,9 +24,11 @@ FileSpectrumMap::FileSpectrumMap(const std::string& params)
 
   facilities::Util::keyValueTokenize(params,",",m_parmap);
 
-  double e_min = std::atof(m_parmap["emin"].c_str());
-  double e_max = std::atof(m_parmap["emax"].c_str());
-
+  //MapSource will not set e_min and e_max properly if
+  //there is no gamma defined. The powerlaw index being irrelevant
+  //here, I just read the parameters here...
+  m_emin = std::atof(m_parmap["emin"].c_str());
+  m_emax = std::atof(m_parmap["emax"].c_str());
 }
 
 

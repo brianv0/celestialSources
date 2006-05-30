@@ -1,5 +1,7 @@
 /**
- *
+ * @file TF1Spectrum.cxx
+ * @author Johann Cohen-Tanugi
+ * $Header$
  */
 
 #include "genericSources/TF1Spectrum.h"

@@ -112,7 +112,8 @@ void TestApp::parseCommandLine(int iargc, char * argv[]) {
 }
 
 void TestApp::setSources() {
-   char * srcNames[] = {"Galactic_diffuse",
+   char * srcNames[] = {
+                        "Galactic_diffuse",
                         "Galactic_diffuse_0",
                         "simple_transient",
                         "transient_template",
@@ -128,9 +129,9 @@ void TestApp::setSources() {
                         "fits_spectrum",
                         "source_population",
 			"tf1spectrum_test",
-			"tf1map_test",
-			"filespectrum_test",
-			"filespectrummap_test"};
+ 			"tf1map_test",
+ 			"filespectrum_test",
+ 			"filespectrummap_test"};
    std::vector<std::string> sourceNames(srcNames, srcNames+19);
 
    m_compositeSource = new CompositeSource();
@@ -167,7 +168,9 @@ void TestApp::createEvents(const std::string & filename) {
       HepRotation rotMatrix = instrumentToCelestial(currentTime);
       astro::SkyDir srcDir(rotMatrix(-launchDir), astro::SkyDir::EQUATORIAL);
       
-      outputFile << newEvent->time() << "  "
+      outputFile << m_compositeSource->findSource().c_str()<<"  "
+		 << newEvent->particleName()<<"  "
+		 << newEvent->time() << "  "
                  << newEvent->energy() << "  "
                  << srcDir.ra() << "  "
                  << srcDir.dec() << "\n";
