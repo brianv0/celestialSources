@@ -339,6 +339,68 @@ TH2D* PulsarSim::PSRPhenom(double par0, double par1, double par2, double par3, d
   delete m_Nv;
 }
 
+
+TH2D* PulsarSim::PSRShape(std::string ModelShapeName, int NormalizeFlux)
+{
+  std::cout << "Testing new model Shape for pulsar " << m_name << " using normalization option " << NormalizeFlux << std::endl; 
+
+
+  //Look for ModelShapeName.root in the data directory...
+  std::string  pulsar_root = ::getenv("PULSARROOT");
+  std::string ModelShapeInputFileName = pulsar_root + "/data/" + ModelShapeName + ".root";
+  const char * gleam = ::getenv("PULSARDATA");
+  
+  // override obssim if running in Gleam environment
+  if( gleam!=0) ModelShapeInputFileName = std::string(gleam)+"/"+ ModelShapeName + ".root";
+
+  std::cout << "Using Shape " << ModelShapeName << " located at: " << ModelShapeInputFileName << std::endl;
+
+  //Load 2HD Histogram
+
+  TFile *ModelShapeInputFile = new TFile(ModelShapeInputFileName.c_str());
+  TH2D *m_Nv = (TH2D*) ModelShapeInputFile->Get("Nv"); //ph m^(-2) s^(-1) keV^(-1)
+    
+  double shapePhmin = m_Nv->GetXaxis()->GetXmin();
+  double shapePhmax = m_Nv->GetXaxis()->GetXmax();
+  double shapeEmin = m_Nv->GetYaxis()->GetXmin();
+  double shapeEmax = m_Nv->GetYaxis()->GetXmax();
+ 
+  int phbin = m_Nv->GetXaxis()->GetNbins();   
+  int ebin = m_Nv->GetYaxis()->GetNbins();
+
+  m_Nv->GetXaxis()->SetLimits(0,m_period);
+
+  TH2D *nph = Nph(m_Nv); //ph/m²
+  
+  int ei2 = nph->GetYaxis()->FindBin(cst::EnNormMin);
+  int ei3 = nph->GetYaxis()->FindBin(cst::EnNormMax);
+
+
+  std::cout << "Pulsar shape defined between " << shapeEmin << " keV and " << shapeEmax << std::endl;
+  std::cout << "Phase bins " << phbin << " ; energy bins : " << ebin << std::endl;
+  std::cout << "Normalization between " << cst::EnNormMin << " keV ("<< ei2 
+	    << ") and " << cst::EnNormMax << " keV (" << ei3 << ")" << std::endl;
+ 
+  //Normalisation factor according to band between EGRET1 and EGRET2 energies
+  //Integration is on a averaged flux over period
+  double norm = m_Nv->Integral(0,m_Tbin,ei2,ei3,"width")/m_period; // ph/m2/s
+
+  m_Nv->Scale(m_flux/norm);
+
+  delete nph;
+
+
+  //Save output
+  SaveNv(m_Nv); // ph/m2/s/keV
+  SaveTimeProfile(m_Nv); //ph/m2/s/kev
+
+  return m_Nv;
+  delete m_Nv;
+
+
+}
+
+
 //////////////////////////////////////////////////
 TH2D *PulsarSim::Nph(const TH2D *Nv)
 {

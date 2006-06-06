@@ -28,6 +28,10 @@ int    TBIN, EBIN;
 double AreaDetector = 0.0; //m2
 const double nLoops = 970787;//=1day of Vela;
 
+//Canvas for intervl distribution
+TCanvas *cInt;// = new TCanvas("cInt","Interval",600,800);
+
+
 //////////////////////////////////////////////////
 
 TH2D *Load(std::string name="pulsar.root")
@@ -151,12 +155,9 @@ void PlotPulsar(double enph = 0,std::string name="pulsar.root")
   csp->SetLogx();
   csp->SetLogy();
 
-  //Canvas for intervl distribution
 
-  TCanvas *cInt = new TCanvas("cInt","Interval",600,800);
-  cInt->Divide(1,2);
-  cInt->cd(1);
-  gPad->SetLogy();
+ 
+
 
   double RunLength = 150.; //lenght of single run in seconds
   int RunCounts =0; // count in a Single Run;
@@ -330,6 +331,12 @@ void PlotPulsar(double enph = 0,std::string name="pulsar.root")
       Counts->Draw("E1same");
       Counts->SetStats(1);
 
+      cInt = new TCanvas("cInt","Interval",600,800);
+
+      cInt->Divide(1,2);
+      cInt->cd(1);
+      gPad->SetLogy();
+
       cInt->cd(1);
       gStyle->SetStatFontSize(0.05);
       gStyle->SetOptFit(1111);
@@ -402,6 +409,7 @@ void PlotPulsar(double enph = 0,std::string name="pulsar.root")
       Lct_LAT->Draw("lsame");
     }
 
+  csp->cd();
   lcleg->Draw("lsame");
 
 
@@ -450,22 +458,19 @@ int main(int argc, char** argv)
   PulsarSim* m_pulsar = new PulsarSim("PSRVELA",seed,flux,enphmin, enphmax, Period);
   m_pulsar->SaveNv((TH2D*)m_pulsar->PSRPhenom(double(npeaks), ppar1,ppar2,ppar3,ppar4));
 
+  //m_pulsar->SaveNv((TH2D*)m_pulsar->PSRShape("PsrPCHShape",1));
   
-
-  //  char name[100];
-  //  sprintf(name,"PsrOutput/PSRVELAroot.root");
-  
-  //Redirect output to a subdirectory
-  //const char * pulsarOutDir = ::getenv("PULSAROUTFILES");
-  std::string pulsarOutDir = ::getenv("PULSAROUTFILES");
-
+  //Redirect output to a subdirectory is $PULSAROUTFILES is defined
+  const char * pulsarOutDir = ::getenv("PULSAROUTFILES");
   std::string name;
 
   // override obssim if running in Gleam environment
   if( pulsarOutDir!=0) 
-    name = pulsarOutDir + "/PSRVELAroot.root";
+    name = std::string(pulsarOutDir) + "/PSRVELAroot.root";
   else
     name = "PSRVELAroot.root";
+
+  std::cout << "cutu3" << name << std::endl;
 
   std::cout << "**  Photons simulated on a period of " << Period*nLoops << " s. " << std::endl;
   PlotPulsar(enph,name);  
