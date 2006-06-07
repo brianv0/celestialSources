@@ -4,6 +4,22 @@ version v0
 author Johann Cohen-Tanugi <cohen@slac.stanford.edu> 
  
 # $Id$
- 
-set DARKMATTERROOT "/data1/DM/DarkMatter/JCT"
 
+use GlastPolicy *
+use tip *
+#use cfitsio * IExternal
+use astro *
+use map_tools *
+
+apply_pattern package_include
+apply_pattern package_linkopts
+apply_pattern package_stamps
+ 
+macro_prepend includes "-I ../src " WIN32 "/I ..\src "
+
+
+library DarkMatter -no_share Profile.cxx LineOfSight.cxx
+
+application makeProfile haloProfile.cxx
+
+application makeMap makeMap.cxx
