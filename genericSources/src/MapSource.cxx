@@ -83,19 +83,25 @@ MapSource::MapSource(const std::string & paramString)
       //gamma, emin and emax remain set to default values
       //if absent from the XML file
       try {
-	m_gamma = parmap.value("gamma");
-	m_emin = parmap.value("emin");
-	m_emax = parmap.value("emax");
-      } catch (...)
-	{
-	   ;
-	}
+         m_gamma = parmap.value("gamma");
+      } catch (...) {
+      }
+      try {
+         m_emin = parmap.value("emin");
+      } catch (...) {
+      }
+      try {
+         m_emax = parmap.value("emax");
+      } catch (...) {
+      }
       //these 4 should be all absent or all present. Code is incorrect as is
-      if (my_parmap.find("lonMin")!=my_parmap.end()||my_parmap.find("lonMax")!=my_parmap.end()||
-	  my_parmap.find("latMin")!=my_parmap.end()||my_parmap.find("latMax")!=my_parmap.end()) {
-	try {
-	    m_lonMin = parmap.value("lonMin");
-	    m_lonMax = parmap.value("lonMax");
+      if (my_parmap.find("lonMin") != my_parmap.end() ||
+          my_parmap.find("lonMax") != my_parmap.end() ||
+	  my_parmap.find("latMin") != my_parmap.end() ||
+          my_parmap.find("latMax") != my_parmap.end()) {
+         try {
+            m_lonMin = parmap.value("lonMin");
+            m_lonMax = parmap.value("lonMax");
             m_latMin = parmap.value("latMin");
             m_latMax = parmap.value("latMax");
             createSubMap = true;
@@ -107,8 +113,14 @@ MapSource::MapSource(const std::string & paramString)
       }
    }
 
-   std::cout<<m_gamma<<" "<<m_emin<<" "<<m_emax<<" "<<m_lonMin<<" "<<m_lonMax<<" "<<m_latMin<<" "<<m_latMax<<std::endl;
-
+//    std::cout << m_gamma << " " 
+//              << m_emin << " " 
+//              << m_emax << " " 
+//              << m_lonMin << " "
+//              << m_lonMax << " "
+//              << m_latMin << " "
+//              << m_latMax 
+//              << std::endl;
 
    readFitsFile(fitsFile, createSubMap);
    makeIntegralDistribution(m_image);
