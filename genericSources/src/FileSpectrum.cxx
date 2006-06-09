@@ -1,53 +1,49 @@
 /** 
-* @file FileSpectrum.cxx
-* @brief Implementation of FileSpectrum
-*
-*  $Header$
-*/
+ * @file FileSpectrum.cxx
+ * @brief Implementation of FileSpectrum
+ *
+ *  $Header$
+ */
+
+#include <cmath>
+
+#include <algorithm>
+#include <fstream>
+#include <functional>
+#include <iostream>
+#include <sstream>
+#include <stdexcept>
+
+#include "facilities/Util.h"
+
+#include "flux/SpectrumFactory.h"
 
 #include "genericSources/FileSpectrum.h"
 
-#include <cmath>
-#include <algorithm>
-#include <functional>
-#include <fstream>
-#include <iostream>
-
-#include "flux/SpectrumFactory.h"
-#include "facilities/Util.h"
-
-ISpectrumFactory &FileSpectrumFactory() {
-  static SpectrumFactory<FileSpectrum> factory;
-  return factory;
+ISpectrumFactory & FileSpectrumFactory() {
+   static SpectrumFactory<FileSpectrum> factory;
+   return factory;
 }
 
-FileSpectrum::FileSpectrum(const std::string& params) : 
-  m_inLog(false)
-{
-  std::vector<efpair> temp_vector;
-  //retrieve and parse the parameter string
-  std::map<std::string,std::string> parmap;
-  facilities::Util::keyValueTokenize(params,",",parmap);
+FileSpectrum::FileSpectrum(const std::string& params) {
+   std::vector<efpair_t> temp_vector;
+// retrieve and parse the parameter string
+   std::map<std::string, std::string> parmap;
+   facilities::Util::keyValueTokenize(params,",",parmap);
 
-  m_flux = std::atof(parmap["flux"].c_str());
-  if(parmap["log"].find("yes")!=std::string::npos)
-    {
-      m_inLog = true; 
-    }
+   m_flux = std::atof(parmap["flux"].c_str());
 
-  //open the spectrum file
-  std::string fileName = parmap["specFile"];
-  facilities::Util::expandEnvVar(&fileName);
-  std::ifstream input_file;
-  input_file.open(fileName.c_str());
+// open the spectrum file
+   std::string fileName = parmap["specFile"];
+   facilities::Util::expandEnvVar(&fileName);
+   std::ifstream input_file;
+   input_file.open(fileName.c_str());
   
-  if(! input_file.is_open())
-    {
-      std::cerr << "ERROR:  Unable to open:  " << fileName.c_str() << std::endl;
-      throw(std::string("ERROR:  Unable to open: "+ fileName ));
-    }
-  else 
-    {
+   if (!input_file.is_open()) {
+      std::ostringstream message;
+      message << "FileSpectrum: Unable to open file " << fileName;
+      throw std::runtime_error(message.str());
+   } else {
       temp_vector=readFile(input_file);
     }
         
@@ -101,7 +97,7 @@ float FileSpectrum::operator() (float r)
     /// Purpose: sample a single particle energy from the spectrum
     double target_flux = r * m_fileflux;
     
-    std::vector<efpair>::const_iterator i;
+    std::vector<efpair_t>::const_iterator i;
     
     std::pair<double,double> previous;
     
