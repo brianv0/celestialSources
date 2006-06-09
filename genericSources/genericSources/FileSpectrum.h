@@ -1,11 +1,10 @@
 /** 
  * @file FileSpectrum.h
-
  * @brief FileSpectrum allows definition of a source based on a
- * spectrum saved in a file. The file is currently assumed to have two
- * columns: energy value and flux (normalized or not). Flux value can
- * be renormalized using the xml source description.  Energy in the
- * file can only be in MeV consistent with GLAST/LAT standards.
+ * spectrum from an ascii file. The file must have two columns: energy
+ * and flux (normalized or not). The flux values can be renormalized
+ * using the xml source description.  Energy values in the file must
+ * be in MeV, consistent with GLAST/LAT standards.
  *
  *  $Header$
  */
@@ -13,17 +12,20 @@
 #ifndef genericSources_FileSpectrum_H
 #define genericSources_FileSpectrum_H
 
-#include <map>
+#include <deque>
 #include <string>
 #include <vector>
 
 #include "flux/Spectrum.h"
 
 /** 
- * \class FileSpectrum
+ * @class FileSpectrum
  *
- * \brief Spectrum that reads its differential spectrum from a table
- * \author Theodore Hierath
+ * @brief Spectrum that reads its differential spectrum from a
+ * table. This version has been massively refactored from the original
+ * implementation in flux/FILESpectrum by Theodore Hierath.
+ *
+ * @author J. Chiang
  * 
  * $Header$
  */
@@ -32,7 +34,7 @@ class FileSpectrum : public Spectrum {
 
 public:
 
-   FileSpectrum(const std::string& params);
+   FileSpectrum(const std::string & params);
    
    /// @return total flux in #/m^2/s
    virtual double flux() const;
@@ -53,14 +55,14 @@ public:
 
 private:
 
-   typedef std::pair<double, double> EFpair_t;
-
-   std::vector<EFpair_t> m_integralSpectrum;
+   double m_emin;
+   double m_emax;
+   std::deque<double> m_energies;
+   std::deque<double> m_integralSpectrum;
 
    double read_file(const std::string & infile);
-
-   double compute_integral_dist(const std::vector<double> & energies,
-                                const std::vector<double> & fluxes);
+   void reset_ebounds(const std::deque<double> & dnde);
+   double compute_integral_dist(const std::deque<double> & dnde);
    
 };
 

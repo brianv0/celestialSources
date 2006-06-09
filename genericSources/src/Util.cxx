@@ -7,6 +7,7 @@
  */
 
 #include <cmath>
+#include <cassert>
 
 #include <algorithm>
 #include <fstream>
@@ -104,6 +105,7 @@ namespace genericSources {
          yy = (xx - *it)/(*(it+1) - *it)*(y[indx+1] - y[indx]) + y[indx];
       } else {
          yy = (y[indx+1] + y[indx])/2.;
+         assert(false);
       }
       return yy;
    }
