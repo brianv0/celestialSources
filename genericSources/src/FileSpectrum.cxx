@@ -56,13 +56,20 @@ ISpectrumFactory & FileSpectrumFactory() {
 
 FileSpectrum::FileSpectrum(const std::string& params) 
    : m_emin(20), m_emax(2e5) {
+
+// m_flux is not set by the Spectrum default constructor, so we set it
+// here to zero.
+   m_flux = 0; 
+
    std::map<std::string, std::string> my_parmap;
    facilities::Util::keyValueTokenize(params, ",", my_parmap);
    
    genericSources::ConstParMap parmap(my_parmap);
    
-   m_flux = parmap.value("flux");
-
+   try {
+      m_flux = parmap.value("flux");
+   } catch (...) {
+   }
    try {
       m_emin = parmap.value("emin");
    } catch (...) {
@@ -169,19 +176,19 @@ compute_integral_dist(const std::deque<double> & dnde) {
    for (size_t k = 1; k < m_energies.size(); k++) {
       double dn(::pl_integral(m_energies.at(k-1), m_energies.at(k),
                               dnde.at(k-1), dnde.at(k)));
-      m_integralSpectrum.push_back(m_integralSpectrum.back() + dn);
+      m_integralSpectrum.push_back(m_integralSpectrum.back() + std::fabs(dn));
    }
    double total_flux(m_integralSpectrum.back());
    for (size_t k = 0; k < m_integralSpectrum.size(); k++) {
       m_integralSpectrum.at(k) /= total_flux;
    }
 
-   std::ofstream outfile("integral_dist.dat");
-   for (size_t k = 0; k < m_energies.size(); k++) {
-      outfile << m_energies.at(k) << "  "
-              << m_integralSpectrum.at(k) << std::endl;
-   }
-   outfile.close();
+//    std::ofstream outfile("integral_dist.dat");
+//    for (size_t k = 0; k < m_energies.size(); k++) {
+//       outfile << m_energies.at(k) << "  "
+//               << m_integralSpectrum.at(k) << std::endl;
+//    }
+//    outfile.close();
 
    return total_flux;
 }
