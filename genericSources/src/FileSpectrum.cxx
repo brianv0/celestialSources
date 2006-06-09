@@ -26,147 +26,84 @@ ISpectrumFactory & FileSpectrumFactory() {
 }
 
 FileSpectrum::FileSpectrum(const std::string& params) {
-   std::vector<efpair_t> temp_vector;
+   std::vector<EFpair_t> temp_vector;
 // retrieve and parse the parameter string
    std::map<std::string, std::string> parmap;
-   facilities::Util::keyValueTokenize(params,",",parmap);
+   facilities::Util::keyValueTokenize(params, ",", parmap);
 
    m_flux = std::atof(parmap["flux"].c_str());
 
 // open the spectrum file
-   std::string fileName = parmap["specFile"];
-   facilities::Util::expandEnvVar(&fileName);
-   std::ifstream input_file;
-   input_file.open(fileName.c_str());
-  
-   if (!input_file.is_open()) {
-      std::ostringstream message;
-      message << "FileSpectrum: Unable to open file " << fileName;
-      throw std::runtime_error(message.str());
-   } else {
-      temp_vector=readFile(input_file);
-    }
-        
-  double total_flux = 0.0;
-  std::pair<double,double> ef;
-  std::vector<std::pair<double,double> >::iterator it; 
-  for(it = temp_vector.begin(); it != temp_vector.end(); it++)
-    {
-      ef = (*it);
-      double factor;
-      
-      if(it == temp_vector.begin() && (it+1) != temp_vector.end() )
-	factor = ( (it+1)->first - ef.first );
-      else if( it == temp_vector.begin() && (it+1) == temp_vector.end() )
-	factor = 1;
-      else if( (it+1) != temp_vector.end() )
-	factor = (((it+1)->first - (it-1)->first)/2);
-      else if( (it+1) == temp_vector.end() )
-	factor = ( ef.first - (it-1)->first );
-      
-//      std::cout<<factor<<" "<<ef.second<<std::endl;
-      ef.second *= factor;
-      total_flux += ef.second;
-      
-      ef.second = total_flux;
-      
-      integ_flux.push_back(ef);
-    }
+   std::string infile = parmap["specFile"];
+   double file_flux = read_file(infile);
 
-  m_fileflux = total_flux;
-
-  //set the flux to the file integral, if not set by XML
-  if(m_flux==0){
-    m_flux = m_fileflux;
-  }
+// set the flux to the file integral, if not set by XML
+   if (m_flux == 0) {
+      m_flux = file_flux;
+   }
 }
 
-
-double FileSpectrum::flux() const
-{
-    return m_flux;
+double FileSpectrum::flux() const {
+   return m_flux;
 }
 
-double FileSpectrum::flux (double time ) const{
-    return flux();
+double FileSpectrum::flux(double time) const {
+   return m_flux;
 }
 
-
-float FileSpectrum::operator() (float r)
-{
-    /// Purpose: sample a single particle energy from the spectrum
-    double target_flux = r * m_fileflux;
-    
-    std::vector<efpair_t>::const_iterator i;
-    
-    std::pair<double,double> previous;
-    
-    i = integ_flux.begin();
-    previous = (*i);
-    
-    for(i = integ_flux.begin(); i != integ_flux.end(); i++)
-    {
-      if((*i).second >= target_flux){
-	if(i==integ_flux.begin()) i++;
-	break;
-      }
-        previous = (*i);
-    }
-    
-    // Use linear interpolation between bins
-    double m = ( (*i).first - previous.first ) / ( (*i).second - previous.second );
-    double b = (*i).first - m * (*i).second;
-    float scale = 1.;
-    double raw_e = m * target_flux + b;
-    if(m_inLog)
-      {
-        return scale*pow(10., raw_e);
-      }
-    else
-      {
-        return scale*raw_e;
-      }
+float FileSpectrum::operator() (float xi) {
+   std::vector<EFpair_t>::const_iterator it
+      = std::upper_bound(m_integralSpectrum.begin(), m_integralSpectrum.end(),
+                         std::make
 }
 
-
-std::string FileSpectrum::title() const
-{
+std::string FileSpectrum::title() const {
     return "FileSpectrum";
 }
 
-const char * FileSpectrum::particleName() const
-{
+const char * FileSpectrum::particleName() const {
     return m_particle_name.c_str();
 }
 
+double FileSpectrum::read_file(const std::string & infile) {
+   Util::file_ok(infile);
+   std::vector<std::string> lines;
+   Util::readLines(infile, lines, "%");
 
-std::vector<std::pair<double,double> > 
-FileSpectrum::readFile(std::ifstream& input_file)
-{
-  char buffer[256];
-  std::vector<std::pair<double,double> > temp_vector;
+   std::vector<double> energies;
+   std::vector<double> dNdE;
 
-  while(input_file.getline(buffer,256,'\n'))
-    {
-      std::string line(buffer);
-      std::vector<std::string> entries;
-      if(line.find('%')!= std::string::npos)
-      	{
-	  //This is taken to be a comment line
-	  continue;
-      	}
-      facilities::Util::stringTokenize(line," \t",entries);
-      if(entries.back() == "") entries.pop_back(); //this should be removed after a fix in stringTokenize
-      int size = entries.size();
-      if(size == 2)
-	{
-	  temp_vector.push_back(std::make_pair<double,double>(atof(entries[0].c_str()),atof(entries[1].c_str())));
-	} 
-      else if(size == 3)
-	{
-	  std::cerr<<"Line contained more than 2 columns"<<std::endl;
-        }
-      
-    }
-  return temp_vector;
+   std::vector<std::string>::const_iterator line = lines.begin();
+   for ( ; line != lines.end(); ++line) {
+      std::vector<std::string> tokens;
+      facilities::Util::stringTokenize(*line, " \t", tokens);
+      if (tokens.size() < 2) {
+         std::ostringstream message;
+         message << "FileSpectrum: poorly formatted column in input file: "
+                 << infile;
+         throw std::runtime_error(message.str());
+      }
+      energies.push_back(std::atof(tokens.at(0).c_str()));
+      fluxes.push_back(std::atof(tokens.at(1).c_str()));
+   }
+   return compute_integral_dist(energies, fluxes);
+}
+
+double FileSpectrum::
+compute_integral_dist(const std::vector<double> & energies,
+                      const std::vector<double> & fluxes) {
+   m_integralSpectrum.clear();
+   m_integralSpectrum.reserve(energies.size());
+   m_integralSpectrum.push_back(std::make_pair(energies.front(), 0));
+   for (size_t k = 1; k < energies.size(); k++) {
+      double dflux = ( (fluxes.at(k) + fluxes.at(k-1))/2.
+                       *(energies.at(k) - energies.at(k-1)) );
+      double integral(m_integralSpectrum.back(k).second + dflux);
+      m_integralSpectrum.push_back(std::make_pair(energies.at(k), integral));
+   }
+   double total_flux(m_integralSpectrum.back().second);
+   for (size_t k = 0; k < m_integralSpectrum.size(); k++) {
+      m_integralSpectrum.at(k).second /= total_flux;
+   }
+   return total_flux;
 }

@@ -40,8 +40,8 @@ namespace genericSources {
    }
 
    void Util::readLines(std::string inputFile, 
-                        std::vector<std::string> &lines,
-                        const std::string &skip) {
+                        std::vector<std::string> & lines,
+                        const std::string & skip) {
       facilities::Util::expandEnvVar(&inputFile);
       std::ifstream file(inputFile.c_str());
       lines.clear();

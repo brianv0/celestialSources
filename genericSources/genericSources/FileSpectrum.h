@@ -41,24 +41,27 @@ public:
    virtual double flux (double time) const;
     
    /// sample a single particle energy from the spectrum
-   virtual float operator() (float);
+   virtual float operator()(float x);
     
    virtual std::string title() const;
 
    virtual const char * particleName() const;
 
-   inline  const char * nameOf() const {return "FileSpectrum";}
-   
+   inline const char * nameOf() const {
+      return "FileSpectrum";
+   }
+
 private:
 
-// normalization from the file: can be overwritten in the xml
-   float m_fileflux;
+   typedef std::pair<double, double> EFpair_t;
+
+   std::vector<EFpair_t> m_integralSpectrum;
+
+   double read_file(const std::string & infile);
+
+   double compute_integral_dist(const std::vector<double> & energies,
+                                const std::vector<double> & fluxes);
    
-   typedef std::pair<double, double> efpair_t;
-   std::vector<efpair_t> m_integ_flux;
-
-   std::vector<efpair_t> readFile(std::ifstream& input_file);
-
 };
 
 #endif // genericeSources_FileSpectrum_H
