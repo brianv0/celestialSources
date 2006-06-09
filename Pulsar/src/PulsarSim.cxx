@@ -370,6 +370,10 @@ TH2D* PulsarSim::PSRShape(std::string ModelShapeName, int NormalizeFlux)
 
   m_Nv->GetXaxis()->SetLimits(0,m_period);
 
+
+  //m_Nv->Scale(1.0e+4);  // [ph/(m² s keV)]
+  m_flux*= 1.0e+4;
+
   TH2D *nph = Nph(m_Nv); //ph/m²
   
   int ei2 = nph->GetYaxis()->FindBin(cst::EnNormMin);
@@ -383,7 +387,7 @@ TH2D* PulsarSim::PSRShape(std::string ModelShapeName, int NormalizeFlux)
  
   //Normalisation factor according to band between EGRET1 and EGRET2 energies
   //Integration is on a averaged flux over period
-  double norm = m_Nv->Integral(0,m_Tbin,ei2,ei3,"width")/m_period; // ph/m2/s
+  double norm = m_Nv->Integral(0,phbin,ei2,ei3,"width")/m_period; // ph/m2/s
 
   m_Nv->Scale(m_flux/norm);
 

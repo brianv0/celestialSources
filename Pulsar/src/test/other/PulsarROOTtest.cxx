@@ -221,9 +221,9 @@ void PlotPulsar(double enph = 0,std::string name="pulsar.root")
   Fv->SetMinimum(1e-10);
   vFv->SetMinimum(1e-10);
 
-  Fv->Draw("al");
-  vFv->Draw("alsame");
-  Ne->Draw("samel");
+  Fv->Draw("l");
+  vFv->Draw("lsame");
+  Ne->Draw("lsame");
   
   std::cout << "****  Ne @ 100 MeV " << Ne->GetBinContent(Ne->FindBin(EGRET2)) << " ph/cm2/kev/s " << std::endl;
 
@@ -323,9 +323,9 @@ void PlotPulsar(double enph = 0,std::string name="pulsar.root")
       Fv->SetMinimum(1e-10*DT*AreaDetector);
       vFv->SetMinimum(1e-10*DT*AreaDetector);
 
-      Fv->Draw("al");
-      vFv->Draw("alsame");
-      Ne->Draw("samel");
+      Fv->Draw("l");
+      vFv->Draw("lsame");
+      Ne->Draw("lsame");
 
       Counts->SetStats(1);
       Counts->Draw("E1same");
@@ -447,7 +447,7 @@ int main(int argc, char** argv)
   
   double Period  = 0.089; // s
   double flux = 1e-5; // ph/cm2/s
-  int npeaks = 2;
+  int npeaks = 3;
   double ppar1 = 1e6;
   double ppar2 = 8e6;
   double ppar3 = -1.62;
@@ -456,9 +456,9 @@ int main(int argc, char** argv)
 
 
   PulsarSim* m_pulsar = new PulsarSim("PSRVELA",seed,flux,enphmin, enphmax, Period);
-  m_pulsar->SaveNv((TH2D*)m_pulsar->PSRPhenom(double(npeaks), ppar1,ppar2,ppar3,ppar4));
+  // m_pulsar->SaveNv((TH2D*)m_pulsar->PSRPhenom(double(npeaks), ppar1,ppar2,ppar3,ppar4));
 
-  //m_pulsar->SaveNv((TH2D*)m_pulsar->PSRShape("PsrPCHShape",1));
+  m_pulsar->SaveNv((TH2D*)m_pulsar->PSRShape("PsrPCHShape",1));
   
   //Redirect output to a subdirectory is $PULSAROUTFILES is defined
   const char * pulsarOutDir = ::getenv("PULSAROUTFILES");

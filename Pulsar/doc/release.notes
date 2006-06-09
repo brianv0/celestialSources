@@ -37,6 +37,7 @@
 *   v1r1p8  14-feb-2006 MR   poisson fix
 *   v1r1p9  15-feb-2006 MR   set env variables for outfiles
 *   v1r1p10 17-feb-2006 MR   fix VC8 compilation problems
+*   v1r2    9-jun-2006 MR    Pulsar shape model option added
 
 
 *@endverbatim
