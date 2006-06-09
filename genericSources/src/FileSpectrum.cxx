@@ -101,6 +101,13 @@ float FileSpectrum::operator() (float xi) {
    size_t k(std::upper_bound(m_integralSpectrum.begin(),
                              m_integralSpectrum.end(), xi) 
             - m_integralSpectrum.begin());
+   if (m_integralSpectrum.at(k-1) == 0 ||
+       m_integralSpectrum.at(k) == 0) {
+      double my_energy = (xi - m_integralSpectrum.at(k-1))
+         /(m_integralSpectrum.at(k) - m_integralSpectrum.at(k-1))
+         *(m_energies.at(k) - m_energies.at(k-1)) + m_energies.at(k-1);
+      return std::max(my_energy, 0.);
+   }
    return ::pl_draw(m_energies.at(k-1), m_energies.at(k),
                     m_integralSpectrum.at(k-1), m_integralSpectrum.at(k));
 }
@@ -174,8 +181,14 @@ compute_integral_dist(const std::deque<double> & dnde) {
    m_integralSpectrum.clear();
    m_integralSpectrum.push_back(0);
    for (size_t k = 1; k < m_energies.size(); k++) {
-      double dn(::pl_integral(m_energies.at(k-1), m_energies.at(k),
-                              dnde.at(k-1), dnde.at(k)));
+      double dn(0);
+      if (dnde.at(k-1) == 0 || dnde.at(k) == 0) {
+         dn = (dnde.at(k) + dnde.at(k-1))/2.
+            *(m_energies.at(k) - m_energies.at(k-1));
+      } else {
+         dn = ::pl_integral(m_energies.at(k-1), m_energies.at(k),
+                            dnde.at(k-1), dnde.at(k));
+      }
       m_integralSpectrum.push_back(m_integralSpectrum.back() + std::fabs(dn));
    }
    double total_flux(m_integralSpectrum.back());
