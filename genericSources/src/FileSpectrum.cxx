@@ -38,13 +38,18 @@ namespace {
    }
 
    double pl_draw(double e1, double e2, double f1, double f2) {
+      double xi(CLHEP::RandFlat::shoot());
+      double ee(0);
+      if (f1 == 0 || f2 == 0) {
+         ee = (xi - f1)/(f2 - f1)*(e2 - e1) + e1;
+         return ee;
+      }
+
       double gamma(std::log(f2/f1)/std::log(e2/e1));
       double e1gam(std::pow(e1, gamma));
       double e2gam(std::pow(e2, gamma));
 
-      double xi(CLHEP::RandFlat::shoot());
-      double ee(std::pow(xi*(e1gam - e2gam) + e2gam, 1./(gamma)));
-
+      ee = std::pow(xi*(e1gam - e2gam) + e2gam, 1./(gamma));
       return ee;
    }
 }
@@ -81,11 +86,15 @@ FileSpectrum::FileSpectrum(const std::string& params)
 
    std::string infile = parmap["specFile"];
    double file_flux = read_file(infile);
+   std::cout << "Integral of flux in " << infile << ": "
+             << file_flux << " photons/m^2/s" << std::endl;
 
 // Set the flux to the file integral, if it is not set by the XML definition.
    if (m_flux == 0) {
+      std::cout << "Setting FileSpectrum flux to " << file_flux << std::endl;
       m_flux = file_flux;
    }
+   std::cout << "source flux = " << m_flux << std::endl;
 }
 
 double FileSpectrum::flux() const {
@@ -123,7 +132,7 @@ const char * FileSpectrum::particleName() const {
 double FileSpectrum::read_file(const std::string & infile) {
    genericSources::Util::file_ok(infile);
    std::vector<std::string> lines;
-   genericSources::Util::readLines(infile, lines, "%");
+   genericSources::Util::readLines(infile, lines, "%#");
 
    m_energies.clear();
    std::deque<double> dnde;
