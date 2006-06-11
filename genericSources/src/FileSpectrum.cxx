@@ -37,19 +37,30 @@ namespace {
       return my_value;
    }
 
+//    double pl_draw(double e1, double e2, double f1, double f2) {
+//       double xi(CLHEP::RandFlat::shoot());
+//       double ee(0);
+//       if (f1 == 0 || f2 == 0) {
+//          ee = (xi - f1)/(f2 - f1)*(e2 - e1) + e1;
+//          return ee;
+//       }
+
+//       double gamma(std::log(f2/f1)/std::log(e2/e1));
+//       double e1gam(std::pow(e1, gamma));
+//       double e2gam(std::pow(e2, gamma));
+
+//       ee = std::pow(xi*(e1gam - e2gam) + e2gam, 1./(gamma));
+//       return ee;
+//    }
+
    double pl_draw(double e1, double e2, double f1, double f2) {
       double xi(CLHEP::RandFlat::shoot());
-      double ee(0);
-      if (f1 == 0 || f2 == 0) {
-         ee = (xi - f1)/(f2 - f1)*(e2 - e1) + e1;
-         return ee;
-      }
 
       double gamma(std::log(f2/f1)/std::log(e2/e1));
-      double e1gam(std::pow(e1, gamma));
-      double e2gam(std::pow(e2, gamma));
+      double e1gam(std::pow(e1, 1. + gamma));
+      double e2gam(std::pow(e2, 1. + gamma));
 
-      ee = std::pow(xi*(e1gam - e2gam) + e2gam, 1./(gamma));
+      double ee(std::pow(xi*(e1gam - e2gam) + e2gam, 1./(1. + gamma)));
       return ee;
    }
 }
@@ -117,8 +128,10 @@ float FileSpectrum::operator() (float xi) {
          *(m_energies.at(k) - m_energies.at(k-1)) + m_energies.at(k-1);
       return std::max(my_energy, 0.);
    }
+//    return ::pl_draw(m_energies.at(k-1), m_energies.at(k),
+//                     m_integralSpectrum.at(k-1), m_integralSpectrum.at(k));
    return ::pl_draw(m_energies.at(k-1), m_energies.at(k),
-                    m_integralSpectrum.at(k-1), m_integralSpectrum.at(k));
+                    m_dnde.at(k-1), m_dnde.at(k));
 }
 
 std::string FileSpectrum::title() const {
@@ -135,7 +148,8 @@ double FileSpectrum::read_file(const std::string & infile) {
    genericSources::Util::readLines(infile, lines, "%#");
 
    m_energies.clear();
-   std::deque<double> dnde;
+//   std::deque<double> dnde;
+   m_dnde.clear();
 
    std::vector<std::string>::const_iterator line = lines.begin();
    for ( ; line != lines.end(); ++line) {
@@ -150,10 +164,10 @@ double FileSpectrum::read_file(const std::string & infile) {
 // Use a deque and push_front to get the spectra to go from high to low
 // energies. See compute_integral_dist implementation.
       m_energies.push_front(std::atof(tokens.at(0).c_str()));
-      dnde.push_front(std::atof(tokens.at(1).c_str()));
+      m_dnde.push_front(std::atof(tokens.at(1).c_str()));
    }
-   reset_ebounds(dnde);
-   return compute_integral_dist(dnde);
+   reset_ebounds(m_dnde);
+   return compute_integral_dist(m_dnde);
 }
 
 void FileSpectrum::reset_ebounds(const std::deque<double> & dnde) {

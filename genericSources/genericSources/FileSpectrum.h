@@ -58,6 +58,7 @@ private:
    double m_emin;
    double m_emax;
    std::deque<double> m_energies;
+   std::deque<double> m_dnde;
    std::deque<double> m_integralSpectrum;
 
    double read_file(const std::string & infile);
