@@ -62,8 +62,8 @@ private:
    std::deque<double> m_integralSpectrum;
 
    double read_file(const std::string & infile);
-   void reset_ebounds(const std::deque<double> & dnde);
-   double compute_integral_dist(const std::deque<double> & dnde);
+   void reset_ebounds();
+   double compute_integral_dist();
    
 };
 

@@ -5,6 +5,7 @@
   @verbatim
   $Id$
 
+  11-Jun-06 v1r6p12 JC    more FileSpectrum refactoring
   09-Jun-06 v1r6p11 JC    FileSpectrum refactoring
   30-Mar-06 v1r6p10 JC    fix for bug in SpectralTransient introduced in
                           CLHEP namespace conversion

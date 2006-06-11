@@ -37,22 +37,6 @@ namespace {
       return my_value;
    }
 
-//    double pl_draw(double e1, double e2, double f1, double f2) {
-//       double xi(CLHEP::RandFlat::shoot());
-//       double ee(0);
-//       if (f1 == 0 || f2 == 0) {
-//          ee = (xi - f1)/(f2 - f1)*(e2 - e1) + e1;
-//          return ee;
-//       }
-
-//       double gamma(std::log(f2/f1)/std::log(e2/e1));
-//       double e1gam(std::pow(e1, gamma));
-//       double e2gam(std::pow(e2, gamma));
-
-//       ee = std::pow(xi*(e1gam - e2gam) + e2gam, 1./(gamma));
-//       return ee;
-//    }
-
    double pl_draw(double e1, double e2, double f1, double f2) {
       double xi(CLHEP::RandFlat::shoot());
 
@@ -97,15 +81,13 @@ FileSpectrum::FileSpectrum(const std::string& params)
 
    std::string infile = parmap["specFile"];
    double file_flux = read_file(infile);
-   std::cout << "Integral of flux in " << infile << ": "
-             << file_flux << " photons/m^2/s" << std::endl;
+//    std::cout << "Integral of flux in " << infile << ": "
+//              << file_flux << " photons/m^2/s" << std::endl;
 
 // Set the flux to the file integral, if it is not set by the XML definition.
    if (m_flux == 0) {
-      std::cout << "Setting FileSpectrum flux to " << file_flux << std::endl;
       m_flux = file_flux;
    }
-   std::cout << "source flux = " << m_flux << std::endl;
 }
 
 double FileSpectrum::flux() const {
@@ -128,8 +110,6 @@ float FileSpectrum::operator() (float xi) {
          *(m_energies.at(k) - m_energies.at(k-1)) + m_energies.at(k-1);
       return std::max(my_energy, 0.);
    }
-//    return ::pl_draw(m_energies.at(k-1), m_energies.at(k),
-//                     m_integralSpectrum.at(k-1), m_integralSpectrum.at(k));
    return ::pl_draw(m_energies.at(k-1), m_energies.at(k),
                     m_dnde.at(k-1), m_dnde.at(k));
 }
@@ -148,7 +128,6 @@ double FileSpectrum::read_file(const std::string & infile) {
    genericSources::Util::readLines(infile, lines, "%#");
 
    m_energies.clear();
-//   std::deque<double> dnde;
    m_dnde.clear();
 
    std::vector<std::string>::const_iterator line = lines.begin();
@@ -166,12 +145,11 @@ double FileSpectrum::read_file(const std::string & infile) {
       m_energies.push_front(std::atof(tokens.at(0).c_str()));
       m_dnde.push_front(std::atof(tokens.at(1).c_str()));
    }
-   reset_ebounds(m_dnde);
-   return compute_integral_dist(m_dnde);
+   reset_ebounds();
+   return compute_integral_dist();
 }
 
-void FileSpectrum::reset_ebounds(const std::deque<double> & dnde) {
-   (void)(dnde);
+void FileSpectrum::reset_ebounds() {
 // Here awaits a proper implementation by JCT.  For now, do nothing
 // and just draw from the energy range given in the spectrum file.
 
@@ -195,8 +173,7 @@ void FileSpectrum::reset_ebounds(const std::deque<double> & dnde) {
 //       std::copy(emin, m_energies.end(), energies.begin() + 1);
 }
 
-double FileSpectrum::
-compute_integral_dist(const std::deque<double> & dnde) {
+double FileSpectrum::compute_integral_dist() {
 // Form the integral distribution going from high energies to low
 // energies since most spectra will be falling as a function of energy
 // and we want rare, high energy events to be sampled near zero where
@@ -205,12 +182,12 @@ compute_integral_dist(const std::deque<double> & dnde) {
    m_integralSpectrum.push_back(0);
    for (size_t k = 1; k < m_energies.size(); k++) {
       double dn(0);
-      if (dnde.at(k-1) == 0 || dnde.at(k) == 0) {
-         dn = (dnde.at(k) + dnde.at(k-1))/2.
+      if (m_dnde.at(k-1) == 0 || m_dnde.at(k) == 0) {
+         dn = (m_dnde.at(k) + m_dnde.at(k-1))/2.
             *(m_energies.at(k) - m_energies.at(k-1));
       } else {
          dn = ::pl_integral(m_energies.at(k-1), m_energies.at(k),
-                            dnde.at(k-1), dnde.at(k));
+                            m_dnde.at(k-1), m_dnde.at(k));
       }
       m_integralSpectrum.push_back(m_integralSpectrum.back() + std::fabs(dn));
    }
@@ -218,13 +195,6 @@ compute_integral_dist(const std::deque<double> & dnde) {
    for (size_t k = 0; k < m_integralSpectrum.size(); k++) {
       m_integralSpectrum.at(k) /= total_flux;
    }
-
-//    std::ofstream outfile("integral_dist.dat");
-//    for (size_t k = 0; k < m_energies.size(); k++) {
-//       outfile << m_energies.at(k) << "  "
-//               << m_integralSpectrum.at(k) << std::endl;
-//    }
-//    outfile.close();
 
    return total_flux;
 }
