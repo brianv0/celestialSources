@@ -71,10 +71,7 @@ MapSource::MapSource(const std::string & paramString)
       }
    } else {
 // use the map version
-      std::map<std::string, std::string> my_parmap;
-      facilities::Util::keyValueTokenize(paramString, ", ", my_parmap);
-      
-      genericSources::ConstParMap parmap(my_parmap);
+      genericSources::ConstParMap parmap(paramString);
 
       //fitFile and flux return a runtime error if absent
       m_flux = parmap.value("flux");
@@ -95,10 +92,10 @@ MapSource::MapSource(const std::string & paramString)
       } catch (...) {
       }
       //these 4 should be all absent or all present. Code is incorrect as is
-      if (my_parmap.find("lonMin") != my_parmap.end() ||
-          my_parmap.find("lonMax") != my_parmap.end() ||
-	  my_parmap.find("latMin") != my_parmap.end() ||
-          my_parmap.find("latMax") != my_parmap.end()) {
+      if (parmap.find("lonMin") != parmap.end() ||
+          parmap.find("lonMax") != parmap.end() ||
+	  parmap.find("latMin") != parmap.end() ||
+          parmap.find("latMax") != parmap.end()) {
          try {
             m_lonMin = parmap.value("lonMin");
             m_lonMax = parmap.value("lonMax");

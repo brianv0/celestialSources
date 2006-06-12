@@ -81,10 +81,7 @@ SpectralTransient::SpectralTransient(const std::string & paramString)
          m_tau = new IRB::EblAtten(IRB::Kneiske);
       }
    } else {
-      std::map<std::string, std::string> params;
-      facilities::Util::keyValueTokenize(paramString, ", ", params);
-
-      genericSources::ConstParMap parmap(params);
+      genericSources::ConstParMap parmap(paramString);
       m_flux = parmap.value("flux");
       m_tstart = parmap.value("tstart");
       m_tstop = parmap.value("tstop");

@@ -62,10 +62,7 @@ MapCube::MapCube(const std::string & paramString) : MapSource() {
          }
       }
    } else {
-      std::map<std::string, std::string> params;
-      facilities::Util::keyValueTokenize(paramString, ", ", params);
-      
-      genericSources::ConstParMap parmap(params);
+      genericSources::ConstParMap parmap(paramString);
       
       m_flux = parmap.value("flux");
       fitsFile = parmap["fitsFile"];

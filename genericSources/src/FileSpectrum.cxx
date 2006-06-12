@@ -61,10 +61,7 @@ FileSpectrum::FileSpectrum(const std::string& params)
 // here to zero.
    m_flux = 0; 
 
-   std::map<std::string, std::string> my_parmap;
-   facilities::Util::keyValueTokenize(params, ",", my_parmap);
-   
-   genericSources::ConstParMap parmap(my_parmap);
+   genericSources::ConstParMap parmap(params);
    
    try {
       m_flux = parmap.value("flux");
