@@ -111,10 +111,6 @@ TH2D* PulsarSim::PSRPhenom(double par0, double par1, double par2, double par3, d
   //TimeProfileFileName = std::string(gleam)+"/"+ m_name + "TimeProfile.txt";
 
 
-
-
-
-
   ofstream PulsarLogSim;
   PulsarLogSim.open(logSimLabel.c_str(),std::ios::app);
 
@@ -344,6 +340,30 @@ TH2D* PulsarSim::PSRShape(std::string ModelShapeName, int NormalizeFlux)
 {
   std::cout << "Testing new model Shape for pulsar " << m_name << " using normalization option " << NormalizeFlux << std::endl; 
 
+  //Writes out an output log file for the pulsar
+ 
+  //Redirect output to a subdirectory
+  const char * pulsarOutDir = ::getenv("PULSAROUTFILES");
+
+  std::string logSimLabel;
+  // override obssim if running in Gleam environment
+  if( pulsarOutDir!=0) 
+    logSimLabel = std::string(pulsarOutDir) + "/" + m_name + "Log.txt"; 
+  else
+    logSimLabel = m_name + "Log.txt"; 
+
+  //TimeProfileFileName = std::string(gleam)+"/"+ m_name + "TimeProfile.txt";
+
+
+  ofstream PulsarLogSim;
+  PulsarLogSim.open(logSimLabel.c_str(),std::ios::app);
+
+  //Writes out informations about the model parameters on the file
+  PulsarLogSim << "******** Pulsar Shape Model ********" << std::endl;
+  PulsarLogSim << "** Using and arbitrary 2-d shape as spectrum" << std::endl;
+  PulsarLogSim << "** Pulsar Shape used:" << ModelShapeName << std::endl;
+  PulsarLogSim << "** Use normalization? : " << NormalizeFlux << std::endl;
+ 
 
   //Look for ModelShapeName.root in the data directory...
   std::string  pulsar_root = ::getenv("PULSARROOT");
@@ -353,7 +373,7 @@ TH2D* PulsarSim::PSRShape(std::string ModelShapeName, int NormalizeFlux)
   // override obssim if running in Gleam environment
   if( gleam!=0) ModelShapeInputFileName = std::string(gleam)+"/"+ ModelShapeName + ".root";
 
-  std::cout << "Using Shape " << ModelShapeName << " located at: " << ModelShapeInputFileName << std::endl;
+  PulsarLogSim << "** Using Shape " << ModelShapeName << " located at: " << ModelShapeInputFileName << std::endl;
 
   //Load 2HD Histogram
 
@@ -380,9 +400,9 @@ TH2D* PulsarSim::PSRShape(std::string ModelShapeName, int NormalizeFlux)
   int ei3 = nph->GetYaxis()->FindBin(cst::EnNormMax);
 
 
-  std::cout << "Pulsar shape defined between " << shapeEmin << " keV and " << shapeEmax << std::endl;
-  std::cout << "Phase bins " << phbin << " ; energy bins : " << ebin << std::endl;
-  std::cout << "Normalization between " << cst::EnNormMin << " keV ("<< ei2 
+  PulsarLogSim << "Pulsar shape defined between " << shapeEmin << " keV and " << shapeEmax << std::endl;
+  PulsarLogSim << "Phase bins " << phbin << " ; energy bins : " << ebin << std::endl;
+  PulsarLogSim << "Normalization between " << cst::EnNormMin << " keV ("<< ei2 
 	    << ") and " << cst::EnNormMax << " keV (" << ei3 << ")" << std::endl;
  
   //Normalisation factor according to band between EGRET1 and EGRET2 energies
@@ -393,6 +413,7 @@ TH2D* PulsarSim::PSRShape(std::string ModelShapeName, int NormalizeFlux)
 
   delete nph;
 
+  PulsarLogSim.close();
 
   //Save output
   SaveNv(m_Nv); // ph/m2/s/keV
