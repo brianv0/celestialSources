@@ -459,6 +459,7 @@ int main(int argc, char** argv)
   // m_pulsar->SaveNv((TH2D*)m_pulsar->PSRPhenom(double(npeaks), ppar1,ppar2,ppar3,ppar4));
 
   m_pulsar->SaveNv((TH2D*)m_pulsar->PSRShape("PsrPCHShape",1));
+  //m_pulsar->SaveNv((TH2D*)m_pulsar->PSRShape("VelaOGRSpect",1));
   
   //Redirect output to a subdirectory is $PULSAROUTFILES is defined
   const char * pulsarOutDir = ::getenv("PULSAROUTFILES");
@@ -469,8 +470,6 @@ int main(int argc, char** argv)
     name = std::string(pulsarOutDir) + "/PSRVELAroot.root";
   else
     name = "PSRVELAroot.root";
-
-  std::cout << "cutu3" << name << std::endl;
 
   std::cout << "**  Photons simulated on a period of " << Period*nLoops << " s. " << std::endl;
   PlotPulsar(enph,name);  

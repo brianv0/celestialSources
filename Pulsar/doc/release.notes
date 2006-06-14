@@ -38,6 +38,7 @@
 *   v1r1p9  15-feb-2006 MR   set env variables for outfiles
 *   v1r1p10 17-feb-2006 MR   fix VC8 compilation problems
 *   v1r2    9-jun-2006 MR    Pulsar shape model option added
+*   v1r2p0  14-jun-2006 MR    Pulsar shape model added to Pulsarspectrum class
 
 
 *@endverbatim
