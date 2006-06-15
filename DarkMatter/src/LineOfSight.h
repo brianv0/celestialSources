@@ -9,7 +9,6 @@ public:
   ~LineOfSight() {delete m_profile;}
   double operator()(const astro::SkyDir& bincenter) const;
   //void setIntegrationSteps();
-  float integral1(float l_obs,float b_obs,float time);
   void setBinSize(const float dl,const float db)
     {
       m_dl=dl;
@@ -19,9 +18,15 @@ public:
       std::cout<<"r_inside="<<r_inside<<" kpc"<<std::endl;
       step1   = r_inside/100.;
     }
-
+  
+  double getSigma19(){return m_sig19;}
+  double getIntegral(){return m_integral;}
+  
 private:
+  float integral1(float l_obs,float b_obs,float time);
   Profile* m_profile;
+  mutable double m_integral;
+  mutable double m_sig19;
   float step0;
   float step1;
   float step2;

@@ -19,7 +19,7 @@ void fitsReportError(int status, std::string routine="") {
       return;
    }
    if (routine == "") {
-      routine = "haloProfile::" + s_fitsRoutine;
+      routine = "makeMap::" + s_fitsRoutine;
    }
    fits_report_error(stderr, status);
    std::ostringstream message;
@@ -59,14 +59,21 @@ int main(void)
   ////////////////////////////////////////
   //Define the LineOfSight functor, derived from SkyFunction
   LineOfSight los(prof);
-  los.setBinSize(1.,1.);
+  //SkyImage only supports square pixels
+  float pixel_size = 0.5;
+  los.setBinSize(pixel_size, pixel_size);
 
-  float step=1.;
-  int nbins=360;
+  double fov=360.;
   std::string filename("output3.fits");
 
-  map_tools::SkyImage skyImage(halo_center,filename,step,nbins,1,"CAR",true);
+  // pixel_size [0.5] degree size of indivitual pixel
+  // fov [20] (degrees) size of field of view, square if <90, full sky if>90
+  // 1 = layers [1] number of layers to allocate (for energy scale)
+  map_tools::SkyImage skyImage(halo_center,filename,pixel_size,fov,1,"CAR",true);
   skyImage.fill(los,0);
+
+  std::cout<<"Sigma19: "<<los.getSigma19()<<std::endl;
+  std::cout<<"Integral (without solid angle): "<<los.getIntegral()<<std::endl;
 
   s_fitsRoutine="create2DMap";
   fitsfile * fptr = 0;
@@ -74,7 +81,7 @@ int main(void)
   int status = 0;
   fits_open_file(&fptr, file, READWRITE,&status);
   fitsReportError(status);
-  fits_write_key(fptr, TFLOAT, "R0", &r0,"Distance to the sun in kpc", status);
+  //fits_write_key(fptr, TFLOAT, "RZERO", &r0,"Distance to the sun in kpc", &status);
   fitsReportError(status);
 
 }

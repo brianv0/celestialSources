@@ -28,6 +28,9 @@ LineOfSight::LineOfSight(Profile& prof)
     step0=step1;
 
   float j_inside=0; //looks useless
+
+  m_integral=0.;
+  m_sig19=0.;
   
 }
 
@@ -98,8 +101,9 @@ double LineOfSight::operator()(const astro::SkyDir& bincenter)const
    float l_halo=m_profile->m_center.l();
    float b_halo=m_profile->m_center.b();
 
-   float integral=0.;
-   float sig19=0.;
+   //reset internals
+   m_integral=0.;
+   m_sig19=0.;
 
   if ((fabs(l_obs-l_halo)<delta_l)&&(fabs(b_obs-b_halo)<delta_b))
     {
@@ -107,10 +111,10 @@ double LineOfSight::operator()(const astro::SkyDir& bincenter)const
       int time=20;
       float rint=integral1(l_obs,b_obs,time);
       float rDeltaOmega=delta_l/time*delta_b/time*pow(deg2rad,2)*kpc2cm;
-      integral+=rint;
-      sig19   +=rint*rDeltaOmega;
+      m_integral+=rint;
+      m_sig19   +=rint*rDeltaOmega;
       //jmap[ix][iy]=rint;
-      std::cout<< "central value of Sigma 19= "<<b_obs<<" "<<l_obs<<" "<<sig19/1.e+19<<std::endl;
+      std::cout<< "central value of Sigma 19= "<<b_obs<<" "<<l_obs<<" "<<m_sig19/1.e+19<<std::endl;
     }
   else
     {
@@ -151,8 +155,9 @@ double LineOfSight::operator()(const astro::SkyDir& bincenter)const
 	}
       // in fact there is a factor pow(R_halo,2)/R_halo/R_halo :
       float rDeltaOmega=delta_l*delta_b*pow(deg2rad,2)*kpc2cm;
-      integral   +=j;
-      sig19      +=j*rDeltaOmega;
-    } 
-  return integral;
+      m_integral   +=j;
+      m_sig19      +=j*rDeltaOmega;
+    }
+  m_sig19/=1.e+19;
+  return m_integral;
 }
