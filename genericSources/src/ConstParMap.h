@@ -24,7 +24,7 @@ public:
       : m_parmap(parmap) {}
 
    ConstParMap(const std::string & params) {
-      facilities::Util::keyValueTokenize(params, ",", m_parmap);
+      facilities::Util::keyValueTokenize(params, ", ", m_parmap);
    }
 
    const std::string & operator[](const std::string & name) const {

@@ -116,9 +116,10 @@ void PeriodicSource::computeIntegralDistribution() {
    m_integralDist.push_back(0);
    std::vector<double>::const_iterator it = m_arrTimes.begin();
    for ( ; it != m_arrTimes.end(); it++) {
-      m_integralDist.push_back(m_flux*(*it + m_amplitude/angularFreq
-                                       *(cos(angularFreq*(*it) + m_phi0)
-                                         - cos(m_phi0))));
+      m_integralDist.push_back(m_flux*EventSource::totalArea()
+                               *(*it + m_amplitude/angularFreq
+                                 *(cos(angularFreq*(*it) + m_phi0)
+                                   - cos(m_phi0))));
    }
 
 // Extend to cover two periods.
