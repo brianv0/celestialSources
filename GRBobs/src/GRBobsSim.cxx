@@ -9,7 +9,7 @@
 #include "TFile.h"
 #include "TCanvas.h"
 #define DEBUG 0
-#define APPLY_REDSHIFT 0
+
 
 using namespace ObsCst;
 //////////////////////////////////////////////////
@@ -17,21 +17,18 @@ GRBobsSim::GRBobsSim(GRBobsParameters *params)
   : m_params(params)
 {
   m_GRBengine = new GRBobsengine(params);
+  m_fluence = m_params->GetFluence();
 }
 
-void GRBobsSim::GetUniqueName(void *ptr, std::string & name)
+void GRBobsSim::GetUniqueName(const void *ptr, std::string & name)
 {
   std::ostringstream my_name;
   my_name << reinterpret_cast<int> (ptr);
   name = my_name.str();
   gDirectory->Delete(name.c_str());
-  reinterpret_cast<TH1*> (ptr)->SetDirectory(0);
 }
-
 TH2D* GRBobsSim::MakeGRB()
 {
-  double z = m_params->GetRedshift();
-  double duration =  m_params->GetDuration();
   double *e = new double[Ebin +1];
   for(int i = 0; i<=Ebin; i++)
     {
@@ -42,162 +39,65 @@ TH2D* GRBobsSim::MakeGRB()
   double s_TimeBinWidth=TimeBinWidth;
   std::vector<GRBobsPulse*> Pulses = m_GRBengine->CreatePulsesVector();
   m_tfinal=0.0;
-  if(DEBUG) std::cout<<Pulses.size()<<std::endl;
+  
   std::vector<GRBobsPulse*>::iterator pos;
-  
-  //  for(pos = Pulses.begin(); pos !=  Pulses.end(); ++pos)
-  //    {
-  //      m_tfinal= TMath::Max(m_tfinal,(*pos)->GetEndTime());      
-  //      if(DEBUG) (*pos)->Print();
-  //    }
-  
-  if(APPLY_REDSHIFT) m_tfinal=(1.0+z) * duration; // duration is in the intrinsic frame;
-  else m_tfinal= duration; // duration is in the observer frame;
+  for(pos = Pulses.begin(); pos !=  Pulses.end(); ++pos)
+    {
+      m_tfinal=TMath::Max(m_tfinal,(*pos)->GetEndTime());      
+    }
   
   m_tbin = TMath::Max(10,int(m_tfinal/s_TimeBinWidth));
-  //  m_tbin = TMath::Min(10000,m_tbin);
+  m_tbin = TMath::Min(10000,m_tbin);
   s_TimeBinWidth = m_tfinal/m_tbin;
-  
+  //  double dt = m_tfinal/(m_tbin-1);
   gDirectory->Delete("Nv");
   m_Nv = new TH2D("Nv","Nv",m_tbin,0.,m_tfinal,Ebin, e);
   
   std::string name;
   GetUniqueName(m_Nv,name);
   m_Nv->SetName(name.c_str());
+  
   double t = 0.0;
   for(int ti = 0; ti<m_tbin; ti++)
     {
-      t = ti * s_TimeBinWidth;
+      t = ti*s_TimeBinWidth;
       for(int ei = 0; ei < Ebin; ei++)
 	{
 	  double nv = 0.0;//m_Nv->GetBinContent(ti+1, ei+1);
 	  
 	  for(pos = Pulses.begin(); pos !=  Pulses.end(); ++pos)
-	    {
-	      if(APPLY_REDSHIFT) nv += (*pos)->PulseShape(t/(1.+z),e[ei]*(1.+z)); //t/(1.+z) and e[ei]*(1.+z) are intrinsic
-	      else nv += (*pos)->PulseShape(t,e[ei]); //t and e[ei] are observed
+	    {	
+	      nv += (*pos)->PulseShape(t,e[ei]);
 	    }
 	  m_Nv->SetBinContent(ti+1, ei+1, nv);
 	  // [ph/(cm² s keV)]
 	}
     }
-  
+
   TH2D *nph = Nph(m_Nv); //ph/cm²
-  // Scale AT BATSE FLUENCE:
-  double norm=0;
   
-  if(m_params->GetNormType()=='F')
+  int ei1 = nph->GetYaxis()->FindBin(BATSE1);
+  int ei2 = nph->GetYaxis()->FindBin(BATSE5);
+  double F=0.0;
+  double en;
+  for (int ei = ei1; ei<=ei2; ei++)
     {
-      double BATSEfluence = m_params->GetFluence();
-      if(DEBUG) std::cout<<" Scale at BATSE fluence!:" << BATSEfluence <<std::endl;
-      
-      int ei1 = nph->GetYaxis()->FindBin(BATSE1);
-      int ei2 = nph->GetYaxis()->FindBin(BATSE5);
-      double F=0.0;
-      double en;
-      for (int ei = ei1; ei<=ei2; ei++)
+      en   = nph->GetYaxis()->GetBinCenter(ei);
+      for(int ti = 1; ti<=m_tbin; ti++)
 	{
-	  en   = nph->GetYaxis()->GetBinCenter(ei);
-	  for(int ti = 1; ti<=m_tbin; ti++)
-	    {
-	      F+= nph->GetBinContent(ti, ei) * en;//[keV/cm²]
-	    }  
-	}
-      F*=1.0e-3/(erg2meV); //erg/cm²
-      // IMPORTANT m_Nv has to  be in [ph/(m² s keV)]
-      norm = 1.0e4 * BATSEfluence/F;
+	  F+= nph->GetBinContent(ti, ei) * en;//[keV/cm²]
+	}  
     }
-  else
-    {
-      //////////////////////////////////////////////////
-      //SCALE AT BATSE PEAK FLUX:
-      double BATSEPeakFlux = m_params->GetPeakFlux();
-      if(DEBUG) std::cout<<" Scale at BATSE PeakFlux!:" << BATSEPeakFlux <<std::endl;
-      
-      int ei1 = nph->GetYaxis()->FindBin(BATSE2);
-      int ei2 = nph->GetYaxis()->FindBin(BATSE4);
-      double PF=0.0;
-      for (int ei = ei1; ei<=ei2; ei++)
-	{
-	  for(int ti = 1; ti<=m_tbin; ti++)
-	    {
-	      PF= TMath::Max(PF,nph->GetBinContent(ti, ei)/s_TimeBinWidth);//[ph/cm^2/s]
-	    }
-	}
-      norm = 1.0e4 * BATSEPeakFlux/PF;
-    }
+  double norm = F*1.0e-3/(erg2meV); //erg/cm²  
+  //  double norm = nph->Integral(0,m_tbin,ei1,ei2,"width")*(1.0e-3)/(erg2meV)/s_TimeBinWidth; //erg/m²
   
-  m_Nv->Scale(norm);
+  // IMPORTANT m_Nv has to  be in [ph/(m² s keV)]
+  m_Nv->Scale(1.0e4 * m_fluence/norm);
   Pulses.erase(Pulses.begin(), Pulses.end());
-  for(int i =0; i<(int) Pulses.size();i++) delete Pulses[i];
-  delete[] e;
+  delete e;
   delete nph;
+  //SaveNv(m_Nv);
   return m_Nv;
-}
-
-//////////////////////////////////////////////////
-TH2D* GRBobsSim::MakeGRB_ExtraComponent(double duration, double LATphotons)
-{
-  double *e = new double[Ebin +1];
-  for(int i = 0; i<=Ebin; i++)
-    {
-      e[i] = emin*pow(de,1.0*i); //keV
-    }
-  const int tbin = 1000;
-  const double dt = duration/(1.0*tbin);
-  
-  gDirectory->Delete("NvEC");
-  m_NvEC = new TH2D("NvEC","NvEC",tbin,0.,duration,Ebin, e);
-
-  std::string name;
-  GetUniqueName(m_NvEC,name);
-  m_NvEC->SetName(name.c_str());
-  
-  for(int ti = 0; ti<tbin; ti++)
-    {
-      double t  = ti*dt;
-      double I0 = pow(duration/(9.*t+duration),2.0);
-      for(int ei = 0; ei < Ebin; ei++)
-	{
-	  double I = I0*pow(e[ei],-1.0);
-	  m_NvEC->SetBinContent(ti+1,ei+1,I); // [ph/(cm² s keV)]
-	}
-    }
-  
-  int ei1 = m_NvEC->GetYaxis()->FindBin(LAT1);
-  int ei2 = m_NvEC->GetYaxis()->FindBin(LAT2);
-  double norm=0.0;  
-  for(int ti = 1; ti<=tbin; ti++)
-    {
-      for (int ei = ei1; ei<=ei2; ei++)
-	{
-	  double de = m_NvEC->GetYaxis()->GetBinWidth(ei);
-	  norm += m_NvEC->GetBinContent(ti, ei) * dt * de; // ph/(cm²)
-	}
-    }
-  //  std::cout<<LATphotons<<" "<<norm<<std::endl;
-  m_NvEC->Scale(LATphotons/norm);
-  delete[] e;
-  return m_NvEC;
-}
-//////////////////////////////////////////////////
-
-TH2D* GRBobsSim::CutOff(TH2D *Nv, double E_CO)
-{
-  
-  if (E_CO==0) return Nv;
-  int tbin = Nv->GetXaxis()->GetNbins();
-  for(int ti = 0; ti<tbin; ti++)
-    {
-      for(int ei = 0; ei < Ebin; ei++)
-	{
-	  double nv = Nv->GetBinContent(ti+1,ei+1); // [ph/(cm² s keV)]
-	  double e = Nv->GetYaxis()->GetBinCenter(ei+1)*1e-6; // (GeV)
-	  double suppression = exp(-e/E_CO);
-	  Nv->SetBinContent(ti+1,ei+1,suppression*nv); // [ph/(cm² s keV)]
-	}
-    }
-  return Nv;
 }
 //////////////////////////////////////////////////
 TH2D *GRBobsSim::Nph(const TH2D *Nv)
@@ -207,7 +107,7 @@ TH2D *GRBobsSim::Nph(const TH2D *Nv)
   std::string name;
   GetUniqueName(Nph,name);
   Nph->SetName(name.c_str());
-
+  
   double dei;
   double deltat = Nv->GetXaxis()->GetBinWidth(1);
   
@@ -224,31 +124,6 @@ TH2D *GRBobsSim::Nph(const TH2D *Nv)
 }
 
 //////////////////////////////////////////////////
-void GRBobsSim::SaveNvEC()
-{
-  
-  m_NvEC->SetXTitle("Time [s]");
-  m_NvEC->SetYTitle("Energy [keV]");
-  m_NvEC->SetZTitle("N_{v} [ph/m^2/s/keV]");
-  m_NvEC->GetXaxis()->SetTitleOffset(1.5);
-  m_NvEC->GetYaxis()->SetTitleOffset(1.5);
-  m_NvEC->GetZaxis()->SetTitleOffset(1.2);
-  m_NvEC->GetXaxis()->CenterTitle();
-  m_NvEC->GetYaxis()->CenterTitle();
-  m_NvEC->GetZaxis()->CenterTitle();
-  
-  char root_name[100];
-  sprintf(root_name,"grbobs_%d_EC.root",(int)m_params->GetGRBNumber());
-  std::cout<<" Saving "<<root_name<<std::endl;
-  TFile mod(root_name,"RECREATE");
-  std::string name = m_NvEC->GetName();
-  m_NvEC->SetName("Nv"); // I need a default name.
-  m_NvEC->Write();
-  mod.Close();
-  m_NvEC->SetName(name.c_str());
-
-};
-
 void GRBobsSim::SaveNv()
 {
   
@@ -271,16 +146,16 @@ void GRBobsSim::SaveNv()
   m_Nv->Write();
   mod.Close();
   m_Nv->SetName(name.c_str());
-
+  
 };
 
 //////////////////////////////////////////////////
-void GRBobsSim::SaveGBMDefinition(std::string GRBname, double ra, double dec, double theta, double phi, double tstart)
+void GRBobsSim::SaveGBMDefinition(TString GRBname, double ra, double dec, double theta, double phi, double tstart)
 {
-  std::string name = "GRBOBS_";
+  TString name = "GRBOBS_";
   name+=GRBname; 
-  name+=".DEF";
-  std::ofstream os(name.c_str(),std::ios::out);
+  name+="_DEF.txt";
+  std::ofstream os(name,std::ios::out);
   os<<"BURST DEFINITION FILE"<<std::endl;
   os<<"Burst Name"<<std::endl;
   os<<GRBname<<std::endl;
@@ -326,7 +201,7 @@ double LogFBOBS(double *var, double *par)
 
 
 
-void GRBobsSim::GetGBMFlux(std::string GRBname)
+void GRBobsSim::GetGBMFlux(TString GRBname)
 {
   //  double *e = new double[Ebin +1];
   //  for(int i = 0; i<=Ebin; i++)
@@ -352,14 +227,14 @@ void GRBobsSim::GetGBMFlux(std::string GRBname)
   double dt   = m_Nv->GetXaxis()->GetBinWidth(1);
   double tbin = m_Nv->GetXaxis()->GetNbins();
   
-  std::string name = "GRBOBS_";
+  TString name = "GRBOBS_";
   name+=GRBname; 
-  name+=".lc";
-  std::ofstream os(name.c_str(),std::ios::out);
+  name+="_GBM.txt";
+  std::ofstream os(name,std::ios::out);
   os<<"Sample Spectrum File "<<std::endl;
   os<<tbin<<" bins"<<std::endl;
   os<<"Norm   alf   beta  E_p "<<std::endl;
-#ifndef WIN32 // THB: Avoid need to link TCanvas on windows 
+  
   if(DEBUG)
     {
       TCanvas *GBMCanvas;
@@ -368,7 +243,7 @@ void GRBobsSim::GetGBMFlux(std::string GRBname)
       GBM.Draw();
       
     }
-#endif 
+  
   a =  -1.00;
   b =  -2.25;
   
@@ -412,13 +287,13 @@ void GRBobsSim::GetGBMFlux(std::string GRBname)
       if(DEBUG)
 	{
 	  std::cout<<"t= "<<t<<" C= "<<Const<<" a= "<<a<<" b= "<<b<<" E0= "<<E0<<" Ep= "<<Ep<<std::endl;
-	  //	  gPad->SetLogx();
-	  //	  gPad->SetLogy();
+	  //gPad->SetLogx();
+	  //gPad->SetLogy();
 	  gPad->Update();
-	  std::string gbmFlux= "GBMFlux";
-	  gbmFlux+=ti;
-	  gbmFlux+=".gif";
-	  if(ti%10==0) gPad->Print(gbmFlux.c_str());
+	  //	  TString gbmFlux= "GBMFlux";
+	  //	  gbmFlux+=ti;
+	  //	  gbmFlux+=".gif";
+	  //	  if(ti%10==0) gPad->Print(gbmFlux);
 	}
     }   
   os.close();

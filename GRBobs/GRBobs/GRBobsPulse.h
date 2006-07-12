@@ -5,7 +5,7 @@
  * \class GRBobsPulse
  * \brief GRB phenomenological pulse description
  *
- * The pulse is the elementary structure of a GRB.
+ * The pulse is the elementary structure of a GRB
  * \author Nicola Omodei       nicola.omodei@pi.infn.it 
  *  
  */
@@ -24,9 +24,9 @@ class GRBobsPulse
   inline void SetIntensity(double i)   {m_Intensity  = i;}
   
   inline double GetPeakTime()     {return m_peakTime ;}
-  inline double GetEndTime()      {return m_end;}
-  inline double GetStartTime()    {return m_start;}
-  inline double GetDuration()     {return m_duration;}
+  inline double GetEndTime()      {return m_peakTime + log(100.0) * m_decayTime;}
+  inline double GetStartTime()    {return m_peakTime - log(100.0) * m_riseTime;}
+
   /*!  
     The pulse shape is composed by a temporal profile of equation:
     \f[
@@ -55,30 +55,22 @@ class GRBobsPulse
     \f[
     \left\{
     \begin{array}{l}
+    W(E) = W_0 E^{-0.4} \\
     \\   
-    \sigma_r(E)=\sigma_r*\frac{E}{E0}^{-We} \\
+    \sigma_r=0.33\sigma_d^{0.83}\\
     \\
-    \sigma_d(E)=\sigma_d*\frac{E}{E0}^{-We} \\
+    \sigma_d = 0.75~0.69^{1/\nu}~W\\
     \end{array}
     \right. 
     \f]
-    The variables \f$\sigma_r\f$, \f$\sigma_d\f$ and \f$\nu\f$ are computed by GRBobsParameters::GenerateParameters(), 
-    and the constants \em E0,\em We are defined in the namespace ObsCst (ObsCst::E0, ObsCst::We).
-    The peaks at different energies are also shifted, so that:
-    \f[
-    t_p(E0)-t_p(E)= \Delta_t~\sigma_r(1-\frac{E}{E0}^{-We})(log(100.))^{1.0/\nu}
-    \f]
-    with \f$\Delta_t\f$ corresponding to ObsCst::deltaTPeak.
-  */
+    The first equation expresses the pulse width dependence on the energy. The second equation correlates the rise time with the decay time, and the third correlates the width with the decay time.    
+   */
   double PulseShape(double t ,double e);
  
  private:
   double m_peakTime;
   double m_riseTime;
   double m_decayTime;
-  double m_start;
-  double m_end;
-  double m_duration;
   double m_Intensity;
   double m_Peakedness;
   double m_Epeak;
