@@ -2,12 +2,11 @@
 #include <iostream>
 #include <fstream>
 #include "flux/SpectrumFactory.h" 
+#include "astro/EarthCoordinate.h"
 #include "astro/GPS.h"
 #include "astro/SkyDir.h"
 #include "astro/PointingTransform.h"
 #include "astro/JulianDate.h"
-#include "astro/EarthOrbit.h"
-#include "facilities/Util.h"
 
 #define DEBUG 0 
 
@@ -28,17 +27,18 @@ GRBtemplateManager::GRBtemplateManager(const std::string& params)
   m_InputFileName = "$(GRBTEMPLATEROOT)/data/test.dat";
   facilities::Util::expandEnvVar(&m_InputFileName);  
   
-  m_startTime       = parseParamList(params,0);
+  m_startTime       = parseParamList(params,0)+Spectrum::startTime();;
   m_MinPhotonEnergy = parseParamList(params,1)*1.0e3; //MeV
 
   if(parseParamList(params,2)!=0) m_GenerateGBMOutputs = true;
   
   //  m_par = new GRBtemplateParameters();
   m_GRBnumber = (long) floor(65540+m_startTime);
-  facilities::Util::expandEnvVar(&m_InputFileName);
+  //  facilities::Util::expandEnvVar(&m_InputFileName);
   
-  m_theta = -90.0;
-  const double FOV=85.0; // degrees above the XY plane.
+  m_theta = -1000000.0;
+  const double FOV=-100.0; // degrees above the XY plane.
+  if(FOV>-90) std::cout<<"WARNING!! GRBtemplate: FOV = "<<FOV<<std::endl;
 
   while(m_theta<FOV)
     {
@@ -51,6 +51,8 @@ GRBtemplateManager::GRBtemplateManager(const std::string& params)
       HepVector3D skydir=sky.dir();
       HepRotation rottoglast = GPS::instance()->transformToGlast(m_startTime,GPS::CELESTIAL);
       HepVector3D scdir = rottoglast * skydir;
+
+      
       m_ra    = sky.ra();
       m_dec   = sky.dec();
       m_theta = 90. - scdir.theta()*180.0/M_PI; // theta=0 -> XY plane, theta=90 -> Z
@@ -64,67 +66,71 @@ GRBtemplateManager::GRBtemplateManager(const std::string& params)
 
 TString GRBtemplateManager::GetGRBname(double time)
 {
+
+
   ////DATE AND GRBNAME
-  astro::EarthOrbit m_EarthOrbit;
-  using astro::JulianDate;
-  JulianDate  JD = m_EarthOrbit.dateFromSeconds(time);
-  int An,Me,Gio;
+  astro::JulianDate JD(astro::JulianDate::missionStart() +
+		       m_startTime/astro::JulianDate::secondsPerDay);
+
+ int An,Me,Gio;
   m_Rest=((int) m_startTime % 86400) + m_startTime - floor(m_startTime);
   m_Frac=(m_Rest/86400.);
   int FracI=(int)(m_Frac*1000.0);
   double utc;
-  JD.getGregorianDate(An,Me,Gio,utc);
-
-  TString GRBname="";
-
+  JD.getGregorianDate(An,Me,Gio,utc);  
   An-=2000;
+
+  std::ostringstream ostr;
   
   if(An<10) 
     {
-      GRBname+="0";
-      GRBname+=An;
+      ostr<<"0";
+      ostr<<An;
     }
   else
     {
-      GRBname+=An;
-    }
-  if(Me<10) 
-    {
-      GRBname+="0";
-      GRBname+=Me;
-    }
-  else
-    {
-      GRBname+=Me;
-    }
-  if(Gio<10) 
-    {
-      GRBname+="0";
-      GRBname+=Gio;
-    }
-  else
-    {
-      GRBname+=Gio;
+      ostr<<An;
     }
   
+  if(Me<10) 
+    {
+      ostr<<"0";
+      ostr<<Me;
+    }
+  else
+    {
+      ostr<<Me;
+    }
+  
+  if(Gio<10) 
+    {
+      ostr<<"0";
+      ostr<<Gio;
+    }
+  else
+    {
+      ostr<<Gio;
+    }
   
   if (FracI<10)
     {
-      GRBname+="00";
-      GRBname+=FracI;
+      ostr<<"00";
+      ostr<<FracI;
     }
   else if(FracI<100) 
     {
-      GRBname+="0";
-      GRBname+=FracI;
+      ostr<<"0";
+      ostr<<FracI;
     }
   else 
-    GRBname+=FracI;
+    ostr<<FracI;
+
+  std::string GRBname = ostr.str();
   
   if(DEBUG) std::cout<<"GENERATE TEMPLATE GRB ("<<GRBname<<")"<<std::endl;
   //..................................................  //
   return GRBname;
-}
+} 
 
 GRBtemplateManager::~GRBtemplateManager() 
 {  

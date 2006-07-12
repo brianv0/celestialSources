@@ -4,6 +4,6 @@ fi
 . ${CMTROOT}/mgr/setup.sh
 tempfile=`${CMTROOT}/mgr/cmt build temporary_name -quiet`
 if test ! $? = 0 ; then tempfile=/tmp/cmt.$$; fi
-${CMTROOT}/mgr/cmt -quiet cleanup -sh -pack=GRBtemplate -version= -path=/data0/glast/MyPkg/celestialSources $* >${tempfile}; . ${tempfile}
+${CMTROOT}/mgr/cmt -quiet cleanup -sh -pack=GRBtemplate -version=v0r2 -path=/data0/glast/ScienceTools/celestialSources $* >${tempfile}; . ${tempfile}
 /bin/rm -f ${tempfile}
 

@@ -14,14 +14,14 @@
 #include <map>
 #include <cmath>
 #include "TRandom.h"
-#include "flux/ISpectrum.h"
+#include "flux/Spectrum.h"
 #include "flux/EventSource.h"
 #include "GRBtemplateSim.h"
 #include "SpectObj/SpectObj.h"
 
 #include "facilities/Util.h"
 
-class GRBtemplateManager : public ISpectrum
+class GRBtemplateManager : public Spectrum
 {
   
  public:
@@ -57,7 +57,7 @@ class GRBtemplateManager : public ISpectrum
   //! direction, taken from GRBtemplateSim
   inline std::pair<double,double> dir(double) 
     {
-      (void)(energy);//energy is not used here
+      //      (void)(energy);//energy is not used here
       return m_GalDir;
     } 
   
