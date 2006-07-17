@@ -214,13 +214,14 @@ void PlotPulsar(double enph = 0,std::string name="pulsar.root")
  
 
   csp->cd();
-  
-  vFv->Scale(1e-6); //Scale in order to plot the 3 histos on the same canvas
 
+  vFv->Scale(1e-6); //Scale in order to plot the 3 histos on the same canvas
+  
   Ne->SetMinimum(1e-10);
   Fv->SetMinimum(1e-10);
   vFv->SetMinimum(1e-10);
 
+  
   Fv->Draw("l");
   vFv->Draw("lsame");
   Ne->Draw("lsame");
@@ -458,8 +459,11 @@ int main(int argc, char** argv)
   PulsarSim* m_pulsar = new PulsarSim("PSRVELA",seed,flux,enphmin, enphmax, Period);
   // m_pulsar->SaveNv((TH2D*)m_pulsar->PSRPhenom(double(npeaks), ppar1,ppar2,ppar3,ppar4));
 
-  m_pulsar->SaveNv((TH2D*)m_pulsar->PSRShape("PsrPCHShape",1));
+  //  m_pulsar->SaveNv((TH2D*)m_pulsar->PSRShape("PsrPCHShape",1));
   //m_pulsar->SaveNv((TH2D*)m_pulsar->PSRShape("VelaOGRSpect",1));
+  m_pulsar->SaveNv((TH2D*)m_pulsar->PSRShape("VelaPCHSpect",1));
+
+
   
   //Redirect output to a subdirectory is $PULSAROUTFILES is defined
   const char * pulsarOutDir = ::getenv("PULSAROUTFILES");
@@ -472,7 +476,10 @@ int main(int argc, char** argv)
     name = "PSRVELAroot.root";
 
   std::cout << "**  Photons simulated on a period of " << Period*nLoops << " s. " << std::endl;
+  
   PlotPulsar(enph,name);  
+
+  //PlotPulsar(enph,"VelaOGRSpect.root");  
 
   theApp.Run();
 }

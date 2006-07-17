@@ -407,9 +407,14 @@ TH2D* PulsarSim::PSRShape(std::string ModelShapeName, int NormalizeFlux)
  
   //Normalisation factor according to band between EGRET1 and EGRET2 energies
   //Integration is on a averaged flux over period
-  double norm = m_Nv->Integral(0,phbin,ei2,ei3,"width")/m_period; // ph/m2/s
 
-  m_Nv->Scale(m_flux/norm);
+  if (NormalizeFlux == 1)
+    {
+      double norm = m_Nv->Integral(0,phbin,ei2,ei3,"width")/m_period; // ph/m2/s
+      m_Nv->Scale(m_flux/norm);
+    }
+
+
 
   delete nph;
 
