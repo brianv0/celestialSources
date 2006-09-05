@@ -5,6 +5,8 @@
   @verbatim
   $Id$
 
+  05-Sep-06 v1r6p14 JC    bug fix for SpectralTransient: handle times past
+                          end of light curve
   29-Jun-06 v1r6p13 JC    bug fix for PeriodicSource: forgot to scale rate
                           by EventSource::totalArea()
   11-Jun-06 v1r6p12 JC    more FileSpectrum refactoring

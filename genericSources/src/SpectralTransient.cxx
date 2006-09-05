@@ -151,6 +151,10 @@ double SpectralTransient::interval(double time) {
 }
 
 void SpectralTransient::fillEventCache(double time) {
+   if (size_t(m_currentInterval - m_lightCurve.begin()) 
+       >= m_lightCurve.size()) {
+      return;
+   }
    for ( ; m_currentInterval != m_lightCurve.end(); ++m_currentInterval) {
       if (time < m_currentInterval->startTime) {
          time = m_currentInterval->startTime;
@@ -158,8 +162,8 @@ void SpectralTransient::fillEventCache(double time) {
       double dt(m_currentInterval->stopTime - time);
       double flux(m_currentInterval->flux);
       double npred(flux*EventSource::totalArea()*dt);
-      int nevts(CLHEP::RandPoisson::shoot(npred));
-      if (nevts > 0) {
+      int nevts;
+      if (npred > 0 && (nevts = CLHEP::RandPoisson::shoot(npred)) > 0) {
          std::vector< std::pair<double, double> > my_cache;
          for (int i = 0; i < nevts; i++) {
             double energy(m_currentInterval->drawEnergy(m_emin, m_emax));
