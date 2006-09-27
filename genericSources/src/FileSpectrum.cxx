@@ -37,8 +37,8 @@ namespace {
       return my_value;
    }
 
-   double pl_draw(double e1, double e2, double f1, double f2) {
-      double xi(CLHEP::RandFlat::shoot());
+   double pl_draw(double e1, double e2, double f1, double f2, double xi) {
+//      double xi(CLHEP::RandFlat::shoot());
 
       double gamma(std::log(f2/f1)/std::log(e2/e1));
       double e1gam(std::pow(e1, 1. + gamma));
@@ -108,7 +108,7 @@ float FileSpectrum::operator() (float xi) {
       return std::max(my_energy, 0.);
    }
    return ::pl_draw(m_energies.at(k-1), m_energies.at(k),
-                    m_dnde.at(k-1), m_dnde.at(k));
+                    m_dnde.at(k-1), m_dnde.at(k), xi);
 }
 
 std::string FileSpectrum::title() const {
