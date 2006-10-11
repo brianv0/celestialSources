@@ -336,6 +336,16 @@ TH2D* PulsarSim::PSRPhenom(double par0, double par1, double par2, double par3, d
 }
 
 
+//////////////////////////////////////////////////
+/*!
+ * \param ModelShapeName Name of the file containing model
+ * \param NormalizeFlux 0 - Use the normalization of the TH2D histogram
+ *                      1 - Normalize the TH2D histogram to the m_flux value (in ph/cm2/s above 100 MeV)
+ * 
+ * This method use an external TH2D histogram containing an arbitrary phase-energy distribution and 
+ * use it to extract photons, instead of using an analytical form for the spectrum as in PSRPhenom method
+ * The model named by the parameter ModelShapeName must be located in the PULSARDATA directory
+ */
 TH2D* PulsarSim::PSRShape(std::string ModelShapeName, int NormalizeFlux)
 {
   std::cout << "Testing new model Shape for pulsar " << m_name << " using normalization option " << NormalizeFlux << std::endl; 
