@@ -174,6 +174,7 @@ void GRBobsParameters::ReadParametersFromFile(std::string paramFile, int NGRB)
   double alpha;
   double beta;
   double Ep;
+  double fssc_fsyn,essc_esyn;
   double Eco;
 
   char buf[100];
@@ -183,7 +184,7 @@ void GRBobsParameters::ReadParametersFromFile(std::string paramFile, int NGRB)
   
   while(i<=NGRB && f1.getline(buf,100))
     {
-      if(sscanf(buf,"%lf %lf %lf %lf %lf %lf %lf %lf",&tstart,&duration,&fluence,&z,&alpha,&beta,&Ep, &Eco)<=0) break;
+      if(sscanf(buf,"%lf %lf %lf %lf %lf %lf %lf %lf %lf %lf",&tstart,&duration,&fluence,&z,&alpha,&beta,&Ep,&essc_esyn,&fssc_fsyn, &Eco)<=0) break;
       i++;
     } 
   i--;
@@ -197,7 +198,7 @@ void GRBobsParameters::ReadParametersFromFile(std::string paramFile, int NGRB)
       for(int j = 1; j<=(NGRB %i);j++)
 	{
 	  f2.getline(buf,100);
-	  sscanf(buf,"%lf %lf %lf %lf %lf %lf %lf %lf",&tstart,&duration,&fluence,&z,&alpha,&beta, &Ep, &Eco);
+	  sscanf(buf,"%lf %lf %lf %lf %lf %lf %lf %lf %lf %lf",&tstart,&duration,&fluence,&z,&alpha,&beta, &Ep,&essc_esyn,&fssc_fsyn, &Eco);
 	}
       f2.close();
     }
@@ -209,6 +210,8 @@ void GRBobsParameters::ReadParametersFromFile(std::string paramFile, int NGRB)
   SetDuration(duration);
   SetAlphaBeta(alpha,beta);
   SetEpeak(Ep);
+  SetFssc_Fsyn(fssc_fsyn);
+  SetEssc_Esyn(essc_esyn);
   SetMinPhotonEnergy(3e4); //keV (this is a defaul value)
   SetGalDir(-200,-200);
   SetCutOffEnergy(Eco);

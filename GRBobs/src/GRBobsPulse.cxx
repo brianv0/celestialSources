@@ -77,7 +77,7 @@ double GRBobsPulse::PulseShape(double t, double e)
     bandf = pow(e,a) * exp(-e*(2.+a)/Ep);
   else
     bandf= C * pow(e,b); // ph cm^(-2) s^(-1) keV^(-1)
-  
+
   return m_Intensity * bandf * pulse;
 }
 

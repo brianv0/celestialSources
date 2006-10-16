@@ -117,6 +117,8 @@ class GRBobsmanager : public Spectrum
   double m_alpha;
   double m_beta;
   double m_epeak;
+  double m_fssc_fsyn;
+  double m_essc_esyn;
   double m_MinPhotonEnergy;
   double m_CutOffEnergy;
   double m_LATphotons;

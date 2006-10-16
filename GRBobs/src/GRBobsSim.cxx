@@ -64,6 +64,11 @@ TH2D* GRBobsSim::MakeGRB()
   std::string name;
   GetUniqueName(m_Nv,name);
   m_Nv->SetName(name.c_str());
+
+  double Fssc_Fsyn = m_params->GetFssc_Fsyn();
+  double Essc_Esyn = m_params->GetEssc_Esyn();
+  
+
   double t = 0.0;
   for(int ti = 0; ti<m_tbin; ti++)
     {
@@ -76,6 +81,11 @@ TH2D* GRBobsSim::MakeGRB()
 	    {
 	      if(APPLY_REDSHIFT) nv += (*pos)->PulseShape(t/(1.+z),e[ei]*(1.+z)); //t/(1.+z) and e[ei]*(1.+z) are intrinsic
 	      else nv += (*pos)->PulseShape(t,e[ei]); //t and e[ei] are observed
+	      if(Essc_Esyn*Fssc_Fsyn>0.0) // Add an extra component
+		{
+		  if(APPLY_REDSHIFT) nv += (*pos)->PulseShape(t/(1.+z),e[ei]*(1.+z)); //t/(1.+z) and e[ei]*(1.+z) are intrinsic
+		  else nv += Fssc_Fsyn*(*pos)->PulseShape(t,e[ei]/Essc_Esyn)/(Essc_Esyn*Essc_Esyn); //t and e[ei] are observed
+		}
 	    }
 	  m_Nv->SetBinContent(ti+1, ei+1, nv);
 	  // [ph/(cm² s keV)]

@@ -186,6 +186,10 @@ void GenerateXMLLibrary(int Nbursts=100)
   double ExtraComponent_Duration=0.0;
   double CO_Energy= 0.0;  
   //////////////////////////////////////////////////
+  double Fssc_Fsyn = 0.0;
+  double Essc_Esyn = 1000.0;
+  
+  //////////////////////////////////////////////////
   if (GenerateRedshift && (CO_Energy!=0)) std::cout<<" WARNING!!! Generate redshift is true and CO_Energy!=0"<<std::endl;
   TRandom *rnd = new TRandom();
   rnd->SetSeed(65540);
@@ -332,13 +336,17 @@ void GenerateXMLLibrary(int Nbursts=100)
   
   
   if(GeneratePF)
-    //    fprint(osTest," T0  T90   Z    PF  alpha   beta   Eco ");
-    osTest<<setw(11)<<"T0"<<setw(9)<<"T90"<<setw(9)<<"PF"<<setw(9)<<"z"<<setw(9)<<"alpha"<<setw(9)<<"beta"<<setw(10)<<"Ep"<<setw(9)<<"Eco"<<std::endl;
-  //osTest<<" T0  T90    PF  alpha   beta   Eco "<<std::endl;
+    {
+      //    fprint(osTest," T0  T90   Z    PF  alpha   beta   Eco ");
+      osTest<<setw(11)<<"T0"<<setw(9)<<"T90"<<setw(9)<<"PF"<<setw(9)<<"z"<<setw(9)<<"alpha"<<setw(9)<<"beta"<<setw(10)<<"Ep(keV)";
+      osTest<<setw(9)<<" Essc/Esyn"<<setw(9)<<" Fssc/Fsyn "<<setw(9)<<"Eco(GeV)"<<std::endl;
+    }
   else
-    //    fprint(osTest," T0  T90   Z    PF  alpha   beta   Eco ");
-    osTest<<setw(11)<<"T0"<<setw(9)<<"T90"<<setw(9)<<"FL"<<setw(9)<<"z"<<setw(9)<<"alpha"<<setw(9)<<"beta"<<setw(10)<<"Ep"<<setw(9)<<"Eco"<<std::endl;
-  //osTest<<" T0  T90    FL  alpha   beta   Eco "<<std::endl;
+    {
+      osTest<<setw(11)<<"T0"<<setw(9)<<"T90"<<setw(9)<<"FL"<<setw(9)<<"z"<<setw(9)<<"alpha"<<setw(9)<<"beta"<<setw(10)<<"Ep(keV)";
+      osTest<<setw(9)<<" Essc/Esyn"<<setw(9)<<" Fssc/Fsyn "<<setw(9)<<"Eco(GeV)"<<std::endl;
+      //osTest<<" T0  T90    FL  alpha   beta   Eco "<<std::endl;
+    }
   
   int type;
   int Nlong=0;
@@ -508,7 +516,8 @@ void GenerateXMLLibrary(int Nbursts=100)
       else 
 	os<<" <SpectrumClass name=\"GRBobsmanager\" params=\""<<BurstTime<<" , "<<Duration<<" , "<<Fluence<<" , "<<
 	  z<<" , "<<alpha<<" , "<<beta<<" , "<<Ep<<" , "<<MinExtractedPhotonEnergy<<" , "<<(int)GenerateGBM;
-      
+
+      os<<" , "<<Essc_Esyn<<" , "<<Fssc_Fsyn;
       os<<" , "<<NphLat<<" , "<<DelayTime<<" , "<<ExtraComponent_Duration<<" , "<<co_energy<<" \"/>"<<std::endl;
       
       
@@ -523,16 +532,11 @@ void GenerateXMLLibrary(int Nbursts=100)
       
       
       if(GeneratePF) 
-	osTest<<setw(11)<<BurstTime<<" "<<setw(8)<<setprecision(4)<<Duration<<" "<<setw(8)<<PeakFlux<<" "<<setw(8)<<z<<" "<<setw(8)<<alpha<<" "<<setw(8)<<beta<<" "<<setw(8)<<Ep<<" "<<setw(8)<<co_energy<<std::endl;
+	osTest<<setw(11)<<BurstTime<<" "<<setw(8)<<setprecision(4)<<Duration<<" "<<setw(8)<<PeakFlux<<" ";
       else
-	osTest<<setw(11)<<BurstTime<<" "<<setw(8)<<setprecision(4)<<Duration<<" "<<setw(8)<<Fluence<<" "<<setw(8)<<z<<" "<<setw(8)<<alpha<<" "<<setw(8)<<beta<<" "<<setw(8)<<Ep<<" "<<setw(8)<<co_energy<<std::endl;
-      //////////////////////////////////////////////////
-      /*
-	if(GeneratePF) 
-	fprintf("%d %.3f  %.3f %.3f %.3f %.3f %d",BurstTime,Duration,PeakFlux,z,alpha,beta,co_energy);
-	else
-	fprintf("%d %.3f  %.3f %.3f %.3f %.3f %d",BurstTime,Duration,Fluence,z,alpha,beta,co_energy);
-      */
+	osTest<<setw(11)<<BurstTime<<" "<<setw(8)<<setprecision(4)<<Duration<<" "<<setw(8)<<Fluence<<" ";
+      
+      osTest<<setw(8)<<z<<" "<<setw(8)<<alpha<<" "<<setw(8)<<beta<<" "<<setw(8)<<Ep<<" "<<setw(8)<<Essc_Esyn<<setw(8)<<Fssc_Fsyn<<setw(8)<<co_energy<<std::endl;
       //////////////////////////////////////////////////
       BurstTime+=(int) rnd->Exp(AverageInterval);
     }

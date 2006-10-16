@@ -152,6 +152,11 @@ class GRBobsParameters
     {
       m_Epeak = Ep;
     }
+  inline void SetFssc_Fsyn(double x) {m_Fssc_Fsyn=x;}
+  inline void SetEssc_Esyn(double x) {m_Essc_Esyn=x;}
+
+  inline double GetFssc_Fsyn()    {return m_Fssc_Fsyn;}
+  inline double GetEssc_Esyn()    {return m_Essc_Esyn;}
   /// Set the minimum photon energy for generating LAT photons.
   void   SetMinPhotonEnergy(double);
   /// Set the galactic position in the sky of the GRB in <em>(l,b)</em> coordinates.
@@ -208,6 +213,8 @@ class GRBobsParameters
   double m_pulseSeparation;
 
   double  m_Epeak;
+  double  m_Essc_Esyn;
+  double  m_Fssc_Fsyn;
   double m_LowEnergy,m_HighEnergy;
   double m_fluence;
   double m_peakFlux;

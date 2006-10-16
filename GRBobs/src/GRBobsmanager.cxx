@@ -41,13 +41,15 @@ GRBobsmanager::GRBobsmanager(const std::string& params)
   m_beta            = parseParamList(params,5);
   m_epeak           = parseParamList(params,6);
   m_MinPhotonEnergy = parseParamList(params,7)*1.0e3; //MeV
+  m_essc_esyn       = parseParamList(params,8);
+  m_fssc_fsyn       = parseParamList(params,9);
 
-  if(parseParamList(params,8)!=0) m_GenerateGBMOutputs = true;
+  if(parseParamList(params,10)!=0) m_GenerateGBMOutputs = true;
 
-  m_LATphotons     = parseParamList(params,9);
-  m_EC_delay       = parseParamList(params,10);
-  m_EC_duration    = parseParamList(params,11);
-  m_CutOffEnergy   = parseParamList(params,12);
+  m_LATphotons     = parseParamList(params,11);
+  m_EC_delay       = parseParamList(params,12);
+  m_EC_duration    = parseParamList(params,13);
+  m_CutOffEnergy   = parseParamList(params,14);
 
   m_par = new GRBobsParameters();
 
@@ -57,6 +59,8 @@ GRBobsmanager::GRBobsmanager(const std::string& params)
   m_par->SetDuration(m_GRB_duration);
   m_par->SetAlphaBeta(m_alpha,m_beta);
   m_par->SetEpeak(m_epeak);
+  m_par->SetEssc_Esyn(m_essc_esyn);
+  m_par->SetFssc_Fsyn(m_fssc_fsyn);
   m_par->SetMinPhotonEnergy(m_MinPhotonEnergy); //keV  
   m_par->SetRedshift(m_z);
   m_theta = -1000000.0;
