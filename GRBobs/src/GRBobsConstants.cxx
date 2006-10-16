@@ -131,12 +131,15 @@ void GRBobsParameters::GenerateParameters()
   m_FWHM =  GetBATSEFWHM();
   
   if(m_Type==1) m_FWHM/=10.0;
-
+  
   m_decayTime         = 1.00/(1.0+m_RD) / pow(log10(2.0),1./m_Peakedness) * m_FWHM;
   m_riseTime          = m_RD/(1.0+m_RD) / pow(log10(2.0),1./m_Peakedness) * m_FWHM;
   m_pulseHeight       = rnd->Uniform();
-  m_Epeak             =  pow(10.,rnd->Gaus(log10(235.0),log10(1.75))); //Short
-  if(m_Type==2 && m_NormType=='P') m_Epeak/=m_Stretch; //Long
+  if(m_Epeak == 0 )
+    {  
+      m_Epeak             =  pow(10.,rnd->Gaus(log10(235.0),log10(1.75))); //Short
+      if(m_Type==2 && m_NormType=='P') m_Epeak/=m_Stretch; //Long
+    }
 }
 
 void GRBobsParameters::PrintParameters()
@@ -170,6 +173,7 @@ void GRBobsParameters::ReadParametersFromFile(std::string paramFile, int NGRB)
   double z;
   double alpha;
   double beta;
+  double Ep;
   double Eco;
 
   char buf[100];
@@ -179,7 +183,7 @@ void GRBobsParameters::ReadParametersFromFile(std::string paramFile, int NGRB)
   
   while(i<=NGRB && f1.getline(buf,100))
     {
-      if(sscanf(buf,"%lf %lf %lf %lf %lf %lf %lf",&tstart,&duration,&fluence,&z,&alpha,&beta,&Eco)<=0) break;
+      if(sscanf(buf,"%lf %lf %lf %lf %lf %lf %lf %lf",&tstart,&duration,&fluence,&z,&alpha,&beta,&Ep, &Eco)<=0) break;
       i++;
     } 
   i--;
@@ -193,7 +197,7 @@ void GRBobsParameters::ReadParametersFromFile(std::string paramFile, int NGRB)
       for(int j = 1; j<=(NGRB %i);j++)
 	{
 	  f2.getline(buf,100);
-	  sscanf(buf,"%lf %lf %lf %lf %lf %lf %lf",&tstart,&duration,&fluence,&z,&alpha,&beta,&Eco);
+	  sscanf(buf,"%lf %lf %lf %lf %lf %lf %lf %lf",&tstart,&duration,&fluence,&z,&alpha,&beta, &Ep, &Eco);
 	}
       f2.close();
     }
@@ -204,6 +208,7 @@ void GRBobsParameters::ReadParametersFromFile(std::string paramFile, int NGRB)
   //  SetPeakFlux(fluence);
   SetDuration(duration);
   SetAlphaBeta(alpha,beta);
+  SetEpeak(Ep);
   SetMinPhotonEnergy(3e4); //keV (this is a defaul value)
   SetGalDir(-200,-200);
   SetCutOffEnergy(Eco);

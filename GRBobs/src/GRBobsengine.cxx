@@ -17,32 +17,27 @@ GRBobsengine::GRBobsengine(GRBobsParameters *params)
 double GRBobsengine::generatePulses(std::vector<GRBobsPulse*> &thePulses, double duration)
 {
   //////////////////////////////////////////////////
-  double tau, pt1,pt,rt, dt, ph, nu, ep, a, b,endTime,BurstEndTime;
+  double tau;
 
-  pt=0.0;
-  
+  double pt  = 0.0;
+  double pt1 = 0.0;
+  double endTime=0.0;
+  double BurstEndTime=0.0;
+
   GRBobsPulse *aPulse;
-  endTime=0.0;
-  BurstEndTime=0.0;
   int npulses=0;
   
   while(endTime<duration || npulses==0)
     {
       m_params->GenerateParameters();
       tau = m_params->GetPulseSeparation();
-      rt  = m_params->GetRiseTime();
-      dt  = m_params->GetDecayTime();
-      ph  = m_params->GetPulseHeight();
-      nu  = m_params->GetPeakedness();
-      ep  = m_params->GetEpeak();
-      a   = m_params->GetLowEnergy();
-      b   = m_params->GetHighEnergy();
+
       if (npulses==0) 
-	pt  = pow(log(100.0),1./nu) * rt; //this sets the tstart =0
+	pt  = pow(log(100.0),1./m_params->GetPeakedness()) * m_params->GetRiseTime(); //this sets the tstart =0
       else 
 	pt=pt1+tau; 
       
-      aPulse = new GRBobsPulse(pt,rt,dt,ph,nu,ep,a,b);
+      aPulse = new GRBobsPulse(pt,m_params);
       
       if(DEBUG) 
 	{

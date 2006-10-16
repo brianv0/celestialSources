@@ -147,6 +147,11 @@ class GRBobsParameters
       m_LowEnergy       += ObsCst::We;
       m_HighEnergy      += ObsCst::We;
     } 
+
+  inline void SetEpeak(double Ep)
+    {
+      m_Epeak = Ep;
+    }
   /// Set the minimum photon energy for generating LAT photons.
   void   SetMinPhotonEnergy(double);
   /// Set the galactic position in the sky of the GRB in <em>(l,b)</em> coordinates.

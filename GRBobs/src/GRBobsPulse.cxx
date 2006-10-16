@@ -9,26 +9,23 @@ using std::fabs; using std::pow;
 
 GRBobsPulse::GRBobsPulse(){;}
 
-GRBobsPulse::GRBobsPulse(double peakTime,
-			 double riseTime,
-			 double decayTime,
-			 double Intensity,
-			 double Peakedness,
-			 double Epeak,
-			 double LowEnergy,
-			 double HighEnergy)
+GRBobsPulse::GRBobsPulse(double peakTime, GRBobsParameters *m_params)
 {  
   m_peakTime     = peakTime;
-  m_riseTime     = riseTime;
-  m_decayTime    = decayTime;
-  m_Intensity    = Intensity;
-  m_Peakedness   = Peakedness;
-  m_start        = peakTime - riseTime  * pow(log(100.0),1.0/Peakedness);
-  m_end          = peakTime + decayTime * pow(log(100.0),1.0/Peakedness);
-  m_Epeak        = Epeak;
-  m_LowEnergy    = LowEnergy;
-  m_HighEnergy   = HighEnergy;
+  m_riseTime     = m_params->GetRiseTime();
+  m_decayTime    = m_params->GetDecayTime();
+  m_Peakedness   = m_params->GetPeakedness();
+  
+  m_Intensity    = m_params->GetPulseHeight();
+    
+  m_start        = m_peakTime - m_riseTime  * pow(log(100.0),1.0/m_Peakedness);
+  m_end          = m_peakTime + m_decayTime * pow(log(100.0),1.0/m_Peakedness);
+  
+  m_Epeak        = m_params->GetEpeak();
+  m_LowEnergy    = m_params->GetLowEnergy();
+  m_HighEnergy   = m_params->GetHighEnergy();
   m_duration     = m_end-m_start;
+  
   if(DEBUG)  Print();
   
 }

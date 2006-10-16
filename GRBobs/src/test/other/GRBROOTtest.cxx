@@ -331,7 +331,7 @@ void PlotGRB(double enph = 0,double z=0,char name[100]="grb_65540.root",TString 
  
   csp->cd();
   e2Ne->SetMinimum(.1);
-  e2Ne->Draw("al");
+  e2Ne->Draw("l");
   Fv->Draw("samel");
   Ne->Draw("samel");
 

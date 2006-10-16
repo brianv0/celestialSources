@@ -129,9 +129,10 @@ int main(int argn, char * argc[]) {
   //TESTING MULTIPLE XML INPUT
   std::vector<std::string> fileList;
   fileList.push_back("$(GRBOBSROOT)/xml/GRBobs_user_library.xml");
-  fileList.push_back("$(GRBOBSROOT)/xml/SWIFT_bursts.xml");
+  //  fileList.push_back("$(GRBOBSROOT)/xml/SWIFT_bursts.xml");
   FluxMgr fm(fileList);
-  
+
+
   //FluxMgr fm;
   
   //Testing the addfactory function
