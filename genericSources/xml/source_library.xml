@@ -241,7 +241,7 @@
       <spectrum escale="MeV" particle_name="gamma">
          <SpectrumClass name="TF1Spectrum"
           params="flux=17.,tf1name=TF1Spectrum_TEST,formula=-0.0001*(100.-x)*(1100.-x),emin=100.,emax=1100"/>
-         <use_spectrum frame="galaxy"/>
+         <celestial_dir ra="266.04" dec="-28.9"/>
       </spectrum>
    </source>
 
@@ -257,7 +257,7 @@
       <spectrum escale="GeV" flux="1." particle_name="gamma">
          <SpectrumClass name="FileSpectrum"
           params="flux=0.,specFile=$(GENERICSOURCESROOT)/data/dm120gev.dat"/>
-         <use_spectrum frame="galaxy"/>
+      <celestial_dir ra="266.04" dec="-28.9"/>
       </spectrum>
    </source>
 
@@ -267,6 +267,14 @@
           params="flux=17.,fitsFile=$(FLUXROOT)/sources/gas_gal.fits,specFile=$(GENERICSOURCESROOT)/data/dm120gev.dat,emin=100.,emax=1000,lonMin=-180,lonMax=180,latMin=-90,latMax=90"/>
          <use_spectrum frame="galaxy"/>
       </spectrum>
+   </source>
+
+   <source name="eventlist_test">
+     <spectrum escale="MeV">
+       <SpectrumClass name="EventList"
+        params="file=$(GENERICSOURCESROOT)/data/LAT-GRB-inc_25.lis,start=0"/>
+       <use_spectrum frame="galaxy"/>
+     </spectrum>
    </source>
 
 </source_library>
