@@ -81,7 +81,7 @@ TH2D* GRBobsSim::MakeGRB()
 	    {
 	      if(APPLY_REDSHIFT) nv += (*pos)->PulseShape(t/(1.+z),e[ei]*(1.+z)); //t/(1.+z) and e[ei]*(1.+z) are intrinsic
 	      else nv += (*pos)->PulseShape(t,e[ei]); //t and e[ei] are observed
-	      if(Essc_Esyn*Fssc_Fsyn>0.0) // Add an extra component
+	      if(Essc_Esyn*Fssc_Fsyn>0.0) // Add the ssc component
 		{
 		  if(APPLY_REDSHIFT) nv += (*pos)->PulseShape(t/(1.+z),e[ei]*(1.+z)); //t/(1.+z) and e[ei]*(1.+z) are intrinsic
 		  else nv += Fssc_Fsyn*(*pos)->PulseShape(t,e[ei]/Essc_Esyn)/(Essc_Esyn*Essc_Esyn); //t and e[ei] are observed

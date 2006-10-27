@@ -4,14 +4,16 @@
 double MinExtractedPhotonEnergy = 10.0; //MeV
 long FirstBurstTime  =      1000; //1e4
 //double AverageInterval = 86400.0; //s
-double AverageInterval = 4851.7; //s
+double AverageInterval = 48516.9; //s
 
 bool  GeneratePF         =   true; // If true: PF is used to normalize Bursts.
                                    // If false Fluence is used to normalize Bursts.
+TString GenerateIC        =   "random"; //"yes", "no"
+double Fssc_Fsyn_const   =   10.0;
 bool  GenerateRedshift   =   true;
 bool  GenerateGBM        =   false;
 bool  GLASTCoordinate    =   false;
-bool  JayDistributions    =   true;
+bool  JayDistributions   =   true;
 //////////////////////////////////////////////////
 
 
@@ -187,12 +189,15 @@ void GenerateXMLLibrary(int Nbursts=100)
   double CO_Energy= 0.0;  
   //////////////////////////////////////////////////
   double Fssc_Fsyn = 0.0;
-  double Essc_Esyn = 1000.0;
-  
+  double Essc_Esyn = 1e4;
+  if(GenerateIC=="yes") 
+    Fssc_Fsyn =   Fssc_Fsyn_const;
   //////////////////////////////////////////////////
   if (GenerateRedshift && (CO_Energy!=0)) std::cout<<" WARNING!!! Generate redshift is true and CO_Energy!=0"<<std::endl;
   TRandom *rnd = new TRandom();
   rnd->SetSeed(65540);
+  TRandom *rnd_1 = new TRandom();
+  rnd_1->SetSeed(65540);
   //  rnd->SetSeed(19741205);
   //rnd->SetSeed(20030914);
   // Peak Flux Distributions, from Jay and Jerry IDL code.
@@ -511,13 +516,17 @@ void GenerateXMLLibrary(int Nbursts=100)
       os<<"<spectrum escale=\"MeV\">"<<std::endl;
       
       if(GeneratePF)
-	os<<" <SpectrumClass name=\"GRBobsmanager\" params=\""<<BurstTime<<" , "<<Duration<<" , "<<PeakFlux<<" , "<<
-	  z<<" , "<<alpha<<" , "<<beta<<" , "<<Ep<<" , "<<MinExtractedPhotonEnergy<<" , "<<(int)GenerateGBM;
+	os<<" <SpectrumClass name=\"GRBobsmanager\" params=\""<<BurstTime<<" , "<<Duration<<" , "<<PeakFlux;
       else 
-	os<<" <SpectrumClass name=\"GRBobsmanager\" params=\""<<BurstTime<<" , "<<Duration<<" , "<<Fluence<<" , "<<
-	  z<<" , "<<alpha<<" , "<<beta<<" , "<<Ep<<" , "<<MinExtractedPhotonEnergy<<" , "<<(int)GenerateGBM;
-
-      os<<" , "<<Essc_Esyn<<" , "<<Fssc_Fsyn;
+	os<<" <SpectrumClass name=\"GRBobsmanager\" params=\""<<BurstTime<<" , "<<Duration<<" , "<<Fluence;
+      
+      os<<" , "<<z<<" , "<<alpha<<" , "<<beta<<" , "<<Ep<<" , "<<MinExtractedPhotonEnergy;
+      if(GenerateIC=="random")
+	if(rnd_1->Uniform()>0.8)
+	  Fssc_Fsyn =   Fssc_Fsyn_const;
+	else 
+	  Fssc_Fsyn =0.0;
+      os<<" , "<<Essc_Esyn<<" , "<<Fssc_Fsyn<<" , "<<(int)GenerateGBM;
       os<<" , "<<NphLat<<" , "<<DelayTime<<" , "<<ExtraComponent_Duration<<" , "<<co_energy<<" \"/>"<<std::endl;
       
       
