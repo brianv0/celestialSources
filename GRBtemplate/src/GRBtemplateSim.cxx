@@ -13,7 +13,7 @@ using namespace TmpCst;
 GRBtemplateSim::GRBtemplateSim(std::string InputFileName)
   : m_InputFileName(InputFileName)
 {
-  std::cout<<m_InputFileName<<std::endl;
+  
 }
 
 void GRBtemplateSim::GetUniqueName(const void *ptr, std::string & name)
@@ -22,6 +22,7 @@ void GRBtemplateSim::GetUniqueName(const void *ptr, std::string & name)
   my_name << reinterpret_cast<int> (ptr);
   name = my_name.str();
   gDirectory->Delete(name.c_str());
+  reinterpret_cast<TH1*> (ptr)->SetDirectory(0);
 }
 
 TH2D* GRBtemplateSim::MakeGRB()
@@ -33,12 +34,12 @@ TH2D* GRBtemplateSim::MakeGRB()
   iFile>>dummy>>m_emax;
   iFile>>dummy>>m_TimeBins;
   iFile>>dummy>>m_TimeBinWidth;
+  std::cout<<"Template from: "<<m_InputFileName<<std::endl;
   std::cout<<"EnergyBins= "<<m_EnergyBins<<std::endl;
   std::cout<<"MinimumEnergy= "<<m_emin<<std::endl;
   std::cout<<"MaximumEnergy= "<<m_emax<<std::endl;
   std::cout<<"TimeBins= "<<m_TimeBins<<std::endl;
   std::cout<<"TimeBinWidth= "<<m_TimeBinWidth<<std::endl;
-
   double de   = pow(m_emax/m_emin,1.0/m_EnergyBins);  
   double *e  = new double[m_EnergyBins +1];
 
@@ -46,11 +47,11 @@ TH2D* GRBtemplateSim::MakeGRB()
     {
      e[i] = m_emin*pow(de,1.0*i); //keV
     }
-  
   //////////////////////////////////////////////////  
   m_tfinal=m_TimeBinWidth * (m_TimeBins-1);
   //////////////////////////////////////////////////
   gDirectory->Delete("Nv");  
+
   m_Nv = new TH2D("Nv","Nv",m_TimeBins,0.,m_tfinal,m_EnergyBins, e);
   std::string name;
   GetUniqueName(m_Nv,name);
@@ -70,7 +71,7 @@ TH2D* GRBtemplateSim::MakeGRB()
     }
 
   TH2D *nph = Nph(m_Nv); //ph/m²
-  delete e;
+  delete[] e;
   delete nph;
   return m_Nv;
 }

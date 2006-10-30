@@ -1,10 +1,57 @@
 <!-- $Header -->
 <!-- ************************************************************************** -->
+
 <source_library title="GRBtemplate_library">
 <source name=" GRBtemplate_1 ">
 <spectrum escale="MeV">
- <SpectrumClass name="GRBtemplateManager" params="10 , 30.0 , 0"/>
-<direction theta= "0" phi="0"/>
-
+ <SpectrumClass name="GRBtemplateManager" params="$(GRBTEMPLATEROOT)/data/test.dat, 3e6, 10.0 , 0, 0"/>
+<use_spectrum frame="galaxy" />
 </spectrum> </source>
+
+<source name=" GRBtemplate_Thermal_DC3_A_025.dat ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBtemplateManager" params="$(GRBTEMPLATEROOT)/data/Thermal_DC3_A_025.dat, 6e6, 10.0 , 0, 0"/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRBtemplate_Thermal_DC3_A_049.dat ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBtemplateManager" params="$(GRBTEMPLATEROOT)/data/Thermal_DC3_A_049.dat, 9e6, 10.0 , 0, 0"/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRBtemplate_Thermal_DC3_A_073.dat ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBtemplateManager" params="$(GRBTEMPLATEROOT)/data/Thermal_DC3_A_073.dat, 1.2e7, 10.0 , 0, 0"/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRBtemplate_Thermal_DC3_A_121.dat ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBtemplateManager" params="$(GRBTEMPLATEROOT)/data/Thermal_DC3_A_121.dat, 1.5e7, 10.0 , 0, 0"/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRBtemplate_Thermal_DC3_A_617.dat ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBtemplateManager" params="$(GRBTEMPLATEROOT)/data/Thermal_DC3_A_617.dat,  1.8e7, 10.0 , 0, 0"/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRBtemplate_Thermal_DC3_B_005.dat ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBtemplateManager" params="$(GRBTEMPLATEROOT)/data/Thermal_DC3_B_005.dat, 2.1e7, 10.0 , 0, 0"/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRBtemplate_Thermal_DC3_C_014.dat ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBtemplateManager" params="$(GRBTEMPLATEROOT)/data/Thermal_DC3_C_014.dat, 2.4e7, 10.0 , 0, 0"/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+
+
+
+
  </source_library>

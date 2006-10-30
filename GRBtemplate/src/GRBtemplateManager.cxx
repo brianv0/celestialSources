@@ -24,43 +24,53 @@ GRBtemplateManager::GRBtemplateManager(const std::string& params)
 
   m_rnd = new TRandom();
   m_GenerateGBMOutputs = false;
-  m_InputFileName = "$(GRBTEMPLATEROOT)/data/test.dat";
+  m_InputFileName = parseParamList(params,0);
+  
   facilities::Util::expandEnvVar(&m_InputFileName);  
   
-  m_startTime       = parseParamList(params,0)+Spectrum::startTime();;
-  m_MinPhotonEnergy = parseParamList(params,1)*1.0e3; //MeV
+  m_startTime       = ::atof(parseParamList(params,1).c_str())+Spectrum::startTime();
+  m_MinPhotonEnergy = ::atof(parseParamList(params,2).c_str())*1.0e3; //MeV
 
-  if(parseParamList(params,2)!=0) m_GenerateGBMOutputs = true;
+  if(::atof(parseParamList(params,3).c_str())!=0) m_GenerateGBMOutputs = true;
+  m_theta_fow           = ::atof(parseParamList(params,4).c_str());
+  
+  
   
   //  m_par = new GRBtemplateParameters();
   m_GRBnumber = (long) floor(65540+m_startTime);
   //  facilities::Util::expandEnvVar(&m_InputFileName);
   
   m_theta = -1000000.0;
-  const double FOV=-100.0; // degrees above the XY plane.
-  if(FOV>-90) std::cout<<"WARNING!! GRBtemplate: FOV = "<<FOV<<std::endl;
-
-  while(m_theta<FOV)
+  
+  //if(FOV>-90) std::cout<<"WARNING!! GRBtemplate: FOV = "<<FOV<<std::endl;
+  m_theta_fow = 90.0 - m_theta_fow;
+  while(m_theta < m_theta_fow - 2.0 || m_theta > m_theta_fow + 2.0)
     {
       double r1 = m_rnd->Uniform();
       double r2 = m_rnd->Uniform();
       m_l = 180.-360.*r1;
       m_b = ((180.0/M_PI)*acos(1.0-2.0*r2)-90.0);
-      
       astro::SkyDir sky(m_l,m_b,astro::SkyDir::GALACTIC);
       HepVector3D skydir=sky.dir();
-      HepRotation rottoglast = GPS::instance()->transformToGlast(m_startTime,GPS::CELESTIAL);
-      HepVector3D scdir = rottoglast * skydir;
-
-      
-      m_ra    = sky.ra();
-      m_dec   = sky.dec();
-      m_theta = 90. - scdir.theta()*180.0/M_PI; // theta=0 -> XY plane, theta=90 -> Z
-      m_phi   = scdir.phi()*180.0/M_PI;
+      try{
+	HepRotation rottoglast = GPS::instance()->transformToGlast(m_startTime,GPS::CELESTIAL);
+	HepVector3D scdir = rottoglast * skydir;
+	m_ra    = sky.ra();
+	m_dec   = sky.dec();
+	double zenithCosTheta=cos(scdir.theta());
+	m_theta = 90. - scdir.theta()*180.0/M_PI; // theta=0 -> XY plane, theta=90 -> Z
+	m_phi   = scdir.phi()*180.0/M_PI;
+	m_grbdeleted      = false;
+	m_grbocculted = (zenithCosTheta < -0.4); // this is hardcoded  in FluxSource.cxx
+      }
+      catch(const std::exception &e)
+	{
+	  m_grbdeleted=true;
+	  break;
+	}
+      m_GalDir=std::make_pair(m_l,m_b);
     }
   
-  m_grbGenerated    = false;
-  m_grbdeleted      = false;
   //////////////////////////////////////////////////
 }
 
@@ -147,7 +157,11 @@ void GRBtemplateManager::GenerateGRB()
   m_endTime   = m_startTime + m_GRB->Tmax();
   TString GRBname = GetGRBname(m_startTime);
   
-  if(m_GenerateGBMOutputs)
+  if(m_grbocculted)
+    {
+      std::cout<<"This GRB is occulted by the Earth"<<std::endl;
+    }
+  else if(m_GenerateGBMOutputs)
     {
       m_GRB->SaveGBMDefinition(GRBname,m_ra,m_dec,m_theta,m_phi,m_Rest);
       m_GRB->GetGBMFlux(GRBname);
@@ -239,17 +253,18 @@ double GRBtemplateManager::energy(double time)
   return ene;
 }
 
-double GRBtemplateManager::parseParamList(std::string input, unsigned int index)
+std::string GRBtemplateManager::parseParamList(std::string input, unsigned int index)
 {
-  std::vector<double> output;
+  std::vector<std::string> output;
   unsigned int i=0;
   for(;!input.empty() && i!=std::string::npos;){
-    double f = ::atof( input.c_str() );
-    output.push_back(f);
+    
     i=input.find_first_of(",");
+    std::string f = input.substr(0,i);
+    output.push_back(f);
     input= input.substr(i+1);
   } 
-  if(index>=(int)output.size()) return 0.0;
+  if(index>=(unsigned int)output.size()) return "0.0";
   return output[index];
 }
 

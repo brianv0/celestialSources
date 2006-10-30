@@ -16,6 +16,13 @@
 
 namespace TmpCst
 {
+ /// minimum energy for the computed spectrum (keV)
+  const double emin = 10.0;
+  /// maximum energy (keV)
+  const double emax = 3e8;
+  /// default value for the minimum energy of the extracted photons -LAT photons- (keV)
+  const double enph = 3e4; 
+  //////////////////////////////////////////////////
   /// minimum energy for the computed spectrum (keV)
   const double erg2meV   = 624151.0;
   const double BATSE1=20.0;       
@@ -34,7 +41,9 @@ namespace TmpCst
   /// Low edge of GLAST/LAT energy band 30 MeV 
   const double LAT1=30.0e3;                   
   /// Top edge of the of GLAST/LAT energy band 300 GeV
-  const double LAT2=3.0e8;            
+  const double LAT2=3.0e8;      
+  const double SWIFT1=15.0;
+  const double SWIFT2=350.0;      
   //////////////////////////////////////////////////
 };
 

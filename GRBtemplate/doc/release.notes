@@ -1,0 +1,9 @@
+/** 
+  @file release.notes
+  @brief package GRBtemplate
+
+  @verbatim
+  $Id$
+  30-oct-06 v1r0       NO    This is the candidate for the first stable version
+  @endverbatim
+*/
