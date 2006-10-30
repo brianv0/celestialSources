@@ -522,10 +522,15 @@ void GenerateXMLLibrary(int Nbursts=100)
       
       os<<" , "<<z<<" , "<<alpha<<" , "<<beta<<" , "<<Ep<<" , "<<MinExtractedPhotonEnergy;
       if(GenerateIC=="random")
-	if(rnd_1->Uniform()>0.8)
-	  Fssc_Fsyn =   Fssc_Fsyn_const;
-	else 
-	  Fssc_Fsyn =0.0;
+	{
+	  double randomNumber = rnd_1->Uniform();
+	  if(randomNumber      > 0.9)
+	    Fssc_Fsyn =   10.0;
+	  else if(randomNumber > 0.8)
+	    Fssc_Fsyn =    1.0;
+	  else
+	    Fssc_Fsyn =    0.0;
+	}
       os<<" , "<<Essc_Esyn<<" , "<<Fssc_Fsyn<<" , "<<(int)GenerateGBM;
       os<<" , "<<NphLat<<" , "<<DelayTime<<" , "<<ExtraComponent_Duration<<" , "<<co_energy<<" \"/>"<<std::endl;
       
