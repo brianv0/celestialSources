@@ -4,7 +4,7 @@
 
   @verbatim
   $Id$
-  
+  31-Oct-06 v1r2     NO    Add GRBtemplate
   17-May-06 v1r1p5   JC    Replace ROOT's default gRandom instance with
                            a TRandom4 instance so that CLHEP random engines
                            are used by TH1::GetRandom methods et al.
