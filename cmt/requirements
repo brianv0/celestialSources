@@ -11,6 +11,7 @@ use genericSources v* celestialSources
 use SpectObj v* celestialSources
 use GRB v* celestialSources
 use GRBobs v* celestialSources
+use GRBtemplate v* celestialSources
 use Pulsar v* celestialSources
 use eblAtten v* celestialSources
 
