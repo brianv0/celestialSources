@@ -680,7 +680,7 @@ int main(int argc, char** argv)
   while(current_arg < argc)
     {
       arg_name = argv[current_arg];
-      if ("-model")
+      if ("-model"==arg_name)
 	{
 	  model_name=argv[++current_arg];
 	}

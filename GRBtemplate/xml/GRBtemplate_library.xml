@@ -10,7 +10,7 @@
 
 <source name=" GRBtemplate_Thermal_DC3_A_025.dat ">
 <spectrum escale="MeV">
- <SpectrumClass name="GRBtemplateManager" params="$(GRBTEMPLATEROOT)/data/Thermal_DC3_A_025.dat, 6e6, 10.0 , 0, 0"/>
+ <SpectrumClass name="GRBtemplateManager" params="$(GRBTEMPLATEROOT)/data/Thermal_LAT_A_025.dat, 6e6, 10.0 , 0, 0"/>
 <use_spectrum frame="galaxy" />
 </spectrum> </source>
 
