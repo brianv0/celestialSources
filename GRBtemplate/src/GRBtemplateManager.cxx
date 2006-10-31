@@ -70,19 +70,22 @@ GRBtemplateManager::GRBtemplateManager(const std::string& params)
 	}
       m_GalDir=std::make_pair(m_l,m_b);
     }
-  
+  m_grbGenerated    = false;
   //////////////////////////////////////////////////
 }
 
-TString GRBtemplateManager::GetGRBname(double time)
+std::string GRBtemplateManager::GetGRBname()
 {
-
-
   ////DATE AND GRBNAME
+  /// GRB are named as customary GRBOBSYYMMDDXXXX
+  //  The mission start and launch date are retrieved, 
+  //  and the current burst's start time is added to them to form a Julian Date.
+  //  Note: the argument of the JulianDate constructor is in day.
+
   astro::JulianDate JD(astro::JulianDate::missionStart() +
 		       m_startTime/astro::JulianDate::secondsPerDay);
 
- int An,Me,Gio;
+  int An,Me,Gio;
   m_Rest=((int) m_startTime % 86400) + m_startTime - floor(m_startTime);
   m_Frac=(m_Rest/86400.);
   int FracI=(int)(m_Frac*1000.0);
@@ -137,25 +140,29 @@ TString GRBtemplateManager::GetGRBname(double time)
 
   std::string GRBname = ostr.str();
   
-  if(DEBUG) std::cout<<"GENERATE TEMPLATE GRB ("<<GRBname<<")"<<std::endl;
+  if(DEBUG) std::cout<<"GENERATE GRB TEMPLATE ("<<GRBname<<")"<<std::endl;
+  
   //..................................................  //
   return GRBname;
-} 
+}
+
 
 GRBtemplateManager::~GRBtemplateManager() 
 {  
+  delete m_rnd;
   DeleteGRB();
 }
 
 void GRBtemplateManager::GenerateGRB()
 {
+  if(m_grbdeleted) return;
   /////GRB GRNERATION////////////////////////////////
   m_GRB      = new  GRBtemplateSim(m_InputFileName);
   m_spectrum = new  SpectObj(m_GRB->MakeGRB(),0);
   m_spectrum->SetAreaDetector(EventSource::totalArea());
   //////////////////////////////////////////////////
   m_endTime   = m_startTime + m_GRB->Tmax();
-  TString GRBname = GetGRBname(m_startTime);
+  std::string GRBname = GetGRBname();
   
   if(m_grbocculted)
     {
@@ -183,33 +190,31 @@ void GRBtemplateManager::GenerateGRB()
 
 void GRBtemplateManager::DeleteGRB()
 {
-  delete m_GRB;
-  delete m_spectrum;
+  if(m_grbGenerated)
+    {
+      delete m_GRB;
+      delete m_spectrum;
+    }
   m_grbdeleted=true;
 }
 
 //return flux, given a time
 double GRBtemplateManager::flux(double time) const
 {
-  if(DEBUG) std::cout<<"flux at "<<time<<std::endl;
-  double flux;
-
+  if(DEBUG) std::cout<<"Flux at "<<time<<" "<<m_startTime<<" "<<m_grbGenerated<<std::endl;
+  double flux= 0.0;
+  
   if(m_grbdeleted) 
-    flux = 0.0;
-  else if(time <= m_startTime) 
-    flux = 0.0;
+    return flux;
+  else if(time <= m_startTime || time >  m_startTime+5000) 
+    {
+      if(m_grbGenerated) const_cast<GRBtemplateManager*>(this)->DeleteGRB();
+      return flux;
+    }
   else 
     {
       if(!m_grbGenerated) const_cast<GRBtemplateManager*>(this)->GenerateGRB();
-      if(time < m_endTime)
-	{
-	  flux = m_spectrum->flux(time-m_startTime,m_MinPhotonEnergy);
-	}
-      else 
-	{
-	  const_cast<GRBtemplateManager*>(this)->DeleteGRB();
-	  flux = 0.0;
-	}
+      flux = m_spectrum->flux(time-m_startTime,m_MinPhotonEnergy);
     }
   if(DEBUG) std::cout<<"flux("<<time<<") = "<<flux<<std::endl;
   return flux;
@@ -219,27 +224,26 @@ double GRBtemplateManager::interval(double time)
 {  
   if(DEBUG) std::cout<<"interval at "<<time<<std::endl;
   double inte;
-  if(m_grbdeleted) inte = 1e10;
-  else if(time < m_startTime) 
-    inte = m_startTime - time;
-  else 
+  if(m_grbdeleted) 
     {
-      if(!m_grbGenerated) GenerateGRB();
-      if(time == m_startTime) 
-	{
-	  inte = m_startTime - time + m_spectrum->interval(0.0,m_MinPhotonEnergy);
-	}
-      else if(time<m_endTime)
-	{
-	  inte = m_spectrum->interval(time - m_startTime,m_MinPhotonEnergy);
-	}
-      else 
-	{
-	  inte = 1e10;
-	  DeleteGRB();
-	}
+      inte = 1e10;
     }
-  if(DEBUG) std::cout<<"interval("<<time<<") = "<<inte<<std::endl;
+  else if(time < m_startTime)
+    { 
+      inte = m_startTime - time;
+    }
+  else if(time<m_startTime + 5000) //Confidential limit
+    {
+      if(!m_grbGenerated) const_cast<GRBtemplateManager*>(this)->GenerateGRB();
+      inte = m_spectrum->interval(time - m_startTime,m_MinPhotonEnergy);
+    }
+  else  
+    {
+      inte = 1e10;
+      if(m_grbGenerated) const_cast<GRBtemplateManager*>(this)->DeleteGRB();
+    }
+  
+  if(DEBUG) std::cout<<"Interval("<<time<<") = "<<inte<<std::endl;
   return inte;
 }
 

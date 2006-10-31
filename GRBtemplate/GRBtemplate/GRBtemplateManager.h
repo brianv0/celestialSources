@@ -66,7 +66,7 @@ class GRBtemplateManager : public Spectrum
   std::string title() const {return "GRBtemplateManager";} 
   const char * particleName() const {return "gamma";}
   const char * nameOf() const {return "GRBtemplateManager";}
-  TString GetGRBname(double time);
+  std::string GetGRBname();
   void GenerateGRB();  
   void DeleteGRB();  
 

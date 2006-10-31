@@ -1,4 +1,3 @@
-#include "TString.h"
 #include "TF1.h"
 #include "TH1D.h"
 #include "TH2D.h"
@@ -67,7 +66,7 @@ class GRBtemplateSim
   //! destructor
   ~GRBtemplateSim()
     {
-      delete m_Nv;
+      if(!m_Nv) delete m_Nv;
     }
   /// This method ensures that a unique name is given to the ROOT objects. It is set equal to the pointer address.
   void GetUniqueName(const void *ptr, std::string & name);
@@ -97,7 +96,7 @@ class GRBtemplateSim
     The name of the txt file is chosen in agreement with the GRB name (See GRBmanager).
     \param GRBname is the name of the GRB created in GRBmanager. It is used for naming the GBM output file, and it is usually computed with the dating convention.
   */
-  void GetGBMFlux(TString GRBname);
+  void GetGBMFlux(std::string GRBname);
   /*!
     \brief This methods saves the definition file for GBM simulator.
     
@@ -125,12 +124,12 @@ class GRBtemplateSim
     \param phi is the elevation (deg) from LAT horizon (zenith -> phi=90)
     \param tstart is the GRB starting time (in second, since the starting time of the simulation).
   */
-  void SaveGBMDefinition(TString GRBname, double ra, double dec, double theta, double phi, double tstart);
+  void SaveGBMDefinition(std::string GRBname, double ra, double dec, double theta, double phi, double tstart);
   
  private:
   
   /// Gathers all relevant constants for the simulation 
-  TString m_InputFileName;
+  std::string m_InputFileName;
   double m_tfinal;
   double m_emin;
   double m_emax;

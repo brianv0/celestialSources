@@ -27,7 +27,7 @@ void GRBtemplateSim::GetUniqueName(const void *ptr, std::string & name)
 
 TH2D* GRBtemplateSim::MakeGRB()
 {
-  ifstream iFile(m_InputFileName);
+  ifstream iFile(m_InputFileName.c_str());
   char dummy[100];
   iFile>>dummy>>m_EnergyBins;
   iFile>>dummy>>m_emin;
@@ -128,12 +128,12 @@ void GRBtemplateSim::SaveNv()
 };
 
 //////////////////////////////////////////////////
-void GRBtemplateSim::SaveGBMDefinition(TString GRBname, double ra, double dec, double theta, double phi, double tstart)
+void GRBtemplateSim::SaveGBMDefinition(std::string GRBname, double ra, double dec, double theta, double phi, double tstart)
 {
-  TString name = "GRBTMP_";
+  std::string name = "GRBTMP_";
   name+=GRBname; 
   name+="_DEF.txt";
-  std::ofstream os(name,std::ios::out);
+  std::ofstream os(name.c_str(),std::ios::out);
   os<<"BURST DEFINITION FILE"<<std::endl;
   os<<"Burst Name"<<std::endl;
   os<<GRBname<<std::endl;
@@ -179,7 +179,7 @@ double LogFBTMP(double *var, double *par)
 
 
 
-void GRBtemplateSim::GetGBMFlux(TString GRBname)
+void GRBtemplateSim::GetGBMFlux(std::string GRBname)
 {
   //  double *e = new double[m_EnergyBins +1];
   //  for(int i = 0; i<=m_EnergyBins; i++)
@@ -204,10 +204,10 @@ void GRBtemplateSim::GetGBMFlux(TString GRBname)
   
   double t    = 0;
   
-  TString name = "GRBTMP_";
+  std::string name = "GRBTMP_";
   name+=GRBname; 
   name+="_GBM.txt";
-  std::ofstream os(name,std::ios::out);
+  std::ofstream os(name.c_str(),std::ios::out);
   os<<"Sample Spectrum File "<<std::endl;
   os<<m_TimeBins<<" bins"<<std::endl;
   os<<"Norm   alf   beta  E_p "<<std::endl;
