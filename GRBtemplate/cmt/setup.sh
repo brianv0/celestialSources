@@ -1,4 +1,4 @@
-# echo "Setting GRBtemplate v0r2 in /data0/glast/ScienceTools/celestialSources"
+# echo "Setting GRBtemplate v1r0p2 in /data0/glast/ScienceTools/celestialSources"
 
 if test "${CMTROOT}" = ""; then
   CMTROOT=/data0/glast/extlib/rh9_gcc32/CMT/v1r16p20040701; export CMTROOT
@@ -7,6 +7,6 @@ fi
 
 tempfile=`${CMTROOT}/mgr/cmt build temporary_name -quiet`
 if test ! $? = 0 ; then tempfile=/tmp/cmt.$$; fi
-${CMTROOT}/mgr/cmt -quiet setup -sh -pack=GRBtemplate -version=v0r2 -path=/data0/glast/ScienceTools/celestialSources  $* >${tempfile}; . ${tempfile}
+${CMTROOT}/mgr/cmt -quiet setup -sh -pack=GRBtemplate -version=v1r0p2 -path=/data0/glast/ScienceTools/celestialSources  $* >${tempfile}; . ${tempfile}
 /bin/rm -f ${tempfile}
 

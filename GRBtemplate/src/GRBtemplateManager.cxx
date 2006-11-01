@@ -1,5 +1,6 @@
 #include "GRBtemplate/GRBtemplateManager.h"
 #include <iostream>
+#include <stdexcept>
 #include <fstream>
 #include "flux/SpectrumFactory.h" 
 #include "astro/EarthCoordinate.h"

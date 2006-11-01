@@ -6,6 +6,6 @@ set tempfile=`${CMTROOT}/mgr/cmt build temporary_name -quiet`
 if $status != 0 then
   set tempfile=/tmp/cmt.$$
 endif
-${CMTROOT}/mgr/cmt -quiet cleanup -csh -pack=GRBtemplate -version=v0r2 -path=/data0/glast/ScienceTools/celestialSources $* >${tempfile}; source ${tempfile}
+${CMTROOT}/mgr/cmt -quiet cleanup -csh -pack=GRBtemplate -version=v1r0p2 -path=/data0/glast/ScienceTools/celestialSources $* >${tempfile}; source ${tempfile}
 /bin/rm -f ${tempfile}
 
