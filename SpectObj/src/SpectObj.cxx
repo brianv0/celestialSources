@@ -63,32 +63,62 @@ SpectObj::SpectObj(const TH2D* In_Nv, int type, double z)
   
   m_TimeBinWidth   = Nv->GetXaxis()->GetBinWidth(0);
   m_z = z;
-  /************************************************************************
-EBL model 0: Kneiske, Bretz, Mannheim, Hartmann (A&A 413, 807-815, 2004)
-  Valid for redshift <= 5.0
-  Here we have implemented the "best fit" model from their paper
-  ************************************************************************/
-  //  m_tau = new IRB::EblAtten(IRB::Kneiske);
 
-  /************************************************************************
-   EBL model 1: Salamon & Stecker (ApJ 1998, 493:547-554)
-   We are using here the model with metallicity correction (see paper)
-   The paper has opacities up to z=3, for z>3 opacity remains constant according to Stecker
-  */  
-  //m_tau = new IRB::EblAtten(IRB::Salamon_Stecker);
+  std::string path = ::getenv("SPECTOBJROOT");
+  std::string EBL_model_fileName(path+"/data/EBLmodel.dat");
+  std::ifstream EBL_model_file(EBL_model_fileName.c_str(),std::ios_base::in);
+  std::string EBl_model;
+  if (!(EBL_model_file.is_open()))
+    EBl_model="Kneiske";
+  else 
+    {
+      std::string tmp;
+      while (getline(EBL_model_file,tmp))
+	{
+	  if(tmp.size()>1) EBl_model=tmp;
+	}
+    }
+  /*
+***********************************************************************
+EBL model 1: Kneiske, Bretz, Mannheim, Hartmann (A&A 413, 807-815, 2004)
+Valid for redshift <= 5.0
+Here we have implemented the "best fit" model from their paper
+***********************************************************************
+EBL model 2: Salamon & Stecker (ApJ 1998, 493:547-554)
+We are using here the model with metallicity correction (see paper)
+The paper has opacities up to z=3, for z>3 opacity remains constant according to Stecker
+***********************************************************************
+EBL model 3: Primack & Bullock (2005) Valid for opacities < 15
+***********************************************************************
+EBL model 4: Kneiske, Bretz, Mannheim, Hartmann (A&A 413, 807-815, 2004)
+Valid for redshift <= 5.0
+Here we have implemented the "High UV" model from their paper
+***********************************************************************
+*/
   
-  //    EBL model 1: Primack & Bullock (2005) Valid for opacities < 15
-  m_tau = new IRB::EblAtten(IRB::Primack05);
-  /************************************************************************
-EBL model 2: Kneiske, Bretz, Mannheim, Hartmann (A&A 413, 807-815, 2004)
-  Valid for redshift <= 5.0
-  Here we have implemented the "High UV" model from their paper
-  ************************************************************************/
-  //  m_tau = new IRB::EblAtten(IRB::Kneiske_HighUV);
-  
-  //////////////////////////////////////////////////
+  if(EBl_model.find("Kneiske")!=std::string::npos && EBl_model.find("HighUV")!=std::string::npos)
+    {
+      EBl_model=" Kneiske, HighUV";
+      m_tau = new IRB::EblAtten(IRB::Kneiske_HighUV);
+    }
+  else if(EBl_model.find("Salamon")!=std::string::npos || EBl_model.find("Stecker")!=std::string::npos)
+    {
+      EBl_model=" Salamon & Stecker (2005)";
+      m_tau = new IRB::EblAtten(IRB::Stecker05);
+    }
+  else if(EBl_model.find("Primack")!=std::string::npos)
+    {
+      EBl_model=" Primack (2005)";
+      m_tau = new IRB::EblAtten(IRB::Primack05);
+    }
+  else 
+    {
+      m_tau = new IRB::EblAtten(IRB::Kneiske);
+      EBl_model="Kneiske, best fit (2004)";
+    }
   if(DEBUG) 
     {
+      std::cout<<"EBL absorption Model selected: "<<EBl_model<<std::endl;
       std::cout<<type<<" SpectObj address:  "<<name<<std::endl;
       std::cout<<"nt,tmin,tmax "<<nt<<" "<<m_Tmin<<" "<<m_Tmax<<std::endl;
     }
