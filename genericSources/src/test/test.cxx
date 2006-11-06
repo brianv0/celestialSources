@@ -111,10 +111,13 @@ void TestApp::parseCommandLine(int iargc, char * argv[]) {
    }
 }
 
+
 void TestApp::setSources() {
    char * srcNames[] = {
+#ifdef HASGAS_GAL  // needs $(FLUXROOT)/sources/gas_gal.fits
                         "Galactic_diffuse",
                         "Galactic_diffuse_0",
+#endif
                         "simple_transient",
                         "transient_template",
                         "_3C279_June1991_flare",
@@ -129,10 +132,15 @@ void TestApp::setSources() {
                         "fits_spectrum",
                         "source_population",
 			"tf1spectrum_test",
+#ifdef HASGAS_GAL
  			"tf1map_test",
- 			"filespectrum_test",
- 			"filespectrummap_test"};
-   std::vector<std::string> sourceNames(srcNames, srcNames+19);
+#endif
+ 			"filespectrum_test"
+#ifdef HASGAS_GAL
+                        ,"filespectrummap_test"
+#endif
+   };
+   std::vector<std::string> sourceNames(srcNames, srcNames+sizeof(srcNames)/sizeof(char*));
 
    m_compositeSource = new CompositeSource();
    unsigned long nsrcs(0);
@@ -197,10 +205,8 @@ void TestApp::load_sources() {
 
 HepRotation TestApp::instrumentToCelestial(double time) {
    astro::GPS *gps = astro::GPS::instance();
-   gps->getPointingCharacteristics(time);
-   astro::SkyDir xAxis(gps->RAX(), gps->DECX());
-   astro::SkyDir zAxis(gps->RAZ(), gps->DECZ());
+   gps->time(time);
 
-   astro::PointingTransform transform(zAxis, xAxis);
+   astro::PointingTransform transform(gps->zAxisDir(), gps->xAxisDir());
    return transform.localToCelestial();
 }
