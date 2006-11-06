@@ -7,25 +7,40 @@
 *   $Header$
 *@verbatim
 *
-*   v0r0    Sep-2004 THB    Initial Phase
-*   v1r0 28-Sep-2004 THB    Version for the ST first checkout
+
+
+*   v0r0    Sep-2004 NO    Initial Phase
+*   v1r0 28-Sep-2004 MR    Version for the ST first checkout
 *   v1r0p1 15-Jan-2005 HMK  Use any version of ROOT
-*   v1r0p2 16-Jan-2005 THB  Decorrections for ephemerides
-*   v1r0p3 17-Jan-2005 THB  Optimization for speed and for multiple pulsars
-*   v1r0p4 09-Mar-2005 THB  Barycentric Decorrections included;
+*   v1r0p2 16-Jan-2005 MR  Decorrections for ephemerides
+*   v1r0p3 17-Jan-2005 MR  Optimization for speed and for multiple pulsars
+*   v1r0p4 09-Mar-2005 MR  Barycentric Decorrections included;
 			    Specific user-defined TimeProfiles;	
 	                    Increased speed
-*   v1r0p5 30-Mar-2005 THB  Continuous phase inserted;
-*   v1r0p6 30-Mar-2005 THB  Compilation bugs fixed;
-*   v1r0p7 30-Mar-2005 THB  Re-organization of parameters; vela and crab profiles added
-*   v1r0p8 30-Mar-2005 THB  Compilation problems fixed;
-*   v1r0p9 30-Mar-2005 THB  Output ASCII File for database
+*   v1r0p5 30-Mar-2005 MR  Continuous phase inserted;
+*   v1r0p6 30-Mar-2005 MR  Compilation bugs fixed;
+*   v1r0p7 30-Mar-2005 MR  Re-organization of parameters; vela and crab profiles added
+*   v1r0p8 30-Mar-2005 MR  Compilation problems fixed;
+*   v1r0p9 30-Mar-2005 MR  Output ASCII File for database
                             Possibility to input frequency and derivatives and not only period and derivatives
-*   v1r0p10 14-Aug-2005 THB  Updated Datalist, xml file and bug fixes;
-*   v1r0p11 19-Sep-2005 THB  GPS and pointing history fixed; Db outut fixed;
-*   v1r1    1-Oct-2005 THB   Timing issue solved
-*   v1r1p0  5-Oct-2005 THB   DataList parameterization changed
-*   v1r1p1  3-Nov-2005 THB   Multiple ephemerides implemented;bug on FT2 fixed.
-
+*   v1r0p10 14-Aug-2005 MR  Updated Datalist, xml file and bug fixes;
+*   v1r0p11 19-Sep-2005 MR  GPS and pointing history fixed; Db outut fixed;
+*   v1r1    1-Oct-2005 MR   Timing issue solved
+*   v1r1p0  5-Oct-2005 MR   DataList parameterization changed
+*   v1r1p1  3-Nov-2005 MR   Multiple ephemerides implemented;bug on FT2 fixed.
+*   v1r1p2  3-dec-2005       (really THB) adjust path for gleam execution
+*   v1r1p3  30-jan-2006 THB   Path problem
+*   v1r1p4  30-jan-2006 MR   Redirct output to a subdirectory
+*   v1r1p5  10-feb-2006 MR   Faint pulsar fix - part 1
+*   v1r1p6  10-feb-2006 MR   Faint pulsar fix - part 2
+*   v1r1p7  12-feb-2006 JC   tag request from Julie
+*   v1r1p8  14-feb-2006 MR   poisson fix
+*   v1r1p9  15-feb-2006 MR   set env variables for outfiles
+*   v1r1p10 17-feb-2006 MR   fix VC8 compilation problems
+*   v1r2    9-jun-2006 MR    Pulsar shape model option added
+*   v1r2p0  14-jun-2006 MR    Pulsar shape model added to Pulsarspectrum class
+*   v1r2p1  17-jul-2006 MR    Minor changes on test program
+*   v1r2p2  11-oct-2006 MR    Chanded MJDREF to be MJDREF(utc)=51910
+*   v2r1p3  06-nov-2006 NO    Fixed the compatibility with the astro package
 *@endverbatim
 */

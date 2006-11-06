@@ -47,6 +47,9 @@ class PulsarSim
   //! Method that creates the TH2D histogram according to the phenomenological model.
   TH2D* PSRPhenom(double par0, double par1, double par2, double par3, double par4);
 
+  //! Method that creates the TH2D histogram according to an external pulsar 2-d Shape
+  TH2D* PSRShape(std::string ModelShapeName="PulsarShape", int NormalizeFlux=0);
+
   // Returns a TH2D ROOT matrix that contains in every bin Nv*dE*dT*Aeff
   TH2D *PulsarSim::Nph(const TH2D *Nv);
 

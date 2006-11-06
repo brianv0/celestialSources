@@ -17,7 +17,7 @@
 #include "PulsarConstants.h"
 #include "PulsarSim.h"
 #include "SpectObj/SpectObj.h"
-#include "flux/ISpectrum.h"
+#include "flux/Spectrum.h"
 #include "CLHEP/Vector/ThreeVector.h"
 #include "flux/EventSource.h"
 #include "facilities/Util.h"
@@ -78,6 +78,7 @@ class PulsarSpectrum : public ISpectrum
 
   //! direction, taken from PulsarSim
   inline std::pair<double,double>
+    
     dir(double energy) 
     {
       return m_GalDir;
@@ -102,20 +103,23 @@ class PulsarSpectrum : public ISpectrum
   astro::SolarSystem m_solSys;
  
   astro::SkyDir m_PulsarDir;
-  Hep3Vector m_PulsarVectDir;
+  CLHEP::Hep3Vector m_PulsarVectDir;
 
   std::pair<double,double> m_GalDir;
   
   const std::string& m_params; 
   
   std::string m_PSRname;
+  std::string m_PSRShapeName;
+  
+  bool m_ff;
 
   double m_RA, m_dec, m_l, m_b;  
   double m_period, m_pdot, m_p2dot, m_t0, m_t0Init, m_t0End, m_phi0, m_f0, m_f1, m_f2,m_N0;
   std::string m_ephemType;
   std::vector<double> m_periodVect, m_pdotVect, m_p2dotVect, m_f0Vect, m_f1Vect, m_f2Vect, m_phi0Vect, m_t0Vect, m_t0InitVect, m_t0EndVect, m_txbaryVect;
   
-  int m_numpeaks;
+  int m_ppar0;
   int m_model;
   double m_flux, m_enphmin, m_enphmax;
   int m_seed;

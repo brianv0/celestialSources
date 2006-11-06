@@ -1,5 +1,5 @@
 package Pulsar
-version v1r0p1
+version v2r1p3
 author Nicola Omodei<nicola.omodei@pi.infn.it>, Massimiliano Razzano <massimiliano.razzano@pi.infn.it>
 # $Id$
 
@@ -21,7 +21,7 @@ macro source "*.cxx" WIN32 "*.cxx *.h"
 
 library Pulsar -no_share \
      -s=../src      $(source) \
-     -s=Pulsar      $(source)
+     -s=../Pulsar   $(source)
 
 #application test_Pulsar      test/testMgr.cxx 
 

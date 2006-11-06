@@ -97,8 +97,20 @@ TH2D* PulsarSim::PSRPhenom(double par0, double par1, double par2, double par3, d
   double HighEnBound = TMath::Max(cst::EnNormMax,m_enphmax); 
 
   //Writes out an output log file for the pulsar
+ 
+  //Redirect output to a subdirectory
+  const char * pulsarOutDir = ::getenv("PULSAROUTFILES");
 
-  std::string logSimLabel = m_name + "Log.txt"; 
+  std::string logSimLabel;
+  // override obssim if running in Gleam environment
+  if( pulsarOutDir!=0) 
+    logSimLabel = std::string(pulsarOutDir) + "/" + m_name + "Log.txt"; 
+  else
+    logSimLabel = m_name + "Log.txt"; 
+
+  //TimeProfileFileName = std::string(gleam)+"/"+ m_name + "TimeProfile.txt";
+
+
   ofstream PulsarLogSim;
   PulsarLogSim.open(logSimLabel.c_str(),std::ios::app);
 
@@ -220,6 +232,10 @@ TH2D* PulsarSim::PSRPhenom(double par0, double par1, double par2, double par3, d
       //Look for NAMETimeProfile.txt in the data directory...
       std::string  pulsar_root = ::getenv("PULSARROOT");
       std::string TimeProfileFileName = pulsar_root + "/data/" + m_name + "TimeProfile.txt";
+      const char * gleam = ::getenv("PULSARDATA");
+
+      // override obssim if running in Gleam environment
+      if( gleam!=0) TimeProfileFileName = std::string(gleam)+"/"+ m_name + "TimeProfile.txt";
 
       if (DEBUG)
 	{
@@ -319,6 +335,112 @@ TH2D* PulsarSim::PSRPhenom(double par0, double par1, double par2, double par3, d
   delete m_Nv;
 }
 
+
+//////////////////////////////////////////////////
+/*!
+ * \param ModelShapeName Name of the file containing model
+ * \param NormalizeFlux 0 - Use the normalization of the TH2D histogram
+ *                      1 - Normalize the TH2D histogram to the m_flux value (in ph/cm2/s above 100 MeV)
+ * 
+ * This method use an external TH2D histogram containing an arbitrary phase-energy distribution and 
+ * use it to extract photons, instead of using an analytical form for the spectrum as in PSRPhenom method
+ * The model named by the parameter ModelShapeName must be located in the PULSARDATA directory
+ */
+TH2D* PulsarSim::PSRShape(std::string ModelShapeName, int NormalizeFlux)
+{
+  std::cout << "Testing new model Shape for pulsar " << m_name << " using normalization option " << NormalizeFlux << std::endl; 
+
+  //Writes out an output log file for the pulsar
+ 
+  //Redirect output to a subdirectory
+  const char * pulsarOutDir = ::getenv("PULSAROUTFILES");
+
+  std::string logSimLabel;
+  // override obssim if running in Gleam environment
+  if( pulsarOutDir!=0) 
+    logSimLabel = std::string(pulsarOutDir) + "/" + m_name + "Log.txt"; 
+  else
+    logSimLabel = m_name + "Log.txt"; 
+
+  //TimeProfileFileName = std::string(gleam)+"/"+ m_name + "TimeProfile.txt";
+
+
+  ofstream PulsarLogSim;
+  PulsarLogSim.open(logSimLabel.c_str(),std::ios::app);
+
+  //Writes out informations about the model parameters on the file
+  PulsarLogSim << "******** Pulsar Shape Model ********" << std::endl;
+  PulsarLogSim << "** Using and arbitrary 2-d shape as spectrum" << std::endl;
+  PulsarLogSim << "** Pulsar Shape used:" << ModelShapeName << std::endl;
+  PulsarLogSim << "** Use normalization? : " << NormalizeFlux << std::endl;
+ 
+
+  //Look for ModelShapeName.root in the data directory...
+  std::string  pulsar_root = ::getenv("PULSARROOT");
+  std::string ModelShapeInputFileName = pulsar_root + "/data/" + ModelShapeName + ".root";
+  const char * gleam = ::getenv("PULSARDATA");
+  
+  // override obssim if running in Gleam environment
+  if( gleam!=0) ModelShapeInputFileName = std::string(gleam)+"/"+ ModelShapeName + ".root";
+
+  PulsarLogSim << "** Using Shape " << ModelShapeName << " located at: " << ModelShapeInputFileName << std::endl;
+
+  //Load 2HD Histogram
+
+  TFile *ModelShapeInputFile = new TFile(ModelShapeInputFileName.c_str());
+  TH2D *m_Nv = (TH2D*) ModelShapeInputFile->Get("Nv"); //ph m^(-2) s^(-1) keV^(-1)
+    
+  double shapePhmin = m_Nv->GetXaxis()->GetXmin();
+  double shapePhmax = m_Nv->GetXaxis()->GetXmax();
+  double shapeEmin = m_Nv->GetYaxis()->GetXmin();
+  double shapeEmax = m_Nv->GetYaxis()->GetXmax();
+ 
+  int phbin = m_Nv->GetXaxis()->GetNbins();   
+  int ebin = m_Nv->GetYaxis()->GetNbins();
+
+  m_Nv->GetXaxis()->SetLimits(0,m_period);
+
+
+  //m_Nv->Scale(1.0e+4);  // [ph/(m² s keV)]
+  m_flux*= 1.0e+4;
+
+  TH2D *nph = Nph(m_Nv); //ph/m²
+  
+  int ei2 = nph->GetYaxis()->FindBin(cst::EnNormMin);
+  int ei3 = nph->GetYaxis()->FindBin(cst::EnNormMax);
+
+
+  PulsarLogSim << "Pulsar shape defined between " << shapeEmin << " keV and " << shapeEmax << std::endl;
+  PulsarLogSim << "Phase bins " << phbin << " ; energy bins : " << ebin << std::endl;
+  PulsarLogSim << "Normalization between " << cst::EnNormMin << " keV ("<< ei2 
+	    << ") and " << cst::EnNormMax << " keV (" << ei3 << ")" << std::endl;
+ 
+  //Normalisation factor according to band between EGRET1 and EGRET2 energies
+  //Integration is on a averaged flux over period
+
+  if (NormalizeFlux == 1)
+    {
+      double norm = m_Nv->Integral(0,phbin,ei2,ei3,"width")/m_period; // ph/m2/s
+      m_Nv->Scale(m_flux/norm);
+    }
+
+
+
+  delete nph;
+
+  PulsarLogSim.close();
+
+  //Save output
+  SaveNv(m_Nv); // ph/m2/s/keV
+  SaveTimeProfile(m_Nv); //ph/m2/s/kev
+
+  return m_Nv;
+  delete m_Nv;
+
+
+}
+
+
 //////////////////////////////////////////////////
 TH2D *PulsarSim::Nph(const TH2D *Nv)
 {
@@ -361,7 +483,21 @@ void PulsarSim::SaveNv(TH2D *Nv)
   Nv->GetYaxis()->CenterTitle();
   Nv->GetZaxis()->CenterTitle();
   
-  std::string root_name = m_name + "root.root";
+  //Redirect output to a subdirectory
+
+  //Redirect output to a subdirectory
+  const char * pulsarOutDir = ::getenv("PULSAROUTFILES");
+
+  // override obssim if running in Gleam environment
+  std::string root_name;
+  if( pulsarOutDir!=0) 
+    root_name = std::string(pulsarOutDir) + "/" + m_name + "root.root";
+  else
+    root_name =  m_name + "root.root";
+
+  //  std::string root_name = "PsrOutput/" + m_name + "root.root";
+
+
   
   TFile mod(root_name.c_str(),"RECREATE");
   Nv->Write();
@@ -382,7 +518,22 @@ void PulsarSim::SaveNv(TH2D *Nv)
 void PulsarSim::SaveTimeProfile(TH2D *Nv)
 {
 
-  std::string nameProfile = m_name + "TimeProfile.txt";
+  //Redirect output to a subdirectory
+  const char * pulsarOutDir = ::getenv("PULSAROUTFILES");
+
+  // override obssim if running in Gleam environment
+  std::string nameProfile;
+  if( pulsarOutDir!=0) 
+    nameProfile = std::string(pulsarOutDir) + "/" + m_name + "TimeProfile.txt";
+  else
+    nameProfile = m_name + "TimeProfile.txt";
+
+  //  std::string nameProfile = "PsrOutput/" + m_name + "TimeProfile.txt";
+
+
+
+
+
 
   ofstream OutTimeProf(nameProfile.c_str());
 
