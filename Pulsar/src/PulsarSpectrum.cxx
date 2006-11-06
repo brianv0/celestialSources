@@ -562,7 +562,11 @@ double PulsarSpectrum::getBaryCorr( double ttInput )
   //Exception error in case of time not in the range of available position (when using a FT2 file)
 
   try {
-    scPos = astro::GPS::instance()->position(timeMET);
+    //    std::cout<<astro::GPS::time()<<std::endl;
+    //astro::GPS::update(timeMET);
+    //    std::cout<<astro::GPS::time()<<std::endl;
+    astro::GPS::instance()->time(timeMET);
+    scPos = astro::GPS::instance()->position();
   }  catch (std::runtime_error  & eObj) {
     // check to see this is the exception I want to ignore, rethrowing if it is not:
     std::string message(eObj.what());
