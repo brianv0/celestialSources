@@ -69,6 +69,7 @@ private:
    int m_lc;
    float m_z;
    int m_logParabola;
+   bool m_specFile;
 
    IRB::EblAtten * m_tau;
 
@@ -77,6 +78,14 @@ private:
    double m_currentEnergy;
 
    void readModel(std::string templateFile);
+
+   void readSpectrum(std::string specFile);
+
+   std::vector<double> m_energies;
+   std::vector<double> m_dnde;
+   std::vector<double> m_cumulativeDist;
+
+   double drawEnergy() const;
 
    class ModelInterval {
    public:

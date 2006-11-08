@@ -42,8 +42,9 @@ ISpectrumFactory & SpectralTransientFactory() {
 
 SpectralTransient::SpectralTransient(const std::string & paramString) 
    : m_emin(20.), m_emax(2e5), m_lc(0), m_z(0), m_logParabola(0),
-     m_tau(0), m_tauScale(1) {
+     m_specFile(false), m_tau(0), m_tauScale(1) {
    std::string templateFile;
+   std::string spectrumFile("none");
    if (paramString.find("=") == std::string::npos) {
       std::vector<std::string> params;
       facilities::Util::stringTokenize(paramString, ", ", params);
@@ -79,6 +80,9 @@ SpectralTransient::SpectralTransient(const std::string & paramString)
          }
       } else {
          m_tau = new IRB::EblAtten(IRB::Kneiske);
+      }
+      if (params.size() > 10) {
+         spectrumFile = params[10];
       }
    } else {
       genericSources::ConstParMap parmap(paramString);
@@ -124,9 +128,18 @@ SpectralTransient::SpectralTransient(const std::string & paramString)
          m_tauScale = std::atoi(parmap["tauScale"].c_str());
       } catch (...) {
       }
+      try {
+         spectrumFile = parmap["spectrumFile"];
+      } catch (...) {
+      }
    }
 
    readModel(templateFile);
+   
+   if (spectrumFile != "none") {
+      readSpectrum(spectrumFile);
+      m_specFile = true;
+   }
 
    m_currentInterval = m_lightCurve.begin();
 }
@@ -166,10 +179,15 @@ void SpectralTransient::fillEventCache(double time) {
       if (npred > 0 && (nevts = CLHEP::RandPoisson::shoot(npred)) > 0) {
          std::vector< std::pair<double, double> > my_cache;
          for (int i = 0; i < nevts; i++) {
-            double energy(m_currentInterval->drawEnergy(m_emin, m_emax));
+            double energy;
+            if (m_specFile) {
+               energy = drawEnergy();
+            } else {
+               energy = m_currentInterval->drawEnergy(m_emin, m_emax);
+            }
             if (m_z == 0 || m_tau == 0 || 
                 CLHEP::RandFlat::shoot() < std::exp(-m_tauScale*
-                                             (*m_tau)(energy, m_z))) {
+                                                    (*m_tau)(energy, m_z))) {
                double eventTime(CLHEP::RandFlat::shoot()*dt + time);
                my_cache.push_back(std::make_pair(eventTime, energy));
             }
@@ -265,6 +283,61 @@ readLightCurve(const std::string & templateFile) {
       m_lightCurve.push_back(ModelInterval(*line, m_emin, m_emax,
                                            m_logParabola));
    }
+}
+
+void SpectralTransient::readSpectrum(std::string specFile) {
+   facilities::Util::expandEnvVar(&specFile);
+   genericSources::Util::file_ok(specFile);
+
+   std::vector<std::string> lines;
+   genericSources::Util::readLines(specFile, lines, "#");
+   std::vector<std::string>::const_iterator line;
+
+   std::vector<double> energies;
+   std::vector<double> dndes;
+   for (line = lines.begin(); line != lines.end(); ++line) {
+      std::vector<std::string> tokens;
+      facilities::Util::stringTokenize(*line, ", \t", tokens);
+      energies.push_back(std::atof(tokens[0].c_str()));
+      dndes.push_back(std::atof(tokens[1].c_str()));
+   }
+   m_energies.clear();
+   m_dnde.clear();
+   m_energies.push_back(m_emin);
+   m_dnde.push_back(genericSources::Util::logInterpolate(energies, dndes, 
+                                                         m_emin));
+   for (size_t k = 0; k < energies.size(); k++) {
+      if (energies.at(k) > m_emin && energies.at(k) < m_emax) {
+         m_energies.push_back(energies.at(k));
+         m_dnde.push_back(dndes.at(k));
+      }
+   }
+   m_energies.push_back(m_emax);
+   m_dnde.push_back(genericSources::Util::logInterpolate(energies, dndes, 
+                                                         m_emax));
+   m_cumulativeDist.clear();
+   m_cumulativeDist.push_back(0);
+   for (size_t k = 1; k < m_energies.size(); k++) {
+      m_cumulativeDist.push_back(
+         genericSources::Util::powerLawIntegral(m_energies.at(k-1),
+                                                m_energies.at(k),
+                                                m_dnde.at(k-1),
+                                                m_dnde.at(k))
+         + m_cumulativeDist.back());
+   }
+}
+
+double SpectralTransient::drawEnergy() const {
+   double xi(CLHEP::RandFlat::shoot()*m_cumulativeDist.back());
+   size_t k = std::upper_bound(m_cumulativeDist.begin(),
+                               m_cumulativeDist.end(), xi) 
+      - m_cumulativeDist.begin() - 1;
+   double gamma = -(std::log(m_dnde.at(k+1)/m_dnde.at(k))
+                    /std::log(m_energies.at(k+1)/m_energies.at(k)));
+   double energy = genericSources::Util::drawFromPowerLaw(m_energies.at(k),
+                                                          m_energies.at(k+1),
+                                                          gamma);
+   return energy;
 }
 
 void SpectralTransient::rescaleLightCurve() {

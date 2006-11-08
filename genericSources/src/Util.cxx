@@ -182,4 +182,35 @@ namespace genericSources {
       return energy;
    }
 
+   double Util::logInterpolate(const std::vector<double> & x,
+                               const std::vector<double> & y,
+                               double xx) {
+      std::vector<double>::const_iterator it 
+         = std::upper_bound(x.begin(), x.end(), xx) - 1;
+      int indx(it - x.begin());
+      if (indx < 0) {
+         indx = 0;
+      }
+      if (static_cast<size_t>(indx) > x.size() - 2) {
+         indx = x.size() - 2;
+      }
+      double yy = 
+         y[indx]*std::exp(std::log(xx/x[indx])/std::log(x[indx+1]/x[indx])
+                          *std::log(y[indx+1]/y[indx]));
+      return yy;
+   }
+
+   double Util::powerLawIntegral(double x1, double x2, double y1, double y2) {
+      if (x1 <= 0 || x2 <= 0 || y1 <= 0 || y2 <= 0) {
+         throw std::range_error("Util::powerLawIntegral"
+                                "Negative or zero argument passed.");
+      }
+      double gamma(std::log(y2/y1)/std::log(x2/x1));
+      if (gamma == -1) {
+         return y1/x1*log(x2/x1);
+      }
+      return (y1/std::pow(x1, gamma)/(gamma + 1)
+              *(std::pow(x2, gamma+1) - std::pow(x1, gamma+1)));
+   }
+
 } // namespace genericSources

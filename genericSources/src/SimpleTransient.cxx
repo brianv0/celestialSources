@@ -61,7 +61,7 @@ double SimpleTransient::interval(double time) {
       return *eventTime - time;
    } 
 // There should be a better way to turn off a source than this:
-   return 8.64e5;
+   return 3.15e8;
 }
 
 double SimpleTransient::energy(double time) {

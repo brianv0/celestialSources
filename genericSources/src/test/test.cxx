@@ -11,7 +11,7 @@
 
 #include <cstdlib>
 
-#include<fstream>
+#include <fstream>
 
 #include "astro/GPS.h"
 #include "astro/PointingTransform.h"
@@ -19,6 +19,8 @@
 
 #include "flux/CompositeSource.h"
 #include "flux/FluxMgr.h"
+
+#include "TestUtil.h"
 
 ISpectrumFactory & FitsTransientFactory();
 ISpectrumFactory & GaussianSourceFactory();
@@ -35,6 +37,7 @@ ISpectrumFactory & TF1SpectrumFactory();
 ISpectrumFactory & TF1MapFactory();
 ISpectrumFactory & FileSpectrumFactory();
 ISpectrumFactory & FileSpectrumMapFactory();
+//ISpectrumFactory & EventListFactory();
 
 class TestApp {
 
@@ -76,7 +79,7 @@ int main(int iargc, char * argv[]) {
 
    try {
       TestApp testApp;
-
+      
       testApp.parseCommandLine(iargc, argv);
       testApp.load_sources();
       testApp.setXmlFiles();
@@ -85,6 +88,11 @@ int main(int iargc, char * argv[]) {
 
    } catch (std::exception & eObj) {
       std::cout << eObj.what() << std::endl;
+      return 1;
+   }
+
+   if (!Util_tests()) {
+      return 1;
    }
 }
 
@@ -114,10 +122,8 @@ void TestApp::parseCommandLine(int iargc, char * argv[]) {
 
 void TestApp::setSources() {
    char * srcNames[] = {
-#ifdef HASGAS_GAL  // needs $(FLUXROOT)/sources/gas_gal.fits
                         "Galactic_diffuse",
                         "Galactic_diffuse_0",
-#endif
                         "simple_transient",
                         "transient_template",
                         "_3C279_June1991_flare",
@@ -132,15 +138,12 @@ void TestApp::setSources() {
                         "fits_spectrum",
                         "source_population",
 			"tf1spectrum_test",
-#ifdef HASGAS_GAL
  			"tf1map_test",
-#endif
+                        "filespectrummap_test",
  			"filespectrum_test"
-#ifdef HASGAS_GAL
-                        ,"filespectrummap_test"
-#endif
    };
-   std::vector<std::string> sourceNames(srcNames, srcNames+sizeof(srcNames)/sizeof(char*));
+   size_t nsrcNames(sizeof(srcNames)/sizeof(char*));
+   std::vector<std::string> sourceNames(srcNames, srcNames + nsrcNames);
 
    m_compositeSource = new CompositeSource();
    unsigned long nsrcs(0);
@@ -201,6 +204,7 @@ void TestApp::load_sources() {
    TF1MapFactory();
    FileSpectrumFactory();
    FileSpectrumMapFactory();
+//   EventListFactory();
 }
 
 HepRotation TestApp::instrumentToCelestial(double time) {

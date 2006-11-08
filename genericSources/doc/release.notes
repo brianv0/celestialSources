@@ -5,7 +5,12 @@
   @verbatim
   $Id$
 
-  06-Nov-06 v1r6p15 THB   fix test program to conform to changed astro::GPS, removed fits file from flux
+  08-Nov-06 v1r7    JC    enable SpectralTransient to use an ascii spectrum
+                          file (functionality to be moved to 
+                          TransientTemplate); modify xml example sources to
+                          use extFiles; add to Util.h and add TestUtil.h
+  06-Nov-06 v1r6p15 THB   fix test program to conform to changed astro::GPS,
+                          removed fits file from flux
   05-Sep-06 v1r6p14 JC    bug fix for SpectralTransient: handle times past
                           end of light curve
   29-Jun-06 v1r6p13 JC    bug fix for PeriodicSource: forgot to scale rate
