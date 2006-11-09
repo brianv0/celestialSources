@@ -5,6 +5,7 @@
   @verbatim
   $Id$
 
+  09-Nov-06 v1r7p1  JC    protect agains empty caches in SpectralTransient
   08-Nov-06 v1r7    JC    enable SpectralTransient to use an ascii spectrum
                           file (functionality to be moved to 
                           TransientTemplate); modify xml example sources to
