@@ -197,7 +197,9 @@ void SpectralTransient::fillEventCache(double time) {
                              compareEventTime);
          }
 // Remove duplicate times
-         m_eventCache.push_back(my_cache.front());
+         if (my_cache.size() > 0) {
+            m_eventCache.push_back(my_cache.front());
+         }
          for (size_t i = 1; i < my_cache.size(); i++) {
             if (m_eventCache.back().first != my_cache.at(i).first) {
                m_eventCache.push_back(my_cache.at(i));
