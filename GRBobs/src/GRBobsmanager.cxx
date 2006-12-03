@@ -10,7 +10,7 @@
 #include "astro/SkyDir.h"
 #include "astro/PointingTransform.h"
 #include "astro/JulianDate.h"
-
+#include "CLHEP/Vector/ThreeVector.h"
 #define DEBUG 0
 
 
@@ -74,10 +74,10 @@ GRBobsmanager::GRBobsmanager(const std::string& params)
       m_b = m_GalDir.second;
       
       astro::SkyDir sky(m_l,m_b,astro::SkyDir::GALACTIC);
-      HepVector3D skydir=sky.dir();
+      Hep3Vector skydir=sky.dir();
       try{
 	HepRotation rottoglast = GPS::instance()->transformToGlast(m_startTime,GPS::CELESTIAL);
-	HepVector3D scdir = rottoglast * skydir;
+	Hep3Vector scdir = rottoglast * skydir;
 	m_ra    = sky.ra();
 	m_dec   = sky.dec();
 	double zenithCosTheta=cos(scdir.theta());
