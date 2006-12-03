@@ -5,6 +5,7 @@
 *
 *   $Header$
 *@verbatim
+    v4r3p1 3-dec-06    THB   Change 3-vector class to Hep3Vector
 *   v4r2p3 23-Feb-2006 NO add data directory to be used by the installers
 *   ...
 *   v4r1p9 15-jun-2005 THB minor fix for GPS move to astro namespace

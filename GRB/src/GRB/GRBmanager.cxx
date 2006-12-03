@@ -7,6 +7,8 @@
 #include "astro/PointingTransform.h"
 #include "astro/JulianDate.h"
 
+#include "CLHEP/Vector/ThreeVector.h"
+
 ISpectrumFactory &GRBmanagerFactory() 
 {
   static SpectrumFactory<GRBmanager> myFactory;
@@ -150,9 +152,9 @@ void GRBmanager::GenerateGRB()
       m_b = m_GalDir.second;
       
       astro::SkyDir sky(m_l,m_b,astro::SkyDir::GALACTIC);
-      HepVector3D skydir=sky.dir();
+      Hep3Vector skydir=sky.dir();
       CLHEP::HepRotation   rottoglast = GPS::instance()->transformToGlast(m_startTime,GPS::CELESTIAL);
-      HepVector3D scdir = rottoglast * skydir;
+      Hep3Vector scdir = rottoglast * skydir;
       m_ra    = sky.ra();
       m_dec   = sky.dec();
       m_theta = 90. - scdir.theta()*180.0/M_PI; // theta=0 -> XY plane, theta=90 -> Z
