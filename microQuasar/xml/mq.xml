@@ -1,0 +1,20 @@
+<source_library title="MQ">
+
+	<!-- 
+- LS I +61 303, 135.68 +1.09 flux 1.42e-7 (>100 MeV), gamma = 2.20
+     Gregory (2002, ApJ, 575, 427) for period and phase:
+	26.4960 d with 0 phase at JD = 2443,366.775 (MJD 43,366.275)
+	So at MET 0, phase = fractional part of (51,910-43,366.275)/26.4960,
+	i.e., 0.45339
+     Modulation is assumed to be like for LS 5039
+     Bosch-Ramon & Paredes (2004, A&A, 425, 1069)
+     Flux and spectral index are for 3EG J0241+6103, extrapolated to 10 MeV
+-->
+
+	<source name="Galactic_LSI61_303">
+	<spectrum escale="MeV">
+<SpectrumClass name="microQuasar" params=""/>
+<galactic_dir l="135.68" b="1.09"/>
+</spectrum>
+</source>
+</source_library>
