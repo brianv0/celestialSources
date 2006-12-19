@@ -12,10 +12,13 @@ $Header$
 
 
 namespace {
-    int default_count = 50 ;
+    int default_count =100 ;
     std::string default_source("Galactic_LSI61_303");
     std::string xml_spec("$(MICROQUASARROOT)/xml/mq.xml");
+
 }
+#define DECLARE_SPECTRUM(x)   extern const ISpectrumFactory& x##Factory; x##Factory.addRef();
+
 
 void listSources(const std::list<std::string>& source_list ) {
     std::cout << "List of available sources:" << std::endl;
@@ -35,7 +38,6 @@ void listSpectra() {
 }
 
 
-#define DECLARE_SPECTRUM(x)   extern const ISpectrumFactory& x##Factory; x##Factory.addRef();
 
 
 int main(int argn, char * argc[]) {
@@ -78,8 +80,8 @@ int main(int argn, char * argc[]) {
             return -1;
         }
 
+        fm.test(std::cout, source_name, count); 
 
-        fm.test(std::cout, source_name, count); // also example to stdout
     }catch(const std::exception & x){
         std::cerr << "Caught exception: " << x.what() << std::endl;
         rc =1 ;

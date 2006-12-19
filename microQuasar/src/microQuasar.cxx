@@ -28,7 +28,12 @@ ISpectrumFactory &microQuasarFactory() { // a.k.a. microQuasarFactory, see http:
    return myFactory;
 }
 
-microQuasar::microQuasar(const std::string &paramString) {
+microQuasar::microQuasar(const std::string &paramString) 
+: m_currentTime(0)
+, m_nTurns(0)
+, m_currentSpectralIndex(2)
+, m_randPhase(0)
+{
 
    std::vector<std::string> params;
    facilities::Util::stringTokenize(paramString, ", ", params);
@@ -82,7 +87,7 @@ double microQuasar::interval(double current_time) {
 	m_currentTime = current_time - Spectrum::startTime();
 	m_randPhase = CLHEP::RandFlat::shoot();
 	double deltaT = m_orbitalPeriod/(2.*M_PI)*(rtsafe(0.,2.*M_PI,1.e-2)+2.*M_PI*m_nTurns);
-//	std::cout << " current t " << m_currentTime << "deltaT " << deltaT << std::endl;
+	std::cout << " current t " << m_currentTime << "deltaT " << deltaT << std::endl;
 	return deltaT;
 //	return 20.;
 }
