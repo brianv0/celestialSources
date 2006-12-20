@@ -15,8 +15,6 @@
 #include <sstream>
 #include <stdexcept>
 
-#include "CLHEP/Random/RandomEngine.h"
-#include "CLHEP/Random/JamesRandom.h"
 #include "CLHEP/Random/RandFlat.h"
 #include "CLHEP/Random/RandPoisson.h"
 
@@ -178,6 +176,9 @@ void SpectralTransient::fillEventCache(double time) {
       int nevts;
       if (npred > 0 && (nevts = CLHEP::RandPoisson::shoot(npred)) > 0) {
          std::vector< std::pair<double, double> > my_cache;
+         if (m_logParabola) {
+            m_currentInterval->fillCumulativeDist(m_emin, m_emax);
+         }
          for (int i = 0; i < nevts; i++) {
             double energy;
             if (m_specFile) {
@@ -191,6 +192,9 @@ void SpectralTransient::fillEventCache(double time) {
                double eventTime(CLHEP::RandFlat::shoot()*dt + time);
                my_cache.push_back(std::make_pair(eventTime, energy));
             }
+         }
+         if (m_logParabola) {
+            m_currentInterval->clearCumulativeDist();
          }
          if (my_cache.size() > 1) {
             std::stable_sort(my_cache.begin(), my_cache.end(),
@@ -421,7 +425,9 @@ ModelInterval(const std::vector<double> & data, double emin, double emax,
    gamma2 = data.at(4);
    ebreak = data.at(5);
    if (useLogParabola) {
-      fillCumulativeDist(emin, emax);
+// Call this inside of SpectralTransient::fillEventCache just before
+// filling the cache
+//      fillCumulativeDist(emin, emax);
    } else {
       brokenPowerLawFractions(emin, emax);
    }
@@ -449,7 +455,9 @@ SpectralTransient::ModelInterval::ModelInterval(const std::string & line,
    gamma2 = std::atof(tokens[4].c_str());
    ebreak = std::atof(tokens[5].c_str());
    if (useLogParabola) {
-      fillCumulativeDist(emin, emax);
+// Call this inside of SpectralTransient::fillEventCache just before
+// filling the cache
+//       fillCumulativeDist(emin, emax);
    } else {
       brokenPowerLawFractions(emin, emax);
    }
