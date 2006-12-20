@@ -76,7 +76,7 @@ void microQuasar::modulation(const double x, double& funcValue, double& derivVal
 	double scale = m_ftot*EventSource::totalArea();
 	double now = fmod((float)m_currentTime,(float)m_orbitalPeriod)/m_orbitalPeriod*2.*M_PI;
 	float z = -log(1.-m_randPhase);
-	float m_nTurns = floor(z/(2.*M_PI*scale));
+	m_nTurns = floor(z/(2.*M_PI*scale));
 	float zp = z - 2.*M_PI*m_nTurns*scale;
 	funcValue =  scale*(x - m_orbitalModulation*(sin(x+now)-sin(now))) - zp;
 	derivValue = scale*(1.- m_orbitalModulation*cos(x+now));
@@ -96,7 +96,7 @@ double microQuasar::interval(double current_time) {
 int microQuasar::OrbitalRegion::findRegion(double time, float period) {
 	float timef = time;
 	float phase = fmod(timef,period)/period;
-	return (phase > m_minOrbitalPhase && phase < m_maxOrbitalPhase) ? 1 : 2;
+	return (phase > m_minOrbitalPhase && phase < m_maxOrbitalPhase) ? 0 : 1;
 }
 double microQuasar::rtsafe(const double x1, const double x2,	const double xacc)
 {
