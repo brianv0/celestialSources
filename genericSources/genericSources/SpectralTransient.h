@@ -122,6 +122,11 @@ private:
       /// Draw a photon energy (MeV)
       double drawEnergy(double emin, double emax) const;
 
+      void fillCumulativeDist(double emin, double emax);
+
+      void clearCumulativeDist() {
+         m_integral.clear();
+      }
    private:
       double m_lowerFraction;
       void brokenPowerLawFractions(double emin, double emax);
@@ -133,7 +138,6 @@ private:
       std::vector<double> m_integral;
 
       double logParabola(double energy) const;
-      void fillCumulativeDist(double emin, double emax);
       void fillEnergies(double emin, double emax);
    };
 
@@ -141,7 +145,8 @@ private:
 
    std::vector< std::pair<double, double> > m_eventCache;
 
-   std::vector<ModelInterval>::const_iterator m_currentInterval;
+//   std::vector<ModelInterval>::const_iterator m_currentInterval;
+   std::vector<ModelInterval>::iterator m_currentInterval;
 
    void readLightCurve(const std::string & templateFile);
    void readFitsLightCurve(const std::string & templateFile);
