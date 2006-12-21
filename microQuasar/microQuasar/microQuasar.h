@@ -32,7 +32,7 @@ public:
 	/// "SpectrumClass" sources.
 	microQuasar(const std::string &params);
 
-	virtual ~microQuasar(){}
+	virtual ~microQuasar(){};
 
 
 	/// @return Particle type, "gamma".
@@ -100,8 +100,14 @@ public:
 
 	class DiskCycleProperties {
 	public:
-		float getCycleDuration() {return m_cycleDuration;}
-		float getCycleDurationFluctuation() {return m_cycleDurationFluctuation;}
+			DiskCycleProperties() {
+				m_cycleDuration = 0.5 * 86400.;  // 1/2 day
+				m_cycleDurationFluctuation = 0.10;  // 10% of duration
+			}
+			~DiskCycleProperties() {};
+			
+			float getCycleDuration() {return m_cycleDuration;}
+			float getCycleDurationFluctuation() {return m_cycleDurationFluctuation;}
 
 	private:
 		/// disk cycle duration
@@ -113,6 +119,14 @@ public:
 
 	class JetProperties {
 	public:
+		JetProperties() {
+			m_jetOnCycle = 0.25;
+			m_jetOnCycleFluctuation = 0.10;
+			m_jetOnDuration = 0.25;
+			m_jetOnDurationFluctuation = 0.10;
+		}
+		~JetProperties() {};
+
 		float getJetOnCycle() {return m_jetOnCycle;}
 		float getJetOnDuration() {return m_jetOnDuration;}
 
@@ -132,10 +146,10 @@ public:
 protected:
 
 	void makeGrid(unsigned int n, double xmin, double xmax, 
-                 std::vector<double> &x, bool makeLog=false);
-   double interpolate(const std::vector<double> &x, 
-                      const std::vector<double> &y,
-                      double xx);
+		std::vector<double> &x, bool makeLog=false);
+	double interpolate(const std::vector<double> &x, 
+		const std::vector<double> &y,
+		double xx);
 
 
 private:
