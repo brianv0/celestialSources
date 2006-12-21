@@ -38,7 +38,7 @@ microQuasar::microQuasar(const std::string &paramString)
    std::vector<std::string> params;
    facilities::Util::stringTokenize(paramString, ", ", params);
 
-   m_ftot = 9.3e-2;
+   m_ftot = 1000.;   //9.3e-2;
    m_alt = 565e3;
    m_eMin = 20.;;
    m_eMax = 200000.;
@@ -64,10 +64,11 @@ float microQuasar::operator()(float xi) const {
 }
 
 double microQuasar::energy(double time) {
+
 	int region = m_orbitalRegion.findRegion(time,m_orbitalPeriod);
 	m_currentSpectralIndex = m_orbitalRegion.getSpectralIndex(region);
 	double xi = CLHEP::RandFlat::shoot();
-   return (*this)(xi);
+	return (*this)(xi);
 }
 
 
@@ -85,11 +86,29 @@ void microQuasar::modulation(const double x, double& funcValue, double& derivVal
 
 double microQuasar::interval(double current_time) {
 	m_currentTime = current_time - Spectrum::startTime();
-	m_randPhase = CLHEP::RandFlat::shoot();
-	double deltaT = m_orbitalPeriod/(2.*M_PI)*(rtsafe(0.,2.*M_PI,1.e-2)+2.*M_PI*m_nTurns);
-	std::cout << " current t " << m_currentTime << "deltaT " << deltaT << std::endl;
-	return deltaT;
-//	return 20.;
+
+	float fTime = m_currentTime;
+	float jetStart = (floor(fTime/m_diskProperties.getCycleDuration()) + m_jetProperties.getJetOnCycle()) * m_diskProperties.getCycleDuration();
+	float jetLength = m_jetProperties.getJetOnDuration()* m_diskProperties.getCycleDuration();
+	float jetEnd = jetStart + jetLength;
+
+	double deltaT;
+
+	// generate times until one falls in a jet-on period. If an attempt fails, fast forward 
+	// the clock to the next jet-on period and fire again.
+
+	int i=0;
+	for (i; i<100; i++) {
+		m_randPhase = CLHEP::RandFlat::shoot();
+		deltaT = m_orbitalPeriod/(2.*M_PI)*(rtsafe(0.,2.*M_PI,1.e-2)+2.*M_PI*m_nTurns);
+		if ((m_currentTime+deltaT > jetStart) && (m_currentTime+deltaT < jetEnd)) break;
+		m_currentTime = jetStart + m_diskProperties.getCycleDuration();
+		jetStart += m_diskProperties.getCycleDuration();
+		jetEnd += m_diskProperties.getCycleDuration();
+	}
+	if (i==100) std::cerr << " microQuasar::interval - exiting with max iterations " << std::endl;
+
+	return m_currentTime - fTime + deltaT;
 }
 
 
