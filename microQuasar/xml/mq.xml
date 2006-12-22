@@ -32,6 +32,7 @@
 13 - fluctuation on jet start (fraction of jet-on start time: 0-1) - not implemented yet
 14 - duration of jet-on period (fraction disk cycle: 0-1)
 15 - fluctuatian on jet-on duration (fraction of jet-on time: 0-1) - not implemented yet
+-->
 </spectrum>
 </source>
 </source_library>

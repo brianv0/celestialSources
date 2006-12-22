@@ -13,7 +13,7 @@ $Header$
 
 namespace {
     int default_count =100 ;
-    std::string default_source("Galactic_LSI61_303");
+    std::string default_source("Galactic_LS5039");
     std::string xml_spec("$(MICROQUASARROOT)/xml/mq.xml");
 
 }
