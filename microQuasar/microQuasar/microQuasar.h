@@ -74,17 +74,19 @@ public:
 
 	class OrbitalRegion {
 	public:
-		OrbitalRegion() {
-			m_spectralIndex[0] = 2.;
-			m_spectralIndex[1] = 1.7;
-			m_numOrbitalRegions = 2;
-			m_minOrbitalPhase = 0.25;
-			m_maxOrbitalPhase = 0.75;
-		};
+		OrbitalRegion() {};
 		~OrbitalRegion() {};
 		float getMinOrbitalPhase() {return m_minOrbitalPhase;}
 		float getMaxOrbitalPhase() {return m_maxOrbitalPhase;}
 		float getSpectralIndex(int region) {return m_spectralIndex[region];}
+		void setSpectralIndex(float p1, float p2) {
+			m_spectralIndex[0] = p1;
+			m_spectralIndex[1] = p2;
+		}
+		void setOrbitalPhase(float p1, float p2) {
+			m_minOrbitalPhase = p1;
+			m_maxOrbitalPhase = p2;
+		}
 		int findRegion(double time, float period);
 
 	private:
@@ -100,14 +102,13 @@ public:
 
 	class DiskCycleProperties {
 	public:
-			DiskCycleProperties() {
-				m_cycleDuration = 0.5 * 86400.;  // 1/2 day
-				m_cycleDurationFluctuation = 0.10;  // 10% of duration
-			}
+			DiskCycleProperties() {}
 			~DiskCycleProperties() {};
 			
 			float getCycleDuration() {return m_cycleDuration;}
 			float getCycleDurationFluctuation() {return m_cycleDurationFluctuation;}
+			void setCycleDuration(float p) {m_cycleDuration = p;}
+			void setCycleDurationFluct(float p) {m_cycleDurationFluctuation = p;}
 
 	private:
 		/// disk cycle duration
@@ -119,16 +120,16 @@ public:
 
 	class JetProperties {
 	public:
-		JetProperties() {
-			m_jetOnCycle = 0.25;
-			m_jetOnCycleFluctuation = 0.10;
-			m_jetOnDuration = 0.25;
-			m_jetOnDurationFluctuation = 0.10;
-		}
+		JetProperties() {}
 		~JetProperties() {};
 
 		float getJetOnCycle() {return m_jetOnCycle;}
 		float getJetOnDuration() {return m_jetOnDuration;}
+
+		void setJetOnCycle(float p) { m_jetOnCycle = p;}
+		void setJetOnCycleFluct(float p) { m_jetOnCycleFluctuation = p;}
+		void setJetOnDuration(float p) { m_jetOnDuration = p;}
+		void setJetOnDurationFluct(float p) { m_jetOnDurationFluctuation = p;}
 
 	private:
 
@@ -178,11 +179,6 @@ private:
 	JetProperties m_jetProperties;
 	/// allow max two orbital regions for now
 	OrbitalRegion m_orbitalRegion;
-
-	std::vector<double> m_arrTimes;
-	std::vector<double> m_integralDist;
-	void computeIntegralDistribution();
-
 
 };
 
