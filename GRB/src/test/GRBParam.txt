@@ -1,7 +1,8 @@
-Seed l     b     Fluence Nshell  Tv   Gmax_Gmin   Ep  IC/Syn
-1  -500.0 -500.0  0.0e-5   50   .01  2   600.  0.0 
-2  -500.0 -500.0  0.0e-5   50   .01  2   600.  1.0 
-3  -500.0 -500.0  0.0e-5   50   .01  10   600.  0.0 
-4  -500.0 -500.0  0.0e-5   50   .01  10   600.  1.0 
-5  -500.0 -500.0  0.0e-5   50   .1   10   600.  0.0 
-6  -500.0 -500.0  0.0e-5   50   .1   10   600.  1.0 
+10		//! Nshell
+0.1		//! Redshift
+5.0e+53		//! Etot
+1.0e+9		//! Radius of the shells [cm]
+1.0e+9		//! Thickness of the shells[cm]
+100.0		//! Minumum Lorenz Factor
+1000.0		//! Maximum Lorenz Factor
+

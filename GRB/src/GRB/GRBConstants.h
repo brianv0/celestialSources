@@ -1,130 +1,110 @@
-#ifndef GRBCONSTANT_HH
-#define GRBCONSTANT_HH 1
-
 /*! 
  * \class GRBConstants
  * \brief Class instantiated to access general parameters and constants.
  *  
- * The namespace cst contains all the constant needed to the simulation.
- * All the constant relative to physical model are included in the GRBParam.txt
- *
- * \author Nicola Omodei       nicola.omodei@pi.infn.it 
+ *  This should be a temporary solution: we need to find a better way to deal
+ *  with it!
+ * \author Nicola Omodei nicola.omodei@pi.infn.it
  * \author Johann Cohen-Tanugi johann.cohen@pi.infn.it
  */
-//#include <iterator>
-//#include <iostream.h>
-//#include <fstream.h>
 
-/* #include <math.h> */
-#include <vector> 
-#include <string>
-/* #include <algorithm> */
-/* #include <cmath> */
-/* #include "stdio.h" */
-
-/* #include "TFile.h" */
-/* #include "TCanvas.h" */
-/* #include "TPad.h" */
-/* #include "TF1.h" */
-/* #include "TF2.h" */
-/* #include "TH1D.h" */
-/* #include "TH2D.h" */
-#include "TRandom.h"
-
+#ifndef GRBCONSTANTS_HH
+#define GRBCONSTANTS_HH 1
 
 namespace cst
 {
-  static const double pi = acos(-1.0); 
-  static const Double_t c = 3.e+10; //cm
-  static const Double_t c2 = c*c;
-  static const Double_t mpc2  = 938.2;
-  static const Double_t mec2  = 0.510999;       //MeV
-  static const double st      = 6.65225e-25;
-  
-  const float ab = 0.3;
-  const float ae = 0.3; 
-  // const float ap = 1.-(ab-ae);
-  
-  const double emin =  10.0; //keV
-  const double emax = 1e9;  //keV
-  const double enph = 1.0e+5;  //keV (30 MeV) 
-  
-  const    int Ebin =  50; 
-  const    int Tbin =  500; 
-  static const double de   = pow(emax/emin,1.0/Ebin);
-  //  static const double dt   = tmax/(Tbin-1);
-  const double erg2meV   = 624151.0;
-  
-  const double BATSE1=20.0;                   //20 keV
-  const double BATSE2=50.0;;                 // 1 MeV
-  const double BATSE3=100.0;                   //20 keV
-  const double BATSE4=300.0;                 // 1 MeV
-  const double BATSE5=1000.0;                 // 1 MeV
-  const double GBM1=10.0;                     // 10 keV 
-  const double GBM2=30.0e3;                   // 25 MeV 
-  const double LAT1=50.0e3;                   // 50 MeV 
-  const double LAT2=3.0e6;                    //300 GeV 
-  //////////////////////////////////////////////////
-};
+  /// Universal constants :
+  const double mpc2      = 938.2;
+  const double erg2MeV   = 624151.0;
+  const double mpc2cm    = 3.0857e+24;
+  //1Gauss = G2Mev * sqrt(Mev)
+  const double G2MeV     = 815.78;
+  const double st        = 6.65225e-25;
+  const double mec2      = 0.510999;
+  //! light speed in cm/sec.
+  const double c         = 2.98e+10;
+  const double c2        = c*c;
+  //! Planck constant in eV*sec.
+  const double hplanck   = 4.13567e-15;
+  const double pi        = 3.1415926535897932385;
+  const double Hubble    = 6.5e+1; 
+  const double wzel      = 0.0;
+  //  const double gamma0    = 100.;
+  //  const double dgamma    = 500.;
+  const double csi       = 0.1;
+  const double alphae    = .33;
+  const double alphab    = .33;
+  const double p         = 2.5;
+  const double viscosity = 0.;
+  /// Internal Parameters
+  const double enmax     = 1.0e+20;
+  //! Min. photon energy detectable by GLAST: set to 10 MeV
+  const double enph      = 1.0e+7; 
+  const double enmin     = 1.0e+3;
+  const double dt1       = 10000.;
+  const int nstep        = 200;
+  const int enstep       = 100;
+  const double ch1L      = 0.001e+9;
+  const double ch1H      = 0.0025e+9;
+  const double ch2L      = 0.0025e+9;
+  const double ch2H      = 0.005e+9;
+  const double ch3L      = 0.005e+9;
+  const double ch3H      = 0.01e+9;
+  const double ch4L      = 0.01e+9;
+  const double ch4H      = 1.00e+9;
+  //! flag =[0,1], if ==0, No inverse compton;
+  const float flagIC     = 1.0; 
+}
 
-class Parameters
-{
+class GRBConstants 
+{ 
+  
  public:
-  Parameters();
-  ~Parameters(){ delete rnd;}
-  int    GetNshell() {return m_Nshell;}
-  double GetFluence(){return m_Fluence;}
-  double GetEtot()   {return m_Etot;}
-  double GetInitialSeparation(){return m_InitialSeparation;}
-  double GetInitialThickness() {return m_InitialThickness;}
-  double GetGammaMin(){return m_Gmin;}
-  double GetGammaMax(){return m_Gmax;}
-  double GetInverseCompton() {return m_InverseCompton;}
+  //! Constructor calls method readParam wich gets an external file
+  GRBConstants();
 
-  double GetBATSEFluence();
+  ~GRBConstants() { }
   
-  void SetGalDir(double l, double b);
-  void SetNshell(int nshell);
-  void SetFluence(double fluence);
-  void SetEtot(double etot);
-  void SetInitialSeparation(double initialSeparation);
-  void SetInitialThickness(double initialThickness);		  
-  void SetGammaMin(double gmin);
-  void SetGammaMax(double gmax);
-  void SetInverseCompton(double ic);
-  void ReadParametersFromFile(std::string paramFile, int NGRB=1);
+  //! Parameters are read from a file using facilities::Util::expandEnvVar ethod
+  void ReadParam();
+  //! Number of shells generated from the source
+  inline int Nshell() {return nshell;}
+  inline void setNshell(int value=10){nshell=value;}
+  
+  //! redshift of the source
+  inline double Redshift() {return redshift;}
+  inline void setRedshift(double value=1.0){redshift=value;}
+  
+  //! Total Energy available (ergs)
+  inline double Etot(){return etot;}
+  inline void setEtot(double value){etot=value;}
+  
+  //! Initial separation between shells (cm)
+  inline double R0(){return r0;}
+  inline void setR0(double value){r0=value;}
+  
+  //! Initial thickness of the shells (cm)
+  inline double T0(){return t0;}
+  inline void setT0(double value){t0=value;}
+  
+  //! Minimum Lorentz factor of the shells (cm)
+  inline double Gamma0(){return g0;}
+  inline void setGamma0(double value=100.0){g0=value;}
+  
+  //! Maximum Lorentz factor of the shells (cm)
+  inline double DGamma(){return g1;}
+  inline void setDGamma(double value=100.0){g1=value;}
+  
+  
+  int nshell;
+  double redshift;
+  double etot;
+  double r0;
+  double t0;
+  double g0,g1;
 
-  void ComputeParametersFromFile(std::string paramFile, int NGRB=1);
-
-  void PrintParameters();
-  inline UInt_t GetGRBNumber(){return m_GRBnumber;}
-  inline std::pair<double,double> GetGalDir(){return m_GalDir;}
-  inline double GetGamma(double gmin=0,double gmax=0)
-    {
-      if(gmin==0) gmin = m_Gmin;
-      if(gmax==0) gmax = m_Gmax;
-      return rnd->Uniform(gmin,gmax);
-    }
-  void SetGRBNumber(UInt_t GRBnumber);
-  //  double GetNextPeak();
-  //  inline   double GetTau(){return m_Tau;}
-
-  TRandom *rnd; 
-
- private:
-
-  UInt_t m_GRBnumber;
-
-  int    m_Nshell;
-  double m_Gmin;
-  double m_Gmax ;
-  double m_Fluence;
-  double m_Etot   ;
-  double m_InitialSeparation;
-  double m_InitialThickness ;
-  double m_InverseCompton ;
-  //  double m_Tau ;
-  std::pair<double,double> m_GalDir;
 };
 
 #endif
+
+

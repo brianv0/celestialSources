@@ -1,35 +1,51 @@
 package GRB
-version v4r0p6
-author Nicola Omodei<nicola.omodei@pi.infn.it> Johann Cohen-Tanugi <johann.cohen@pi.infn.it> Sandhia Bansal <sandhiab@lheapop.gsfc.nasa.gov>
 
-# $Id$
+version v1
 
+# $Header$
 
-use flux       v8r*
-use ROOT       v2r*  IExternal 
-use SpectObj   v0* celestialSources
+use FluxSvc
+use ROOT
 
-macro_append ROOT_libs " -lHist -lGraf "\
-                 WIN32 " libHist.lib libGraf.lib " 
-
-
+# this is only a shareable package
+apply_pattern packageShr
 apply_pattern package_include
-apply_pattern package_linkopts
+
+pattern ld_library_path \
+path_append LD_LIBRARY_PATH ${GRBROOT}/${CMTCONFIG}
+path_append LD_LIBRARY_PATH ${FLUXSVCROOT}/${CMTCONFIG}
+apply_pattern ld_library_path
 
 
 #=============================================================
 private
 
-macro source "*.cxx" WIN32 "*.cxx *.h"
+# get flags to build shared library
 
-library GRB -no_share \
-     -s=../src      $(source) \
-     -s=GRB         $(source)\
-     -s=GRBmaker    $(source)\
-     -s=LatGRBAlert $(source)
+apply_pattern package_Cshlibflags
+apply_pattern package_headers
 
+public
 
-application test_GRB      test/testMgr.cxx 
+library GRB \
+ ${GRBROOT}/src/GRB/*.cxx
 
-macro_append ROOT_libs " -lGpad " WIN32 " libGpad.lib " 
-application test_GRBROOT  test/other/GRBROOTtest.cxx 
+macro GRB_lib " -L ${GRBROOT}/${CMTCONFIG} -lGRB "\
+    WIN32 "${GRBROOT}/${BINDIR}/GRB.lib "
+
+#non-share test program for development
+
+application GRBTest  test/GRBTest.cxx
+
+macro_append GRBTestlinkopts  "$(GRB_lib) -L${FLUXSVCROOT}/${CMTCONFIG} -lFluxSvc "\
+      WIN32 " $(GRB_lib) -L${FLUXSVCROOT}/${BINDIR}/FluxSvc.lib "
+
+macro_append GRBTest1linkopts  "$(GRB_lib) -L${FLUXSVCROOT}/${CMTCONFIG} -lFluxSvc "\
+      WIN32 " $(GRB_lib) -L${FLUXSVCROOT}/${BINDIR}/FluxSvc.lib "
+
+application GRBTest1  test/GRBTest1.cxx
+
+macro_append ROOT_libs  " -lHist  -lMatrix -lGraf -lGraf3d -lGpad" \
+               WIN32    "$(ROOT_PATH)/lib/libHist.lib $(ROOT_PATH)/lib/libMatrix.lib \
+			$(ROOT_PATH)/lib/libGraf.lib $(ROOT_PATH)/lib/libGraf3d.lib \
+			$(ROOT_PATH)/lib/libGpad.lib"

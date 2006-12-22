@@ -4,30 +4,48 @@
 //
 
 #include "GRBShell.h"
+#include <iostream>
+#include <math.h>
+#include <stdlib.h>
+#include "CLHEP/Random/RandomEngine.h"
+#include "CLHEP/Random/RandGeneral.h"
+#include "CLHEP/Random/RandExponential.h"
+#include "CLHEP/Random/RandFlat.h"
+#include "CLHEP/Random/RanluxEngine.h"
 
-using namespace cst;
+using namespace std;
 
-GRBShell::GRBShell(double g, double r, double dr, double e)
-{
-  m_g  = g;
-  m_r  = r;
-  m_dr = dr;
-  m_e  = e;
-  m_m  = e/(g*c2);
+//GRBShell::GRBShell(double E) 
+GRBShell::GRBShell() 
+{ 
+  //  cout<<cst::gamma0<<endl;
+  //m_gamma = generateGamma(cst::gamma0,cst::dgamma);
+  //m_mass = E/(m_gamma*cst::c2);
 }
 
-GRBShell::GRBShell(double g, double r, double dr, double e, double m)
+
+double GRBShell::generateGamma(double gamma0,double dgamma) 
 {
-  m_g  = g;
-  m_r  = r;
-  m_dr = dr;
-  m_e  = e; 
-  m_m  = m;
+  HepRandom::setTheEngine(new RanluxEngine);
+  double gamma = gamma0 + (double (RandFlat::shoot(1.0)))*dgamma;
+  return gamma;
 }
 
-void GRBShell::Evolve(double t)
+
+double GRBShell::beta(const double gamma) 
 {
-  m_r  += c * GetBeta() * t;
-  //  m_dr += c * GetBeta() * t;
+  if(gamma<1.0)
+    {
+      cout << "warning: gamma undefined, returning beta=0" << endl;
+      return 0;
+    } else 
+      {
+	return sqrt(1. - 1./(gamma*gamma));  
+      }
 }
-//////////////////////////////////////////////////
+
+
+void GRBShell::evolve(double time) 
+{
+  m_radius += beta(m_gamma)*cst::c*time;
+}
