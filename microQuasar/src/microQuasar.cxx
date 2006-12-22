@@ -1,10 +1,10 @@
 /**
- * @file microQuasar.cxx
- * @brief A phenomenological model of the microQuasar based on EGRET measurements
- * @author D. Petry
- *
- * $Header$
- */
+* @file microQuasar.cxx
+* @brief A phenomenological model of the microQuasar based on EGRET measurements
+* @author D. Petry
+*
+* $Header$
+*/
 
 #include <iostream>
 
@@ -24,8 +24,8 @@
 
 
 ISpectrumFactory &microQuasarFactory() { // a.k.a. microQuasarFactory, see http://www.bbc.co.uk/dna/h2g2/A105265
-   static SpectrumFactory<microQuasar> myFactory;
-   return myFactory;
+	static SpectrumFactory<microQuasar> myFactory;
+	return myFactory;
 }
 
 microQuasar::microQuasar(const std::string &paramString) 
@@ -35,32 +35,45 @@ microQuasar::microQuasar(const std::string &paramString)
 , m_randPhase(0)
 {
 
-   std::vector<std::string> params;
-   facilities::Util::stringTokenize(paramString, ", ", params);
+	std::vector<std::string> params;
+	facilities::Util::stringTokenize(paramString, ", ", params);
 
-   m_ftot = 1000.;   //9.3e-2;
-   m_alt = 565e3;
-   m_eMin = 20.;;
-   m_eMax = 200000.;
+	float daySecs = 86400.;
 
-   m_orbitalPeriod = 3.91*86400;
-   m_orbitalModulation = 1.0;
-   m_phi0 = 0.;
+	m_ftot = ::atof(params[0].c_str());
+	m_eMin = ::atof(params[1].c_str());
+	m_eMax = ::atof(params[2].c_str());
+	m_orbitalPeriod = ::atof(params[3].c_str()) * daySecs;
+	m_orbitalModulation = ::atof(params[4].c_str());
+	m_phi0 = ::atof(params[5].c_str());
 
-   std::cerr << "microQuasar created. Total flux = " 
-	     << m_ftot << " cm^-2 s^-1 " << " between " 
-	     << m_eMin << " MeV and "
-	     << m_eMax << " MeV." << std::endl;
+	m_orbitalRegion.setSpectralIndex(::atof(params[6].c_str()),::atof(params[7].c_str()));
+	m_orbitalRegion.setOrbitalPhase(::atof(params[8].c_str()),::atof(params[9].c_str()));
+
+	m_diskProperties.setCycleDuration(::atof(params[10].c_str())* daySecs);
+	m_diskProperties.setCycleDurationFluct(::atof(params[11].c_str()));
+
+	m_jetProperties.setJetOnCycle(::atof(params[12].c_str()));
+	m_jetProperties.setJetOnCycleFluct(::atof(params[13].c_str()));
+	m_jetProperties.setJetOnDuration(::atof(params[14].c_str()));
+	m_jetProperties.setJetOnDurationFluct(::atof(params[15].c_str()));
+
+
+
+	std::cerr << "microQuasar created. Total flux = " 
+		<< m_ftot << " cm^-2 s^-1 " << " between " 
+		<< m_eMin << " MeV and "
+		<< m_eMax << " MeV." << std::endl;
 
 }
 
 
 float microQuasar::operator()(float xi) const {
-   double one_m_gamma = 1. - m_currentSpectralIndex;
-   double arg = xi*(pow(m_eMax, one_m_gamma) - pow(m_eMin, one_m_gamma)) 
-      + pow(m_eMin, one_m_gamma);
-   float energy = pow(arg, 1./one_m_gamma);
-   return energy;
+	double one_m_gamma = 1. - m_currentSpectralIndex;
+	double arg = xi*(pow(m_eMax, one_m_gamma) - pow(m_eMin, one_m_gamma)) 
+		+ pow(m_eMin, one_m_gamma);
+	float energy = pow(arg, 1./one_m_gamma);
+	return energy;
 }
 
 double microQuasar::energy(double time) {
@@ -73,9 +86,9 @@ double microQuasar::energy(double time) {
 
 
 void microQuasar::modulation(const double x, double& funcValue, double& derivValue) {
-// see http://d0.phys.washington.edu/~burnett/glast/generate_periodic/oscilations.htm for details
+	// see http://d0.phys.washington.edu/~burnett/glast/generate_periodic/oscilations.htm for details
 	double scale = m_ftot*EventSource::totalArea();
-	double now = fmod((float)m_currentTime,(float)m_orbitalPeriod)/m_orbitalPeriod*2.*M_PI;
+	double now = fmod((float)(m_currentTime+m_phi0*m_orbitalPeriod),(float)m_orbitalPeriod)/m_orbitalPeriod*2.*M_PI;
 	float z = -log(1.-m_randPhase);
 	m_nTurns = floor(z/(2.*M_PI*scale));
 	float zp = z - 2.*M_PI*m_nTurns*scale;
@@ -143,23 +156,23 @@ double microQuasar::rtsafe(const double x1, const double x2,	const double xacc)
 	for (j=0;j<MAXIT;j++) {
 		if ((((rts-xh)*df-f)*((rts-xl)*df-f) > 0.0)
 			|| (fabs(2.0*f) > fabs(dxold*df))) {
-			dxold=dx;
-			dx=0.5*(xh-xl);
-			rts=xl+dx;
-			if (xl == rts) return rts;
-		} else {
-			dxold=dx;
-			dx=f/df;
-			temp=rts;
-			rts -= dx;
-			if (temp == rts) return rts;
-		}
-		if (fabs(dx) < xacc) return rts;
-		modulation(rts,f,df);
-		if (f < 0.0)
-			xl=rts;
-		else
-			xh=rts;
+				dxold=dx;
+				dx=0.5*(xh-xl);
+				rts=xl+dx;
+				if (xl == rts) return rts;
+			} else {
+				dxold=dx;
+				dx=f/df;
+				temp=rts;
+				rts -= dx;
+				if (temp == rts) return rts;
+			}
+			if (fabs(dx) < xacc) return rts;
+			modulation(rts,f,df);
+			if (f < 0.0)
+				xl=rts;
+			else
+				xh=rts;
 	}
 	std::cerr << "Maximum number of iterations exceeded in rtsafe" << std::endl;
 	return 0.0;
