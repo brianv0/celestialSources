@@ -101,23 +101,27 @@ double microQuasar::interval(double current_time) {
 	m_currentTime = current_time - Spectrum::startTime();
 
 	float fTime = m_currentTime;
-	float jetStart = (floor(fTime/m_diskProperties.getCycleDuration()) + m_jetProperties.getJetOnCycle()) * m_diskProperties.getCycleDuration();
+	float jetCycle = m_jetProperties.getJetOnCycle() * m_diskProperties.getCycleDuration();
 	float jetLength = m_jetProperties.getJetOnDuration()* m_diskProperties.getCycleDuration();
+	float nJet = floor((fTime+jetLength+jetCycle)/m_diskProperties.getCycleDuration());
+	float jetStart = nJet*m_diskProperties.getCycleDuration() + jetCycle;
 	float jetEnd = jetStart + jetLength;
 
 	double deltaT;
 
 	// generate times until one falls in a jet-on period. If an attempt fails, fast forward 
-	// the clock to the next jet-on period and fire again.
+	// the clock to the next jet-on period after the projected time and fire again. Find the 
+	// next jet-end period after the trial time
 
 	int i=0;
 	for (i; i<100; i++) {
 		m_randPhase = CLHEP::RandFlat::shoot();
 		deltaT = m_orbitalPeriod/(2.*M_PI)*(rtsafe(0.,2.*M_PI,1.e-2)+2.*M_PI*m_nTurns);
 		if ((m_currentTime+deltaT > jetStart) && (m_currentTime+deltaT < jetEnd)) break;
-		m_currentTime = jetStart + m_diskProperties.getCycleDuration();
-		jetStart += m_diskProperties.getCycleDuration();
-		jetEnd += m_diskProperties.getCycleDuration();
+		nJet = floor((m_currentTime+deltaT+jetLength+jetCycle)/m_diskProperties.getCycleDuration());
+		jetStart = nJet*m_diskProperties.getCycleDuration()	+ jetCycle;
+		jetEnd = jetStart + jetLength;
+		m_currentTime = jetStart;
 	}
 	if (i==100) std::cerr << " microQuasar::interval - exiting with max iterations " << std::endl;
 
