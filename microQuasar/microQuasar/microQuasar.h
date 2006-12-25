@@ -71,6 +71,7 @@ public:
 
 	/// fiddle of Numerical Recipe's rtsafe to avoid function passing
 	double rtsafe(const double x1, const double x2, const double xacc);
+	std::pair<float,float> calculateJetStart(float time);
 
 	class OrbitalRegion {
 	public:
@@ -106,7 +107,7 @@ public:
 			~DiskCycleProperties() {};
 			
 			float getCycleDuration() {return m_cycleDuration;}
-			float getCycleDurationFluctuation() {return m_cycleDurationFluctuation;}
+			float getCycleDurationFluct() {return m_cycleDurationFluctuation;}
 			void setCycleDuration(float p) {m_cycleDuration = p;}
 			void setCycleDurationFluct(float p) {m_cycleDurationFluctuation = p;}
 
@@ -124,7 +125,9 @@ public:
 		~JetProperties() {};
 
 		float getJetOnCycle() {return m_jetOnCycle;}
+		float getJetOnCycleFluct() {return m_jetOnCycleFluctuation;}
 		float getJetOnDuration() {return m_jetOnDuration;}
+		float getJetOnDurationFluct() {return m_jetOnDurationFluctuation;}
 
 		void setJetOnCycle(float p) { m_jetOnCycle = p;}
 		void setJetOnCycleFluct(float p) { m_jetOnCycleFluctuation = p;}
@@ -173,6 +176,8 @@ private:
 	float m_randPhase;	
 	/// current time
 	double m_currentTime;
+	float m_jetStart;
+	float m_jetEnd;
 	/// disk-cycle properties
 	DiskCycleProperties m_diskProperties;
 	/// jet timing properties
