@@ -58,7 +58,7 @@ microQuasar::microQuasar(const std::string &paramString)
 	m_jetProperties.setJetOnDuration(::atof(params[14].c_str()));
 	m_jetProperties.setJetOnDurationFluct(::atof(params[15].c_str()));
 
-
+	m_jetEnd = 0.;
 
 	std::cerr << "microQuasar created. Total flux = " 
 		<< m_ftot << " cm^-2 s^-1 " << " between " 
@@ -101,11 +101,19 @@ double microQuasar::interval(double current_time) {
 	m_currentTime = current_time - Spectrum::startTime();
 
 	float fTime = m_currentTime;
-	float jetCycle = m_jetProperties.getJetOnCycle() * m_diskProperties.getCycleDuration();
-	float jetLength = m_jetProperties.getJetOnDuration()* m_diskProperties.getCycleDuration();
-	float nJet = floor((fTime+jetLength+jetCycle)/m_diskProperties.getCycleDuration());
-	float jetStart = nJet*m_diskProperties.getCycleDuration() + jetCycle;
-	float jetEnd = jetStart + jetLength;
+	std::pair<float, float> jet;
+	
+	if (fTime> m_jetEnd) {
+		jet = calculateJetStart(fTime);
+		m_jetStart = jet.first;
+		m_jetEnd = jet.second;
+	}
+
+	//float jetCycle = m_jetProperties.getJetOnCycle() * m_diskProperties.getCycleDuration();
+	//float jetLength = m_jetProperties.getJetOnDuration()* m_diskProperties.getCycleDuration();
+	//float nJet = floor((fTime+jetLength+jetCycle)/m_diskProperties.getCycleDuration());
+	//float jetStart = nJet*m_diskProperties.getCycleDuration() + jetCycle;
+	//float jetEnd = jetStart + jetLength;
 
 	double deltaT;
 
@@ -117,17 +125,40 @@ double microQuasar::interval(double current_time) {
 	for (i; i<100; i++) {
 		m_randPhase = CLHEP::RandFlat::shoot();
 		deltaT = m_orbitalPeriod/(2.*M_PI)*(rtsafe(0.,2.*M_PI,1.e-2)+2.*M_PI*m_nTurns);
-		if ((m_currentTime+deltaT > jetStart) && (m_currentTime+deltaT < jetEnd)) break;
-		nJet = floor((m_currentTime+deltaT+jetLength+jetCycle)/m_diskProperties.getCycleDuration());
-		jetStart = nJet*m_diskProperties.getCycleDuration()	+ jetCycle;
-		jetEnd = jetStart + jetLength;
-		m_currentTime = jetStart;
+		if ((m_currentTime+deltaT > m_jetStart) && (m_currentTime+deltaT < m_jetEnd)) break;
+		jet = calculateJetStart(m_currentTime+deltaT);
+		m_jetStart = jet.first;
+		m_jetEnd = jet.second;
+		//nJet = floor((m_currentTime+deltaT+jetLength+jetCycle)/m_diskProperties.getCycleDuration());
+		//jetStart = nJet*m_diskProperties.getCycleDuration()	+ jetCycle;
+		//jetEnd = jetStart + jetLength;
+		m_currentTime = m_jetStart;
 	}
 	if (i==100) std::cerr << " microQuasar::interval - exiting with max iterations " << std::endl;
 
 	return m_currentTime - fTime + deltaT;
 }
 
+
+std::pair<float,float> microQuasar::calculateJetStart(float time) {
+
+	float jetOn = m_jetProperties.getJetOnCycle() * 
+		(1. + m_jetProperties.getJetOnCycleFluct()*(0.5*CLHEP::RandFlat::shoot()-1.));
+
+	float diskCycle = m_diskProperties.getCycleDuration() *
+		(1. + m_diskProperties.getCycleDurationFluct()*(0.5*CLHEP::RandFlat::shoot()-1.));
+
+	float jetCycle = jetOn * diskCycle;
+		
+	float jetLength = m_jetProperties.getJetOnDuration()* 
+		(1. + m_jetProperties.getJetOnDurationFluct()*(0.5*CLHEP::RandFlat::shoot()-1.)) *
+		diskCycle;
+
+	float nJet = ceil((time+jetLength+jetCycle)/diskCycle);
+	float jetStart = jetCycle + nJet*diskCycle;
+	float jetEnd = jetStart + jetLength;
+	return std::make_pair(jetStart, jetEnd);
+}
 
 int microQuasar::OrbitalRegion::findRegion(double time, float period) {
 	float timef = time;
