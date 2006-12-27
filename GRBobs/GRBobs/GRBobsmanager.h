@@ -13,21 +13,22 @@
 #define GRBobsmanager_H
 #include "GRBobsConstants.h"
 
+#include "TString.h"
+
 #include <vector>
 #include <string>
 #include <map>
 #include <cmath>
-#include "flux/Spectrum.h"
+#include "flux/ISpectrum.h"
 #include "flux/EventSource.h"
 #include "GRBobsSim.h"
-#include "SpectralComponent.h"
-
 #include "SpectObj/SpectObj.h"
 
 #include "facilities/Util.h"
 
+//class ISpectrum;
 
-class GRBobsmanager : public Spectrum
+class GRBobsmanager : public ISpectrum
 {
   
  public:
@@ -63,6 +64,7 @@ class GRBobsmanager : public Spectrum
   //! direction, taken from GRBobsSim
   inline std::pair<double,double> dir(double) 
     {
+      (void)(energy);//energy is not used here
       return m_GalDir;
     } 
   
@@ -71,9 +73,10 @@ class GRBobsmanager : public Spectrum
   std::string title() const {return "GRBobsmanager";} 
   const char * particleName() const {return "gamma";}
   const char * nameOf() const {return "GRBobsmanager";}
-  std::string GetGRBname();
+  TString GetGRBname(double time);
   void GenerateGRB();  
   void DeleteGRB();  
+
   /*! 
     This method parses the parameter list
     \param input is the string to parse
@@ -90,12 +93,8 @@ class GRBobsmanager : public Spectrum
   double m_theta;
   double m_phi;
 
-  SpectObj    *m_spectrum;
-  SpectObj    *m_spectrum1;
 
-  SpectralComponent *PromptEmission;
-  SpectralComponent *AfterGlowEmission;
-  
+  SpectObj    *m_spectrum;
   GRBobsSim   *m_GRB;
   GRBobsParameters  *m_par;
 
@@ -104,32 +103,16 @@ class GRBobsmanager : public Spectrum
   std::pair<double,double> m_GalDir;
   bool m_grbGenerated;
   bool m_grbdeleted;
-  bool m_grbocculted;
-  bool m_inSAA;
   bool m_GenerateGBMOutputs;
 
   double m_l;
   double m_b;
-  double m_GRB_duration;
   double m_fluence;
-  double m_z;
   long   m_GRBnumber;
   double m_alpha;
   double m_beta;
-  double m_epeak;
-  double m_fssc_fsyn;
-  double m_essc_esyn;
   double m_MinPhotonEnergy;
-  double m_CutOffEnergy;
-  double m_LATphotons;
-  double m_EC_delay,m_EC_duration;
-
   double m_startTime;
   double m_endTime;
-  double m_startTime_EC;
-  double m_endTime_EC;
-  double m_GRBend ;
-
-
 };
 #endif

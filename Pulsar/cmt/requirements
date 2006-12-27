@@ -1,12 +1,13 @@
 package Pulsar
-version v1r1p7
-author Nicola Omodei<nicola.omodei@pi.infn.it>, Massimiliano Razzano <massimiliano.razzano@pi.infn.it>
+version v1r0p1
+author Nicola Omodei<nicola.omodei@pi.infn.it> Massimiliano Razzano <massimiliano.razzano@pi.infn.it>
 # $Id$
 
 use flux       v8r*
 use ROOT       v*  IExternal
 use SpectObj   v* celestialSources
 use astro v*
+
 
 macro_append ROOT_libs " -lHist -lGraf "\
                  WIN32 " libHist.lib libGraf.lib " 
@@ -21,7 +22,7 @@ macro source "*.cxx" WIN32 "*.cxx *.h"
 
 library Pulsar -no_share \
      -s=../src      $(source) \
-     -s=../Pulsar   $(source)
+     -s=Pulsar      $(source)
 
 #application test_Pulsar      test/testMgr.cxx 
 

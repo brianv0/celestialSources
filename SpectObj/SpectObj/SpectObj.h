@@ -1,17 +1,9 @@
-/** @file SpectObj.h
-  @brief declaration n of SpectObj class
-
-  $Header$
-
-*/
 #ifndef SpectObj_H
 #define SpectObj_H
 #include "TH2D.h"
 #include "TH1D.h"
 #include "TROOT.h"
-#if 0 //THB
 #include "TRandom.h"
-#endif
 #include <vector>
 #include <iostream>
 
@@ -19,9 +11,6 @@
   \struct photon
   Trivial struct for storing time and energy.
 */
-namespace IRB {
-   class EblAtten;
-}
 
 struct photon
 {
@@ -39,17 +28,8 @@ struct photon
 */
 class SpectObj
 {
-#if 0 //THB
-#else
-  class UniformRandom {
-  public:
-    UniformRandom(){}
-    double Uniform(double a=0, double b=1);
-  };
-#endif
-
  public:
-  SpectObj(const TH2D* In_Nv, int type, double z=0.0); //Max
+  SpectObj(const TH2D* In_Nv, int type); //Max
   
   ~SpectObj()
     {
@@ -58,14 +38,11 @@ class SpectObj
       delete Probability;
       delete Nv;
       delete m_SpRandGen;
-      if (PeriodicSpectrumIsComputed == true ) 
-	{
-	  delete PeriodicSpectrum;
-	  delete PeriodicLightCurve;
-	}
+      //      if (PeriodicSpectrumIsComputed == true ) 
+      delete PeriodicSpectrum;
       std::cout<<" SpectObj: Generated photons : "<<counts<<" over "<<m_AreaDetector<<" m^2 "<<std::endl;
     }
-  void GetUniqueName(void *ptr, std::string & name);
+  void GetUniqueName(const void *ptr, std::string & name);
   
   TH1D *Integral_E(double e1, double e2);
   TH1D *Integral_E(int ei1, int ei2); 
@@ -103,11 +80,7 @@ class SpectObj
  private:
   int counts;
   double  m_AreaDetector;
-#if 0 //THB
   TRandom *m_SpRandGen;
-#else
-  UniformRandom * m_SpRandGen;
-#endif
   TH2D* Nv;
   int ne,nt;
   int sourceType; //"0=Transient,1=Periodic"
@@ -115,16 +88,9 @@ class SpectObj
 
   double m_Tmin,m_Tmax, m_TimeBinWidth;
   double Ptot;
-  double m_z;
-  double m_meanRate;
-  
-  TH1D *spec,*times,*Probability,*PeriodicSpectrum,*PeriodicLightCurve;
+  TH1D *spec,*times,*Probability,*PeriodicSpectrum;
   photon ph;
   bool ProbabilityIsComputed, PeriodicSpectrumIsComputed;
-  IRB::EblAtten * m_tau;
-
-   static bool s_gRandom_seed_set;
-
+  
 };
 #endif
-

@@ -1,31 +1,16 @@
-/** @file SpectObj.cxx
-    @brief implemetation of SpectObj class
-    
-    $Header$
-*/
 #include <string>
 #include <sstream>
 #include <iostream>
 #include <fstream>
 #include <iomanip>
-#include <cmath>
-#include <cstdlib>
-
 //#include "SpectObj.h"
 #include "SpectObj/SpectObj.h"
-#include "eblAtten/EblAtten.h"
-
-#include "CLHEP/Random/RandFlat.h"
-
-#include "TH1.h"
 
 #define DEBUG 0
 
-static const double erg2meV      = 624151.0;
+const double erg2meV      = 624151.0;
 
-bool SpectObj::s_gRandom_seed_set(false);
-
-SpectObj::SpectObj(const TH2D* In_Nv, int type, double z)
+SpectObj::SpectObj(const TH2D* In_Nv, int type)
 {
   m_AreaDetector = 1.0;
   sourceType = type;
@@ -34,22 +19,9 @@ SpectObj::SpectObj(const TH2D* In_Nv, int type, double z)
   std::string name;
   GetUniqueName(Nv,name);
   Nv->SetName(name.c_str());
-  //  Nv->SetDirectory(0);
+  
   counts=0;
-#if 0 //THB
   m_SpRandGen = new TRandom();
-
-// Set the TRandom seeds using the CLHEP generator.
-  int bigInt(1000000);
-  m_SpRandGen->SetSeed(int(CLHEP::RandFlat::shoot()*bigInt));
-  if (!s_gRandom_seed_set) { 
-    // Set the global generator once for all SpectObjs
-      gRandom->SetSeed(int(CLHEP::RandFlat::shoot()*bigInt));
-    s_gRandom_seed_set = true;
-  }
-#else
-  m_SpRandGen = new UniformRandom();
-#endif
   sourceType = type; //Max
   
   ne   = Nv->GetNbinsY();
@@ -62,29 +34,6 @@ SpectObj::SpectObj(const TH2D* In_Nv, int type, double z)
   m_Tmax = Nv->GetXaxis()->GetXmax();
   
   m_TimeBinWidth   = Nv->GetXaxis()->GetBinWidth(0);
-  m_z = z;
-  /************************************************************************
-EBL model 0: Kneiske, Bretz, Mannheim, Hartmann (A&A 413, 807-815, 2004)
-  Valid for redshift <= 5.0
-  Here we have implemented the "best fit" model from their paper
-  ************************************************************************/
-  //  m_tau = new IRB::EblAtten(IRB::Kneiske);
-
-  /************************************************************************
-   EBL model 1: Salamon & Stecker (ApJ 1998, 493:547-554)
-   We are using here the model with metallicity correction (see paper)
-   The paper has opacities up to z=3, for z>3 opacity remains constant according to Stecker
-  */  
-  //m_tau = new IRB::EblAtten(IRB::Salamon_Stecker);
-  
-  //    EBL model 1: Primack & Bullock (2005) Valid for opacities < 15
-  m_tau = new IRB::EblAtten(IRB::Primack05);
-  /************************************************************************
-EBL model 2: Kneiske, Bretz, Mannheim, Hartmann (A&A 413, 807-815, 2004)
-  Valid for redshift <= 5.0
-  Here we have implemented the "High UV" model from their paper
-  ************************************************************************/
-  //  m_tau = new IRB::EblAtten(IRB::Kneiske_HighUV);
   
   //////////////////////////////////////////////////
   if(DEBUG) 
@@ -137,8 +86,6 @@ EBL model 2: Kneiske, Bretz, Mannheim, Hartmann (A&A 413, 807-815, 2004)
   ProbabilityIsComputed=false;
   PeriodicSpectrumIsComputed = false;
 
-  m_meanRate=0.;
-
   delete[] en;
       
   if(DEBUG)  std::cout<<" SpectObj initialized ! ( " << sourceType <<")"<<std::endl;
@@ -153,13 +100,12 @@ void SpectObj::SetAreaDetector(double AreaDetector)
   m_AreaDetector = AreaDetector;
 }
 
-void SpectObj::GetUniqueName(void *ptr, std::string & name)
+void SpectObj::GetUniqueName(const void *ptr, std::string & name)
 {
   std::ostringstream my_name;
   my_name << reinterpret_cast<int> (ptr);
   name = my_name.str();
   gDirectory->Delete(name.c_str());
-  reinterpret_cast<TH1*> (ptr)->SetDirectory(0);
 }
 
 TH1D *SpectObj::CloneSpectrum()
@@ -351,7 +297,7 @@ photon SpectObj::GetPhoton(double t0, double enph)
 	{
 	  ph.time   = time;
 	  ph.energy = energy;
-	  return ph;
+  	  return ph;
 	}
       
       int t1 = Probability->FindBin(t0);
@@ -369,7 +315,7 @@ photon SpectObj::GetPhoton(double t0, double enph)
 	  dP0 = (Probability->GetBinContent(t1) - Probability->GetBinContent(t1-1))*dt0/m_TimeBinWidth;
 	}
       double P0  = Probability->GetBinContent(t1) + dP0;
-      
+
       while(Probability->GetBinContent(t2) < P0 + myP && t2 < nt)
 	{
 	  t2++;
@@ -399,64 +345,109 @@ photon SpectObj::GetPhoton(double t0, double enph)
     } 
   else if (sourceType == 1) //Periodic //Max
     {
-      m_z=0.0;
-
       if (!PeriodicSpectrumIsComputed)
 	{
 	  PeriodicSpectrum = Integral_T(1,nt,ei);
-
-	  //Integral over energies of interest.
-	  PeriodicLightCurve = Integral_E(ei,Nv->GetYaxis()->FindBin(emax)); //ph
-	  PeriodicLightCurve->Scale(1./m_TimeBinWidth);
-
-	  //Compute also mean flux over bins
-	  m_meanRate=0;
-
-	  for (int tt=0; tt < nt; tt++)
- 	    {
-	      m_meanRate = m_meanRate + PeriodicLightCurve->GetBinContent(tt+1);
-	    }
-	  m_meanRate=m_meanRate/nt;
-	  // std::cout << "***mF is " << m_meanRate*1e-4/m_AreaDetector << std::endl;
-	  // std::cout << "***mR is " << m_meanRate << std::endl;
-	   
-	  //Normalize PeriodicSpectrum
-	  //int binT0 = Nv->GetXaxis()->FindBin(0.);
-	  //int binTmax = Nv->GetXaxis()->FindBin(m_Tmax);
-   	  //	  double TotalCounts = PeriodicLightCurve->Integral(binT0,binTmax);
-	  //      PeriodicLightCurve->Scale(1./TotalCounts);
-
 	  PeriodicSpectrumIsComputed = true;
+	}
+      
+      double TimeToFirstPeriod = 0.0;
+      double TimeFromLastPeriod = 0.0;
+      double IntNumPer = 0.0;
+      double ProbRest = 1.0;
+      double InternalTime = t0 - Int_t(t0/m_Tmax)*m_Tmax; // InternalTime is t0 reduced to a period
+      double Pnt = Probability->GetBinContent(nt);
+      double Ptot = Pnt - Probability->GetBinContent(1); //Total proability in a period 
+      
+      if (DEBUG)
+	{
+	  std::cout << std::setprecision(30) << "\n\n**t0 is " << t0 << std::endl;
+	  std::cout << std::setprecision(30) << "Interval start : Ptot in a period is :" << Ptot << std::endl; 
 	}
 
 
-      //Extract energyfrom Profile.
+
+      //Step 1 
+
+      int InternalBin = Nv->GetXaxis()->FindBin(InternalTime) ;  
+      double InternalBinProbCont = Probability->GetBinContent(InternalBin) - Probability->GetBinContent(InternalBin-1);
+      double LowEdge = (Nv->GetXaxis()->GetBinCenter(InternalBin)-m_TimeBinWidth/2);
+      if (InternalBin == 1) 
+	LowEdge = 0.0;
+
+      ProbRest =  InternalBinProbCont*(1.0 - ((InternalTime - LowEdge)/(2*m_TimeBinWidth)));
+      
+      ProbRest = ProbRest + (Probability->GetBinContent(nt) - Probability->GetBinContent(InternalBin));
+      
+      double myP = m_SpRandGen->Uniform(0.9,1.1);
+
+      if (ProbRest <  myP)
+	{
+	  TimeToFirstPeriod = m_Tmax - InternalTime;
+	  ProbRest = myP - ProbRest;
+	}
+      else 
+	{
+	  std::cout << " Next Photon within the same period " << std::endl;
+	}
+
+      
+      //Step 2;
+      if (ProbRest/Ptot >= 1.0)
+	{
+ 		
+	  IntNumPer = floor(ProbRest/Ptot);	
+	  ProbRest = ProbRest - IntNumPer*Ptot;
+	}
+
+      int tBinCurrent = 1;
+
+      while ((Probability->GetBinContent(tBinCurrent) - Probability->GetBinContent(1)) <  ProbRest )
+	{
+	  tBinCurrent++;
+	}
+    
+      //      ProbRest = ProbRest - (Probability->GetBinContent(tBinCurrent-1) - Probability->GetBinContent(1));
+	 
+      TimeFromLastPeriod = Nv->GetXaxis()->GetBinCenter(tBinCurrent) - m_TimeBinWidth/2 +  m_TimeBinWidth*m_SpRandGen->Uniform(); 
+      //     std::cout << "TimeForm " << TimeFromLastPeriod << " width " << m_TimeBinWidth/2 
+      //	<< " --> " << TimeFromLastPeriod - Nv->GetXaxis()->GetBinCenter(tBinCurrent) 
+      //	<< " phase " << TimeFromLastPeriod/m_Tmax << std::endl;
+      
+      
+      if(DEBUG)
+     	{
+	  std::cout << "\n\n First Step " << t0 
+ 		    << " to " << t0 + TimeToFirstPeriod 
+	 	    << " (" << TimeToFirstPeriod << ")" << std::endl;  
+	  std::cout << " Second Step " << t0 + TimeToFirstPeriod 
+		    << " to " << t0 + TimeToFirstPeriod + IntNumPer*m_Tmax 
+		    << " (" << IntNumPer*m_Tmax << "," << IntNumPer << " periods)" << std::endl;  
+	  std::cout << " Third Step " << t0 + TimeToFirstPeriod + IntNumPer*m_Tmax 
+		    << " to " << t0 + TimeToFirstPeriod + IntNumPer*m_Tmax + TimeFromLastPeriod 
+		    << " (" << TimeFromLastPeriod << ")" << std::endl;  
+	  
+
+	  }
+      
+      // Now evaluate the Spectrum Histogram
+      
+      ph.time   = t0 + TimeToFirstPeriod + IntNumPer*m_Tmax +TimeFromLastPeriod;
       ph.energy = PeriodicSpectrum->GetRandom();
 
-      double InternalTime = t0 - Int_t(t0/m_Tmax)*m_Tmax; // InternalTime is t0 reduced to a period
-        
-      double deltaTPoisson =  -log(1.-CLHEP::RandFlat::shoot(1.0))/m_meanRate; //interval according to Poisson statistics
-      int deltaPer = Int_t((deltaTPoisson - (m_Tmax-InternalTime))/m_Tmax); //number of period up to next photon
-      //Computes PerResid ,i.e. the residual time from deltaTPoisson
-      //after removing the time up to the beginning of the period that contains the next photon  
-      double PerResid = deltaTPoisson - deltaPer*m_Tmax - (m_Tmax-InternalTime); // Residual of
-      //Time added by hand to be compatible with the lightcurve
-      double InternalDelta =  PeriodicLightCurve->GetRandom();
-
-      ph.time = t0 + deltaTPoisson - PerResid + InternalDelta;
-
-      //Warning:check for extremely low sources, if it is ok.It should be ok, but we need a test
-    
+      if (IntNumPer == -1.0)
+	{
+	  if (DEBUG)
+	    {		
+	      std::cout << " Warning! No photons within the mission lifetime ! " << std::endl;
+	    }
+	  ph.time = t0 + 2.0e8;
+	}
+            
     }
   
-  if(DEBUG)  std::cout<< " T0 =  ("<<t0<<"), Next  " << ph.time << " Energy  (KeV) " << ph.energy << std::endl;
-  if (m_z == 0 || m_tau == 0 || m_SpRandGen->Uniform() < std::exp(-(*m_tau)(ph.energy/1000.0, m_z)))
-    return ph;
-  else
-    {
-      if(DEBUG)  std::cout<< "Absorbed"<< std::endl;
-      return GetPhoton( ph.time, enph);
-    }
+  if(DEBUG)  std::cout<< " New Photon at ("<<t0<<"): Internal time =  " << ph.time << " Energy  (KeV) " << ph.energy << std::endl;
+  return ph;
 }
 
 double SpectObj::GetFluence(double BL, double BH)
@@ -556,7 +547,7 @@ double SpectObj::flux(double time, double enph)
 
 double SpectObj::interval(double time, double enph)
 {
-  return GetPhoton(time,enph).time - time;
+  return  GetPhoton(time,enph).time - time;
 }
 
 double SpectObj::energy(double time, double enph)
@@ -594,13 +585,6 @@ void SpectObj::SaveParameters(double tstart, std::pair<double,double> direction)
   std::cout<<" GRB   flux ("<< emin <<","<< emax <<") = "<<fTOT<<" erg/cm^2"<<std::endl;
   std::cout<<"**************************************************"<<std::endl;
 }
-
-#if 0  //THB
-#else
-double SpectObj::UniformRandom::Uniform(double a, double b) {
-  return CLHEP::RandFlat::shoot(a,b);
-}
-#endif
 
 void SpectObj::GetGBM()
 {

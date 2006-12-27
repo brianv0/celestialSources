@@ -1,6 +1,6 @@
 package celestialSources
-version v1r1p5
-author James Chiang <jchiang@slac.stanford.edu>
+
+version v1r0p1
 
 # $Header$
 #
@@ -12,7 +12,7 @@ use SpectObj v* celestialSources
 use GRB v* celestialSources
 use GRBobs v* celestialSources
 use Pulsar v* celestialSources
-use eblAtten v* celestialSources
+#use DarkMatter JCT celestialSources
 
 apply_pattern package_include
 apply_pattern package_linkopts
@@ -20,8 +20,7 @@ apply_pattern package_stamps
 
 macro source *.cxx WIN32 "*.h *.cxx"
 
-library celestialSources -no_share -s=../celestialSources \
-        $(source) -s=../src $(source)
+library celestialSources -no_share $(source) *.c
 
 application test_celestialSources test/*.cxx
 

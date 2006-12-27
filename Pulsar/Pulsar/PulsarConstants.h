@@ -1,10 +1,6 @@
 #ifndef PulsarCONSTANT_HH
 #define PulsarCONSTANT_HH 
 
-#include <vector> 
-#include <string>
-#include "TRandom.h"
-
 /*! 
  * \class PulsarConstants
  * \brief Class instantiated to access general parameters and constants.
@@ -16,6 +12,9 @@
  * \author Massimiliano Razzano massimiliano.razzano@pi.infn.it
  */
 
+#include <vector> 
+#include <string>
+#include "TRandom.h"
 
 //! Namespace containing general parameters and constants
 namespace cst
@@ -30,13 +29,10 @@ namespace cst
   const    int Ebin =  50 ; 
 
   //! Number of time bins used in the TH2D histogram
-  const int Tbin =  200; 
+  const    int Tbin =  200; 
 
   //! Conversion erg-->MeV
   const double erg2meV   = 624151.0;
-
-  //! Spedd of light (km/s)
-  const double clight = 299792.45;
 
   //! Lower energy of GBM band, expressed in keV (10keV)
   const double GBM1=10.0;                     
@@ -59,14 +55,8 @@ namespace cst
   //! Upper energy of EGRET band, expressed in keV (30GeV)
   const double EGRET3=3.0e7;                  
 
-  //! Start Mission Date, expressed in MJD (corresponding to TT January 1st, 2007, at 00:00:00)
-  const double StartMissionDateMJD = 51910.0 + 64.184/86400.; ;//54101.0; 
-  
-  //! Tolerance for the ephemerides decorrection (in us.)
-  const double ephemCorrTol = 1e-6;//1e-6
-
-  //! Tolerance for the barycentri decorrection (in us.)
-  const double baryCorrTol = 1e-5;
+  //! Start Mission Date, expressed in MJD (Jan,1 2001, 00:00:00)
+  const double StartMissionDateMJD = 51910.0; 
 
   //! Difference between JD and MJD
   const double JDminusMJD = 2400000.5; 
