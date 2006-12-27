@@ -1,4 +1,5 @@
 package celestialSources/microQuasar
+version v1r0p1
 
 author Richard Dubois<richard@slac.stanford.edu>
 # $Id$

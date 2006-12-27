@@ -17,7 +17,7 @@ namespace {
     std::string xml_spec("$(MICROQUASARROOT)/xml/mq.xml");
 
 }
-#define DECLARE_SPECTRUM(x)   extern const ISpectrumFactory& x##Factory; x##Factory.addRef();
+ISpectrumFactory & microQuasarFactory();
 
 
 void listSources(const std::list<std::string>& source_list ) {
@@ -46,8 +46,8 @@ int main(int argn, char * argc[]) {
     int rc(0);
 
     try {
-        // load our factory by name
-        DECLARE_SPECTRUM( microQuasar);
+        // load our factory by name -- this adds the factory to the list
+        microQuasarFactory();
 
         int count = default_count;
         std::string source_name(default_source);
