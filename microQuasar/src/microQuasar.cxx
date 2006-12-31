@@ -58,7 +58,9 @@ microQuasar::microQuasar(const std::string &paramString)
 	m_jetProperties.setJetOnDuration(::atof(params[14].c_str()));
 	m_jetProperties.setJetOnDurationFluct(::atof(params[15].c_str()));
 
-	m_jetEnd = 0.;
+	std::pair<float,float> jet = calculateJetStart(false,0.);
+	m_jetStart = jet.first;
+	m_jetEnd = jet.second;
 
 	std::cerr << "microQuasar created. Total flux = " 
 		<< m_ftot << " cm^-2 s^-1 " << " between " 
@@ -87,8 +89,10 @@ double microQuasar::energy(double time) {
 
 void microQuasar::modulation(const double x, double& funcValue, double& derivValue) {
 	// see http://d0.phys.washington.edu/~burnett/glast/generate_periodic/oscilations.htm for details
-	double scale = m_ftot*EventSource::totalArea();
-	double now = fmod((float)(m_currentTime+m_phi0*m_orbitalPeriod),(float)m_orbitalPeriod)/m_orbitalPeriod*2.*M_PI;
+	// 
+	double scale = (1.+m_orbitalModulation)*m_orbitalPeriod/2./M_PI*m_ftot*EventSource::totalArea();
+
+	double now = (m_currentTime/m_orbitalPeriod+m_phi0)*2.*M_PI;
 	float z = -log(1.-m_randPhase);
 	m_nTurns = floor(z/(2.*M_PI*scale));
 	float zp = z - 2.*M_PI*m_nTurns*scale;
@@ -104,7 +108,7 @@ double microQuasar::interval(double current_time) {
 	std::pair<float, float> jet;
 	
 	if (fTime> m_jetEnd) {
-		jet = calculateJetStart(fTime);
+		jet = calculateJetStart(true,fTime);
 		m_jetStart = jet.first;
 		m_jetEnd = jet.second;
 	}
@@ -119,12 +123,11 @@ double microQuasar::interval(double current_time) {
 	for (i; i<100; i++) {
 		m_randPhase = CLHEP::RandFlat::shoot();
 		deltaT = m_orbitalPeriod/(2.*M_PI)*(rtsafe(0.,2.*M_PI,1.e-2)+2.*M_PI*m_nTurns);
-
 		if ((m_currentTime+deltaT > m_jetStart) && (m_currentTime+deltaT < m_jetEnd)) break;
-
-		jet = calculateJetStart(m_currentTime+deltaT);
+		jet = calculateJetStart(true,m_currentTime+deltaT);
 		m_jetStart = jet.first;
 		m_jetEnd = jet.second;
+
 		m_currentTime = m_jetStart;
 	}
 	if (i==100) std::cerr << " microQuasar::interval - exiting with max iterations " << std::endl;
@@ -133,7 +136,7 @@ double microQuasar::interval(double current_time) {
 }
 
 
-std::pair<float,float> microQuasar::calculateJetStart(float time) {
+std::pair<float,float> microQuasar::calculateJetStart(bool nextOn, float time) {
 
 	float jetOn = m_jetProperties.getJetOnCycle() * 
 		(1. + m_jetProperties.getJetOnCycleFluct()*(0.5*CLHEP::RandFlat::shoot()-1.));
@@ -148,6 +151,7 @@ std::pair<float,float> microQuasar::calculateJetStart(float time) {
 		diskCycle;
 
 	float nJet = ceil((time+jetLength+jetCycle)/diskCycle);
+	if (!nextOn) nJet--;
 	float jetStart = jetCycle + nJet*diskCycle;
 	float jetEnd = jetStart + jetLength;
 	return std::make_pair(jetStart, jetEnd);
