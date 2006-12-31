@@ -71,7 +71,7 @@ public:
 
 	/// fiddle of Numerical Recipe's rtsafe to avoid function passing
 	double rtsafe(const double x1, const double x2, const double xacc);
-	std::pair<float,float> calculateJetStart(float time);
+	std::pair<float,float> calculateJetStart(bool nextOn, float time);
 
 	class OrbitalRegion {
 	public:
