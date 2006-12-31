@@ -66,13 +66,6 @@ public:
 	/// @return energy and photon direction (zenith angle (degrees), azimuth (degrees,East=0,North=90deg)).
 	std::pair<double, std::pair<double, double> > photon();
 
-	/// function for generating the orbit modulation
-	void modulation(const double x, double& funcValue, double& derivValue);
-
-	/// fiddle of Numerical Recipe's rtsafe to avoid function passing
-	double rtsafe(const double x1, const double x2, const double xacc);
-	std::pair<float,float> calculateJetStart(bool nextOn, float time);
-
 	class OrbitalRegion {
 	public:
 		OrbitalRegion() {};
@@ -157,6 +150,13 @@ protected:
 
 
 private:
+	/// function for generating the orbit modulation
+	void modulation(const double x, double& funcValue, double& derivValue);
+
+	/// fiddle of Numerical Recipe's rtsafe to avoid function passing
+	double rtsafe(const double x1, const double x2, const double xacc);
+	std::pair<float,float> calculateJetStart(bool nextOn, float time);
+
 	/// flux (ph s^-1 cm^-2)
 	float m_ftot;
 	float m_alt;

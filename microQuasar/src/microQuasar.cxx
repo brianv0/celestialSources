@@ -123,8 +123,15 @@ double microQuasar::interval(double current_time) {
 	for (i; i<100; i++) {
 		m_randPhase = CLHEP::RandFlat::shoot();
 		deltaT = m_orbitalPeriod/(2.*M_PI)*(rtsafe(0.,2.*M_PI,1.e-2)+2.*M_PI*m_nTurns);
-		if ((m_currentTime+deltaT > m_jetStart) && (m_currentTime+deltaT < m_jetEnd)) break;
-		jet = calculateJetStart(true,m_currentTime+deltaT);
+		
+		// if steady source, don't worry about artificial jet-on boundaries
+		if (m_jetProperties.getJetOnDuration() == 1.) break;
+
+		float nextTime = m_currentTime+deltaT;
+		if ((nextTime >= m_jetStart) && (nextTime <= m_jetEnd)) break;
+
+		bool nextOn = (nextTime > m_jetEnd) ? true : false;
+		jet = calculateJetStart(nextOn, nextTime);
 		m_jetStart = jet.first;
 		m_jetEnd = jet.second;
 
@@ -150,8 +157,8 @@ std::pair<float,float> microQuasar::calculateJetStart(bool nextOn, float time) {
 		(1. + m_jetProperties.getJetOnDurationFluct()*(0.5*CLHEP::RandFlat::shoot()-1.)) *
 		diskCycle;
 
-	float nJet = ceil((time+jetLength+jetCycle)/diskCycle);
-	if (!nextOn) nJet--;
+	float nJet = floor((time+jetLength+jetCycle)/diskCycle);
+	if (nextOn) nJet++;
 	float jetStart = jetCycle + nJet*diskCycle;
 	float jetEnd = jetStart + jetLength;
 	return std::make_pair(jetStart, jetEnd);
