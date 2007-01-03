@@ -14,6 +14,7 @@ use GRBobs v* celestialSources
 use GRBtemplate v* celestialSources
 use Pulsar v* celestialSources
 use eblAtten v* celestialSources
+use microQuasar v* celestialSources
 
 apply_pattern package_include
 apply_pattern package_linkopts
