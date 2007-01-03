@@ -34,6 +34,7 @@ ISpectrumFactory & TF1SpectrumFactory();
 ISpectrumFactory & TF1MapFactory();
 ISpectrumFactory & FileSpectrumFactory();
 ISpectrumFactory & FileSpectrumMapFactory();
+ISpectrumFactory & microQuasarFactory();
 
 SpectrumFactoryLoader::SpectrumFactoryLoader() {
 // Replace ROOT's global TRandom instance with our local version that
@@ -61,6 +62,7 @@ SpectrumFactoryLoader::SpectrumFactoryLoader() {
    load(TF1MapFactory());
    load(FileSpectrumFactory());
    load(FileSpectrumMapFactory());
+   load(microQuasarFactory());
 }
 
 void SpectrumFactoryLoader::load(ISpectrumFactory& factory) {
