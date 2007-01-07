@@ -92,7 +92,10 @@ void microQuasar::modulation(const double x, double& funcValue, double& derivVal
 	// 
 	double scale = (1.+m_orbitalModulation)*m_orbitalPeriod/2./M_PI*m_ftot*EventSource::totalArea();
 
-	double now = (m_currentTime/m_orbitalPeriod+m_phi0)*2.*M_PI;
+	// normalize 'now' so that time runs from 0-2pi, ie only look at one period
+	float nowPeriodNorm = m_currentTime/m_orbitalPeriod;
+	float now = fmod((nowPeriodNorm+m_phi0),(float)1.)*2.*M_PI;
+
 	float z = -log(1.-m_randPhase);
 	m_nTurns = floor(z/(2.*M_PI*scale));
 	float zp = z - 2.*M_PI*m_nTurns*scale;
