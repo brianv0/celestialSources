@@ -457,11 +457,11 @@ int main(int argc, char** argv)
 
 
   PulsarSim* m_pulsar = new PulsarSim("PSRVELA",seed,flux,enphmin, enphmax, Period);
-  // m_pulsar->SaveNv((TH2D*)m_pulsar->PSRPhenom(double(npeaks), ppar1,ppar2,ppar3,ppar4));
+  m_pulsar->SaveNv((TH2D*)m_pulsar->PSRPhenom(double(npeaks), ppar1,ppar2,ppar3,ppar4));
 
   //  m_pulsar->SaveNv((TH2D*)m_pulsar->PSRShape("PsrPCHShape",1));
   //m_pulsar->SaveNv((TH2D*)m_pulsar->PSRShape("VelaOGRSpect",1));
-  m_pulsar->SaveNv((TH2D*)m_pulsar->PSRShape("VelaPCHSpect",1));
+  //m_pulsar->SaveNv((TH2D*)m_pulsar->PSRShape("VelaPCHSpect",1));
 
 
   

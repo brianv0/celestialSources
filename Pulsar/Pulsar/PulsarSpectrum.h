@@ -124,6 +124,7 @@ class PulsarSpectrum : public ISpectrum
   double m_flux, m_enphmin, m_enphmax;
   int m_seed;
   double m_ppar1,m_ppar2,m_ppar3,m_ppar4;
+  int m_TimingNoiseModel;
 
 
 };

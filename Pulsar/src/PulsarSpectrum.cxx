@@ -78,6 +78,7 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
   m_phi0 = 0.0;
   m_model = 0;
   m_seed = 0;
+  m_TimingNoiseModel = 0.;
   //
 
   //Read from XML file
@@ -238,6 +239,9 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
   PulsarLog << "**   Mission started at (MJD) : " << StartMissionDateMJD << " (" 
 	    << std::setprecision(12) << (StartMissionDateMJD+JDminusMJD)*SecsOneDay 
 	    << " sec.)" << std::endl;
+  if (m_TimingNoiseModel == 1)
+    PulsarLog << "**   Timing Noise Model : " << m_TimingNoiseModel << "(Stability parameter, Arzoumanian 1994)" << std::endl;
+
   PulsarLog << "**************************************************" << std::endl;
 
   //Instantiate an object of PulsarSim class
@@ -377,6 +381,15 @@ double PulsarSpectrum::interval(double time)
 		  std::cout << "f0 " << m_f0 << " f1 " << m_f1 << " f2 " << m_f2 << std::endl;
 		  std::cout << "Period " << m_period << " pdot " << m_pdot << " p2dot " << m_p2dot << std::endl;
 		}
+
+	      //Applying timingnoise
+	      if (m_TimingNoiseModel ==1)
+		{
+		  double Delta8 = 6.6 + 0.6*log(m_pdot);
+		  m_f2 = ((exp(Delta8)*6*m_f0)/1e8);
+		  std::cout << "D8: " << Delta8 << " f2 " << m_f2 << std::endl;
+		}
+
 
 	      //Re-instantiate PulsarSim and SpectObj
 	      delete m_Pulsar;
@@ -566,7 +579,7 @@ double PulsarSpectrum::getBaryCorr( double ttInput )
     //astro::GPS::update(timeMET);
     //    std::cout<<astro::GPS::time()<<std::endl;
     astro::GPS::instance()->time(timeMET);
-    scPos = astro::GPS::instance()->position();
+    scPos = astro::GPS::instance()->position(timeMET);
   }  catch (std::runtime_error  & eObj) {
     // check to see this is the exception I want to ignore, rethrowing if it is not:
     std::string message(eObj.what());
@@ -689,17 +702,19 @@ int PulsarSpectrum::getPulsarFromDataList(std::string sourceFileName)
 
   double flux, ephem0, ephem1, ephem2, t0Init, t0, t0End, txbary, phi0, period, pdot, p2dot, f0, f1, f2, phas;
   char ephemType[15] = "";
+  int tnmodel;
 
   while (PulsarDataTXT.eof() != 1)
     {
 
-      PulsarDataTXT >> tempName >> flux >> ephemType >> ephem0 >> ephem1 >> ephem2 >> t0Init >> t0 >> t0End  >> txbary;
+      PulsarDataTXT >> tempName >> flux >> ephemType >> ephem0 >> ephem1 >> ephem2 >> t0Init >> t0 >> t0End  >> txbary >> tnmodel;
      
       if (std::string(tempName) == m_PSRname)
 	{
 
 	  Status = 1;
 	  m_flux = flux;
+	  m_TimingNoiseModel = tnmodel;
 	  m_ephemType = ephemType;
 
 	  m_t0InitVect.push_back(t0Init);
