@@ -290,9 +290,9 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
   
   PulsarLog << "\n********   PulsarSpectrum Log for pulsar" << m_PSRname << std::endl;
   PulsarLog << "**   Name : " << m_PSRname << std::endl;
-  PulsarLog << "\n**   Position : (RA,Dec)=(" << m_RA << "," << m_dec 
+  PulsarLog << "**\n**   Position : (RA,Dec)=(" << m_RA << "," << m_dec 
 	    << ") ; (l,b)=(" << m_l << "," << m_b << ")" << std::endl; 
-  PulsarLog << "\n**   Flux above 100 MeV : " << m_flux << " ph/cm2/s " << std::endl;
+  PulsarLog << "**\n**   Flux above 100 MeV : " << m_flux << " ph/cm2/s " << std::endl;
   PulsarLog << "**   Enphmin: " << m_enphmin << " keV | Enphmax: " << m_enphmax << " keV" << std::endl;
   PulsarLog << "**************************************************" << std::endl;
   
@@ -322,7 +322,7 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
 	}
     }
 
-  PulsarLog << "\n**   Mission started at (MJD) : " << StartMissionDateMJD << " (" 
+  PulsarLog << "**\n**   Mission started at (MJD) : " << StartMissionDateMJD << " (" 
 	    << std::setprecision(12) << (StartMissionDateMJD+JDminusMJD)*SecsOneDay 
 	    << " sec.)" << std::endl;
   if (m_TimingNoiseModel == 1)
@@ -335,7 +335,7 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
   if (m_BinaryFlag == 1)
     {
       PulsarLog << "**   Pulsar in a Binary System! Orbital Data:" << std::endl;
-      PulsarLog << "**\n**     Orbital period: " << m_Porb << " days" << std::endl;
+      PulsarLog << "**     Orbital period: " << m_Porb << " days" << std::endl;
       PulsarLog << "**     Projected major semiaxis (a * sini): " << m_asini << " lightsec." <<std::endl; 
       PulsarLog << "**     Eccentricity: " << m_ecc << std::endl;
       PulsarLog << "**     Longitude of periastron: " <<  m_omega << " deg." << std::endl;

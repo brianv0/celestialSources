@@ -110,12 +110,11 @@ TH2D* PulsarSim::PSRPhenom(double par0, double par1, double par2, double par3, d
 
   //TimeProfileFileName = std::string(gleam)+"/"+ m_name + "TimeProfile.txt";
 
-
   ofstream PulsarLogSim;
   PulsarLogSim.open(logSimLabel.c_str(),std::ios::app);
 
   //Writes out informations about the model parameters on the file
-  PulsarLogSim << "\n******** Pulsar Phenomenological Model ********" << std::endl;
+  PulsarLogSim << "******** Pulsar Phenomenological Model ********" << std::endl;
   PulsarLogSim << "**  Random seed for the model : " << m_seed << std::endl;
   PulsarLogSim << "**  Spectrum parameters: " << std::endl;
   PulsarLogSim << "**           En = " << En  
