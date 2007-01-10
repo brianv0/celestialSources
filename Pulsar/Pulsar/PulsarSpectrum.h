@@ -73,6 +73,9 @@ class PulsarSpectrum : public ISpectrum
   //! Get the pulsar ephemerides and data from the DataList
   int getPulsarFromDataList(std::string sourceFileName);
 
+  //! Get the binary pulsar orbital data from the BinDataList
+  int getOrbitalDataFromBinDataList(std::string sourceBinFileName);
+
   //! Save an output txt file compatible with D4 file
   int saveDbTxtFile();
 
@@ -123,9 +126,11 @@ class PulsarSpectrum : public ISpectrum
   int m_model;
   double m_flux, m_enphmin, m_enphmax;
   int m_seed;
+  int m_BinaryFlag;
   double m_ppar1,m_ppar2,m_ppar3,m_ppar4;
   int m_TimingNoiseModel;
 
+  double m_Porb,m_asini,m_ecc,m_omega,m_t0Periastr,m_t0AscNode,m_PPN;
 
 };
 #endif

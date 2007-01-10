@@ -78,7 +78,16 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
   m_phi0 = 0.0;
   m_model = 0;
   m_seed = 0;
-  m_TimingNoiseModel = 0.;
+  m_TimingNoiseModel = 0;
+  m_BinaryFlag = 0;
+  m_Porb = 0;
+  m_asini = 0;
+  m_ecc = 0;
+  m_omega = 0;
+  m_t0Periastr = 0;
+  m_t0AscNode = 0;
+  m_PPN =0.;
+
   //
 
   //Read from XML file
@@ -117,6 +126,8 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
   if( gleam!=0) {
       pulsar_data =  std::string(gleam)+"/";
   }
+
+  //Scan PulsarDataList.txt
   std::string ListFileName = pulsar_data + "PulsarDataList.txt";
   
   std::ifstream ListFile;
@@ -155,11 +166,85 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
 	if (AllRetrieved == 0)
 	  {
 	    std::cout << "Pulsar " << m_PSRname 
-		      << " not found in any DataList file.Please Check if PULSARROOT is correctly set " 
+		      << " not found in any DataList file.Please Check if PULSARDATA is correctly set " 
 		      << std::endl;
 	    exit(1);
 	  }
       }
+
+  //Scan for Binary Pulsar if there are
+
+  std::string BinListFileName = pulsar_data + "PulsarBinDataList.txt";
+  
+  //Provare con le exceptions!
+
+  std::ifstream BinListFile;
+  BinListFile.open(BinListFileName.c_str(), std::ios::in);
+  char BinDataListFileName[200];
+  BinListFile.getline(BinDataListFileName,200); 
+
+  //  int Retrieved = 0;
+  // int AllRetrieved = 0;
+ 
+  if (! BinListFile.is_open()) 
+    {
+      std::cout << "Error opening file containing Binary DataList files" << BinListFileName  
+		<< " (check whether $PULSARDATA is set" << std::endl; 
+      exit(1);
+    }  else 
+      {
+
+	BinListFile >> BinDataListFileName;
+	while (!BinListFile.eof()) 
+	  {	
+	    CompletePathFileName = pulsar_data + std::string(BinDataListFileName);
+	    Retrieved = getOrbitalDataFromBinDataList(CompletePathFileName);
+	    
+	    if (Retrieved == 1)
+	      {
+		std::cout << "Binary Pulsar " << m_PSRname << " found in file " << CompletePathFileName << std::endl;
+		AllRetrieved = 1;
+	      } 
+	    BinListFile >> BinDataListFileName ;	  
+ 	  }
+
+	if (AllRetrieved == 0)
+	  {
+	    std::cout << "Binary Pulsar " << m_PSRname 
+		      << " not found in any BinDataList file.Please Check if PULSARDATA is correctly set " 
+		      << std::endl;
+	    exit(1);
+	  }
+       }
+
+
+
+  /*
+  try
+     {
+       std::ifstream BinListFile;
+      std::cout << "Opening " << BinListFileName << std::endl;
+      BinListFile.open(BinListFileName.c_str(), std::ios::in);
+      BinListFile.getline(DataListFileName,200); 
+    }
+  catch (std::ifstream::failure& se)
+    {
+      std::cout << "Error!!!" << BinListFileName << std::endl;
+    }
+  */
+
+
+  //char DataListFileName[200];
+  //std::string CompletePathFileName = "";
+
+  ListFile.getline(DataListFileName,200); 
+
+  //  int Retrieved = 0;
+  //  int AllRetrieved = 0;
+
+
+
+
 
   //Assign as starting ephemeris the first entry of the vectors... 
   m_t0Init = m_t0InitVect[0];
@@ -205,9 +290,11 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
   
   PulsarLog << "\n********   PulsarSpectrum Log for pulsar" << m_PSRname << std::endl;
   PulsarLog << "**   Name : " << m_PSRname << std::endl;
-  PulsarLog << "**   Position : (RA,Dec)=(" << m_RA << "," << m_dec 
+  PulsarLog << "\n**   Position : (RA,Dec)=(" << m_RA << "," << m_dec 
 	    << ") ; (l,b)=(" << m_l << "," << m_b << ")" << std::endl; 
-  PulsarLog << "**   Flux above 100 MeV : " << m_flux << " ph/cm2/s " << std::endl;
+  PulsarLog << "\n**   Flux above 100 MeV : " << m_flux << " ph/cm2/s " << std::endl;
+  PulsarLog << "**   Enphmin: " << m_enphmin << " keV | Enphmax: " << m_enphmax << " keV" << std::endl;
+  PulsarLog << "**************************************************" << std::endl;
   
   //Writes down on Log all the ephemerides
   for (unsigned int n=0; n < m_t0Vect.size(); n++)
@@ -221,28 +308,44 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
       
       if (m_ephemType == "P")
 	{
-	  PulsarLog << "**     Ephemrides type: PERIOD" << std::endl;
+	  PulsarLog << "**     Ephemerides type: PERIOD" << std::endl;
 	  PulsarLog << std::setprecision(14) << "**     Period : " << m_periodVect[n] << " s. | f0: " << m_f0Vect[n] << std::endl;
 	  PulsarLog << std::setprecision(14) << "**     Pdot : " <<  m_pdotVect[n]  << " | f1: " << m_f1Vect[n] << std::endl; 
 	  PulsarLog << std::setprecision(14) << "**     P2dot : " <<  m_p2dotVect[n]  << " | f2: " << m_f2Vect[n] << std::endl; 
 	} 
       else if (m_ephemType == "F")
 	{
-	  PulsarLog << "**Ephemrides type: FREQUENCY" << std::endl;
+	  PulsarLog << "**Ephemerides type: FREQUENCY" << std::endl;
 	  PulsarLog << std::setprecision(14) << "**     Period : " << m_periodVect[n] << " s. | f0: " << m_f0Vect[n] << std::endl;
 	  PulsarLog << std::setprecision(14) << "**     f1: " << m_f1Vect[n] << std::endl; 
 	  PulsarLog << std::setprecision(14) << "**     f2: " << m_f2Vect[n] << std::endl; 
 	}
     }
 
-  PulsarLog << "**\n**   Enphmin : " << m_enphmin << " keV | Enphmax: " << m_enphmax << " keV" << std::endl;
-  PulsarLog << "**   Mission started at (MJD) : " << StartMissionDateMJD << " (" 
+  PulsarLog << "\n**   Mission started at (MJD) : " << StartMissionDateMJD << " (" 
 	    << std::setprecision(12) << (StartMissionDateMJD+JDminusMJD)*SecsOneDay 
 	    << " sec.)" << std::endl;
   if (m_TimingNoiseModel == 1)
     PulsarLog << "**   Timing Noise Model : " << m_TimingNoiseModel << "(Stability parameter, Arzoumanian 1994)" << std::endl;
 
   PulsarLog << "**************************************************" << std::endl;
+
+  //Add lines in case of binary
+
+  if (m_BinaryFlag == 1)
+    {
+      PulsarLog << "**   Pulsar in a Binary System! Orbital Data:" << std::endl;
+      PulsarLog << "**\n**     Orbital period: " << m_Porb << " days" << std::endl;
+      PulsarLog << "**     Projected major semiaxis (a * sini): " << m_asini << " lightsec." <<std::endl; 
+      PulsarLog << "**     Eccentricity: " << m_ecc << std::endl;
+      PulsarLog << "**     Longitude of periastron: " <<  m_omega << " deg." << std::endl;
+      PulsarLog << "**     Epoch of Periastron (MJD): " << m_t0Periastr << std::endl;
+      PulsarLog << "**     Epoch of Ascending Node (MJD): " << m_t0AscNode << std::endl;
+      if (m_PPN ==0)
+	PulsarLog << "**   No Post Newtonian Parameterization " << std::endl; 
+
+      PulsarLog << "**************************************************" << std::endl;
+    }
 
   //Instantiate an object of PulsarSim class
   m_Pulsar    = new PulsarSim(m_PSRname, m_seed, m_flux, m_enphmin, m_enphmax, m_period);
@@ -702,12 +805,13 @@ int PulsarSpectrum::getPulsarFromDataList(std::string sourceFileName)
 
   double flux, ephem0, ephem1, ephem2, t0Init, t0, t0End, txbary, phi0, period, pdot, p2dot, f0, f1, f2, phas;
   char ephemType[15] = "";
-  int tnmodel;
+  int tnmodel, binflag;
 
   while (PulsarDataTXT.eof() != 1)
     {
 
-      PulsarDataTXT >> tempName >> flux >> ephemType >> ephem0 >> ephem1 >> ephem2 >> t0Init >> t0 >> t0End  >> txbary >> tnmodel;
+      PulsarDataTXT >> tempName >> flux >> ephemType >> ephem0 >> ephem1 >> ephem2 
+		    >> t0Init >> t0 >> t0End  >> txbary >> tnmodel >> binflag;
      
       if (std::string(tempName) == m_PSRname)
 	{
@@ -716,6 +820,7 @@ int PulsarSpectrum::getPulsarFromDataList(std::string sourceFileName)
 	  m_flux = flux;
 	  m_TimingNoiseModel = tnmodel;
 	  m_ephemType = ephemType;
+	  m_BinaryFlag = binflag;
 
 	  m_t0InitVect.push_back(t0Init);
 	  m_t0Vect.push_back(t0);
@@ -763,6 +868,76 @@ int PulsarSpectrum::getPulsarFromDataList(std::string sourceFileName)
 
 	  m_phi0Vect.push_back(phi0);
 	  
+	}
+    }
+
+  return Status;
+}
+
+
+
+/////////////////////////////////////////////
+/*!
+ * \param None
+ *
+ * <br>
+ * This method gets the orbital parameters of the binary pulsar from a 
+ * <i>BinDataList/i> file among those specified in the<i>/data/PulsarBinDataList</i> 
+ *
+ * The orbital parameters are:
+ *
+ * m_Porb Orbital period;
+ * m_asini Projected major semiaxis;
+ * m_eccentr eccentricity;
+ * m_omega longitude of periastron;
+ * m_t0Periastron epoch of periastron passage;
+ * m_t0AscNode Epoch of the ascending node;
+ *
+ * The key for finding pulsar is the name of the files that contain the pulsars parameters. 
+ * The default one is <i>BasicDataList.txt</i>.
+ * Extra parameters are used to specify a PPN parameterization for General Relativity;
+ * This method returns a integer status code (1 is Ok, 0 is failure)
+ */
+int PulsarSpectrum::getOrbitalDataFromBinDataList(std::string sourceBinFileName)
+{
+  int Status = 0;
+  std::ifstream PulsarBinDataTXT;
+  
+  if (DEBUG)
+    {
+      std::cout << "\nOpening Binary Pulsar BinDatalist File : " << sourceBinFileName << std::endl;
+    }
+  
+  PulsarBinDataTXT.open(sourceBinFileName.c_str(), std::ios::in);
+  
+  if (! PulsarBinDataTXT.is_open()) 
+    {
+      std::cout << "Error opening BinDatalist file " << sourceBinFileName  
+		<< " (check whether $PULSARDATA is set)" << std::endl; 
+      Status = 0;
+      exit(1);
+    }
+  
+  char aLine[400];  
+  PulsarBinDataTXT.getline(aLine,400); 
+ 
+  char tempName[30];
+  double porb,asini,ecc,omega,t0peri,t0asc,ppn;
+
+  while (PulsarBinDataTXT.eof() != 1)
+    {
+      
+      PulsarBinDataTXT >> tempName >> porb >> asini >> ecc >> omega >> t0peri >> t0asc >> ppn;
+      
+      if (std::string(tempName) == m_PSRname)
+	{
+	  m_Porb = porb;
+	  m_asini = asini;
+	  m_ecc = ecc;
+	  m_omega = omega;
+	  m_t0Periastr = t0peri;
+	  m_t0AscNode = t0asc;
+	  m_PPN = ppn;
 	}
     }
 

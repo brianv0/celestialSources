@@ -115,14 +115,14 @@ TH2D* PulsarSim::PSRPhenom(double par0, double par1, double par2, double par3, d
   PulsarLogSim.open(logSimLabel.c_str(),std::ios::app);
 
   //Writes out informations about the model parameters on the file
-  PulsarLogSim << "******** Pulsar Phenomenological Model ********" << std::endl;
+  PulsarLogSim << "\n******** Pulsar Phenomenological Model ********" << std::endl;
   PulsarLogSim << "**  Random seed for the model : " << m_seed << std::endl;
   PulsarLogSim << "**  Spectrum parameters: " << std::endl;
   PulsarLogSim << "**           En = " << En  
 	       << " | E0 = " << E0 << std::endl;
   PulsarLogSim << "**           G1 = " << G1 
 	       << " | b  = "  << b << std::endl;
-  PulsarLogSim << "**  enphmin " << m_enphmin << " enphmax " << m_enphmax << std::endl; 
+  //PulsarLogSim << "**  enphmin " << m_enphmin << " enphmax " << m_enphmax << std::endl; 
   PulsarLogSim << "**           Normalisation between " << cst::EnNormMin << " keV and " 
 	       << cst::EnNormMax << " keV " << std::endl;
   PulsarLogSim << "**           Photon extraction between " << m_enphmin << " keV and " 

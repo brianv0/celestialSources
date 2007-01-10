@@ -1,0 +1,2 @@
+#BinDataList txt files, Datalist files for binary pulsar data
+BasicBinDataList.txt
