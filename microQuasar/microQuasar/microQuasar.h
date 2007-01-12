@@ -155,7 +155,7 @@ private:
 
 	/// fiddle of Numerical Recipe's rtsafe to avoid function passing
 	double rtsafe(const double x1, const double x2, const double xacc);
-	std::pair<float,float> calculateJetStart(bool nextOn, float time);
+	std::pair<double,double> calculateJetStart(bool nextOn, double time);
 
 	/// flux (ph s^-1 cm^-2)
 	float m_ftot;
@@ -176,8 +176,8 @@ private:
 	float m_randPhase;	
 	/// current time
 	double m_currentTime;
-	float m_jetStart;
-	float m_jetEnd;
+	double m_jetStart;
+	double m_jetEnd;
 	/// disk-cycle properties
 	DiskCycleProperties m_diskProperties;
 	/// jet timing properties
