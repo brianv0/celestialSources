@@ -79,6 +79,10 @@ class PulsarSpectrum : public ISpectrum
   //! Save an output txt file compatible with D4 file
   int saveDbTxtFile();
 
+  //! Get the eccentric anomaly at time t (only for binaries)
+  double GetEccentricAnomaly(double mytime);
+
+
   //! direction, taken from PulsarSim
   inline std::pair<double,double>
     
@@ -130,7 +134,8 @@ class PulsarSpectrum : public ISpectrum
   double m_ppar1,m_ppar2,m_ppar3,m_ppar4;
   int m_TimingNoiseModel;
 
-  double m_Porb,m_asini,m_ecc,m_omega,m_t0Periastr,m_t0AscNode,m_PPN;
+  double m_Porb,m_asini,m_ecc,m_omega,m_t0PeriastrMJD,m_t0AscNode,m_PPN;
+  double m_PorbDot,m_omegaDot;
 
 };
 #endif

@@ -84,7 +84,7 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
   m_asini = 0;
   m_ecc = 0;
   m_omega = 0;
-  m_t0Periastr = 0;
+  m_t0PeriastrMJD = 0;
   m_t0AscNode = 0;
   m_PPN =0.;
 
@@ -339,7 +339,7 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
       PulsarLog << "**     Projected major semiaxis (a * sini): " << m_asini << " lightsec." <<std::endl; 
       PulsarLog << "**     Eccentricity: " << m_ecc << std::endl;
       PulsarLog << "**     Longitude of periastron: " <<  m_omega << " deg." << std::endl;
-      PulsarLog << "**     Epoch of Periastron (MJD): " << m_t0Periastr << std::endl;
+      PulsarLog << "**     Epoch of Periastron (MJD): " << m_t0PeriastrMJD << std::endl;
       PulsarLog << "**     Epoch of Ascending Node (MJD): " << m_t0AscNode << std::endl;
       if (m_PPN ==0)
 	PulsarLog << "**   No Post Newtonian Parameterization " << std::endl; 
@@ -712,6 +712,23 @@ double PulsarSpectrum::getBaryCorr( double ttInput )
       std::cout << std::setprecision(20) << "** ====> Total= " << tdb_min_tt + GeomCorr + ShapiroCorr  << " s." <<std::endl;
     }  
 
+  // Binary corrections
+  double GeometricOrbitalDelay =0.;
+
+  if (m_BinaryFlag !=0)
+    {
+      double EccentricAnomaly = GetEccentricAnomaly(ttInput);
+      double TrueAnomaly = 2*atan(pow(((1.+m_ecc)/(1.-m_ecc)),0.5)*tan(EccentricAnomaly));
+
+      GeometricOrbitalDelay = m_asini*(cos(EccentricAnomaly)-m_ecc)*sin(m_omega)
+	+m_asini*sin(EccentricAnomaly)*cos(m_omega)*pow(((1-m_ecc)*(1+m_ecc)),0.5);
+
+      std::cout << "Binary modulations t=" << ttInput << " E=" 
+		<< EccentricAnomaly << "At" << TrueAnomaly << "Drd=" << GeometricOrbitalDelay << std::endl;
+
+    }
+
+
   return tdb_min_tt + GeomCorr + ShapiroCorr; //seconds
 
 }
@@ -890,7 +907,7 @@ int PulsarSpectrum::getPulsarFromDataList(std::string sourceFileName)
  * m_asini Projected major semiaxis;
  * m_eccentr eccentricity;
  * m_omega longitude of periastron;
- * m_t0Periastron epoch of periastron passage;
+ * m_t0PeriastrMJDon epoch of periastron passage;
  * m_t0AscNode Epoch of the ascending node;
  *
  * The key for finding pulsar is the name of the files that contain the pulsars parameters. 
@@ -935,7 +952,7 @@ int PulsarSpectrum::getOrbitalDataFromBinDataList(std::string sourceBinFileName)
 	  m_asini = asini;
 	  m_ecc = ecc;
 	  m_omega = omega;
-	  m_t0Periastr = t0peri;
+	  m_t0PeriastrMJD = t0peri;
 	  m_t0AscNode = t0asc;
 	  m_PPN = ppn;
 	}
@@ -1020,6 +1037,52 @@ int PulsarSpectrum::saveDbTxtFile()
   DbOutputFile.close();
   return Flag;
 }
+
+
+//////////////////////////////////////////////////////////
+double PulsarSpectrum::GetEccentricAnomaly(double mytime)
+{
+  double OmegaMean = 2*M_PI/(m_Porb*SecsOneDay);
+  double EccAnConst = OmegaMean*(mytime-m_t0PeriastrMJD*SecsOneDay) -
+    0.5*((mytime-m_t0PeriastrMJD*SecsOneDay)*(mytime-m_t0PeriastrMJD*SecsOneDay)*(m_PorbDot/m_Porb));
+
+  // std::cout << "Eccentric Anomal at t=:" << mytime << " dt=" << (mytime-m_t0PeriastrMJD*SecsOneDay) 
+  //    << " const " << EccAnConst << std::endl;
+
+
+  double Edown = 0.;
+  double EccAnDown = Edown-(m_ecc*sin(Edown))-EccAnConst;
+
+  double Eup = 2*pi;
+  double EccAnUp = Eup-(m_ecc*sin(Eup))-EccAnConst;
+
+  double Emid = 0.5*(Eup + Edown);
+  double EccAnMid = Emid-(m_ecc*sin(Emid))-EccAnConst;
+
+
+  while (fabs(EccAnMid) > 0.01)
+    {
+      if ((EccAnDown*EccAnMid) < 0)
+	{
+	  Eup = Emid;
+	  EccAnUp = EccAnMid;
+	}
+      else
+	{
+	  Edown = Emid;
+	  EccAnDown = EccAnMid;
+	}
+      
+      Emid = 0.5*(Eup + Edown);
+      EccAnMid = Emid-(m_ecc*sin(Emid))-EccAnConst;
+      //std::cout << Edown << " to " << Eup <<  " Emid " << EccAnMid << std::endl;
+      if (fabs(EccAnMid) < 0.01)
+	break;
+    }
+
+  return Emid;
+}
+
 
 /////////////////////////////////////////////
 double PulsarSpectrum::energy(double time)
