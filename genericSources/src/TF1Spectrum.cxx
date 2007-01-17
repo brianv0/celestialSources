@@ -18,7 +18,7 @@ ISpectrumFactory &TF1SpectrumFactory() {
 TF1Spectrum::TF1Spectrum(const std::string& params)
   : Spectrum()
 {
-  facilities::Util::keyValueTokenize(params,",",m_parmap);
+  facilities::Util::keyValueTokenize(params," \t,\n",m_parmap);
   std::string internal_name = m_parmap["tf1name"].c_str();
   int grid_bins = 0;
   grid_bins = std::atoi(m_parmap["tf1precision"].c_str());
@@ -35,6 +35,7 @@ TF1Spectrum::TF1Spectrum(const std::string& params)
 
   if(m_flux==0.)
     m_flux = p_tf1.Integral(e_min,e_max);
+
 }
 
 

@@ -49,6 +49,11 @@ class TF1Spectrum : public Spectrum
       return (*this)(time);
     }
 
+  /// Overload of flux method to ensure proper call to m_flux
+  /// @return Total flux (photons/m^2).
+  /// @param time Simulation time in seconds.
+  virtual double flux(double ) const  { return m_flux; } 
+
  private:
   ///pointer to the TF1 object that reads the symbolic formula and does all the job
   mutable TF1  p_tf1;
