@@ -76,12 +76,14 @@ class PulsarSpectrum : public ISpectrum
   //! Get the binary pulsar orbital data from the BinDataList
   int getOrbitalDataFromBinDataList(std::string sourceBinFileName);
 
-  //! Save an output txt file compatible with D4 file
+  //! Save an output txt file with pulsar ephemerides compatible with D4 file
   int saveDbTxtFile();
+
+  //! Save an output txt file with pulsar orbital data compatible with D4 file
+  int saveBinDbTxtFile();
 
   //! Get the eccentric anomaly at time t (only for binaries)
   double GetEccentricAnomaly(double mytime);
-
 
   //! direction, taken from PulsarSim
   inline std::pair<double,double>
@@ -134,8 +136,10 @@ class PulsarSpectrum : public ISpectrum
   double m_ppar1,m_ppar2,m_ppar3,m_ppar4;
   int m_TimingNoiseModel;
 
-  double m_Porb,m_asini,m_ecc,m_omega,m_t0PeriastrMJD,m_t0AscNode,m_PPN;
-  double m_PorbDot,m_omegaDot;
+  //Binary parameters
+  double m_Porb,m_asini,m_ecc,m_omega,m_t0PeriastrMJD,m_t0AscNodeMJD,m_PPN;
+  double m_Porb_dot,m_xdot,m_ecc_dot,m_omega_dot,m_gamma;
+  double m_shapiro_r, m_shapiro_s;
 
 };
 #endif
