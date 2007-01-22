@@ -141,8 +141,9 @@ double microQuasar::interval(double current_time) {
 		double nextTime = m_currentTime+deltaT;
 		if ((nextTime >= m_jetStart) && (nextTime <= m_jetEnd)) break;
 
-		bool nextOn = (nextTime > m_jetEnd) ? true : false;
-		jet = calculateJetStart(nextOn, nextTime);
+		// if we're still in the current jet, don't recalculate it (because of
+		// fluctuations as much as efficiency)
+		if (nextTime > m_jetEnd) jet = calculateJetStart(true, nextTime);
 		m_jetStart = jet.first;
 		m_jetEnd = jet.second;
 
