@@ -74,6 +74,9 @@ namespace cst
   //! Seconds in one day
   const int SecsOneDay = 86400; 
 
+  //! Degree to Radiants conversion
+  const double DegToRad = M_PI/180.;
+
 };
 
 #endif

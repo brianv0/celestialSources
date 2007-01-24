@@ -744,20 +744,50 @@ double PulsarSpectrum::getBaryCorr( double ttInput )
     }  
 
   // Binary corrections
-  double GeometricOrbitalDelay =0.;
+  double BinaryRoemerDelay =0.;
 
   if (m_BinaryFlag !=0)
     {
+
+      double OmegaMean = 2*M_PI/m_Porb;
+
+      //Calculate Eccenctric Anomaly solving Kepler equation using first derivative of orbital period
       double EccentricAnomaly = GetEccentricAnomaly(ttInput);
-      double TrueAnomaly = 2*atan(pow(((1.+m_ecc)/(1.-m_ecc)),0.5)*tan(EccentricAnomaly));
 
-      GeometricOrbitalDelay = m_asini*(cos(EccentricAnomaly)-m_ecc)*sin(m_omega)
-	+m_asini*sin(EccentricAnomaly)*cos(m_omega)*pow(((1-m_ecc)*(1+m_ecc)),0.5);
+      //Calculate True Anomaly
+      double TrueAnomaly = 2.0 * std::atan(std::sqrt((1.0+m_ecc)/(1.0-m_ecc))*std::tan(EccentricAnomaly*0.5));
+      TrueAnomaly == TrueAnomaly + 2*M_PI*floor((EccentricAnomaly - TrueAnomaly)/ (2*M_PI));
+      while ((TrueAnomaly - EccentricAnomaly) > M_PI) TrueAnomaly -= 2*M_PI;
+      while ((EccentricAnomaly - TrueAnomaly) > M_PI) TrueAnomaly += 2*M_PI;
 
-      std::cout << "\nBinary modulations t=" << std::setprecision(15) << ttInput-(StartMissionDateMJD)*SecsOneDay 
-		<< " dt=" << ttInput - m_t0PeriastrMJD*SecsOneDay
-		<< " asini=" << m_asini << " Porb=" << m_Porb 
-		<< " E=" << EccentricAnomaly << " At" << TrueAnomaly << " Drd=" << GeometricOrbitalDelay << std::endl;
+      // Calculate longitude of periastron using m_omega_dot
+      double Omega = DegToRad*m_omega + DegToRad*m_omega_dot*(TrueAnomaly/OmegaMean);
+ 
+      // compute projected semimajor axis using x_dot
+      double asini = m_asini + m_xdot*(ttInput - m_t0PeriastrMJD*SecsOneDay);
+
+      //da gttphase
+      //roemer_delay = std::sin(Omega) * (std::cos(eccen_anomaly) - eccen)
+      //+ std::sqrt(1.0 - eccen*eccen) * std::cos(omega) * std::sin(eccen_anomaly);
+
+
+      BinaryRoemerDelay = (std::cos(EccentricAnomaly)-m_ecc)*std::sin(Omega)
+	+ std::sin(EccentricAnomaly)*std::cos(Omega)*std::sqrt(1-m_ecc*m_ecc);
+
+      //      BinaryRoemerDelay = BinaryRoemerDelay*asini;
+
+      //	+m_asini*sin(EccentricAnomaly)*cos(m_omega)*pow(((1-m_ecc)*(1+m_ecc)),0.5);
+
+      std::cout << "\n**  Binary modulations t=" << std::setprecision(15) << ttInput-(StartMissionDateMJD)*SecsOneDay 
+		<< " dt=" << ttInput - m_t0PeriastrMJD*SecsOneDay << std::endl;
+      std::cout << "**  Ecc.Anomaly=" << EccentricAnomaly << " deg. True Anomaly=" << TrueAnomaly << " deg." << std::endl;
+      std::cout << "**  Omega=" << Omega << " rad. Major Semiaxis " << asini << " light-sec" << std::endl;
+      std::cout << "**  --> Binary Roemer Delay2=" << BinaryRoemerDelay << " s." << std::endl;
+
+      std::cout <<"(std::cos(EccentricAnomaly))" << (std::cos(EccentricAnomaly)) << std::endl; 
+      std::cout << "std::sin(Omega)" << std::sin(Omega) << std::endl;
+      std::cout <<  "std::sin(EccentricAnomaly)*std::cos(Omega)*std::sqrt(1-m_ecc*m_ecc)" << std::sin(EccentricAnomaly)*std::cos(Omega)*std::sqrt(1-m_ecc*m_ecc) << std::endl;;
+
 
     }
 
@@ -1145,7 +1175,6 @@ int PulsarSpectrum::saveBinDbTxtFile()
 }
 
 
-
 //////////////////////////////////////////////////////////
 double PulsarSpectrum::GetEccentricAnomaly(double mytime)
 {
@@ -1153,21 +1182,23 @@ double PulsarSpectrum::GetEccentricAnomaly(double mytime)
   double EccAnConst = OmegaMean*(mytime-m_t0PeriastrMJD*SecsOneDay) -
     0.5*((mytime-m_t0PeriastrMJD*SecsOneDay)*(mytime-m_t0PeriastrMJD*SecsOneDay)*(m_Porb_dot/m_Porb));
 
+  //  std::cout << "OmegaMean " << OmegaMean << " Const " << EccAnConst << std::endl;
+
   // std::cout << "Eccentric Anomal at t=:" << mytime << " dt=" << (mytime-m_t0PeriastrMJD*SecsOneDay) 
   //    << " const " << EccAnConst << std::endl;
 
 
   double Edown = 0.;
-  double EccAnDown = Edown-(m_ecc*sin(Edown))-EccAnConst;
+  double EccAnDown = Edown-(m_ecc*std::sin(Edown))-EccAnConst;
 
-  double Eup = 2*pi;
-  double EccAnUp = Eup-(m_ecc*sin(Eup))-EccAnConst;
+  double Eup = 2*M_PI;
+  double EccAnUp = Eup-(m_ecc*std::sin(Eup))-EccAnConst;
 
   double Emid = 0.5*(Eup + Edown);
-  double EccAnMid = Emid-(m_ecc*sin(Emid))-EccAnConst;
+  double EccAnMid = Emid-(m_ecc*std::sin(Emid))-EccAnConst;
 
-
-  while (fabs(EccAnMid) > 0.01)
+  int i=0;
+  while (fabs(EccAnMid) > 5e-7)
     {
       if ((EccAnDown*EccAnMid) < 0)
 	{
@@ -1179,11 +1210,12 @@ double PulsarSpectrum::GetEccentricAnomaly(double mytime)
 	  Edown = Emid;
 	  EccAnDown = EccAnMid;
 	}
-      
+      i++;
       Emid = 0.5*(Eup + Edown);
-      EccAnMid = Emid-(m_ecc*sin(Emid))-EccAnConst;
+      EccAnMid = Emid-(m_ecc*std::sin(Emid))-EccAnConst;
+      //  std::cout << i << "Emid" << Emid << " EccAnMid " << EccAnMid << std::endl;
       //std::cout << Edown << " to " << Eup <<  " Emid " << EccAnMid << std::endl;
-      if (fabs(EccAnMid) < 0.01)
+      if (fabs(EccAnMid) < 5e-7)
 	break;
     }
 
