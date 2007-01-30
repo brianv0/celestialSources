@@ -32,7 +32,6 @@ namespace ObsCst
   const double episode_mean_interval    = 10.;
   const double pulse_mean_interval   = 1.;
   const double episode_pulses        = 0.824;
-  //  const char   NormType              = 'F';  //Type (P = PeakFlux or F = Fluence)
 
   ///reference energy for the Universal Width (keV)
   const double E0           = 100.0;  
@@ -64,9 +63,6 @@ namespace ObsCst
   const double LAT1=30.0e3;                   
   /// Top edge of the of GLAST/LAT energy band 300 GeV
   const double LAT2=3.0e8;            
-  
-  const double SWIFT1=15.0;
-  const double SWIFT2=350.0;
   //////////////////////////////////////////////////
 };
 
@@ -94,10 +90,9 @@ class GRBobsParameters
       gDirectory->Delete("PFshort");
     }
 
-  //  inline  char GetNormType()         {return ObsCst::NormType;}
-  inline  char GetNormType()         {return m_NormType;}
+  inline  int GetNormType()        {return m_NormType;}
   inline  double GetFluence()        {return m_fluence;}
-  inline  double GetPeakFlux()       {return m_peakFlux;}
+  inline  double GetPeakFlux()        {return m_peakFlux;}
   inline  double GetRiseTime()       {return m_riseTime;}
   inline  double GetDecayTime()      {return m_decayTime;}
   inline  double GetPulseHeight()    {return m_pulseHeight;}
@@ -106,12 +101,8 @@ class GRBobsParameters
   inline  double GetEpeak()          {return m_Epeak;}
   inline  double GetLowEnergy()      {return m_LowEnergy;}
   inline  double GetHighEnergy()     {return m_HighEnergy;}
-  inline  double GetAlpha()          {return m_LowEnergy-ObsCst::We;}
-  inline  double GetBeta()           {return m_HighEnergy-ObsCst::We;}
   inline  long   GetGRBNumber()      {return m_GRBnumber;}
   inline  double GetDuration()       {return m_duration;}
-  inline  double GetCutOffEnergy()   {return m_Eco;}
-  inline  double GetRedshift()       {return m_z;}
   
   inline std::pair<double,double> GetGalDir(){return m_GalDir;}
   inline void GetUniqueName(const void *ptr, std::string & name)
@@ -126,9 +117,7 @@ class GRBobsParameters
   void SetDuration(double);
   void SetFluence(double);
   void SetPeakFlux(double);
-  inline void SetCutOffEnergy(double Eco){m_Eco = Eco;}
-  inline void SetRedshift(double z){m_z = z;}
-  
+  void   SetNormType(char);
   /// Sets the low energy spectral index and the high energy spectral index.
   /// \param alpha low energy spectral index (\f$-3<\alpha<1\f$)
   /// \param beta high energy spectral index (\f$\beta>-1\f$,\f$\beta>\alpha\f$)
@@ -141,22 +130,12 @@ class GRBobsParameters
       m_LowEnergy       = alpha;
       m_HighEnergy      = beta;
       
-      //      while (m_LowEnergy<-3.0 || m_LowEnergy>=1.0)                      m_LowEnergy  = rnd->Gaus(-1.0,0.4);
-      //      while(m_HighEnergy >= m_LowEnergy || m_HighEnergy >= -1.0)       m_HighEnergy = rnd->Gaus(-2.25,0.4);
+      while (m_LowEnergy<-3.0 || m_LowEnergy>1.0)                      m_LowEnergy  = rnd->Gaus(-1.0,0.4);
+      while(m_HighEnergy >= m_LowEnergy || m_HighEnergy >= -1.0)       m_HighEnergy = rnd->Gaus(-2.25,0.4);
       
       m_LowEnergy       += ObsCst::We;
       m_HighEnergy      += ObsCst::We;
     } 
-
-  inline void SetEpeak(double Ep)
-    {
-      m_Epeak = Ep;
-    }
-  inline void SetFssc_Fsyn(double x) {m_Fssc_Fsyn=x;}
-  inline void SetEssc_Esyn(double x) {m_Essc_Esyn=x;}
-
-  inline double GetFssc_Fsyn()    {return m_Fssc_Fsyn;}
-  inline double GetEssc_Esyn()    {return m_Essc_Esyn;}
   /// Set the minimum photon energy for generating LAT photons.
   void   SetMinPhotonEnergy(double);
   /// Set the galactic position in the sky of the GRB in <em>(l,b)</em> coordinates.
@@ -204,18 +183,14 @@ class GRBobsParameters
   TRandom *rnd;
  
  private:
-  TRandom *rndGalacticDir;
-
-  char m_NormType;
   int m_Type;
   double  m_Peakedness;
   double  m_FWHM;
   double m_pulseSeparation;
 
   double  m_Epeak;
-  double  m_Essc_Esyn;
-  double  m_Fssc_Fsyn;
   double m_LowEnergy,m_HighEnergy;
+  int m_NormType;
   double m_fluence;
   double m_peakFlux;
   double m_Stretch;
@@ -225,8 +200,6 @@ class GRBobsParameters
 
   long   m_GRBnumber;
   double m_enph;
-  double m_Eco;
-  double m_z;
   std::pair<double,double> m_GalDir;
   
   TH1D *PFshort;

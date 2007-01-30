@@ -1,6 +1,5 @@
 #include "GRBtemplate/GRBtemplateManager.h"
 #include <iostream>
-#include <stdexcept>
 #include <fstream>
 #include "flux/SpectrumFactory.h" 
 #include "astro/EarthCoordinate.h"
@@ -8,8 +7,6 @@
 #include "astro/SkyDir.h"
 #include "astro/PointingTransform.h"
 #include "astro/JulianDate.h"
-
-#include "CLHEP/Vector/ThreeVector.h"
 
 #define DEBUG 0 
 
@@ -54,10 +51,10 @@ GRBtemplateManager::GRBtemplateManager(const std::string& params)
       m_l = 180.-360.*r1;
       m_b = ((180.0/M_PI)*acos(1.0-2.0*r2)-90.0);
       astro::SkyDir sky(m_l,m_b,astro::SkyDir::GALACTIC);
-      Hep3Vector skydir=sky.dir();
+      HepVector3D skydir=sky.dir();
       try{
 	HepRotation rottoglast = GPS::instance()->transformToGlast(m_startTime,GPS::CELESTIAL);
-	Hep3Vector scdir = rottoglast * skydir;
+	HepVector3D scdir = rottoglast * skydir;
 	m_ra    = sky.ra();
 	m_dec   = sky.dec();
 	double zenithCosTheta=cos(scdir.theta());

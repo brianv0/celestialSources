@@ -69,7 +69,7 @@ class GRBtemplateSim
       if(!m_Nv) delete m_Nv;
     }
   /// This method ensures that a unique name is given to the ROOT objects. It is set equal to the pointer address.
-  void GetUniqueName(void *ptr, std::string & name);
+  void GetUniqueName(const void *ptr, std::string & name);
     
   /*!
    * \brief Starts the GRBtemplate simulation

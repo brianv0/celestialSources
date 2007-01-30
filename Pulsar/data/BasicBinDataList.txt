@@ -1,2 +1,0 @@
-Name	Porb(s)	asini(lt-sec)	eccentr	omega	t0Periastr(MJD)	t0AscNode	PPN
-PSRMUROB	9.78912e+07	3480.	0.976	164.	51906.	51908.		0	

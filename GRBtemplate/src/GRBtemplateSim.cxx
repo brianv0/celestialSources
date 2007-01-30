@@ -1,6 +1,6 @@
 #include <fstream>
 #include <iostream>
-#include <string>
+# include <string>
 #include "GRBtemplate/GRBtemplateSim.h"
 
 #include "TFile.h"
@@ -16,7 +16,7 @@ GRBtemplateSim::GRBtemplateSim(std::string InputFileName)
   
 }
 
-void GRBtemplateSim::GetUniqueName(void *ptr, std::string & name)
+void GRBtemplateSim::GetUniqueName(const void *ptr, std::string & name)
 {
   std::ostringstream my_name;
   my_name << reinterpret_cast<int> (ptr);
