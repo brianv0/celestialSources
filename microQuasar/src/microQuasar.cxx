@@ -90,7 +90,7 @@ double microQuasar::energy(double time) {
 void microQuasar::modulation(const double x, double& funcValue, double& derivValue) {
 	// see http://d0.phys.washington.edu/~burnett/glast/generate_periodic/oscilations.htm for details
 	// 
-	double scale = (1.+m_orbitalModulation)*m_orbitalPeriod/2./M_PI*m_ftot*EventSource::totalArea();
+	double scale = m_orbitalPeriod/2./M_PI*m_ftot*EventSource::totalArea();
 
 	// normalize 'now' so that time runs from 0-2pi, ie only look at one period
 	double nowPeriodNorm = m_currentTime/m_orbitalPeriod;
