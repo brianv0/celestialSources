@@ -38,7 +38,11 @@
 * and the energy range of the extracted photons. Then it looks in the PulsarDataList.txt file ( in the <i>/data</i> directory)
 * for the name of the pulsar and then extracts the specific parameters of the pulsar (period, flux, ephemerides, etc.) related 
 * to that pulsar. 
-* Then it computes all the needed decorretions for timing, in particular the period changes and the barycentric decorrections.
+* Then it computes all the needed decorretions for timing, in particular:
+*  - Period changes according to some ephemerides;
+*  - Barycentric corrections:
+*  - Timing Noise;
+*  - Binary demodulation
 */
 
 class PulsarSpectrum : public ISpectrum
@@ -65,10 +69,16 @@ class PulsarSpectrum : public ISpectrum
   double retrieveNextTimeTilde( double tTilde, double totalTurns, double err );
 
   //!Apply the barycentric corrections and returns arrival time in TDB
-  double getBaryCorr( double tdbInput ); 
+  double getBaryCorr( double tdbInput, int LogCorrFlag);
+ 
+  //!Apply the binary demodulations
+  double getBinaryDemodulation( double tInput, int LogDemodFlag);
 
-  //! Get the decorrected time in TDB starting from a TT corrected time
+  //! Get the decorrected time in TDB starting from a TT corrected time (inverse of getBaryCorr)
   double getDecorrectedTime( double CorrectedTime);
+
+  //! Get the binary modulated time (inverse of getBinaryDemodulation)
+  double getBinaryDemodulationInverse( double CorrectedTime);
   
   //! Get the pulsar ephemerides and data from the DataList
   int getPulsarFromDataList(std::string sourceFileName);
@@ -85,6 +95,9 @@ class PulsarSpectrum : public ISpectrum
   //! Get the eccentric anomaly at time t (only for binaries)
   double GetEccentricAnomaly(double mytime);
 
+  //! calls PulsarSpectrum::energySrc
+  double energy(double time);
+
   //! direction, taken from PulsarSim
   inline std::pair<double,double>
     
@@ -92,10 +105,7 @@ class PulsarSpectrum : public ISpectrum
     {
       return m_GalDir;
     } 
-  
-  //! calls PulsarSpectrum::energySrc
-  double energy(double time);
-  
+
   std::string title() const {return "PulsarSpectrum";} 
   const char * particleName() const {return "gamma";}
   const char * nameOf() const {return "PulsarSpectrum";}
@@ -108,25 +118,45 @@ class PulsarSpectrum : public ISpectrum
   PulsarSim *m_Pulsar; 
   SpectObj  *m_spectrum;
   
+  //! Variables related to Solar System and Astro.
   astro::EarthOrbit *m_earthOrbit;
-  astro::SolarSystem m_solSys;
- 
+  astro::SolarSystem m_solSys; 
   astro::SkyDir m_PulsarDir;
   CLHEP::Hep3Vector m_PulsarVectDir;
-
-  std::pair<double,double> m_GalDir;
   
   const std::string& m_params; 
-  
+
+  //! Pulsar name  
   std::string m_PSRname;
+
+  //! Name of file containing shape spectrum for model PSRShape
   std::string m_PSRShapeName;
   
   bool m_ff;
 
-  double m_RA, m_dec, m_l, m_b;  
-  double m_period, m_pdot, m_p2dot, m_t0, m_t0Init, m_t0End, m_phi0, m_f0, m_f1, m_f2,m_N0;
+  //! Pulsar Coordinates and Directions
+  double m_RA, m_dec;
+  double m_l, m_b;  
+  std::pair<double,double> m_GalDir;
+
+  //! Ephemerides type
   std::string m_ephemType;
-  std::vector<double> m_periodVect, m_pdotVect, m_p2dotVect, m_f0Vect, m_f1Vect, m_f2Vect, m_phi0Vect, m_t0Vect, m_t0InitVect, m_t0EndVect, m_txbaryVect;
+
+  //! Period and derivatives
+  double m_period, m_pdot, m_p2dot;
+  std::vector<double> m_periodVect, m_pdotVect, m_p2dotVect;
+
+  //!Epoch and ephemerides validity range
+  double m_t0, m_t0Init, m_t0End;
+  std::vector<double> m_t0Vect, m_t0InitVect, m_t0EndVect;
+
+  //! Frequency and derivatives
+  double m_f0, m_f1, m_f2;
+  std::vector<double> m_f0Vect, m_f1Vect, m_f2Vect;
+
+  //! phase and turns at the epoch t0
+  double m_phi0,m_N0;
+  std::vector<double> m_phi0Vect,m_txbaryVect;
   
   int m_ppar0;
   int m_model;
