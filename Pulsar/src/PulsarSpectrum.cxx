@@ -520,38 +520,40 @@ double PulsarSpectrum::flux(double time) const
  * This method also calls the interval method in SpectObj class to determine the next photon in a rest-frame without 
  * ephemerides effects.
  */
-
-
-
-
 double PulsarSpectrum::interval(double time)
 {  
   
   double timeTildeDecorr = time + (StartMissionDateMJD)*SecsOneDay; //Arrival time decorrected
   //this should be corrected before applying barycentryc decorr + ephem de-corrections
   double timeTilde = timeTildeDecorr + getBaryCorr(timeTildeDecorr,0); 
+
+  double timeTildeDemodulated =0.;
   
   //binary qui!
-  if (m_BinaryFlag ==1)
+
+  if (m_BinaryFlag ==0)
+    {
+      timeTildeDemodulated = timeTilde;
+    }
+  else
     {
       std::cout << "\n\n*****binary!" <<std::endl;
-      double t = getBinaryDemodulation(timeTilde,0);
+      timeTildeDemodulated = timeTilde + getBinaryDemodulation(timeTilde,0);
     }
 
-
-  double initTurns = getTurns(timeTilde); //Turns made at this time
+  double initTurns = getTurns(timeTildeDemodulated); //Turns made at this time
   double intPart; //Integer part
   double tStart = modf(initTurns,&intPart)*m_period; // Start time for interval
 
   //Checks whether ephemerides (period,pdot, etc..) are within validity ranges
-  if (((timeTilde/SecsOneDay) < m_t0Init) || ((timeTilde/SecsOneDay) > m_t0End)) 
+  if (((timeTildeDemodulated/SecsOneDay) < m_t0Init) || ((timeTildeDemodulated/SecsOneDay) > m_t0End)) 
     {
 #if DEBUG
       std::cout << "Warning!Time is out of range of validity for pulsar " << m_PSRname 
 		<< ": Switching to new ephemerides set..." << std::endl;
 #endif
 	for (unsigned int e=0; e < m_t0Vect.size();e++)
-	  if (((timeTilde/SecsOneDay) > m_t0InitVect[e]) && ((timeTilde/SecsOneDay) < m_t0EndVect[e])) 
+	  if (((timeTildeDemodulated/SecsOneDay) > m_t0InitVect[e]) && ((timeTildeDemodulated/SecsOneDay) < m_t0EndVect[e])) 
 	    {
 	      // std::cout << "\n" << timeTilde -(StartMissionDateMJD)*SecsOneDay <<  " PulsarSpectrum Phase is " 
 	      // << std::setprecision(20) << getTurns(timeTilde) << "phi0 is " << m_phi0 << std::endl;
@@ -597,7 +599,7 @@ double PulsarSpectrum::interval(double time)
 		  m_spectrum->SetAreaDetector(EventSource::totalArea());
 		}
 
-	      m_N0 = m_N0 + initTurns - getTurns(timeTilde); //Number of turns at next t0
+	      m_N0 = m_N0 + initTurns - getTurns(timeTildeDemodulated); //Number of turns at next t0
 	       double intN0;
 	       double N0frac = modf(m_N0,&intN0); // Start time for interval
 	       m_N0 = m_N0 - N0frac;
@@ -620,43 +622,69 @@ double PulsarSpectrum::interval(double time)
   // if (DEBUG)
   //{
   //  if ((int(timeTilde - (StartMissionDateMJD)*SecsOneDay) % 1000) < 1.5)
-  std::cout << "\n\n**  Time reached is: " << timeTildeDecorr-(StartMissionDateMJD)*SecsOneDay
-	    << " s. MET in TT, and " << timeTilde-(StartMissionDateMJD)*SecsOneDay
-	    << " at the SSB (in TDB) ||| Pulsar " << m_PSRname << std::endl;
+  std::cout << "\n\n** " << m_PSRname << " Time is: " 
+	    << timeTildeDecorr-(StartMissionDateMJD)*SecsOneDay << " s MET in TT | "
+	    << timeTilde-(StartMissionDateMJD)*SecsOneDay << "s. MET in SSB in TDB (barycorr.) | "
+	    << timeTildeDemodulated-(StartMissionDateMJD)*SecsOneDay << "s. MET in SSB in TDB (barycorr. + demod.)| "
+	    << std::endl;
 
 
-  //  double a = GetBinaryDemodulation(1);
+  //Log out the barycentric corrections  
   if (BARYCORRLOG)
     double bl = getBaryCorr(timeTilde,1);
-
-
+  
+  /*
   if ((m_BinaryFlag==1) && (BINDEMODLOG))
     {
       double a = getBinaryDemodulation(timeTilde,1);
     }
+  */
 
    //Ephemerides calculations...
 
   double inte = m_spectrum->interval(tStart,m_enphmin); //deltaT (in system where Pdot = 0
   double inteTurns = inte/m_period; // conversion to # of turns
   double totTurns = initTurns + inteTurns + m_phi0; //Total turns at the nextTimeTilde
-  double nextTimeTilde = retrieveNextTimeTilde(timeTilde, totTurns, (ephemCorrTol/m_period));
+  double nextTimeTildeDemodulated = retrieveNextTimeTilde(timeTildeDemodulated, totTurns, (ephemCorrTol/m_period));
+
+  //
+  double nextTimeTilde =0.;
+  double nextTimeTildeDecorr =0.;
 
 
-  double nextTimeDecorr = getDecorrectedTime(nextTimeTilde); //Barycentric decorrections
+  if (m_BinaryFlag == 0)
+    {
+      nextTimeTilde = nextTimeTildeDemodulated;
+      nextTimeTildeDecorr = getDecorrectedTime(nextTimeTilde); //Barycentric decorrections
+    }
+  else 
+    {
+      nextTimeTilde = getBinaryDemodulationInverse(nextTimeTildeDemodulated);
+      nextTimeTildeDecorr = getDecorrectedTime(nextTimeTilde); //Barycentric decorrections
+      /*  
+      std::cout << std::setprecision(15) << "\n\n***Testing inary inverse.." 
+		<< nextTimeTilde << " --> " << nextTimeDecorr<< std::endl; 
+
+      std::cout << std::setprecision(15) << "  " << nextTimeDecorr << " --> " 
+		<< nextTimeDecorr+getBinaryDemodulation(nextTimeDecorr,0)  
+	 	<< " d=" << nextTimeTilde-nextTimeDecorr-getBinaryDemodulation(nextTimeDecorr,0) << std::endl;
+      */
+    }
  
   if (DEBUG)
     { 
      std::cout << "\nTimeTildeDecorr at Spacecraft (TT) is: " 
 	       << timeTildeDecorr - (StartMissionDateMJD)*SecsOneDay << "sec." << std::endl;
-     std::cout << "TimeTilde at SSB (in TDB) is: " << timeTilde - (StartMissionDateMJD)*SecsOneDay << "sec." << std::endl;
-     std::cout << "nextTimeTilde at SSB (in TDB) is:" << nextTimeTilde - (StartMissionDateMJD)*SecsOneDay << "sec." << std::endl;
-     std::cout << " nextTimeTilde decorrected (TT)is" << nextTimeDecorr - (StartMissionDateMJD)*SecsOneDay << "sec." << std::endl;
-     std::cout << " corrected is " << nextTimeDecorr + getBaryCorr(nextTimeDecorr,0) - (StartMissionDateMJD)*SecsOneDay << std::endl;
-     std::cout << " interval is " <<  nextTimeDecorr - timeTildeDecorr << std::endl;
+     std::cout << "  TimeTilde at SSB (in TDB) is: " << timeTilde - (StartMissionDateMJD)*SecsOneDay << "sec." << std::endl;
+     std::cout << "  TimeTildeDemodulated : " << timeTildeDemodulated - (StartMissionDateMJD)*SecsOneDay << "sec." << std::endl;
+     std::cout << "  nextTimeTildeDemodulated at SSB (in TDB) is:" << nextTimeTildeDemodulated - (StartMissionDateMJD)*SecsOneDay << "s." << std::endl;
+     std::cout << "  nextTimeTilde at SSB (in TDB) is:" << nextTimeTilde - (StartMissionDateMJD)*SecsOneDay << "s." << std::endl;
+     std::cout << " nextTimeTilde decorrected (TT)is" << nextTimeTildeDecorr - (StartMissionDateMJD)*SecsOneDay << "s." << std::endl;
+     //std::cout << " corrected is " << nextTimeTildeDecorr + getBaryCorr(nextTimeTildeDecorr,0) - (StartMissionDateMJD)*SecsOneDay << std::endl;
+     std::cout << " interval is " <<  nextTimeTildeDecorr - timeTildeDecorr << std::endl;
     }
   
-  return nextTimeDecorr - timeTildeDecorr; //interval between the de-corected times
+  return nextTimeTildeDecorr - timeTildeDecorr; //interval between the de-corected times
 }
 
 /////////////////////////////////////////////
@@ -857,14 +885,14 @@ double PulsarSpectrum::getBinaryDemodulation( double tInput, int LogDemodFlag)
   BinaryRoemerDelay = asini*((std::cos(EccentricAnomaly)-m_ecc)*std::sin(Omega)
 			     + std::sin(EccentricAnomaly)*std::cos(Omega)*std::sqrt(1-m_ecc*m_ecc));
      
-  //  if (DEBUG)
-  //{
-  std::cout << "\n**  Binary modulations t=" << std::setprecision(15) << tInput-(StartMissionDateMJD)*SecsOneDay
-	    << " dt=" << tInput - m_t0PeriastrMJD*SecsOneDay << std::endl;
-  std::cout << "**  Ecc.Anomaly=" << EccentricAnomaly << " deg. True Anomaly=" << TrueAnomaly << " deg." << std::endl;
-  std::cout << "**  Omega=" << Omega << " rad. Major Semiaxis " << asini << " light-sec" << std::endl;
-  std::cout << "**  --> Binary Roemer Delay=" << BinaryRoemerDelay << " s." << std::endl;
-  //}
+  if (DEBUG)
+    {
+      std::cout << "\n**  Binary modulations t=" << std::setprecision(15) << tInput-(StartMissionDateMJD)*SecsOneDay
+		<< " dt=" << tInput - m_t0PeriastrMJD*SecsOneDay << std::endl;
+      std::cout << "**  Ecc.Anomaly=" << EccentricAnomaly << " deg. True Anomaly=" << TrueAnomaly << " deg." << std::endl;
+      std::cout << "**  Omega=" << Omega << " rad. Major Semiaxis " << asini << " light-sec" << std::endl;
+      std::cout << "**  --> Binary Roemer Delay=" << BinaryRoemerDelay << " s." << std::endl;
+  }
   
   /*
   std::cout <<"(std::cos(EccentricAnomaly))" << (std::cos(EccentricAnomaly)) << std::endl; 
@@ -943,7 +971,40 @@ double PulsarSpectrum::getDecorrectedTime(double CorrectedTime)
 
 double PulsarSpectrum::getBinaryDemodulationInverse( double CorrectedTime)
 {
+  //Use the bisection method to find the inverse of the de-corrected time, i.e. the time (in TT)
+  //that after correction is equal to Time in TDB
 
+  double deltaMax = m_asini*2; //max deltat (s)
+  double ttUp = CorrectedTime + deltaMax;
+  double ttDown = CorrectedTime - deltaMax;
+  double ttMid = (ttUp + ttDown)/2;
+
+  int i = 0;
+  double hMid = 1e30; //for the 1st iteration
+
+  while (fabs(hMid)>baryCorrTol )
+    {
+      double hDown = (CorrectedTime - (ttDown + getBinaryDemodulation(ttDown,0)));
+      hMid = (CorrectedTime - (ttMid + getBinaryDemodulation(ttMid,0)));
+                
+      //std::cout << std::setprecision(30) 
+      //	<< "\n" << i << "**ttUp " << ttUp << " ttDown " << ttDown << " mid " << ttMid << std::endl;
+             
+      if (fabs(hMid) < baryCorrTol) break;
+      if ((hDown*hMid)>0)
+	{
+	  ttDown = ttMid;
+	  ttMid = (ttUp+ttDown)/2;
+	}
+      else 
+	{
+	  ttUp = ttMid;
+	  ttMid = (ttUp+ttDown)/2;
+	}
+       i++;
+    }
+   
+   return ttMid;
 }
 
 /////////////////////////////////////////////

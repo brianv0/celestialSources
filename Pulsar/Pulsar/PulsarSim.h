@@ -27,8 +27,11 @@
  *
  * This class creates the TH2D ROOT histogram that contains the differential photon flux (dN/dE/dt/dA) of the simulated
  * pulsar espressed in ph/keV/s/m2.
- * The user can specify the emission model. Now the default model is a phenomenological one based on observations of
- * known gamma-ray pulsars.
+ *
+ * The user can specify the emission model. The two classes of model that can be used are:
+ *
+ * - PSRPhenom - A phenomenological model with an analitical spectrum (Nel & De Jager 1995);
+ * - PSRShape  - A model that allow the user to use an arbitrary 2D ROOT spectrum model;
 */
 
 class PulsarSim 
@@ -63,15 +66,29 @@ class PulsarSim
   void SaveTimeProfile(TH2D *Nv);
   
  private:
-  
-  //! Gathers all relevant constants for the simulation 
-  double m_period;
-  double m_flux;
-  int m_Tbin;
-  int m_numpeaks;
-  double m_enphmin, m_enphmax;
-  int m_seed;
+
+  //! Pulsar name
   std::string m_name;
+
+  //! Pulsar Period
+  double m_period;
+
+  //! Pulsar flux
+  double m_flux;
+
+  //! Number of bin in time
+  int m_Tbin;
+
+  //! Number of peaks
+  int m_numpeaks;
+
+  //! Minimum and maximum energy of the extracted photon
+  double m_enphmin, m_enphmax;
+
+  //!Random seed
+  int m_seed;
+
+  //!Outpur 2D ROOT histogram
   TH2D *m_Nv;
 };
 

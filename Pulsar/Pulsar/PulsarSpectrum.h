@@ -157,17 +157,33 @@ class PulsarSpectrum : public ISpectrum
   //! phase and turns at the epoch t0
   double m_phi0,m_N0;
   std::vector<double> m_phi0Vect,m_txbaryVect;
-  
-  int m_ppar0;
+
+  //!Type of model
   int m_model;
-  double m_flux, m_enphmin, m_enphmax;
-  int m_seed;
-  int m_BinaryFlag;
+
+  //!Pulsar flux
+  double m_flux;
+
+  //! model-dependent parameters
+  int m_ppar0;
   double m_ppar1,m_ppar2,m_ppar3,m_ppar4;
+
+  //!Minimum and maximum energy of the extracted photons
+  double m_enphmin, m_enphmax;
+
+  //! Random seed
+  int m_seed;
+
+  //! Flag for binary demodulation
+  int m_BinaryFlag;
+
+  //! Flag for enabling timing noise
   int m_TimingNoiseModel;
 
   //Binary parameters
   double m_Porb,m_asini,m_ecc,m_omega,m_t0PeriastrMJD,m_t0AscNodeMJD,m_PPN;
+
+  //! Binary parameters - relative to PPN
   double m_Porb_dot,m_xdot,m_ecc_dot,m_omega_dot,m_gamma;
   double m_shapiro_r, m_shapiro_s;
 

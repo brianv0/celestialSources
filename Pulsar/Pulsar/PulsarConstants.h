@@ -66,7 +66,10 @@ namespace cst
   const double ephemCorrTol = 1e-6;//1e-6
 
   //! Tolerance for the barycentri decorrection (in us.)
-  const double baryCorrTol = 1e-5;
+  const double baryCorrTol = 1e-6;
+
+  //! Tolerance for the inverse binary demodulation (in s.)
+  const double binDemodTol = 1e-7;
 
   //! Difference between JD and MJD
   const double JDminusMJD = 2400000.5; 
