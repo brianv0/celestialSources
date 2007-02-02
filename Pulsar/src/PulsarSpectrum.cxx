@@ -671,8 +671,8 @@ double PulsarSpectrum::interval(double time)
       */
     }
  
-  if (DEBUG)
-    { 
+  //  if (DEBUG)
+  //{ 
      std::cout << "\nTimeTildeDecorr at Spacecraft (TT) is: " 
 	       << timeTildeDecorr - (StartMissionDateMJD)*SecsOneDay << "sec." << std::endl;
      std::cout << "  TimeTilde at SSB (in TDB) is: " << timeTilde - (StartMissionDateMJD)*SecsOneDay << "sec." << std::endl;
@@ -682,7 +682,7 @@ double PulsarSpectrum::interval(double time)
      std::cout << " nextTimeTilde decorrected (TT)is" << nextTimeTildeDecorr - (StartMissionDateMJD)*SecsOneDay << "s." << std::endl;
      //std::cout << " corrected is " << nextTimeTildeDecorr + getBaryCorr(nextTimeTildeDecorr,0) - (StartMissionDateMJD)*SecsOneDay << std::endl;
      std::cout << " interval is " <<  nextTimeTildeDecorr - timeTildeDecorr << std::endl;
-    }
+     //}
   
   return nextTimeTildeDecorr - timeTildeDecorr; //interval between the de-corected times
 }
@@ -913,7 +913,7 @@ double PulsarSpectrum::getBinaryDemodulation( double tInput, int LogDemodFlag)
       BinDemodLogFile.close();
     }
 
-  return BinaryRoemerDelay;
+  return -1.*BinaryRoemerDelay;
 }
 
 /////////////////////////////////////////////
