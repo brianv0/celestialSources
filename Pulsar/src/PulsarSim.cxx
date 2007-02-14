@@ -347,7 +347,7 @@ TH2D* PulsarSim::PSRPhenom(double par0, double par1, double par2, double par3, d
  */
 TH2D* PulsarSim::PSRShape(std::string ModelShapeName, int NormalizeFlux)
 {
-  std::cout << "Testing new model Shape for pulsar " << m_name << " using normalization option " << NormalizeFlux << std::endl; 
+  //  std::cout << "Testing new model Shape for pulsar " << m_name << " using normalization option " << NormalizeFlux << std::endl; 
 
   //Writes out an output log file for the pulsar
  

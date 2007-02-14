@@ -537,8 +537,33 @@ double PulsarSpectrum::interval(double time)
     }
   else
     {
+      timeTildeDemodulated = getIterativeDemodulatedTime(timeTilde,0);
+
+      /*
       std::cout << "\n\n*****binary!" <<std::endl;
-      timeTildeDemodulated = timeTilde + getBinaryDemodulation(timeTilde,0);
+      std::cout << "step" << timeTildeDemodulated - (StartMissionDateMJD)*SecsOneDay << std::endl;
+      timeTildeDemodulated = timeTilde+getBinaryDemodulation(timeTilde,0);
+            
+      double TargetTime = timeTilde;
+      //double timeTilde1 = timeTilde;
+      double delay = getBinaryDemodulation(timeTilde,0);
+
+      for (int i=0; i < 50; i++)
+	{
+	  timeTildeDemodulated = TargetTime+delay;
+	  delay = getBinaryDemodulation(timeTildeDemodulated,0);
+
+	  //	  timeTildeDemodulated = timeTilde1-delay;
+
+	  std::cout << "Direct!" << std::endl;
+	  std::cout << std::setprecision(15) << "i" << i << " " << timeTildeDemodulated- (StartMissionDateMJD)*SecsOneDay << " " 
+		    << fabs(timeTildeDemodulated-delay-TargetTime) << " " << timeTildeDemodulated-delay -(StartMissionDateMJD)*SecsOneDay << std::endl;
+
+	  //if (fabs(timeTildeDemodulated-TargetTime) < DemodTol) break;
+	   if (fabs(timeTildeDemodulated-delay-TargetTime) < DemodTol) break;
+	  }
+      */
+      
     }
 
   double initTurns = getTurns(timeTildeDemodulated); //Turns made at this time
@@ -673,15 +698,16 @@ double PulsarSpectrum::interval(double time)
  
   //  if (DEBUG)
   //{ 
-     std::cout << "\nTimeTildeDecorr at Spacecraft (TT) is: " 
+  std::cout << std::setprecision(15) << "\nTimeTildeDecorr at Spacecraft (TT) is: " 
 	       << timeTildeDecorr - (StartMissionDateMJD)*SecsOneDay << "sec." << std::endl;
-     std::cout << "  TimeTilde at SSB (in TDB) is: " << timeTilde - (StartMissionDateMJD)*SecsOneDay << "sec." << std::endl;
-     std::cout << "  TimeTildeDemodulated : " << timeTildeDemodulated - (StartMissionDateMJD)*SecsOneDay << "sec." << std::endl;
-     std::cout << "  nextTimeTildeDemodulated at SSB (in TDB) is:" << nextTimeTildeDemodulated - (StartMissionDateMJD)*SecsOneDay << "s." << std::endl;
-     std::cout << "  nextTimeTilde at SSB (in TDB) is:" << nextTimeTilde - (StartMissionDateMJD)*SecsOneDay << "s." << std::endl;
-     std::cout << " nextTimeTilde decorrected (TT)is" << nextTimeTildeDecorr - (StartMissionDateMJD)*SecsOneDay << "s." << std::endl;
+     std::cout << std::setprecision(15) <<"  TimeTilde at SSB (in TDB) is: " << timeTilde - (StartMissionDateMJD)*SecsOneDay << "sec." << std::endl;
+     std::cout << std::setprecision(15) <<"  TimeTildeDemodulated : " << timeTildeDemodulated - (StartMissionDateMJD)*SecsOneDay 
+	       << "sec.; phase=" << modf(initTurns,&intPart) << std::endl;
+     std::cout << std::setprecision(15) <<"  nextTimeTildeDemodulated at SSB (in TDB) is:" << nextTimeTildeDemodulated - (StartMissionDateMJD)*SecsOneDay << "s." << std::endl;
+     std::cout << std::setprecision(15) <<"  nextTimeTilde at SSB (in TDB) is:" << nextTimeTilde - (StartMissionDateMJD)*SecsOneDay << "s." << std::endl;
+     std::cout << std::setprecision(15) <<"  nextTimeTilde decorrected (TT)is" << nextTimeTildeDecorr - (StartMissionDateMJD)*SecsOneDay << "s." << std::endl;
      //std::cout << " corrected is " << nextTimeTildeDecorr + getBaryCorr(nextTimeTildeDecorr,0) - (StartMissionDateMJD)*SecsOneDay << std::endl;
-     std::cout << " interval is " <<  nextTimeTildeDecorr - timeTildeDecorr << std::endl;
+     std::cout << std::setprecision(15) <<"  -->Interval is " <<  nextTimeTildeDecorr - timeTildeDecorr << std::endl;
      //}
   
   return nextTimeTildeDecorr - timeTildeDecorr; //interval between the de-corected times
@@ -853,6 +879,32 @@ double PulsarSpectrum::getBaryCorr( double ttInput, int LogCorrFlag)
   
 }
 
+//!Get binarydemodulated time in a iterative way
+double PulsarSpectrum::getIterativeDemodulatedTime(double tInput, int LogFlag)
+{
+
+  double timeDemodulated = tInput+getBinaryDemodulation(tInput,LogFlag);
+            
+  double TargetTime = tInput;
+  double delay = getBinaryDemodulation(tInput,LogFlag);
+
+  for (int i=0; i < 50; i++)
+    {
+      timeDemodulated = TargetTime+delay;
+      delay = getBinaryDemodulation(timeDemodulated,LogFlag);
+      /*
+      std::cout << std::setprecision(15) << "i" << i << " " << timeDemodulated- (StartMissionDateMJD)*SecsOneDay << " " 
+		    << fabs(timeTildeDemodulated-delay-TargetTime) << " " << timeTildeDemodulated-delay -(StartMissionDateMJD)*SecsOneDay << std::endl;
+      */
+
+      if (fabs(timeDemodulated-delay-TargetTime) < DemodTol) break;
+    }
+
+  return timeDemodulated;
+}
+
+
+
 //!Apply the binary demodulations
 double PulsarSpectrum::getBinaryDemodulation( double tInput, int LogDemodFlag)
 {
@@ -984,8 +1036,9 @@ double PulsarSpectrum::getBinaryDemodulationInverse( double CorrectedTime)
 
   while (fabs(hMid)>baryCorrTol )
     {
-      double hDown = (CorrectedTime - (ttDown + getBinaryDemodulation(ttDown,0)));
-      hMid = (CorrectedTime - (ttMid + getBinaryDemodulation(ttMid,0)));
+      double hDown = (CorrectedTime - (getIterativeDemodulatedTime(ttDown,0)));
+      
+      hMid = (CorrectedTime - (getIterativeDemodulatedTime(ttMid,0)));
                 
       //std::cout << std::setprecision(30) 
       //	<< "\n" << i << "**ttUp " << ttUp << " ttDown " << ttDown << " mid " << ttMid << std::endl;

@@ -62,14 +62,17 @@ namespace cst
   //! Start Mission Date, expressed in MJD (corresponding to TT January 1st, 2007, at 00:00:00)
   const double StartMissionDateMJD = 51910.0 + 64.184/86400.; ;//54101.0; 
   
-  //! Tolerance for the ephemerides decorrection (in us.)
+  //! Tolerance for the ephemerides decorrection (in s.)
   const double ephemCorrTol = 1e-6;//1e-6
 
   //! Tolerance for the barycentri decorrection (in us.)
-  const double baryCorrTol = 1e-6;
+  const double baryCorrTol = 5e-7;
 
   //! Tolerance for the inverse binary demodulation (in s.)
   const double binDemodTol = 1e-7;
+
+  //! Tolerance for the iterative binary demodulation
+  const double DemodTol = 1e-9;
 
   //! Difference between JD and MJD
   const double JDminusMJD = 2400000.5; 

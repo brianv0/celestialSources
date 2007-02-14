@@ -71,6 +71,9 @@ class PulsarSpectrum : public ISpectrum
   //!Apply the barycentric corrections and returns arrival time in TDB
   double getBaryCorr( double tdbInput, int LogCorrFlag);
  
+  //! compute binary demodulation in iterative way
+  double getIterativeDemodulatedTime(double tInput, int LogFlag);
+
   //!Apply the binary demodulations
   double getBinaryDemodulation( double tInput, int LogDemodFlag);
 

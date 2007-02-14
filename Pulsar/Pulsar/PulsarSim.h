@@ -25,15 +25,14 @@
  * \author Nicola Omodei        nicola.omodei@pi.infn.it 
  * \author Massimiliano Razzano massimiliano.razzano@pi.infn.it
  *
- * This class creates the TH2D ROOT histogram that contains the differential photon flux (dN/dE/dt/dA) of the simulated
- * pulsar espressed in ph/keV/s/m2.
+ * This class creates the TH2D ROOT histogram that contains the differential photon flux (dN/dE/dt/dA)
+ * of the simulate pulsar espressed in ph/keV/s/m2.
  *
  * The user can specify the emission model. The two classes of model that can be used are:
  *
  * - PSRPhenom - A phenomenological model with an analitical spectrum (Nel & De Jager 1995);
  * - PSRShape  - A model that allow the user to use an arbitrary 2D ROOT spectrum model;
 */
-
 class PulsarSim 
 {
  public:

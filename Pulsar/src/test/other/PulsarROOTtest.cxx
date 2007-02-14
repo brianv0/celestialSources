@@ -430,6 +430,7 @@ int main(int argc, char** argv)
   double enph= 0.0;
   double enphmin = 3e4;
   double enphmax = 3e8;
+  int SelectedModel = 1;
 
   while(current_arg < argc)
     {
@@ -439,6 +440,11 @@ int main(int argc, char** argv)
 	{
 	  enph  = atof(argv[++current_arg]);
 	}
+      if("-model"==arg_name)
+	{
+	  SelectedModel = atoi(argv[++current_arg]);
+	}
+
       current_arg++;
     }
   TApplication theApp("App",0,0);
@@ -455,11 +461,19 @@ int main(int argc, char** argv)
   double ppar4 = 1.7;//1.7;
   int seed = 61443;
 
-
   PulsarSim* m_pulsar = new PulsarSim("PSRVELA",seed,flux,enphmin, enphmax, Period);
-  m_pulsar->SaveNv((TH2D*)m_pulsar->PSRPhenom(double(npeaks), ppar1,ppar2,ppar3,ppar4));
 
-  //  m_pulsar->SaveNv((TH2D*)m_pulsar->PSRShape("PsrPCHShape",1));
+  if (SelectedModel == 1) 
+    {
+      std::cout << "**  PSRPhenom: Phenomenological model selected !" << std::endl;
+      m_pulsar->SaveNv((TH2D*)m_pulsar->PSRPhenom(double(npeaks), ppar1,ppar2,ppar3,ppar4));
+    }
+  else if (SelectedModel == 2) 
+    {
+      std::cout << "**  PSRShape: Shape model selected !" << std::endl;
+      m_pulsar->SaveNv((TH2D*)m_pulsar->PSRShape("PsrPCHShape",1));
+    }
+
   //m_pulsar->SaveNv((TH2D*)m_pulsar->PSRShape("VelaOGRSpect",1));
   //m_pulsar->SaveNv((TH2D*)m_pulsar->PSRShape("VelaPCHSpect",1));
 
@@ -475,7 +489,7 @@ int main(int argc, char** argv)
   else
     name = "PSRVELAroot.root";
 
-  std::cout << "**  Photons simulated on a period of " << Period*nLoops << " s. " << std::endl;
+  std::cout << "**  Photons simulated over a time of of " << Period*nLoops << " seconds " << std::endl;
   
   PlotPulsar(enph,name);  
 
