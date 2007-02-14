@@ -10,6 +10,7 @@
 #include "astro/SkyDir.h"
 #include "astro/PointingTransform.h"
 #include "astro/JulianDate.h"
+#include "ConstParMap.h"
 #include "CLHEP/Vector/ThreeVector.h"
 #define DEBUG 0
 
@@ -24,33 +25,61 @@ ISpectrumFactory &GRBobsmanagerFactory()
 GRBobsmanager::GRBobsmanager(const std::string& params)
   : m_params(params)
 {
+
+  
+
   //  Field Of View for generating bursts degrees above the XY plane.
   const double FOV = -100;
   if(FOV>-90) std::cout<<"WARNING!! GRBobs: FOV = "<<FOV<<std::endl;
-
   using astro::GPS;
   m_GenerateGBMOutputs = false;
-  facilities::Util::expandEnvVar(&paramFile);  
+  //  facilities::Util::expandEnvVar(&paramFile);  
   
-  m_GRBnumber = (long) floor(65540+parseParamList(params,0));
-  m_startTime       = parseParamList(params,0)+Spectrum::startTime();
-  m_GRB_duration    = parseParamList(params,1);
-  m_fluence         = parseParamList(params,2);
-  m_z               = parseParamList(params,3);
-  m_alpha           = parseParamList(params,4);
-  m_beta            = parseParamList(params,5);
-  m_epeak           = parseParamList(params,6);
-  m_MinPhotonEnergy = parseParamList(params,7)*1.0e3; //MeV
-  m_essc_esyn       = parseParamList(params,8);
-  m_fssc_fsyn       = parseParamList(params,9);
-
-  if(parseParamList(params,10)!=0) m_GenerateGBMOutputs = true;
-
-  m_LATphotons     = parseParamList(params,11);
-  m_EC_delay       = parseParamList(params,12);
-  m_EC_duration    = parseParamList(params,13);
-  m_CutOffEnergy   = parseParamList(params,14);
-
+  if (params.find("=") == std::string::npos) 
+    {
+      m_GRBnumber = (long) floor(65540+parseParamList(params,0));
+      m_startTime       = parseParamList(params,0)+Spectrum::startTime();
+      m_GRB_duration    = parseParamList(params,1);
+      m_fluence         = parseParamList(params,2);
+      m_z               = parseParamList(params,3);
+      m_alpha           = parseParamList(params,4);
+      m_beta            = parseParamList(params,5);
+      m_epeak           = parseParamList(params,6);
+      m_MinPhotonEnergy = parseParamList(params,7)*1.0e3; //MeV
+      m_essc_esyn       = parseParamList(params,8);
+      m_fssc_fsyn       = parseParamList(params,9);
+      
+      if(parseParamList(params,10)!=0) m_GenerateGBMOutputs = true;
+      
+      m_LATphotons     = parseParamList(params,11);
+      m_EC_delay       = parseParamList(params,12);
+      m_EC_duration    = parseParamList(params,13);
+      m_CutOffEnergy   = parseParamList(params,14);
+    }
+  else
+    {
+      genericSources::ConstParMap parmap(params);
+      
+      m_startTime       = parmap.value("tstart")+Spectrum::startTime();
+      m_GRB_duration    = parmap.value("duration");
+      m_fluence         = parmap.value("fluence");
+      m_fluence         = parmap.value("peakFlux");
+      m_z               = parmap.value("redshift");
+      m_alpha           = parmap.value("alpha");
+      m_beta            = parmap.value("beta");
+      m_epeak           = parmap.value("Epeak");
+      m_MinPhotonEnergy = parmap.value("emin")*1.0e3; //MeV
+      m_essc_esyn       = parmap.value("essc_esyn");
+      m_fssc_fsyn       = parmap.value("Fssc_Fsyn");
+      
+      if(parmap.value("GBM")!=0) m_GenerateGBMOutputs = true;
+      
+      m_LATphotons     = parmap.value("EC_NLAT");
+      m_EC_delay       = parmap.value("EC_delay");
+      m_EC_duration    = parmap.value("EC_duration");
+      m_CutOffEnergy   = parmap.value("EC_CutOff");
+    }
+  
   m_par = new GRBobsParameters();
 
   m_par->SetGRBNumber(m_GRBnumber);

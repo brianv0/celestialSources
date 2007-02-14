@@ -100,7 +100,7 @@ class GRBobsmanager : public Spectrum
   GRBobsParameters  *m_par;
 
   const std::string& m_params;
-  std::string paramFile;
+  //  std::string paramFile;
   std::pair<double,double> m_GalDir;
   bool m_grbGenerated;
   bool m_grbdeleted;

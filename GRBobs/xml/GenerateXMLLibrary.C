@@ -1,19 +1,20 @@
 #include <iomanip>
 //////////////////////////////////////////////////
 // OPTIONS FOR GENERATING THE XML LIBRARY:
-double MinExtractedPhotonEnergy = 10.0; //MeV
+double MinExtractedPhotonEnergy = 20.0; //MeV
 long FirstBurstTime  =      1000; //1e4
 //double AverageInterval = 86400.0; //s
 double AverageInterval = 48516.9; //s
 
 bool  GeneratePF         =   true; // If true: PF is used to normalize Bursts.
                                    // If false Fluence is used to normalize Bursts.
-TString GenerateIC        =   "random"; //"yes", "no"
-double Fssc_Fsyn_const   =   10.0;
+TString GenerateIC        =   "no";//"random"; //"yes", "no"
+double Fssc_Fsyn_const   =   10;
 bool  GenerateRedshift   =   true;
 bool  GenerateGBM        =   false;
 bool  GLASTCoordinate    =   false;
 bool  JayDistributions   =   true;
+bool  BN                 =   true;
 //////////////////////////////////////////////////
 
 
@@ -159,7 +160,7 @@ double GetEPeak(TRandom *rnd, int Type, double Stretch)
 }
 
 //////////////////////////////////////////////////
-void GenerateXMLLibrary(int Nbursts=100)
+void GenerateXMLLibrary(int Nbursts=1000)
 {
   
   //////////////////////////////////////////////////
@@ -180,7 +181,7 @@ void GenerateXMLLibrary(int Nbursts=100)
   double alpha_min = -2.5;  //  -3<= a < 1.0 
   double alpha_max = 0.5;   //   -3<= a < 1.0 
   double beta_max = -1.2;   //   b < a && b < -2 
-  double beta_min = -4.0;//-7.2;   //   b < a && b < -2 
+  double beta_min = -7.2;// -4.0;   //   b < a && b < -2 
   
   //////////////////////////////////////////////////
   int NphLat=0;
@@ -307,6 +308,25 @@ void GenerateXMLLibrary(int Nbursts=100)
   
   FluenceVsT90->SetXTitle("Log_{10}(T_{90})");
   FluenceVsT90->SetYTitle("Fluence 50-300 keV (erg/cm^{2}) ");
+  if(BN)
+    {
+      //      PFlong->SetLineStyle(4);
+      PFshort->SetLineStyle(3);
+      //FLlong->SetLineStyle(4);
+      FLshort->SetLineStyle(3);
+      //T90long->SetLineStyle(4);
+      T90short->SetLineStyle(3);
+      //Zlong->SetLineStyle(4);
+      Zshort->SetLineStyle(3);
+      //alphalong->SetLineStyle(4);
+      alphashort->SetLineStyle(3);
+      //betalong->SetLineStyle(4);
+      betashort->SetLineStyle(3);
+      //Eplong->SetLineStyle(4);
+      Epshort->SetLineStyle(3);
+    }
+  else
+    {
 
   PFlong->SetLineColor(4);
   PFshort->SetLineColor(2);
@@ -322,7 +342,7 @@ void GenerateXMLLibrary(int Nbursts=100)
   betashort->SetLineColor(2);
   Eplong->SetLineColor(4);
   Epshort->SetLineColor(2);
-
+    }
   Zlong->SetXTitle("Redshift z");
   Zshort->SetXTitle("Redshift z");
 
