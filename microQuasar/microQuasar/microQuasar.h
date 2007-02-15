@@ -153,6 +153,9 @@ private:
 	/// function for generating the orbit modulation
 	void modulation(const double x, double& funcValue, double& derivValue);
 
+	/// function to tokenize the parameters and get rid of whitespaces
+	std::vector<std::string> tokenize(const std::string params);
+
 	/// fiddle of Numerical Recipe's rtsafe to avoid function passing
 	double rtsafe(const double x1, const double x2, const double xacc);
 	std::pair<double,double> calculateJetStart(bool nextOn, double time);

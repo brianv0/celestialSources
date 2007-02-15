@@ -12,6 +12,7 @@
 #include <algorithm>
 #include <cstdlib>
 #include <stdexcept>
+#include <cctype>
 
 #include "facilities/Util.h"
 
@@ -35,11 +36,55 @@ microQuasar::microQuasar(const std::string &paramString)
 , m_randPhase(0)
 {
 
-	std::vector<std::string> params;
-	facilities::Util::stringTokenize(paramString, ", ", params);
+  std::vector<std::string> tokens = tokenize(paramString,',');
 
-	float daySecs = 86400.;
+  float daySecs = 86400.;
+  
+  float specOrbital1,specOrbital2=-1;
+  float phaseOrbital1,phaseOrbital2=-1;
 
+  std::vector<std::String>::iterator curToken = tokens.begin();
+  while(curToken!=tokens.end()){
+    std::vector<std::string> token = tokenize(*curToken,'=');
+    std::transform(token[0].begin(),token[0].end(),token[0].begin(),(int(*)(int))toupper);
+    if(token[0]=="FLUX")
+      m_ftot = std::atof(token[1].c_str());
+    if(token[0]=="EMIN")
+      m_eMin = std::atof(token[1].c_str());
+    if(token[0]=="EMAX")
+      m_eMax = std::atof(token[1].c_str());
+    if(token[0]=="ORBITALPERIOD")
+      m_orbitalPeriod = std::atof(token[1].c_str());
+    if(token[0]=="ORBITALMODULATION")
+      m_orbitalModulation = std::atof(token[1].c_str());
+    if(token[0]=="ORBITALPHASE")
+      m_phi0 = std::atof(token[1].c_str());
+    if(token[0]=="SPECTRALORBITALREGION1")
+      specOrbital1 = std::atof(token[1].c_str());
+    if(token[0]=="SPECTRALORBITALREGION2")
+      specOrbital2 = std::atof(token[1].c_str());
+    if(token[0]=="ORBITALPHASEREGION1")
+      phaseOrbital1 = std::atof(token[1].c_str());
+    if(token[0]=="ORBITALPHASEREGION2")
+      phseOrbital2 = std::atof(token[1].c_str());
+    if(token[0]=="DISKCYCLEDURATION")
+      m_diskProperties.setCycleDuration(std::atof(token[1].c_str())*daySeecs);
+    if(token[0]=="DISKCYCLEFLUCTUATION")
+      m_diskProperties.setCycleDurationFluct(std::atof(token[1].c_str()));
+    if(token[0]=="JETONCYCLE")
+      m_jetProperties.setJetOnCycle(std::atof(token[1].c_str()));
+    if(token[0]=="JETONCYCLEFLUCTUATION")
+      m_jetProperties.setJetOnCycleFluct(std::atof(token[1].c_str()));
+    if(token[0]=="JETONDURATION")
+      m_jetProperties.setJetOnDuration(std::atof(token[1].c_str()));
+    if(token[0]=="JETONDURATIONFLUCTUATION")
+      m_jetProperties.setJetOnDurationFluct(std::atof(token[1].c_str()));
+  }
+  if(specOrbital1!=-1 && specOrbital2!=-1)
+    m_orbitalRegion.setSpectralIndex(specOrbital1,specOrbital2);
+  if(phaseOrbital1!=-1 && phaseOrbital2!=-1)
+    m_orbitalRegion.setOrbitalPhase(phaseOribtal1,phaseOrbital2);
+	/*
 	m_ftot = ::atof(params[0].c_str());
 	m_eMin = ::atof(params[1].c_str());
 	m_eMax = ::atof(params[2].c_str());
@@ -57,7 +102,7 @@ microQuasar::microQuasar(const std::string &paramString)
 	m_jetProperties.setJetOnCycleFluct(::atof(params[13].c_str()));
 	m_jetProperties.setJetOnDuration(::atof(params[14].c_str()));
 	m_jetProperties.setJetOnDurationFluct(::atof(params[15].c_str()));
-
+	*/
 	std::pair<float,float> jet = calculateJetStart(false,0.);
 	m_jetStart = jet.first;
 	m_jetEnd = jet.second;
@@ -66,9 +111,26 @@ microQuasar::microQuasar(const std::string &paramString)
 		<< m_ftot << " cm^-2 s^-1 " << " between " 
 		<< m_eMin << " MeV and "
 		<< m_eMax << " MeV." << std::endl;
-
 }
 
+std::vector<std::string> microQuasar::tokenize(const std::string params, char token){
+  std::vector<std::string> tokens;
+  while(params.length()!=0){
+    std::string::size_type pos = params.find(token,0);
+    std::string token = params.substr(0,pos);
+    while(token.at(0)==' ')
+      token.erase(0,1);
+    while(token.at(token.length()-1)==' ')
+      token.erase(token.length()-1,1);
+    tokens.push_back(token);
+    params.erase(0,pos);
+    if(params.length()!=0)
+      params.erase(0,1);
+    while(params.length()!=0 && params.at(0)==' ')
+      params.erase(0,1);
+  }
+  return tokens;
+}
 
 float microQuasar::operator()(float xi) const {
 	double one_m_gamma = 1. - m_currentSpectralIndex;
