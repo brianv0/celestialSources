@@ -41,10 +41,9 @@ void LoadTree(int type=0, double tmin=0, double tmax=0, TString cuts="")
      double ene = Spectrum->GetBinCenter(ei);
      double ne  = Spectrum->GetBinContent(ei);
      double Ene = Spectrum->GetBinError(ei);
-     Spectrum->SetBinContent(ei,pow(ene,type) * ne);
-     Spectrum->SetBinContent(ei,pow(ene,type) * ne);
-     Spectrum->SetBinError(ei,pow(ene,type) * Ene); //ph/cm^2/MeV
- 
+
+     Spectrum->SetBinContent(ei,pow(ene,type-1.0) * ne);
+     Spectrum->SetBinError(ei,pow(ene,type-1.0) * Ene); //ph/cm^2/MeV
    }
  Spectrum->SetMarkerStyle(4);
  Spectrum->Draw("e");

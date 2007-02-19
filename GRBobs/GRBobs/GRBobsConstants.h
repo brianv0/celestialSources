@@ -126,8 +126,8 @@ class GRBobsParameters
   void SetDuration(double);
   void SetFluence(double);
   void SetPeakFlux(double);
-  inline void SetCutOffEnergy(double Eco){m_Eco = Eco;}
-  inline void SetRedshift(double z){m_z = z;}
+  inline void SetCutOffEnergy(double x){ m_Eco =(x>0) ? x : 0 ;}
+  inline void SetRedshift(double x){ m_z =(x>0) ? x : 0 ;}
   
   /// Sets the low energy spectral index and the high energy spectral index.
   /// \param alpha low energy spectral index (\f$-3<\alpha<1\f$)
@@ -147,14 +147,14 @@ class GRBobsParameters
       m_LowEnergy       += ObsCst::We;
       m_HighEnergy      += ObsCst::We;
     } 
-
+  
   inline void SetEpeak(double Ep)
     {
       m_Epeak = Ep;
     }
-  inline void SetFssc_Fsyn(double x) {m_Fssc_Fsyn=x;}
-  inline void SetEssc_Esyn(double x) {m_Essc_Esyn=x;}
-
+  inline void SetFssc_Fsyn(double x) {m_Fssc_Fsyn = (x>0) ? x : 0;}
+  inline void SetEssc_Esyn(double x) {m_Essc_Esyn = (x>0) ? x : 0;}
+  
   inline double GetFssc_Fsyn()    {return m_Fssc_Fsyn;}
   inline double GetEssc_Esyn()    {return m_Essc_Esyn;}
   /// Set the minimum photon energy for generating LAT photons.
@@ -167,7 +167,7 @@ class GRBobsParameters
   ///        for long  bursts: \f$\overline{\log(f_{tot})}=  1.46\f$, \f$\sigma_{f_{tot}}=0.49\f$.
   ///
   double GetBATSEFluence();
-
+  
   /// Distribution of the bursts duration expressed by the quantity \f$T_{90}\f$, taken from the BATSE catalog. 
   /// \f$N(\log(T_{90}))=A \exp[-0.5\left(\frac{\log(T_{90})-\overline{\log( T_{90})}}{\sigma_{T_{90}}}\right)^2]\f$ <br>
   /// Where, for short bursts: \f$\overline{\log(T_{90})}= -6.35\f$, \f$\sigma_{T_{90}}=0.57\f$.

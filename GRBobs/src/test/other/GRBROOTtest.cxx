@@ -364,12 +364,18 @@ void PlotGRB(double enph = 0,double z=0,char name[100]="grb_65540.root",TString 
       
       double a=band.GetParameter(0);
       double b=band.GetParameter(1);
+      double a_err=band.GetParError(0);
+      double b_err=band.GetParError(1);
+
       double E0=pow(10.,band.GetParameter(2));
+      double E0_err_p=pow(10.,band.GetParameter(2)+band.GetParError(2));
+      double E0_err_m=pow(10.,band.GetParameter(2)-band.GetParError(2));
       double Ep=(a+2)*E0;
+
       std::cout<<"-- BAND FUNCTION Fv FIT ---------------------------"<<std::endl;
-      std::cout<<" a     = "<<a<<std::endl;
-      std::cout<<" b     = "<<b<<std::endl;
-      std::cout<<" E0    = "<<E0<<std::endl;
+      std::cout<<" a     = "<<a<<" +- "<<a_err<<std::endl;
+      std::cout<<" b     = "<<b<<" +- "<<b_err<<std::endl;
+      std::cout<<" E0    = "<<E0<<" + "<<E0_err_p<<" - "<<E0_err_m<<std::endl;
       std::cout<<" Ep    = "<<Ep<<std::endl;
       std::cout<<" Const = "<<pow(10.,band.GetParameter(3))<<std::endl;
       std::cout<<"--------------------------------------------------"<<std::endl;

@@ -15,6 +15,7 @@ bool  GenerateGBM        =   false;
 bool  GLASTCoordinate    =   false;
 bool  JayDistributions   =   true;
 bool  BN                 =   true;
+//bool  newXML             =   true;
 //////////////////////////////////////////////////
 
 
@@ -385,13 +386,13 @@ void GenerateXMLLibrary(int Nbursts=1000)
   Zlong->SetXTitle("Redshift z");
   Zshort->SetXTitle("Redshift z");
 
-  std::ofstream os("GRBobs_user_library.xml",std::ios::out);
+  std::ofstream osXML("GRBobs_user_library.xml",std::ios::out);
   std::ofstream osTest("../src/test/GRBParam.txt",std::ios::out);
-  os.precision(4);
+  osXML.precision(4);
   
-  os<<"<!-- $Header -->"<<std::endl;
-  os<<"<!-- ************************************************************************** -->"<<std::endl;
-  os<<"<source_library title=\"GRBobs_user_library\">"<<std::endl;
+  osXML<<"<!-- $Header -->"<<std::endl;
+  osXML<<"<!-- ************************************************************************** -->"<<std::endl;
+  osXML<<"<source_library title=\"GRBobs_user_library\">"<<std::endl;
   char SourceName[100]="GRB";
   
   long BurstTime=1000;//FirstBurstTime;
@@ -566,20 +567,22 @@ void GenerateXMLLibrary(int Nbursts=1000)
       else 
 	FluenceVsT90->Fill(log10(Duration),log10(Fluence));
       
-      os<<""<<std::endl;
-      if(i<10) os<<"<source name=\" GRB_0000"<<i<<" \">"<<std::endl;
-      else if(i<100) os<<"<source name=\" GRB_000"<<i<<" \">"<<std::endl;
-      else if(i<1000) os<<"<source name=\" GRB_00"<<i<<" \">"<<std::endl;
-      else if(i<10000) os<<"<source name=\" GRB_0"<<i<<" \">"<<std::endl;
-      else os<<"<source name=\" GRB_"<<i<<" \">"<<std::endl;
-      os<<"<spectrum escale=\"MeV\">"<<std::endl;
+      osXML<<""<<std::endl;
+      if(i<10) osXML<<"<source name=\" GRB_0000"<<i<<" \">"<<std::endl;
+      else if(i<100) osXML<<"<source name=\" GRB_000"<<i<<" \">"<<std::endl;
+      else if(i<1000) osXML<<"<source name=\" GRB_00"<<i<<" \">"<<std::endl;
+      else if(i<10000) osXML<<"<source name=\" GRB_0"<<i<<" \">"<<std::endl;
+      else osXML<<"<source name=\" GRB_"<<i<<" \">"<<std::endl;
+      osXML<<"<spectrum escale=\"MeV\">"<<std::endl;
+      
       
       if(GeneratePF)
-	os<<" <SpectrumClass name=\"GRBobsmanager\" params=\""<<BurstTime<<" , "<<Duration<<" , "<<PeakFlux;
+	osXML<<" <SpectrumClass name=\"GRBobsmanager\" params=\"tstart="<<BurstTime<<", duration="<<Duration<<", peakFlux="<<PeakFlux;
       else 
-	os<<" <SpectrumClass name=\"GRBobsmanager\" params=\""<<BurstTime<<" , "<<Duration<<" , "<<Fluence;
+	osXML<<" <SpectrumClass name=\"GRBobsmanager\" params=\"tstart="<<BurstTime<<", duration= "<<Duration<<", fluence="<<Fluence;
       
-      os<<" , "<<z<<" , "<<alpha<<" , "<<beta<<" , "<<Ep<<" , "<<MinExtractedPhotonEnergy;
+      osXML<<", redshift="<<z<<", alpha="<<alpha<<", beta="<<beta<<", Ep="<<Ep<<", emin="<<MinExtractedPhotonEnergy;
+      
       if(GenerateIC=="random")
 	{
 	  double randomNumber = rnd_1->Uniform();
@@ -590,19 +593,23 @@ void GenerateXMLLibrary(int Nbursts=1000)
 	  else
 	    Fssc_Fsyn =    0.0;
 	}
-      os<<" , "<<Essc_Esyn<<" , "<<Fssc_Fsyn<<" , "<<(int)GenerateGBM;
-      os<<" , "<<NphLat<<" , "<<DelayTime<<" , "<<ExtraComponent_Duration<<" , "<<co_energy<<" \"/>"<<std::endl;
-      
+      if(Fssc_Fsyn>0.0)
+	osXML<<", essc_esyn="<<Essc_Esyn<<", Fssc_Fsyn="<<Fssc_Fsyn;
+      if (GenerateGBM==true)
+	osXML<<", GBM="<<(int)GenerateGBM;
+      if(NphLat>0)
+	osXML<<", EC_NLAT="<<NphLat<<", EC_delay="<<DelayTime<<", EC_duration="<<ExtraComponent_Duration;
+      if (co_energy>0)
+	osXML<<", EC_CutOff="<<co_energy;
+      osXML<<" \"/>"<<std::endl;
       
       if(GLASTCoordinate)  
-	os<<"<direction theta=\""<<theta<<"\" phi=\""<<phi<<"\" />"<<std::endl;//u galactic_dir l=\""<<l<<"\" b=\""<<b<<"\" />"<<std::endl;
+	osXML<<"<direction theta=\""<<theta<<"\" phi=\""<<phi<<"\" />"<<std::endl; //u galactic_dir l=\""<<l<<"\" b=\""<<b<<"\" />"<<std::endl;
       else
-	os<<"<use_spectrum frame=\"galaxy\" />"<<std::endl;//u galactic_dir l=\""<<l<<"\" b=\""<<b<<"\" />"<<std::endl;
+	osXML<<"<use_spectrum frame=\"galaxy\" />"<<std::endl; //u galactic_dir l=\""<<l<<"\" b=\""<<b<<"\" />"<<std::endl;
       
-      
-      os<<"</spectrum> </source>"<<std::endl;
+      osXML<<"</spectrum> </source>"<<std::endl;
       //////////////////////////////////////////////////
-      
       
       if(GeneratePF) 
 	osTest<<setw(11)<<BurstTime<<" "<<setw(8)<<setprecision(4)<<Duration<<" "<<setw(8)<<PeakFlux<<" ";
@@ -614,51 +621,52 @@ void GenerateXMLLibrary(int Nbursts=1000)
       BurstTime+=(int) rnd->Exp(AverageInterval);
     }
   //////////////////////////////////////////////////
-  os<<""<<std::endl;
-  os<<"<source name=\" GRBobs-10\" >"<<std::endl;
+  osXML<<" "<<std::endl;
+  osXML<<"<source name=\" GRBobs-10\" >"<<std::endl;
   for(int i = 0; i<10 ; i++)
     {
-      if(i<10) os<<"     <nestedSource sourceRef=\" GRB_0000"<<i<<" \"/>"<<std::endl;
+      if(i<10) osXML<<"     <nestedSource sourceRef=\" GRB_0000"<<i<<" \"/>"<<std::endl;
     }
-  os<<"</source>"<<std::endl;
+  
+  osXML<<"</source>"<<std::endl;
   //////////////////////////////////////////////////
   
   //////////////////////////////////////////////////
-  os<<""<<std::endl;
-  os<<"<source name=\" GRBobs-100\" >"<<std::endl;
+  osXML<<""<<std::endl;
+  osXML<<"<source name=\" GRBobs-100\" >"<<std::endl;
   for(int i = 0; i<100 ; i++)
     {
-      if(i<10) os<<"     <nestedSource sourceRef=\" GRB_0000"<<i<<" \"/>"<<std::endl;
-      else if(i<100) os<<"     <nestedSource sourceRef=\" GRB_000"<<i<<" \"/>"<<std::endl;
-      else os<<"     <nestedSource sourceRef=\" GRB_"<<i<<" \"/>"<<std::endl;
+      if(i<10) osXML<<"     <nestedSource sourceRef=\" GRB_0000"<<i<<" \"/>"<<std::endl;
+      else if(i<100) osXML<<"     <nestedSource sourceRef=\" GRB_000"<<i<<" \"/>"<<std::endl;
+      else osXML<<"     <nestedSource sourceRef=\" GRB_"<<i<<" \"/>"<<std::endl;
     }
-  os<<"</source>"<<std::endl;
+  osXML<<"</source>"<<std::endl;
   //////////////////////////////////////////////////
   
   //////////////////////////////////////////////////
-  os<<""<<std::endl;
-  os<<"<source name=\" GRBobs-1000\" >"<<std::endl;
+  osXML<<""<<std::endl;
+  osXML<<"<source name=\" GRBobs-1000\" >"<<std::endl;
   for(int i = 0; i<1000 ; i++)
     {
-      if(i<10) os<<"     <nestedSource sourceRef=\" GRB_0000"<<i<<" \"/>"<<std::endl;
-      else if(i<100) os<<"     <nestedSource sourceRef=\" GRB_000"<<i<<" \"/>"<<std::endl;
-      else if(i<1000) os<<"     <nestedSource sourceRef=\" GRB_00"<<i<<" \"/>"<<std::endl;
+      if(i<10) osXML<<"     <nestedSource sourceRef=\" GRB_0000"<<i<<" \"/>"<<std::endl;
+      else if(i<100) osXML<<"     <nestedSource sourceRef=\" GRB_000"<<i<<" \"/>"<<std::endl;
+      else if(i<1000) osXML<<"     <nestedSource sourceRef=\" GRB_00"<<i<<" \"/>"<<std::endl;
     }
-  os<<"</source>"<<std::endl;
+  osXML<<"</source>"<<std::endl;
   //////////////////////////////////////////////////
   
-  os<<""<<std::endl;
-  os<<"<source name=\" AllGRBobs\" >"<<std::endl;
+  osXML<<""<<std::endl;
+  osXML<<"<source name=\" AllGRBobs\" >"<<std::endl;
   for(int i = 0; i<Nbursts ; i++)
     {
-      if(i<10) os<<"     <nestedSource sourceRef=\" GRB_0000"<<i<<" \"/>"<<std::endl;
-      else if(i<100) os<<"     <nestedSource sourceRef=\" GRB_000"<<i<<" \"/>"<<std::endl;
-      else if(i<1000) os<<"     <nestedSource sourceRef=\" GRB_00"<<i<<" \"/>"<<std::endl;
-      else if(i<10000) os<<"     <nestedSource sourceRef=\" GRB_0"<<i<<" \"/>"<<std::endl;
-      else os<<"     <nestedSource sourceRef=\" GRB_"<<i<<" \"/>"<<std::endl;
+      if(i<10) osXML<<"     <nestedSource sourceRef=\" GRB_0000"<<i<<" \"/>"<<std::endl;
+      else if(i<100) osXML<<"     <nestedSource sourceRef=\" GRB_000"<<i<<" \"/>"<<std::endl;
+      else if(i<1000) osXML<<"     <nestedSource sourceRef=\" GRB_00"<<i<<" \"/>"<<std::endl;
+      else if(i<10000) osXML<<"     <nestedSource sourceRef=\" GRB_0"<<i<<" \"/>"<<std::endl;
+      else osXML<<"     <nestedSource sourceRef=\" GRB_"<<i<<" \"/>"<<std::endl;
     }
-  os<<"</source>"<<std::endl;
-  os<<"  </source_library>"<<std::endl;
+  osXML<<"</source>"<<std::endl;
+  osXML<<"  </source_library>"<<std::endl;
   TCanvas *Correlation = new TCanvas("Correlation","Correlation",600,400);
   if(GeneratePF) PeakFluxVsT90->Draw();
   else  FluenceVsT90->Draw();

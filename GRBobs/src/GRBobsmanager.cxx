@@ -26,7 +26,7 @@ GRBobsmanager::GRBobsmanager(const std::string& params)
   : m_params(params)
 {
 
-  
+  if(DEBUG) std::cout<<" GRBobsmanager::GRBobsmanager "<<std::endl;
 
   //  Field Of View for generating bursts degrees above the XY plane.
   const double FOV = -100;
@@ -34,7 +34,6 @@ GRBobsmanager::GRBobsmanager(const std::string& params)
   using astro::GPS;
   m_GenerateGBMOutputs = false;
   //  facilities::Util::expandEnvVar(&paramFile);  
-  
   if (params.find("=") == std::string::npos) 
     {
       m_GRBnumber = (long) floor(65540+parseParamList(params,0));
@@ -59,29 +58,56 @@ GRBobsmanager::GRBobsmanager(const std::string& params)
   else
     {
       genericSources::ConstParMap parmap(params);
-      
       m_startTime       = parmap.value("tstart")+Spectrum::startTime();
       m_GRB_duration    = parmap.value("duration");
-      m_fluence         = parmap.value("fluence");
-      m_fluence         = parmap.value("peakFlux");
+      if(params.find("fluence")!= std::string::npos)
+	{
+	  std::cout<<"READ FLUENCE"<<std::endl;
+	  m_fluence         = parmap.value("fluence");
+	}
+      else
+	{
+	  std::cout<<"READ PEAK FLUX"<<std::endl;
+	  m_fluence         = parmap.value("peakFlux");
+	}
       m_z               = parmap.value("redshift");
       m_alpha           = parmap.value("alpha");
       m_beta            = parmap.value("beta");
-      m_epeak           = parmap.value("Epeak");
+      m_epeak           = parmap.value("Ep");
       m_MinPhotonEnergy = parmap.value("emin")*1.0e3; //MeV
       m_essc_esyn       = parmap.value("essc_esyn");
       m_fssc_fsyn       = parmap.value("Fssc_Fsyn");
       
       if(parmap.value("GBM")!=0) m_GenerateGBMOutputs = true;
-      
+
       m_LATphotons     = parmap.value("EC_NLAT");
       m_EC_delay       = parmap.value("EC_delay");
       m_EC_duration    = parmap.value("EC_duration");
       m_CutOffEnergy   = parmap.value("EC_CutOff");
     }
   
+  if(DEBUG)
+    {
+      std::cout<<"-------Read the following parameters --------"<<std::endl;
+      std::cout<<" m_startTime         = "<<m_startTime<<std::endl;
+      std::cout<<"m_GRB_duration       = "<<m_GRB_duration<<std::endl;
+      std::cout<<"m_fluence            = "<<m_fluence<<std::endl;
+      std::cout<<"m_fluence            = "<<m_fluence<<std::endl;
+      std::cout<<"m_z                  = "<<m_z<<std::endl;
+      std::cout<<"m_alpha              = "<<m_alpha<<std::endl;
+      std::cout<<"m_beta               = "<<m_beta<<std::endl;
+      std::cout<<"m_epeak              = "<<m_epeak<<std::endl;
+      std::cout<<"m_MinPhotonEnergy    = "<<m_MinPhotonEnergy<<std::endl;
+      std::cout<<" m_essc_esyn         = "<<m_essc_esyn<<std::endl;
+      std::cout<<"m_fssc_fsyn          = "<<m_fssc_fsyn<<std::endl;
+      std::cout<<"m_GenerateGBMOutputs = "<<m_GenerateGBMOutputs<<std::endl;
+      std::cout<<"m_LATphotons         = "<<m_LATphotons<<std::endl;
+      std::cout<<"m_EC_delay           = "<<m_EC_delay <<std::endl;
+      std::cout<<"m_EC_duration        = "<<m_EC_duration<<std::endl;
+      std::cout<<"m_CutOffEnergy       = "<<m_CutOffEnergy <<std::endl;
+    }
   m_par = new GRBobsParameters();
-
+  
   m_par->SetGRBNumber(m_GRBnumber);
   m_par->SetFluence(m_fluence);
   m_par->SetPeakFlux(m_fluence);
