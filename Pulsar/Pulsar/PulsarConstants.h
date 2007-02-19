@@ -72,7 +72,7 @@ namespace cst
   const double binDemodTol = 1e-7;
 
   //! Tolerance for the iterative binary demodulation
-  const double DemodTol = 1e-9;
+  const double DemodTol = 1e-6;
 
   //! Difference between JD and MJD
   const double JDminusMJD = 2400000.5; 

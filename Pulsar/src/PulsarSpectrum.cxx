@@ -537,7 +537,9 @@ double PulsarSpectrum::interval(double time)
     }
   else
     {
+      //     std::cout << "pippo2" << std::endl;
       timeTildeDemodulated = getIterativeDemodulatedTime(timeTilde,0);
+      //std::cout << "pippo2a" << std::endl;
 
       /*
       std::cout << "\n\n*****binary!" <<std::endl;
@@ -644,17 +646,18 @@ double PulsarSpectrum::interval(double time)
 	//}
     }
 
-  // if (DEBUG)
-  //{
-  //  if ((int(timeTilde - (StartMissionDateMJD)*SecsOneDay) % 1000) < 1.5)
-  std::cout << "\n\n** " << m_PSRname << " Time is: " 
-	    << timeTildeDecorr-(StartMissionDateMJD)*SecsOneDay << " s MET in TT | "
-	    << timeTilde-(StartMissionDateMJD)*SecsOneDay << "s. MET in SSB in TDB (barycorr.) | "
-	    << timeTildeDemodulated-(StartMissionDateMJD)*SecsOneDay << "s. MET in SSB in TDB (barycorr. + demod.)| "
-	    << std::endl;
+  if (DEBUG)
+    {
+      if ((int(timeTilde - (StartMissionDateMJD)*SecsOneDay) % 1000) < 1.5)
+	std::cout << "\n\n** " << m_PSRname << " Time is: " 
+		  << timeTildeDecorr-(StartMissionDateMJD)*SecsOneDay << " s MET in TT | "
+		  << timeTilde-(StartMissionDateMJD)*SecsOneDay << "s. MET in SSB in TDB (barycorr.) | "
+		  << timeTildeDemodulated-(StartMissionDateMJD)*SecsOneDay << "s. MET in SSB in TDB (barycorr. + demod.)| "
+		  << std::endl;
+      
+    }
 
-
-  //Log out the barycentric corrections  
+      //Log out the barycentric corrections  
   if (BARYCORRLOG)
     double bl = getBaryCorr(timeTilde,1);
   
@@ -696,19 +699,19 @@ double PulsarSpectrum::interval(double time)
       */
     }
  
-  //  if (DEBUG)
+  // if (DEBUG)
   //{ 
-  std::cout << std::setprecision(15) << "\nTimeTildeDecorr at Spacecraft (TT) is: " 
-	       << timeTildeDecorr - (StartMissionDateMJD)*SecsOneDay << "sec." << std::endl;
-     std::cout << std::setprecision(15) <<"  TimeTilde at SSB (in TDB) is: " << timeTilde - (StartMissionDateMJD)*SecsOneDay << "sec." << std::endl;
-     std::cout << std::setprecision(15) <<"  TimeTildeDemodulated : " << timeTildeDemodulated - (StartMissionDateMJD)*SecsOneDay 
-	       << "sec.; phase=" << modf(initTurns,&intPart) << std::endl;
-     std::cout << std::setprecision(15) <<"  nextTimeTildeDemodulated at SSB (in TDB) is:" << nextTimeTildeDemodulated - (StartMissionDateMJD)*SecsOneDay << "s." << std::endl;
-     std::cout << std::setprecision(15) <<"  nextTimeTilde at SSB (in TDB) is:" << nextTimeTilde - (StartMissionDateMJD)*SecsOneDay << "s." << std::endl;
-     std::cout << std::setprecision(15) <<"  nextTimeTilde decorrected (TT)is" << nextTimeTildeDecorr - (StartMissionDateMJD)*SecsOneDay << "s." << std::endl;
-     //std::cout << " corrected is " << nextTimeTildeDecorr + getBaryCorr(nextTimeTildeDecorr,0) - (StartMissionDateMJD)*SecsOneDay << std::endl;
-     std::cout << std::setprecision(15) <<"  -->Interval is " <<  nextTimeTildeDecorr - timeTildeDecorr << std::endl;
-     //}
+      std::cout << std::setprecision(15) << "\nTimeTildeDecorr at Spacecraft (TT) is: " 
+		<< timeTildeDecorr - (StartMissionDateMJD)*SecsOneDay << "sec." << std::endl;
+      std::cout << std::setprecision(15) <<"  TimeTilde at SSB (in TDB) is: " << timeTilde - (StartMissionDateMJD)*SecsOneDay << "sec." << std::endl;
+      std::cout << std::setprecision(15) <<"  TimeTildeDemodulated : " << timeTildeDemodulated - (StartMissionDateMJD)*SecsOneDay 
+		<< "sec.; phase=" << modf(initTurns,&intPart) << std::endl;
+      std::cout << std::setprecision(15) <<"  nextTimeTildeDemodulated at SSB (in TDB) is:" << nextTimeTildeDemodulated - (StartMissionDateMJD)*SecsOneDay << "s." << std::endl;
+      std::cout << std::setprecision(15) <<"  nextTimeTilde at SSB (in TDB) is:" << nextTimeTilde - (StartMissionDateMJD)*SecsOneDay << "s." << std::endl;
+      std::cout << std::setprecision(15) <<"  nextTimeTilde decorrected (TT)is" << nextTimeTildeDecorr - (StartMissionDateMJD)*SecsOneDay << "s." << std::endl;
+      //std::cout << " corrected is " << nextTimeTildeDecorr + getBaryCorr(nextTimeTildeDecorr,0) - (StartMissionDateMJD)*SecsOneDay << std::endl;
+      std::cout << std::setprecision(15) <<"  -->Interval is " <<  nextTimeTildeDecorr - timeTildeDecorr << std::endl;
+      //  }
   
   return nextTimeTildeDecorr - timeTildeDecorr; //interval between the de-corected times
 }
@@ -882,23 +885,42 @@ double PulsarSpectrum::getBaryCorr( double ttInput, int LogCorrFlag)
 //!Get binarydemodulated time in a iterative way
 double PulsarSpectrum::getIterativeDemodulatedTime(double tInput, int LogFlag)
 {
+  //std::cout << "pippo0" << std::endl;
 
   double timeDemodulated = tInput+getBinaryDemodulation(tInput,LogFlag);
             
   double TargetTime = tInput;
   double delay = getBinaryDemodulation(tInput,LogFlag);
 
-  for (int i=0; i < 50; i++)
+  //for (int i=0; i < 50; i++)
+  int i=0;
+  while ((fabs(timeDemodulated-delay-TargetTime) > DemodTol) && ( i < 20))
     {
+
+      i++;
       timeDemodulated = TargetTime+delay;
       delay = getBinaryDemodulation(timeDemodulated,LogFlag);
+        
+      //      std::cout << std::setprecision(15) << "i" << i << " " << timeDemodulated-(StartMissionDateMJD)*SecsOneDay << " " 
+      //	<< fabs(timeDemodulated-delay-TargetTime) << " " << timeDemodulated-delay -(StartMissionDateMJD)*SecsOneDay << std::endl;
       /*
-      std::cout << std::setprecision(15) << "i" << i << " " << timeDemodulated- (StartMissionDateMJD)*SecsOneDay << " " 
-		    << fabs(timeTildeDemodulated-delay-TargetTime) << " " << timeTildeDemodulated-delay -(StartMissionDateMJD)*SecsOneDay << std::endl;
+      if ((i==20) || (fabs(timeDemodulated-delay-TargetTime) < DemodTol))
+	{
+	  std::cout << i << "Break! " << fabs(timeDemodulated-delay-TargetTime) << std::endl;
+	  break;
+	}
       */
-
-      if (fabs(timeDemodulated-delay-TargetTime) < DemodTol) break;
+      /*
+      if (fabs(timeDemodulated-delay-TargetTime) < DemodTol)
+	{
+	  std::cout << "Break! " << fabs(timeDemodulated-delay-TargetTime) << std::endl;
+	  break;
+	}
+      std::cout << "e poiii " << fabs(timeDemodulated-delay-TargetTime) << std::endl;
+      */  
     }
+
+  //std::cout << "pippo1" << std::endl;
 
   return timeDemodulated;
 }
@@ -934,8 +956,16 @@ double PulsarSpectrum::getBinaryDemodulation( double tInput, int LogDemodFlag)
   // compute projected semimajor axis using x_dot
   double asini = m_asini + m_xdot*dt;
   
-  BinaryRoemerDelay = asini*((std::cos(EccentricAnomaly)-m_ecc)*std::sin(Omega)
+  //Binary Roemer delay
+  BinaryRoemerDelay = ((std::cos(EccentricAnomaly)-m_ecc)*std::sin(Omega)
 			     + std::sin(EccentricAnomaly)*std::cos(Omega)*std::sqrt(1-m_ecc*m_ecc));
+  //Einstein Delay
+  double BinaryEinsteinDelay = m_gamma*std::sin(EccentricAnomaly);
+ 
+  //Shapiro binary delay
+  double BinaryShapiroDelay = -2.0*m_shapiro_r*log(1.-m_ecc*std::cos(EccentricAnomaly)-m_shapiro_s*BinaryRoemerDelay);
+
+  BinaryRoemerDelay = asini*BinaryRoemerDelay;
      
   if (DEBUG)
     {
@@ -944,6 +974,8 @@ double PulsarSpectrum::getBinaryDemodulation( double tInput, int LogDemodFlag)
       std::cout << "**  Ecc.Anomaly=" << EccentricAnomaly << " deg. True Anomaly=" << TrueAnomaly << " deg." << std::endl;
       std::cout << "**  Omega=" << Omega << " rad. Major Semiaxis " << asini << " light-sec" << std::endl;
       std::cout << "**  --> Binary Roemer Delay=" << BinaryRoemerDelay << " s." << std::endl;
+      std::cout << "**  --> Binary Einstein Delay=" << BinaryEinsteinDelay << " s." << std::endl;
+      std::cout << "**  --> Binary Shapiro Delay=" << BinaryShapiroDelay << " s." << std::endl;
   }
   
   /*
@@ -958,10 +990,12 @@ double PulsarSpectrum::getBinaryDemodulation( double tInput, int LogDemodFlag)
     {
       std::ofstream BinDemodLogFile((m_PSRname + "BinDemod.log").c_str(),std::ios::app);
       BinDemodLogFile << std::setprecision(15) 
-		     << tInput-StartMissionDateMJD*SecsOneDay << "\t" << tInput - m_t0PeriastrMJD*SecsOneDay << "\t"
-		     << EccentricAnomaly << "\t" << TrueAnomaly << "\t"
-		     << Omega << "\t" << m_ecc << "\t" << asini << "\t"
- 		     << BinaryRoemerDelay << std::endl;
+		      << tInput-StartMissionDateMJD*SecsOneDay << "\t" << tInput - m_t0PeriastrMJD*SecsOneDay << "\t"
+		      << EccentricAnomaly << "\t" << TrueAnomaly << "\t"
+		      << Omega << "\t" << m_ecc << "\t" << asini << "\t"
+		      << BinaryRoemerDelay << "\t" 
+		      << BinaryEinsteinDelay << "\t" 
+		      << BinaryShapiroDelay << "\t" << std::endl;
       BinDemodLogFile.close();
     }
 
@@ -1023,41 +1057,107 @@ double PulsarSpectrum::getDecorrectedTime(double CorrectedTime)
 
 double PulsarSpectrum::getBinaryDemodulationInverse( double CorrectedTime)
 {
-  //Use the bisection method to find the inverse of the de-corrected time, i.e. the time (in TT)
-  //that after correction is equal to Time in TDB
+  TRandom engine;
+  
+  //Set initial conditions
+  double deltaMax = m_asini*(1-m_ecc)+m_asini*std::sqrt(1-m_ecc*m_ecc);; //max deltat (s)
+  double deltaMin = m_asini*(1+m_ecc)-m_asini*std::sqrt(1-m_ecc*m_ecc);
 
-  double deltaMax = m_asini*2; //max deltat (s)
-  double ttUp = CorrectedTime + deltaMax;
-  double ttDown = CorrectedTime - deltaMax;
-  double ttMid = (ttUp + ttDown)/2;
+  /*
+  //Metodo delle corde
+  double a = CorrectedTime-deltaMin;
+  double b = CorrectedTime+deltaMax;
+  double fa = 10.;//CorrectedTime - (getIterativeDemodulatedTime(a,0));
+  double fb = -10.;//CorrectedTime - (getIterativeDemodulatedTime(b,0));
+  double h1,h2 = 0.;// a + h1;
+
+  //start iteration
+  //  for (int i=0; i < 100; i++)
+  while (fabs(fa) > 1e-6)
+    {
+      fa = CorrectedTime - (getIterativeDemodulatedTime(a,0));
+      fb = CorrectedTime - (getIterativeDemodulatedTime(b,0));
+      h1 = (a-b)*(fa/(fb-fa));
+      std::cout << std::setprecision(30) << "\n**Corde: a=" << a << " h1" << h1 
+		<< " fa=" << fa << " fb " << fb << std::endl;
+      a = a + h1;
+      //fa = CorrectedTime - (getIterativeDemodulatedTime(a,0));
+      //h2 = (a-b)*(fb/(fb-fa));
+      //b = b + h2;
+
+      //      fa = CorrectedTime - (getIterativeDemodulatedTime(a,0));
+      //      fb = CorrectedTime - (getIterativeDemodulatedTime(b,0));
+      if (fa*fb>0)
+	{
+	  std::cout << "\n\n*********Warning!!! " << std::endl;
+	}
+    }
+
+   return a;
+  */
+
+
+  double tModUp = CorrectedTime + deltaMax;
+  double tModDown = CorrectedTime - deltaMin;
+  double tModMid = (tModUp + tModDown)/2.;
 
   int i = 0;
-  double hMid = 1e30; //for the 1st iteration
+  double hModUp = CorrectedTime - (getIterativeDemodulatedTime(tModUp,0));
+  double hModDown = CorrectedTime - (getIterativeDemodulatedTime(tModDown,0));
+  double hModMid = 1e30; //for the 1st iteration
 
-  while (fabs(hMid)>baryCorrTol )
-    {
-      double hDown = (CorrectedTime - (getIterativeDemodulatedTime(ttDown,0)));
-      
-      hMid = (CorrectedTime - (getIterativeDemodulatedTime(ttMid,0)));
-                
-      //std::cout << std::setprecision(30) 
-      //	<< "\n" << i << "**ttUp " << ttUp << " ttDown " << ttDown << " mid " << ttMid << std::endl;
-             
-      if (fabs(hMid) < baryCorrTol) break;
-      if ((hDown*hMid)>0)
-	{
-	  ttDown = ttMid;
-	  ttMid = (ttUp+ttDown)/2;
-	}
-      else 
-	{
-	  ttUp = ttMid;
-	  ttMid = (ttUp+ttDown)/2;
-	}
-       i++;
-    }
+  //std::cout << std::setprecision(20) << "\n**** Ocrrtime" << CorrectedTime << "\ntdown=" << tModDown << " tup=" << tModUp << " tMid=" << tModMid << std::endl;
+  //std::cout << std::setprecision(20) << "hdown=" << hModDown << " hup=" << hModUp << " hMid=" << hModMid << std::endl;
+
    
-   return ttMid;
+   while (fabs(hModMid)>DemodTol )
+    {
+
+      hModUp = CorrectedTime - (getIterativeDemodulatedTime(tModUp,0));
+      hModDown = CorrectedTime - (getIterativeDemodulatedTime(tModDown,0));
+      double RandFrac  = engine.Uniform();
+      RandFrac = RandFrac-0.1*RandFrac;
+      /*
+      std::cout << std::setprecision(20) << "\n****Rand" << RandFrac << "\ntdown=" << tModDown << " tup=" << tModUp << " tMid=" << tModMid << std::endl;
+      std::cout << std::setprecision(20) << "hdown=" << hModDown << " hup=" << hModUp << " hMid=" << hModMid << std::endl;
+      std::cout << "2asini" << m_asini*2 << std::endl;
+      */
+
+      if ((hModDown*hModMid)<0)
+	{
+	  tModUp = tModMid;
+	}
+      else
+	{
+	  tModDown = tModMid;
+	}
+
+      //      tModMid = (tModUp + tModDown)/2.;
+      tModMid = tModDown + (tModUp - tModDown)*RandFrac;
+      hModMid = CorrectedTime - (getIterativeDemodulatedTime(tModMid,0));
+
+      /*
+      if ((tModUp-tModMid) == 0) 
+	{
+	  std::cout << "stop1" << std::endl;
+	  //break;
+	  tModUp=tModUp+1e-3;
+	}
+      if ((tModDown-tModMid) == 0)
+	{
+	  tModDown=tModDown+1e-3;
+	  std::cout << "stop2" << std::endl;
+	  //break;
+	 }
+       */
+
+     }
+   
+  return tModMid;
+ 
+
+
+
 }
 
 /////////////////////////////////////////////
