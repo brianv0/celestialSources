@@ -282,32 +282,71 @@ void GenerateXMLLibrary(int Nbursts=1000)
   gDirectory->Delete("Eplong");
   gDirectory->Delete("Epshort");
 
-  TH1D* PFlong  = new TH1D("PFlong","Peak Flux ",NentriesL-1,XL);
-  TH1D* PFshort = new TH1D("PFshort","Peak Flux",NentriesS-1,XS);
+  TH1D* PFlong  = new TH1D("PFlong","",NentriesL-1,XL);
+  TH1D* PFshort = new TH1D("PFshort","",NentriesS-1,XS);
   
-  TH1D* FLlong  = new TH1D("FLlong","Fluence ",50,-9,-2);
-  TH1D* FLshort = new TH1D("FLshort","Fluence",50,-9,-2);
+  TH1D* FLlong  = new TH1D("FLlong","",50,-9,-2);
+  TH1D* FLshort = new TH1D("FLshort","",50,-9,-2);
   
-  TH1D* T90long  = new TH1D("T90long","Duration",100,-3,3);
-  TH1D* T90short = new TH1D("T90short","Duration",100,-3,3);
+  TH1D* T90long  = new TH1D("T90long","",100,-3,3);
+  TH1D* T90short = new TH1D("T90short","",100,-3,3);
   
-  TH1D* Zlong  = new TH1D("Zlong","Redshift",100,0,10);
-  TH1D* Zshort = new TH1D("Zshort","Redshift",100,0,10);
+  TH1D* Zlong  = new TH1D("Zlong","",100,0,10);
+  TH1D* Zshort = new TH1D("Zshort","",100,0,10);
   
-  TH1D* alphalong  = new TH1D("alphalong","Low energy spectral index",50,alpha_min,alpha_max);
-  TH1D* alphashort = new TH1D("alphashort","Low energy spectral index",50,alpha_min,alpha_max);
+  TH1D* alphalong  = new TH1D("alphalong","",50,alpha_min,alpha_max);
+  TH1D* alphashort = new TH1D("alphashort","",50,alpha_min,alpha_max);
 
-  TH1D* betalong  = new TH1D("betalong","High energy spectral index",60,beta_min,beta_max);
-  TH1D* betashort = new TH1D("betashort","High energy spectral index",60,beta_min,beta_max);
+  TH1D* betalong  = new TH1D("betalong","",60,beta_min,beta_max);
+  TH1D* betashort = new TH1D("betashort","",60,beta_min,beta_max);
   
-  TH1D* Eplong  = new TH1D("Eplong","Peak Of The e^{2} N(e) spectrum (log_{10})",60,log10(235.0)-5*log10(1.75),log10(235.0)+5*log10(1.75));
-  TH1D* Epshort = new TH1D("Epshort","Peak Of The e^{2} N(e) spectrum (log_{10})",60,log10(235.0)-5*log10(1.75),log10(235.0)+5*log10(1.75));
+  TH1D* Eplong  = new TH1D("Eplong","",60,log10(235.0)-5*log10(1.75),log10(235.0)+5*log10(1.75));
+  TH1D* Epshort = new TH1D("Epshort","",60,log10(235.0)-5*log10(1.75),log10(235.0)+5*log10(1.75));
   
-  TH2D *FluenceVsT90 = new TH2D("FluenceVsT90","LogFluence vs T90",100,-3,3,100,-9,-2);
-  TH2D *PeakFluxVsT90 = new TH2D("PeakFluxVsT90","LogPF vs T90",100,-3,3,100,-2,3);
+  TH2D *FluenceVsT90 = new TH2D("FluenceVsT90","",100,-3,3,100,-9,-2);
+  TH2D *PeakFluxVsT90 = new TH2D("PeakFluxVsT90","",100,-3,3,100,-2,3);
   
   FluenceVsT90->SetXTitle("Log_{10}(T_{90})");
   FluenceVsT90->SetYTitle("Fluence 50-300 keV (erg/cm^{2}) ");
+  
+  //////////////////////////////////////////////////
+  T90long->GetXaxis()->CenterTitle();
+  T90short->GetXaxis()->CenterTitle();
+
+  PFlong->GetXaxis()->CenterTitle();
+  PFshort->GetXaxis()->CenterTitle();
+  
+  betalong->GetXaxis()->CenterTitle();
+  betashort->GetXaxis()->CenterTitle();
+
+  alphalong->GetXaxis()->CenterTitle();
+  alphashort->GetXaxis()->CenterTitle();
+  
+  Eplong->GetXaxis()->CenterTitle();
+  Epshort->GetXaxis()->CenterTitle();
+
+  Zlong->GetXaxis()->CenterTitle();
+  Zshort->GetXaxis()->CenterTitle();
+
+  T90long->GetXaxis()->SetTitle("Log_{10} Duration [sec]");
+  T90short->GetXaxis()->SetTitle("Log_{10} Duration [sec]");
+
+  PFlong->GetXaxis()->SetTitle("Peak Flux 50-300 keV [ph/cm^{2}/s]");
+  PFshort->GetXaxis()->SetTitle("Peak Flux 50-300 keV [ph/cm^{2}/s]");
+  
+  betalong->GetXaxis()->SetTitle("High Energy Spectral Index (#beta)");
+  betashort->GetXaxis()->SetTitle("High Energy Spectral Index (#beta)");
+
+  alphalong->GetXaxis()->SetTitle("Low Energy Spectral Index (#alpha)");  
+  alphashort->GetXaxis()->SetTitle("Low Energy Spectral Index (#alpha)");  
+  
+  Eplong->GetXaxis()->SetTitle("Peak Of The e^{2} N(e) spectrum (log_{10}) [keV]");
+  Epshort->GetXaxis()->SetTitle("Peak Of The e^{2} N(e) spectrum (log_{10}) [keV]");
+
+  Zlong->GetXaxis()->SetTitle("Redshift");
+  Zshort->GetXaxis()->SetTitle("Redshift");
+
+  
   if(BN)
     {
       //      PFlong->SetLineStyle(4);
