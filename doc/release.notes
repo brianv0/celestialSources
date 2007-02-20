@@ -4,22 +4,8 @@
 
   @verbatim
   $Id$
-  31-Oct-06 v1r2     NO    Add GRBtemplate
-  17-May-06 v1r1p5   JC    Replace ROOT's default gRandom instance with
-                           a TRandom4 instance so that CLHEP random engines
-                           are used by TH1::GetRandom methods et al.
-  29-Mar-06 v1r1p4   JC    Johann's addition to SpectrumFactoryLoader to
-                           set the ROOT gRandom seed from the CLHEP engine
-  14-mar-06 v1r1p3   THB   fix req file to include eblAtten
-  02-Feb-06 v1r1p2   JCT   add 3 sources, based on a flux file and ROOT TF1
-                           in genericSources
-  31-Oct-05 v1r1     JC    add FitsTransient, SourcePopulation
-  28-Aug-05 v1r0p5   JC    tag for GRBobsmanager
-  27-Apr-05 v1r0p4   THB   restore GRBobs 
-  27-Apr-05 v1r0p3   THB   remove GRBobs for now--does not build on Windows,
-                           not used yet
-  27-Apr-05 v1r0p2   THB   add header files to project on Windows, enable 
-                           creation of names
+  27-Apr-05 v1r0p3   THB   remove GRBobs for now--does not build on Windows, not used yet
+  27-Apr-05 v1r0p2   THB   add header files to project on Windows, enable creation of names
   26-Apr-05 v1r0p1   JC    add cppflags for package includes on Windows
   26-Apr-05 v1       JC    Add SpectrumFactoryLoader class used to create
                            SpectrumFactory objects found in celestialSources

@@ -25,7 +25,6 @@ class GRBobsengine
   /*!
     Generate a sequance of pulses (GRBobsPulses) and is store them into a vector.
   */
-  double generatePulses(std::vector<GRBobsPulse*> &thePulses, double duration);
   std::vector<GRBobsPulse*> CreatePulsesVector();
   /// Returns the galactic position of the burst in <em>l and <em>b coordinates.
   inline std::pair<double,double> GetDirection(){return m_dir;}

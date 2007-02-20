@@ -4,7 +4,6 @@
 
   @verbatim
   $Id$
-  02-dec-06 v1r0p4     THB   Changed to supported CLHEP vector class
   01-nov-06 v1r0p3     NO    Fixed compilation under windows 
   31-oct-06 v1r0p2     NO    Bug Fixed (caused a seg fault)
   31-oct-06 v1r0p1     NO    Added 4 template files from Milan (Thermal model)
