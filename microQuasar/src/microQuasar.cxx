@@ -43,7 +43,7 @@ microQuasar::microQuasar(const std::string &paramString)
   float specOrbital1,specOrbital2=-1;
   float phaseOrbital1,phaseOrbital2=-1;
 
-  std::vector<std::String>::iterator curToken = tokens.begin();
+  std::vector<std::string>::iterator curToken = tokens.begin();
   while(curToken!=tokens.end()){
     std::vector<std::string> token = tokenize(*curToken,'=');
     std::transform(token[0].begin(),token[0].end(),token[0].begin(),(int(*)(int))toupper);
@@ -66,9 +66,9 @@ microQuasar::microQuasar(const std::string &paramString)
     if(token[0]=="ORBITALPHASEREGION1")
       phaseOrbital1 = std::atof(token[1].c_str());
     if(token[0]=="ORBITALPHASEREGION2")
-      phseOrbital2 = std::atof(token[1].c_str());
+      phaseOrbital2 = std::atof(token[1].c_str());
     if(token[0]=="DISKCYCLEDURATION")
-      m_diskProperties.setCycleDuration(std::atof(token[1].c_str())*daySeecs);
+      m_diskProperties.setCycleDuration(std::atof(token[1].c_str())*daySecs);
     if(token[0]=="DISKCYCLEFLUCTUATION")
       m_diskProperties.setCycleDurationFluct(std::atof(token[1].c_str()));
     if(token[0]=="JETONCYCLE")
@@ -83,7 +83,7 @@ microQuasar::microQuasar(const std::string &paramString)
   if(specOrbital1!=-1 && specOrbital2!=-1)
     m_orbitalRegion.setSpectralIndex(specOrbital1,specOrbital2);
   if(phaseOrbital1!=-1 && phaseOrbital2!=-1)
-    m_orbitalRegion.setOrbitalPhase(phaseOribtal1,phaseOrbital2);
+    m_orbitalRegion.setOrbitalPhase(phaseOrbital1,phaseOrbital2);
 	/*
 	m_ftot = ::atof(params[0].c_str());
 	m_eMin = ::atof(params[1].c_str());
@@ -113,7 +113,7 @@ microQuasar::microQuasar(const std::string &paramString)
 		<< m_eMax << " MeV." << std::endl;
 }
 
-std::vector<std::string> microQuasar::tokenize(const std::string params, char token){
+std::vector<std::string> microQuasar::tokenize(std::string params, char token){
   std::vector<std::string> tokens;
   while(params.length()!=0){
     std::string::size_type pos = params.find(token,0);
