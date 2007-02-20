@@ -79,7 +79,8 @@ microQuasar::microQuasar(const std::string &paramString)
       m_jetProperties.setJetOnDuration(std::atof(token[1].c_str()));
     if(token[0]=="JETONDURATIONFLUCTUATION")
       m_jetProperties.setJetOnDurationFluct(std::atof(token[1].c_str()));
-  }
+	curToken++;
+  } 
   if(specOrbital1!=-1 && specOrbital2!=-1)
     m_orbitalRegion.setSpectralIndex(specOrbital1,specOrbital2);
   if(phaseOrbital1!=-1 && phaseOrbital2!=-1)
@@ -108,7 +109,7 @@ microQuasar::microQuasar(const std::string &paramString)
 	m_jetEnd = jet.second;
 
 	std::cerr << "microQuasar created. Total flux = " 
-		<< m_ftot << " cm^-2 s^-1 " << " between " 
+		<< m_ftot << " m^-2 s^-1 " << " between " 
 		<< m_eMin << " MeV and "
 		<< m_eMax << " MeV." << std::endl;
 }
