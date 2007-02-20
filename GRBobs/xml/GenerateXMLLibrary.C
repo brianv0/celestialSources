@@ -182,7 +182,7 @@ void GenerateXMLLibrary(int Nbursts=1000)
   double alpha_min = -2.5;  //  -3<= a < 1.0 
   double alpha_max = 0.5;   //   -3<= a < 1.0 
   double beta_max = -1.2;   //   b < a && b < -2 
-  double beta_min = -7.2;// -4.0;   //   b < a && b < -2 
+  double beta_min = -4.0;//-7.2;// -4.0;   //   b < a && b < -2 
   
   //////////////////////////////////////////////////
   int NphLat=0;

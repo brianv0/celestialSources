@@ -21,6 +21,17 @@ ISpectrumFactory &GRBobsmanagerFactory()
   return myFactory;
 }
 
+void ComputeCoordinates(double time, double l, double b, double& ra, double& dec, double& theta, double& phi)
+{
+  astro::SkyDir sky(l,b,astro::SkyDir::GALACTIC);
+  Hep3Vector skydir=sky.dir();
+  HepRotation rottoglast =   astro::GPS::instance()->transformToGlast(time,astro::GPS::CELESTIAL);
+  Hep3Vector scdir = rottoglast * skydir;
+  ra    = sky.ra();
+  dec   = sky.dec();
+  theta = 90. - scdir.theta()*180.0/M_PI;
+  phi   = scdir.phi()*180.0/M_PI;
+}
 
 GRBobsmanager::GRBobsmanager(const std::string& params)
   : m_params(params)
@@ -31,9 +42,12 @@ GRBobsmanager::GRBobsmanager(const std::string& params)
   //  Field Of View for generating bursts degrees above the XY plane.
   const double FOV = -100;
   if(FOV>-90) std::cout<<"WARNING!! GRBobs: FOV = "<<FOV<<std::endl;
-  using astro::GPS;
+
   m_GenerateGBMOutputs = false;
   //  facilities::Util::expandEnvVar(&paramFile);  
+  m_l=-200;
+  m_b=-200;
+
   if (params.find("=") == std::string::npos) 
     {
       m_GRBnumber = (long) floor(65540+parseParamList(params,0));
@@ -62,14 +76,15 @@ GRBobsmanager::GRBobsmanager(const std::string& params)
       m_GRB_duration    = parmap.value("duration");
       if(params.find("fluence")!= std::string::npos)
 	{
-	  std::cout<<"READ FLUENCE"<<std::endl;
 	  m_fluence         = parmap.value("fluence");
 	}
       else
 	{
-	  std::cout<<"READ PEAK FLUX"<<std::endl;
 	  m_fluence         = parmap.value("peakFlux");
 	}
+      m_l = parmap.value("l");
+      m_b = parmap.value("b");
+      
       m_z               = parmap.value("redshift");
       m_alpha           = parmap.value("alpha");
       m_beta            = parmap.value("beta");
@@ -119,39 +134,44 @@ GRBobsmanager::GRBobsmanager(const std::string& params)
   m_par->SetMinPhotonEnergy(m_MinPhotonEnergy); //keV  
   m_par->SetRedshift(m_z);
   m_theta = -1000000.0;
+  
   //  std::cout<<m_par->rnd->GetSeed()<<std::endl;
   //  m_GRBnumber=m_par->rnd->GetSeed();
-  while(m_theta<FOV)
+  if (m_l > 0 && m_l < 360 && m_b > -90 && m_b < 90)
     {
-      m_par->SetGalDir(-200,-200); //this generates random direction in the sky
-      m_GalDir = m_par->GetGalDir();      
-      m_l = m_GalDir.first;
-      m_b = m_GalDir.second;
-      
-      astro::SkyDir sky(m_l,m_b,astro::SkyDir::GALACTIC);
-      Hep3Vector skydir=sky.dir();
-      try{
-	HepRotation rottoglast = GPS::instance()->transformToGlast(m_startTime,GPS::CELESTIAL);
-	Hep3Vector scdir = rottoglast * skydir;
-	m_ra    = sky.ra();
-	m_dec   = sky.dec();
-	double zenithCosTheta=cos(scdir.theta());
-	m_theta = 90. - scdir.theta()*180.0/M_PI; // theta=0 -> XY plane, theta=90 -> Z
-	m_phi   = scdir.phi()*180.0/M_PI;
-	m_grbdeleted      = false;
-	m_grbocculted = (zenithCosTheta < -0.4); // this is hardcoded  in FluxSource.cxx
-      }
+      try 
+	{
+	  ComputeCoordinates(m_startTime,m_l,m_b,m_ra,m_dec,m_theta,m_phi);
+	  m_grbdeleted      = false;
+	}
       catch(const std::exception &e)
 	{
 	  m_grbdeleted=true;
-	  break;
 	}
     }
+  else
+    while(m_theta<FOV)
+      {
+	m_par->SetGalDir(-200,-200); //this generates random direction in the sky
+	m_GalDir = m_par->GetGalDir();      
+	m_l = m_GalDir.first;
+	m_b = m_GalDir.second;
+	
+	try{	
+	  ComputeCoordinates(m_startTime,m_l,m_b,m_ra,m_dec,m_theta,m_phi);
+	  m_grbdeleted      = false;
+	}
+	catch(const std::exception &e)
+	  {
+	    m_grbdeleted=true;
+	    break;
+	  }
+      }
   //PROMPT
-
+  
   //  astro::EarthCoordinate earthpos()
-
-
+  
+  
   //  m_inSAA =   astro::EarthCoordinate::insideSAA();
   m_endTime    = m_startTime  +    m_GRB_duration; //check this in GRBobsSim !!!!!
   m_GRBend     = m_endTime;
@@ -276,16 +296,18 @@ void GRBobsmanager::GenerateGRB()
   //////////////////////////////////////////////////
   string GRBname = GetGRBname();
   
-  if(m_grbocculted)
-    {
+  /*  if(m_grbocculted)
+      {
       cout<<"This GRB is occulted by the Earth"<<endl;
-    }
-  else if(m_GenerateGBMOutputs)
+      }
+  else 
+  */
+  if(m_GenerateGBMOutputs)
     {
       m_GRB->SaveGBMDefinition(GRBname,m_ra,m_dec,m_theta,m_phi,m_Rest);
       m_GRB->GetGBMFlux(GRBname);
     }
-
+  
   string name = "GRBOBS_";
   name+=GRBname; 
   name+="_PAR.txt";
