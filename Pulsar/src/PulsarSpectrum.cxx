@@ -145,7 +145,11 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
   m_enphmax    = std::atof(parseParamList(params,4).c_str()); // minimum energy of extracted photons
   m_model      = std::atoi(parseParamList(params,5).c_str()); // choosen model
   m_seed       = std::atoi(parseParamList(params,6).c_str()); //Model Parameters: Random seed
-  
+
+  //Setting random seed
+  m_PSpectrumRandom = new TRandom;
+  m_PSpectrumRandom->SetSeed(m_seed);
+ 
   if (m_model == 1) //Phenomenological model
     {
       m_ppar0   = std::atoi(parseParamList(params,7).c_str()); //Model Parameters: Number of peaks  
@@ -490,6 +494,7 @@ PulsarSpectrum::~PulsarSpectrum()
   delete m_Pulsar;
   delete m_spectrum;
   delete m_earthOrbit;
+  delete m_PSpectrumRandom;
 }
 
 /////////////////////////////////////////////////
@@ -537,35 +542,7 @@ double PulsarSpectrum::interval(double time)
     }
   else
     {
-      //     std::cout << "pippo2" << std::endl;
-      timeTildeDemodulated = getIterativeDemodulatedTime(timeTilde,0);
-      //std::cout << "pippo2a" << std::endl;
-
-      /*
-      std::cout << "\n\n*****binary!" <<std::endl;
-      std::cout << "step" << timeTildeDemodulated - (StartMissionDateMJD)*SecsOneDay << std::endl;
-      timeTildeDemodulated = timeTilde+getBinaryDemodulation(timeTilde,0);
-            
-      double TargetTime = timeTilde;
-      //double timeTilde1 = timeTilde;
-      double delay = getBinaryDemodulation(timeTilde,0);
-
-      for (int i=0; i < 50; i++)
-	{
-	  timeTildeDemodulated = TargetTime+delay;
-	  delay = getBinaryDemodulation(timeTildeDemodulated,0);
-
-	  //	  timeTildeDemodulated = timeTilde1-delay;
-
-	  std::cout << "Direct!" << std::endl;
-	  std::cout << std::setprecision(15) << "i" << i << " " << timeTildeDemodulated- (StartMissionDateMJD)*SecsOneDay << " " 
-		    << fabs(timeTildeDemodulated-delay-TargetTime) << " " << timeTildeDemodulated-delay -(StartMissionDateMJD)*SecsOneDay << std::endl;
-
-	  //if (fabs(timeTildeDemodulated-TargetTime) < DemodTol) break;
-	   if (fabs(timeTildeDemodulated-delay-TargetTime) < DemodTol) break;
-	  }
-      */
-      
+      timeTildeDemodulated = getIterativeDemodulatedTime(timeTilde,1);      
     }
 
   double initTurns = getTurns(timeTildeDemodulated); //Turns made at this time
@@ -640,10 +617,10 @@ double PulsarSpectrum::interval(double time)
 		   std::cout << std::setprecision(20) << " At Next t0 Number of Turns will be: " << m_N0 << std::endl;
 		 }
 	    }
-	// else
-	//	    {
-	//std::cout << "Warning! Valid ephemerides not found!Proceeding with the old ones" << std::endl; 
-	//}
+	 else
+	   {
+	     std::cout << "Warning! Valid ephemerides not found!Proceeding with the old ones" << std::endl; 
+	   }
     }
 
   if (DEBUG)
@@ -699,7 +676,7 @@ double PulsarSpectrum::interval(double time)
       */
     }
  
-  // if (DEBUG)
+  //  if (DEBUG)
   //{ 
       std::cout << std::setprecision(15) << "\nTimeTildeDecorr at Spacecraft (TT) is: " 
 		<< timeTildeDecorr - (StartMissionDateMJD)*SecsOneDay << "sec." << std::endl;
@@ -713,7 +690,13 @@ double PulsarSpectrum::interval(double time)
       std::cout << std::setprecision(15) <<"  -->Interval is " <<  nextTimeTildeDecorr - timeTildeDecorr << std::endl;
       //  }
   
-  return nextTimeTildeDecorr - timeTildeDecorr; //interval between the de-corected times
+      double interv = nextTimeTildeDecorr - timeTildeDecorr;
+      if (interv < 0.)
+	interv = m_periodVect[0]/100.;
+      
+      //      return nextTimeTildeDecorr - timeTildeDecorr; //interval between the de-corected times
+      return interv;
+      
 }
 
 /////////////////////////////////////////////
@@ -890,16 +873,16 @@ double PulsarSpectrum::getIterativeDemodulatedTime(double tInput, int LogFlag)
   double timeDemodulated = tInput+getBinaryDemodulation(tInput,LogFlag);
             
   double TargetTime = tInput;
-  double delay = getBinaryDemodulation(tInput,LogFlag);
+  double delay = getBinaryDemodulation(tInput,0);
 
   //for (int i=0; i < 50; i++)
   int i=0;
-  while ((fabs(timeDemodulated-delay-TargetTime) > DemodTol) && ( i < 20))
+  while ((fabs(timeDemodulated-delay-TargetTime) > DemodTol) && ( i < 50))
     {
 
       i++;
       timeDemodulated = TargetTime+delay;
-      delay = getBinaryDemodulation(timeDemodulated,LogFlag);
+      delay = getBinaryDemodulation(timeDemodulated,0);
         
       //      std::cout << std::setprecision(15) << "i" << i << " " << timeDemodulated-(StartMissionDateMJD)*SecsOneDay << " " 
       //	<< fabs(timeDemodulated-delay-TargetTime) << " " << timeDemodulated-delay -(StartMissionDateMJD)*SecsOneDay << std::endl;
@@ -919,9 +902,12 @@ double PulsarSpectrum::getIterativeDemodulatedTime(double tInput, int LogFlag)
       std::cout << "e poiii " << fabs(timeDemodulated-delay-TargetTime) << std::endl;
       */  
     }
-
-  //std::cout << "pippo1" << std::endl;
-
+  
+  if (LogFlag == 1)
+    {
+      delay = getBinaryDemodulation(timeDemodulated,1);
+    }
+  
   return timeDemodulated;
 }
 
@@ -978,14 +964,6 @@ double PulsarSpectrum::getBinaryDemodulation( double tInput, int LogDemodFlag)
       std::cout << "**  --> Binary Shapiro Delay=" << BinaryShapiroDelay << " s." << std::endl;
   }
   
-  /*
-  std::cout <<"(std::cos(EccentricAnomaly))" << (std::cos(EccentricAnomaly)) << std::endl; 
-  std::cout << "std::sin(Omega)" << std::sin(Omega) << std::endl;
-  std::cout <<  "std::sin(EccentricAnomaly)" << std::sin(EccentricAnomaly) << std::endl;;
-  std::cout <<  "std::cos(Omega)" << std::cos(Omega) << std::endl;;
-  std::cout <<  "std::sqrt(1-m_ecc*m_ecc)" << std::sqrt(1-m_ecc*m_ecc) << std::endl;;
-  */
-  
   if ((LogDemodFlag ==1) && (tInput-StartMissionDateMJD*SecsOneDay > 0.))
     {
       std::ofstream BinDemodLogFile((m_PSRname + "BinDemod.log").c_str(),std::ios::app);
@@ -999,7 +977,7 @@ double PulsarSpectrum::getBinaryDemodulation( double tInput, int LogDemodFlag)
       BinDemodLogFile.close();
     }
 
-  return -1.*BinaryRoemerDelay;
+  return -1.*(BinaryRoemerDelay+BinaryEinsteinDelay+BinaryShapiroDelay);
 }
 
 /////////////////////////////////////////////
@@ -1055,108 +1033,84 @@ double PulsarSpectrum::getDecorrectedTime(double CorrectedTime)
    return ttMid;
 }
 
+/////////////////////////////////////////////
+/*!
+ * \param CorrectedTime Photon arrival time Modulatedat SSB (TDB expressed in MJD)
+ *
+ * <br>
+ * This method returns the correspondent inverse-demodulated time of each photons, includingRoemer delay, Einstein delay 
+ * and Shapiro delay
+ */
 double PulsarSpectrum::getBinaryDemodulationInverse( double CorrectedTime)
 {
-  TRandom engine;
-  
+
   //Set initial conditions
-  double deltaMax = m_asini*(1-m_ecc)+m_asini*std::sqrt(1-m_ecc*m_ecc);; //max deltat (s)
+  double deltaMax = m_asini*(1-m_ecc)+m_asini*std::sqrt(1-m_ecc*m_ecc); //max deltat (s)
   double deltaMin = m_asini*(1+m_ecc)-m_asini*std::sqrt(1-m_ecc*m_ecc);
-
-  /*
-  //Metodo delle corde
-  double a = CorrectedTime-deltaMin;
-  double b = CorrectedTime+deltaMax;
-  double fa = 10.;//CorrectedTime - (getIterativeDemodulatedTime(a,0));
-  double fb = -10.;//CorrectedTime - (getIterativeDemodulatedTime(b,0));
-  double h1,h2 = 0.;// a + h1;
-
-  //start iteration
-  //  for (int i=0; i < 100; i++)
-  while (fabs(fa) > 1e-6)
-    {
-      fa = CorrectedTime - (getIterativeDemodulatedTime(a,0));
-      fb = CorrectedTime - (getIterativeDemodulatedTime(b,0));
-      h1 = (a-b)*(fa/(fb-fa));
-      std::cout << std::setprecision(30) << "\n**Corde: a=" << a << " h1" << h1 
-		<< " fa=" << fa << " fb " << fb << std::endl;
-      a = a + h1;
-      //fa = CorrectedTime - (getIterativeDemodulatedTime(a,0));
-      //h2 = (a-b)*(fb/(fb-fa));
-      //b = b + h2;
-
-      //      fa = CorrectedTime - (getIterativeDemodulatedTime(a,0));
-      //      fb = CorrectedTime - (getIterativeDemodulatedTime(b,0));
-      if (fa*fb>0)
-	{
-	  std::cout << "\n\n*********Warning!!! " << std::endl;
-	}
-    }
-
-   return a;
-  */
-
 
   double tModUp = CorrectedTime + deltaMax;
   double tModDown = CorrectedTime - deltaMin;
-  double tModMid = (tModUp + tModDown)/2.;
+  double tModMid = 0.;//(tModUp + tModDown)/2.;
 
   int i = 0;
-  double hModUp = CorrectedTime - (getIterativeDemodulatedTime(tModUp,0));
-  double hModDown = CorrectedTime - (getIterativeDemodulatedTime(tModDown,0));
+  double hModUp = 0.;//CorrectedTime - (getIterativeDemodulatedTime(tModUp,0));
+  double hModDown = 0.;//CorrectedTime - (getIterativeDemodulatedTime(tModDown,0));
   double hModMid = 1e30; //for the 1st iteration
 
-  //std::cout << std::setprecision(20) << "\n**** Ocrrtime" << CorrectedTime << "\ntdown=" << tModDown << " tup=" << tModUp << " tMid=" << tModMid << std::endl;
-  //std::cout << std::setprecision(20) << "hdown=" << hModDown << " hup=" << hModUp << " hMid=" << hModMid << std::endl;
-
-   
-   while (fabs(hModMid)>DemodTol )
+   while (fabs(hModMid)>InverseDemodTol )
     {
+      i++;
+      tModMid = tModUp*0.5 + tModDown*0.5;
+      
+      if (tModMid == tModDown)
+	{
+	  tModDown = tModDown-1e-5*m_PSpectrumRandom->Uniform();
+	  std::cout << "\n**Correcting down " << std::endl;
+	  tModMid = tModUp*0.5 + tModDown*0.5;
+	}
 
-      hModUp = CorrectedTime - (getIterativeDemodulatedTime(tModUp,0));
-      hModDown = CorrectedTime - (getIterativeDemodulatedTime(tModDown,0));
-      double RandFrac  = engine.Uniform();
-      RandFrac = RandFrac-0.1*RandFrac;
+      if (tModMid == tModUp)
+	{
+	  tModUp = tModUp+1e-5*m_PSpectrumRandom->Uniform();
+	  std::cout << "\n**Correcting up " << std::endl;
+	  tModMid = tModUp*0.5 + tModDown*0.5;
+	}
+
+      hModMid = CorrectedTime - (getIterativeDemodulatedTime(tModMid,0));
+
       /*
-      std::cout << std::setprecision(20) << "\n****Rand" << RandFrac << "\ntdown=" << tModDown << " tup=" << tModUp << " tMid=" << tModMid << std::endl;
-      std::cout << std::setprecision(20) << "hdown=" << hModDown << " hup=" << hModUp << " hMid=" << hModMid << std::endl;
-      std::cout << "2asini" << m_asini*2 << std::endl;
+       std::cout << std::setprecision(30) << "\n****Rand" << RandFrac << " delta " << (tModUp - tModDown)*RandFrac << std::endl;
+       std::cout << std::setprecision(30) << " tUp-tmid " << tModUp - tModMid << std::endl;
+       std::cout << std::setprecision(30) << " tDown-tmid " << tModDown - tModMid << std::endl;
+       std::cout << std::setprecision(30) << "   tdown=" << tModDown << " tup=" << tModUp << " tMid=" << tModMid << std::endl;
+       std::cout << std::setprecision(30) << "   hdown=" << hModDown << " hup=" << hModUp << " hMid=" << hModMid << std::endl;
       */
-
+      
       if ((hModDown*hModMid)<0)
 	{
 	  tModUp = tModMid;
+	  //std::cout << " tMid--->tTup ::: tUp=" << tModUp<<std::endl; 
 	}
       else
 	{
 	  tModDown = tModMid;
+	  //	  std::cout << " tMid--->tTDown ::: tDown=" << tModDown<<std::endl; 
 	}
 
-      //      tModMid = (tModUp + tModDown)/2.;
-      tModMid = tModDown + (tModUp - tModDown)*RandFrac;
-      hModMid = CorrectedTime - (getIterativeDemodulatedTime(tModMid,0));
+      hModUp = CorrectedTime - (getIterativeDemodulatedTime(tModUp,0));
+      hModDown = CorrectedTime - (getIterativeDemodulatedTime(tModDown,0));
 
-      /*
-      if ((tModUp-tModMid) == 0) 
+      if (i==50) 
 	{
-	  std::cout << "stop1" << std::endl;
-	  //break;
-	  tModUp=tModUp+1e-3;
-	}
-      if ((tModDown-tModMid) == 0)
-	{
-	  tModDown=tModDown+1e-3;
-	  std::cout << "stop2" << std::endl;
-	  //break;
-	 }
-       */
-
-     }
+	  if (DEBUG)
+	    {
+	      std::cout << " ERROR!!!: Inverse demodulation does not converge! " << std::endl;
+	    }
+	  break;
+    	}
+    }
    
   return tModMid;
- 
-
-
 
 }
 

@@ -120,6 +120,7 @@ class PulsarSpectrum : public ISpectrum
   
   PulsarSim *m_Pulsar; 
   SpectObj  *m_spectrum;
+  TRandom *m_PSpectrumRandom;
   
   //! Variables related to Solar System and Astro.
   astro::EarthOrbit *m_earthOrbit;
