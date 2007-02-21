@@ -90,7 +90,7 @@ class GRBobsSim
     \param tstart is the GRB starting time (in second, since the starting time of the simulation).
   */
   void SaveGBMDefinition(std::string GRBname, double ra, double dec, double theta, double phi, double tstart);
-  
+  double *ComputeEnergyBins(int &Nbins);
  private:
   
   /// Gathers all relevant constants for the simulation 
@@ -99,8 +99,11 @@ class GRBobsSim
   double m_tfinal;
   double m_fluence;
   int m_tbin;
+
   TH2D *m_Nv;
   TH2D *m_NvEC;
+  std::vector<double> NaIEnergyGrid_Vector;
+  std::vector<double> BGOEnergyGrid_Vector;
 };
 
 #endif

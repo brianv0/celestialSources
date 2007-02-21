@@ -38,7 +38,6 @@ GRBobsmanager::GRBobsmanager(const std::string& params)
 {
 
   if(DEBUG) std::cout<<" GRBobsmanager::GRBobsmanager "<<std::endl;
-
   //  Field Of View for generating bursts degrees above the XY plane.
   const double FOV = -100;
   if(FOV>-90) std::cout<<"WARNING!! GRBobs: FOV = "<<FOV<<std::endl;
@@ -313,8 +312,15 @@ void GRBobsmanager::GenerateGRB()
   name+="_PAR.txt";
   //..................................................//
   ofstream os(name.c_str(),ios::out);  
-  os<<"  GRBName      T_start         T_end        L        B    Theta      Phi        z     Flux    Alpha     Beta    Epeak     Essc     Fssc      Eco    N_ext  Del_ext  Dur_ext "<<endl;
-  os<<setw(9)<<GRBname<<setw(13)<<setprecision(10)<<m_startTime<<" "<<setw(13)<<m_GRBend<<" "<<setprecision(4)<<setw(8)<<m_l<<" "<<setw(8)<<m_b<<" "<<setw(8)<<m_theta<<" "<<setw(8)<<m_phi<<" "<<setw(8)<<m_z<<" "<<setw(8)<<m_fluence<<" "<<setw(8)<<m_alpha<<" "<<setw(8)<<m_beta<<" "<<setw(8)<<m_epeak<<" "<<setw(8)<<m_essc_esyn<<" "<<setw(8)<<m_fssc_fsyn<<" "<<setw(8)<<m_CutOffEnergy <<" "<<setw(8)<<m_LATphotons <<" "<< setw(8)<<m_EC_delay<<" "<<setw(8)<<m_EC_duration<<endl;
+  os<<"  GRBName      T_start         T_end        L        B    Ra    Dec     Theta      Phi        z     Flux    Alpha     Beta    Epeak     Essc     Fssc      Eco    N_ext  Del_ext  Dur_ext "<<endl;
+  os<<setw(9)<<GRBname<<setw(13)<<setprecision(10)<<m_startTime<<" "<<setw(13)<<m_GRBend;
+  os<<" "<<setprecision(4)<<setw(8)<<m_l<<" "<<setw(8)<<m_b;
+  os<<" "<<setw(8)<<m_ra<<" "<<setw(8)<<m_dec;
+  os<<" "<<setw(8)<<m_theta<<" "<<setw(8)<<m_phi;
+  os<<" "<<setw(8)<<m_z<<" "<<setw(8)<<m_fluence;
+  os<<" "<<setw(8)<<m_alpha<<" "<<setw(8)<<m_beta<<" "<<setw(8)<<m_epeak;
+  os<<" "<<setw(8)<<m_essc_esyn<<" "<<setw(8)<<m_fssc_fsyn<<" "<<setw(8)<<m_CutOffEnergy;
+  os<<" "<<setw(8)<<m_LATphotons <<" "<< setw(8)<<m_EC_delay<<" "<<setw(8)<<m_EC_duration<<endl;
   os.close();  
   cout<<"GRB"<<GRBname;
   if( m_z >0)  cout<<" redshift = "<<m_z;

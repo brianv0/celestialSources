@@ -18,8 +18,8 @@
  */
 namespace ObsCst
 {
-  /// minimum energy for the computed spectrum (keV)
-  const double emin = 10.0;
+  /// Number of  LAT energy bins.
+  const int   LAT_number_of_energy_bins=20;
   /// maximum energy (keV)
   const double emax = 3e8;
   /// default value for the minimum energy of the extracted photons -LAT photons- (keV)
@@ -41,10 +41,10 @@ namespace ObsCst
   /// for the displacements between peaks
   const double deltaTPeak   = 0.5;//0.5;  //for the displacements between peaks
   /// Number of energy bins (logarithmically spaced)
-  const    int Ebin =  50; 
+  //  const    int Ebin =  50; 
   /// Time resolution for the GBM spectra.
   const    double  TimeBinWidth   =  0.016; //s (16 ms)
-  static const double de   = pow(emax/emin,1.0/Ebin);
+  //  static const double de   = pow(emax/emin,1.0/Ebin);
   
   const double erg2meV   = 624151.0;
   const double BATSE1=20.0;       

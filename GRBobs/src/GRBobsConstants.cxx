@@ -9,7 +9,7 @@ GRBobsParameters::GRBobsParameters()
   rndGalacticDir = new TRandom();
   SetGRBNumber((long) rnd->GetSeed());
   m_Type=0; //1->Short, 2->Long, 0->Both
-  m_enph=emin;
+  m_enph=enph;
   m_NormType='P';
   m_Stretch=1.0;
 }
@@ -66,7 +66,7 @@ void GRBobsParameters::SetGRBNumber(long GRBnumber)
 
 void GRBobsParameters::SetMinPhotonEnergy(double enph)
 {
-  m_enph = TMath::Min(emax, TMath::Max(enph,emin));
+  m_enph = enph;
 }
 
 

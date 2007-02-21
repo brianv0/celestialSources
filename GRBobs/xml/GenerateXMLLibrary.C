@@ -159,6 +159,16 @@ double GetEPeak(TRandom *rnd, int Type, double Stretch)
   if(Type==2 && (GeneratePF)) Ep/=Stretch; //Long
   return Ep;
 }
+//////////////////////////////////////////////////
+void GenerateGalDir(TRandom *rnd, double &l, double &b)
+{
+  double r1 = rnd->Uniform();
+  double r2 = rnd->Uniform();
+  l = 180.-360.*r1;
+  b = (180.0/TMath::Pi())*acos(1.0-2.0*r2)-90.0;
+}
+
+
 
 //////////////////////////////////////////////////
 void GenerateXMLLibrary(int Nbursts=1000)
@@ -196,10 +206,16 @@ void GenerateXMLLibrary(int Nbursts=1000)
     Fssc_Fsyn =   Fssc_Fsyn_const;
   //////////////////////////////////////////////////
   if (GenerateRedshift && (CO_Energy!=0)) std::cout<<" WARNING!!! Generate redshift is true and CO_Energy!=0"<<std::endl;
+  
   TRandom *rnd = new TRandom();
   rnd->SetSeed(65540);
+  
   TRandom *rnd_1 = new TRandom();
   rnd_1->SetSeed(65540);
+  
+  TRandom *rnd_2 = new TRandom();
+  rnd_2->SetSeed(65540);
+  
   //  rnd->SetSeed(19741205);
   //rnd->SetSeed(20030914);
   // Peak Flux Distributions, from Jay and Jerry IDL code.
@@ -431,7 +447,9 @@ void GenerateXMLLibrary(int Nbursts=1000)
 
   for(int i = 0; i<Nbursts ; i++)
     {
-      
+      double gal_l = 0.0; 
+      double gal_b = 0.0; 
+      GenerateGalDir(rnd_2,gal_l,gal_b);
       
       if(BURSTtype==1) 
 	{
@@ -580,6 +598,9 @@ void GenerateXMLLibrary(int Nbursts=1000)
 	osXML<<" <SpectrumClass name=\"GRBobsmanager\" params=\"tstart="<<BurstTime<<", duration="<<Duration<<", peakFlux="<<PeakFlux;
       else 
 	osXML<<" <SpectrumClass name=\"GRBobsmanager\" params=\"tstart="<<BurstTime<<", duration= "<<Duration<<", fluence="<<Fluence;
+      
+      //      if(!GLASTCoordinate)  
+	osXML<<", l="<<gal_l<<", b="<<gal_b;
       
       osXML<<", redshift="<<z<<", alpha="<<alpha<<", beta="<<beta<<", Ep="<<Ep<<", emin="<<MinExtractedPhotonEnergy;
       
