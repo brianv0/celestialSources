@@ -10,7 +10,7 @@
 #include "astro/SkyDir.h"
 #include "astro/PointingTransform.h"
 #include "astro/JulianDate.h"
-#include "CLHEP/Vector/ThreeVector.h"
+
 #define DEBUG 0
 
 
@@ -74,10 +74,10 @@ GRBobsmanager::GRBobsmanager(const std::string& params)
       m_b = m_GalDir.second;
       
       astro::SkyDir sky(m_l,m_b,astro::SkyDir::GALACTIC);
-      Hep3Vector skydir=sky.dir();
+      HepVector3D skydir=sky.dir();
       try{
 	HepRotation rottoglast = GPS::instance()->transformToGlast(m_startTime,GPS::CELESTIAL);
-	Hep3Vector scdir = rottoglast * skydir;
+	HepVector3D scdir = rottoglast * skydir;
 	m_ra    = sky.ra();
 	m_dec   = sky.dec();
 	double zenithCosTheta=cos(scdir.theta());
@@ -237,7 +237,7 @@ void GRBobsmanager::GenerateGRB()
   //..................................................//
   ofstream os(name.c_str(),ios::out);  
   os<<"  GRBName      T_start         T_end        L        B    Theta      Phi        z     Flux    Alpha     Beta    Epeak     Essc     Fssc      Eco    N_ext  Del_ext  Dur_ext "<<endl;
-  os<<setw(9)<<GRBname<<setw(13)<<setprecision(10)<<m_startTime<<" "<<setw(13)<<m_GRBend<<" "<<setprecision(4)<<setw(8)<<m_l<<" "<<setw(8)<<m_b<<" "<<setw(8)<<m_theta<<" "<<setw(8)<<m_phi<<" "<<setw(8)<<m_z<<" "<<setw(8)<<m_fluence<<" "<<setw(8)<<m_alpha<<" "<<setw(8)<<m_beta<<" "<<setw(8)<<m_epeak<<" "<<setw(8)<<m_essc_esyn<<" "<<setw(8)<<m_fssc_fsyn<<" "<<setw(8)<<m_CutOffEnergy <<" "<<setw(8)<<m_LATphotons <<" "<< setw(8)<<m_EC_delay<<" "<<setw(8)<<m_EC_duration<<endl;
+  os<<setw(9)<<GRBname<<setw(13)<<m_startTime<<" "<<setw(13)<<m_GRBend<<" "<<setw(8)<<m_l<<" "<<setw(8)<<m_b<<" "<<setw(8)<<m_theta<<" "<<setw(8)<<m_phi<<" "<<setw(8)<<m_z<<" "<<setw(8)<<m_fluence<<" "<<setw(8)<<m_alpha<<" "<<setw(8)<<m_beta<<" "<<setw(8)<<m_epeak<<" "<<setw(8)<<m_essc_esyn<<" "<<setw(8)<<m_fssc_fsyn<<" "<<setw(8)<<m_CutOffEnergy <<" "<<setw(8)<<m_LATphotons <<" "<< setw(8)<<m_EC_delay<<" "<<setw(8)<<m_EC_duration<<endl;
   os.close();  
   cout<<"GRB"<<GRBname;
   if( m_z >0)  cout<<" redshift = "<<m_z;

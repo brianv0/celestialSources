@@ -1,5 +1,5 @@
 package GRBobs
-version v2r2p2
+version v2r2
 author Nicola Omodei<nicola.omodei@pi.infn.it>
 
 # $Id$
@@ -7,7 +7,7 @@ author Nicola Omodei<nicola.omodei@pi.infn.it>
 use flux       v*
 use astro      v*
 use ROOT       v*  IExternal 
-use SpectObj   v* celestialSources
+use SpectObj   v1r1* celestialSources
 
 
 macro_append ROOT_libs " -lHist -lGraf "\
