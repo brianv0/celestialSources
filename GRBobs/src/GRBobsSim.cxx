@@ -2,6 +2,10 @@
 #include <iostream>
 #include <iomanip>
 #include <vector>
+#include <string>
+
+#include <stdexcept>
+
 #include "GRBobs/GRBobsConstants.h"
 #include "GRBobs/GRBobsengine.h"
 #include "GRBobs/GRBobsSim.h"
@@ -20,18 +24,22 @@ double *GRBobsSim::ComputeEnergyBins(int &Nbins)
   BGOEnergyGrid_Vector.erase(BGOEnergyGrid_Vector.begin(),BGOEnergyGrid_Vector.end());
 
   std::vector<double> EnergyGrid;
-  
-  std::ifstream NaIEnergyGrid("../GRBobs/NaI_energy_grid.dat");
+  std::string path = ::getenv("GRBOBSROOT");
+  std::string NaIpath(path+"/GRBobs/NaI_energy_grid.dat");
+  std::string BGOpath(path+"/GRBobs/BGO_energy_grid.dat");
+  //  std::cout<<NaIpath<<" "<<BGOpath<<std::endl;
+  std::ifstream NaIEnergyGrid(NaIpath.c_str());
+
   if(!NaIEnergyGrid.is_open())
     {
-      std::cout<<" Unable to open ../GRBobs/NaI_energy_grid.dat"<<std::endl;
-      exit;
+      std::cout<<"Unable to open "+NaIpath<<std::endl;
+      throw std::runtime_error("Unable to open "+NaIpath);
     }
-  std::ifstream BGOEnergyGrid("../GRBobs/BGO_energy_grid.dat");
+  std::ifstream BGOEnergyGrid(BGOpath.c_str());
   if(!BGOEnergyGrid.is_open())
     {
-      std::cout<<" Unable to open ../GRBobs/BGO_energy_grid.dat"<<std::endl;
-      exit;
+      std::cout<<"Unable to open "+NaIpath<<std::endl;
+      throw std::runtime_error("Unable to open "+BGOpath);
     }
   
   int NaI_number_of_energy_bins;
@@ -416,8 +424,8 @@ void GRBobsSim::GetGBMFlux(std::string GRBname)
 {
   //  m_Nv has to  be in [ph/(m² s keV)]
   if(DEBUG) std::cout<<" NaI channels: "<<NaIEnergyGrid_Vector.size()<<" BGO channels: "<<BGOEnergyGrid_Vector.size()<<std::endl;
-  double t    = 0;
-  double dt   = m_Nv->GetXaxis()->GetBinWidth(1);
+  //  double t    = 0;
+  //  double dt   = m_Nv->GetXaxis()->GetBinWidth(1);
   double tbin = m_Nv->GetXaxis()->GetNbins();
   //  double ebin = m_Nv->GetYaxis()->GetNbins();
   
