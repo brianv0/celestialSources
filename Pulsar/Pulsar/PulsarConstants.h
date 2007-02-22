@@ -69,7 +69,7 @@ namespace cst
   const double baryCorrTol = 5e-7;
 
   //! Tolerance for the inverse binary demodulation (in s.)
-  const double InverseDemodTol = 1e-5;
+  const double InverseDemodTol = 1e-6;
 
   //! Tolerance for the iterative binary demodulation
   const double DemodTol = 1e-8;

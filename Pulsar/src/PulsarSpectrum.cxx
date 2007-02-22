@@ -135,9 +135,7 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
   m_t0AscNodeMJD = 0;
   m_PPN =0.;
 
-  //
-
-  //Read from XML file
+   //Read from XML file
   m_PSRname    = parseParamList(params,0).c_str();            // Pulsar name
   m_RA = std::atof(parseParamList(params,1).c_str());         // Pulsar Right Ascension
   m_dec = std::atof(parseParamList(params,2).c_str());         // Pulsar Declination
@@ -216,7 +214,7 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
 	if (AllRetrieved == 0)
 	  {
 	    std::cout << "Pulsar " << m_PSRname 
-		      << " not found in any DataList file.Please Check if PULSARDATA is correctly set " 
+		      << " not found in any DataList file.Please Check if $PULSARDATA is correctly set " 
 		      << std::endl;
 	    exit(1);
 	  }
@@ -226,16 +224,12 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
 
   std::string BinListFileName = pulsar_data + "PulsarBinDataList.txt";
   
-  //Provare con le exceptions!
-
+  //Look to BinDataList.txt for binary pulsar data
   std::ifstream BinListFile;
   BinListFile.open(BinListFileName.c_str(), std::ios::in);
   char BinDataListFileName[200];
   BinListFile.getline(BinDataListFileName,200); 
 
-  //  int Retrieved = 0;
-  // int AllRetrieved = 0;
- 
   if (! BinListFile.is_open()) 
     {
       std::cout << "Error opening file containing Binary DataList files" << BinListFileName  
@@ -267,34 +261,7 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
 	  }
        }
 
-
-
-  /*
-  try
-     {
-       std::ifstream BinListFile;
-      std::cout << "Opening " << BinListFileName << std::endl;
-      BinListFile.open(BinListFileName.c_str(), std::ios::in);
-      BinListFile.getline(DataListFileName,200); 
-    }
-  catch (std::ifstream::failure& se)
-    {
-      std::cout << "Error!!!" << BinListFileName << std::endl;
-    }
-  */
-
-
-  //char DataListFileName[200];
-  //std::string CompletePathFileName = "";
-
   ListFile.getline(DataListFileName,200); 
-
-  //  int Retrieved = 0;
-  //  int AllRetrieved = 0;
-
-
-
-
 
   //Assign as starting ephemeris the first entry of the vectors... 
   m_t0Init = m_t0InitVect[0];
@@ -308,9 +275,7 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
   m_f2 = m_f2Vect[0];
   m_phi0 = m_phi0Vect[0];
 
-
   //Init SolarSystem stuffs useful for barycentric decorrections
-
   astro::JulianDate JDStart(StartMissionDateMJD+JDminusMJD);
   m_earthOrbit = new astro::EarthOrbit(JDStart); 
   
@@ -319,10 +284,6 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
   m_GalDir = std::make_pair(m_PulsarDir.l(),m_PulsarDir.b());
   m_l = m_GalDir.first;
   m_b = m_GalDir.second;
-
-
-  //writes out an output log file
-  //  std::string logLabel = "PsrOutput/" + m_PSRname + "Log.txt";
 
   //Redirect output to a subdirectory
   const char * pulsarOutDir = ::getenv("PULSAROUTFILES");
@@ -334,10 +295,10 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
   else
     logLabel = m_PSRname + "Log.txt";
 
-  //  std::string nameProfile = "PsrOutput/" + m_name + "TimeProfile.txt";
-
   ofstream PulsarLog(logLabel.c_str());
-  
+
+  //Write infos to Log file  
+
   PulsarLog << "\n********   PulsarSpectrum Log for pulsar" << m_PSRname << std::endl;
   PulsarLog << "**   Name : " << m_PSRname << std::endl;
   PulsarLog << "**\n**   Position : (RA,Dec)=(" << m_RA << "," << m_dec 
@@ -372,7 +333,7 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
 	}
     }
 
-  PulsarLog << "**\n**   Mission started at (MJD) : " << StartMissionDateMJD << " (" 
+  PulsarLog << "**\n**   Mission Reference time: MJD " << StartMissionDateMJD << " (" 
 	    << std::setprecision(12) << (StartMissionDateMJD+JDminusMJD)*SecsOneDay 
 	    << " sec.)" << std::endl;
   if (m_TimingNoiseModel == 1)
@@ -534,8 +495,7 @@ double PulsarSpectrum::interval(double time)
 
   double timeTildeDemodulated =0.;
   
-  //binary qui!
-
+  //binary demodulation
   if (m_BinaryFlag ==0)
     {
       timeTildeDemodulated = timeTilde;
@@ -545,6 +505,7 @@ double PulsarSpectrum::interval(double time)
       timeTildeDemodulated = getIterativeDemodulatedTime(timeTilde,1);      
     }
 
+  //Phase assignment
   double initTurns = getTurns(timeTildeDemodulated); //Turns made at this time
   double intPart; //Integer part
   double tStart = modf(initTurns,&intPart)*m_period; // Start time for interval
@@ -634,29 +595,21 @@ double PulsarSpectrum::interval(double time)
       
     }
 
-      //Log out the barycentric corrections  
+  //Log out the barycentric corrections  
   if (BARYCORRLOG)
     double bl = getBaryCorr(timeTilde,1);
   
-  /*
-  if ((m_BinaryFlag==1) && (BINDEMODLOG))
-    {
-      double a = getBinaryDemodulation(timeTilde,1);
-    }
-  */
-
-   //Ephemerides calculations...
+  //Ephemerides calculations...
 
   double inte = m_spectrum->interval(tStart,m_enphmin); //deltaT (in system where Pdot = 0
   double inteTurns = inte/m_period; // conversion to # of turns
   double totTurns = initTurns + inteTurns + m_phi0; //Total turns at the nextTimeTilde
   double nextTimeTildeDemodulated = retrieveNextTimeTilde(timeTildeDemodulated, totTurns, (ephemCorrTol/m_period));
 
-  //
   double nextTimeTilde =0.;
   double nextTimeTildeDecorr =0.;
 
-
+  //inverse of binary demodulation and of barycentric corrections
   if (m_BinaryFlag == 0)
     {
       nextTimeTilde = nextTimeTildeDemodulated;
@@ -666,18 +619,10 @@ double PulsarSpectrum::interval(double time)
     {
       nextTimeTilde = getBinaryDemodulationInverse(nextTimeTildeDemodulated);
       nextTimeTildeDecorr = getDecorrectedTime(nextTimeTilde); //Barycentric decorrections
-      /*  
-      std::cout << std::setprecision(15) << "\n\n***Testing inary inverse.." 
-		<< nextTimeTilde << " --> " << nextTimeDecorr<< std::endl; 
-
-      std::cout << std::setprecision(15) << "  " << nextTimeDecorr << " --> " 
-		<< nextTimeDecorr+getBinaryDemodulation(nextTimeDecorr,0)  
-	 	<< " d=" << nextTimeTilde-nextTimeDecorr-getBinaryDemodulation(nextTimeDecorr,0) << std::endl;
-      */
     }
  
-  //  if (DEBUG)
-  //{ 
+  if (DEBUG)
+    { 
       std::cout << std::setprecision(15) << "\nTimeTildeDecorr at Spacecraft (TT) is: " 
 		<< timeTildeDecorr - (StartMissionDateMJD)*SecsOneDay << "sec." << std::endl;
       std::cout << std::setprecision(15) <<"  TimeTilde at SSB (in TDB) is: " << timeTilde - (StartMissionDateMJD)*SecsOneDay << "sec." << std::endl;
@@ -686,17 +631,16 @@ double PulsarSpectrum::interval(double time)
       std::cout << std::setprecision(15) <<"  nextTimeTildeDemodulated at SSB (in TDB) is:" << nextTimeTildeDemodulated - (StartMissionDateMJD)*SecsOneDay << "s." << std::endl;
       std::cout << std::setprecision(15) <<"  nextTimeTilde at SSB (in TDB) is:" << nextTimeTilde - (StartMissionDateMJD)*SecsOneDay << "s." << std::endl;
       std::cout << std::setprecision(15) <<"  nextTimeTilde decorrected (TT)is" << nextTimeTildeDecorr - (StartMissionDateMJD)*SecsOneDay << "s." << std::endl;
-      //std::cout << " corrected is " << nextTimeTildeDecorr + getBaryCorr(nextTimeTildeDecorr,0) - (StartMissionDateMJD)*SecsOneDay << std::endl;
+      std::cout << " corrected is " << nextTimeTildeDecorr + getBaryCorr(nextTimeTildeDecorr,0) - (StartMissionDateMJD)*SecsOneDay << std::endl;
       std::cout << std::setprecision(15) <<"  -->Interval is " <<  nextTimeTildeDecorr - timeTildeDecorr << std::endl;
-      //  }
+    }
   
-      double interv = nextTimeTildeDecorr - timeTildeDecorr;
-      if (interv < 0.)
-	interv = m_periodVect[0]/100.;
-      
-      //      return nextTimeTildeDecorr - timeTildeDecorr; //interval between the de-corected times
-      return interv;
-      
+  double interv = nextTimeTildeDecorr - timeTildeDecorr;
+  if (interv < 0.)
+    interv = m_periodVect[0]/100.;
+  
+  return interv;
+  
 }
 
 /////////////////////////////////////////////
@@ -723,7 +667,6 @@ double PulsarSpectrum::interval(double time)
  * </ul>
  * </blockquote>
  */
-
 double PulsarSpectrum::getTurns( double time )
 {
   double dt = time - m_t0*SecsOneDay;
@@ -865,17 +808,24 @@ double PulsarSpectrum::getBaryCorr( double ttInput, int LogCorrFlag)
   
 }
 
-//!Get binarydemodulated time in a iterative way
+
+/////////////////////////////////////////////
+/*!
+ * \param tInput Photon arrival time do be demodulated
+ * \param LogFlag Flag for writing output
+ *
+ * <br>
+ * This method compute the binary demodulation in an iterative way 
+ * using the getBinaryDemodulation method
+ */
 double PulsarSpectrum::getIterativeDemodulatedTime(double tInput, int LogFlag)
 {
-  //std::cout << "pippo0" << std::endl;
 
   double timeDemodulated = tInput+getBinaryDemodulation(tInput,LogFlag);
             
   double TargetTime = tInput;
   double delay = getBinaryDemodulation(tInput,0);
 
-  //for (int i=0; i < 50; i++)
   int i=0;
   while ((fabs(timeDemodulated-delay-TargetTime) > DemodTol) && ( i < 50))
     {
@@ -883,24 +833,6 @@ double PulsarSpectrum::getIterativeDemodulatedTime(double tInput, int LogFlag)
       i++;
       timeDemodulated = TargetTime+delay;
       delay = getBinaryDemodulation(timeDemodulated,0);
-        
-      //      std::cout << std::setprecision(15) << "i" << i << " " << timeDemodulated-(StartMissionDateMJD)*SecsOneDay << " " 
-      //	<< fabs(timeDemodulated-delay-TargetTime) << " " << timeDemodulated-delay -(StartMissionDateMJD)*SecsOneDay << std::endl;
-      /*
-      if ((i==20) || (fabs(timeDemodulated-delay-TargetTime) < DemodTol))
-	{
-	  std::cout << i << "Break! " << fabs(timeDemodulated-delay-TargetTime) << std::endl;
-	  break;
-	}
-      */
-      /*
-      if (fabs(timeDemodulated-delay-TargetTime) < DemodTol)
-	{
-	  std::cout << "Break! " << fabs(timeDemodulated-delay-TargetTime) << std::endl;
-	  break;
-	}
-      std::cout << "e poiii " << fabs(timeDemodulated-delay-TargetTime) << std::endl;
-      */  
     }
   
   if (LogFlag == 1)
@@ -911,9 +843,21 @@ double PulsarSpectrum::getIterativeDemodulatedTime(double tInput, int LogFlag)
   return timeDemodulated;
 }
 
-
-
-//!Apply the binary demodulations
+/////////////////////////////////////////////
+/*!
+ * \param tInput Photon arrival time do be demodulated
+ * \param LogFlag Flag for writing output
+ *
+ * <br>
+ * This method compute the binary demodulation using the orbital parameters
+ * of the pulsar. The corrections computed are:
+ * 
+ *<ul>
+ * <li> Roemer delay
+ * <li> Einstein delay
+ * <li> Shapiro delay
+ *</ul>
+ */
 double PulsarSpectrum::getBinaryDemodulation( double tInput, int LogDemodFlag)
 {
   double BinaryRoemerDelay = 0.;
@@ -1050,11 +994,11 @@ double PulsarSpectrum::getBinaryDemodulationInverse( double CorrectedTime)
 
   double tModUp = CorrectedTime + deltaMax;
   double tModDown = CorrectedTime - deltaMin;
-  double tModMid = 0.;//(tModUp + tModDown)/2.;
+  double tModMid = 0.;
 
   int i = 0;
-  double hModUp = 0.;//CorrectedTime - (getIterativeDemodulatedTime(tModUp,0));
-  double hModDown = 0.;//CorrectedTime - (getIterativeDemodulatedTime(tModDown,0));
+  double hModUp = 0.;
+  double hModDown = 0.;
   double hModMid = 1e30; //for the 1st iteration
 
    while (fabs(hModMid)>InverseDemodTol )
@@ -1065,14 +1009,14 @@ double PulsarSpectrum::getBinaryDemodulationInverse( double CorrectedTime)
       if (tModMid == tModDown)
 	{
 	  tModDown = tModDown-1e-5*m_PSpectrumRandom->Uniform();
-	  std::cout << "\n**Correcting down " << std::endl;
+	  if (DEBUG) std::cout << "\n**Correcting down to tDown:" << tModDown << std::endl;
 	  tModMid = tModUp*0.5 + tModDown*0.5;
 	}
 
       if (tModMid == tModUp)
 	{
 	  tModUp = tModUp+1e-5*m_PSpectrumRandom->Uniform();
-	  std::cout << "\n**Correcting up " << std::endl;
+	  if (DEBUG) std::cout << "\n**Correcting up to tUp:" << tModUp << std::endl;
 	  tModMid = tModUp*0.5 + tModDown*0.5;
 	}
 
@@ -1449,12 +1393,6 @@ double PulsarSpectrum::GetEccentricAnomaly(double mytime)
   double EccAnConst = OmegaMean*(mytime-m_t0PeriastrMJD*SecsOneDay) -
     0.5*((mytime-m_t0PeriastrMJD*SecsOneDay)*(mytime-m_t0PeriastrMJD*SecsOneDay)*(m_Porb_dot/m_Porb));
 
-  //  std::cout << "OmegaMean " << OmegaMean << " Const " << EccAnConst << std::endl;
-
-  // std::cout << "Eccentric Anomal at t=:" << mytime << " dt=" << (mytime-m_t0PeriastrMJD*SecsOneDay) 
-  //    << " const " << EccAnConst << std::endl;
-
-
   double Edown = 0.;
   double EccAnDown = Edown-(m_ecc*std::sin(Edown))-EccAnConst;
 
@@ -1480,8 +1418,6 @@ double PulsarSpectrum::GetEccentricAnomaly(double mytime)
       i++;
       Emid = 0.5*(Eup + Edown);
       EccAnMid = Emid-(m_ecc*std::sin(Emid))-EccAnConst;
-      //  std::cout << i << "Emid" << Emid << " EccAnMid " << EccAnMid << std::endl;
-      //std::cout << Edown << " to " << Eup <<  " Emid " << EccAnMid << std::endl;
       if (fabs(EccAnMid) < 5e-7)
 	break;
     }
