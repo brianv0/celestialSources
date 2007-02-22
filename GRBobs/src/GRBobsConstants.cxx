@@ -75,7 +75,6 @@ void GRBobsParameters::SetGalDir(double l, double b)
 {
   double r1 = rndGalacticDir->Uniform();
   double r2 = rndGalacticDir->Uniform();
-  
   double ll = (l<=180.0 && l>=-180.0) ? l : 180.-360.*r1;
   double bb = (b<=90.0 && b>=-90.0)   ? b : ((180.0/TMath::Pi())*acos(1.0-2.0*r2)-90.0);
   m_GalDir=std::make_pair(ll,bb);

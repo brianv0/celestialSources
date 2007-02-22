@@ -325,7 +325,7 @@ void GRBobsSim::SaveNvEC()
   
   char root_name[100];
   sprintf(root_name,"grbobs_%d_EC.root",(int)m_params->GetGRBNumber());
-  std::cout<<" Saving "<<root_name<<std::endl;
+  if(DEBUG) std::cout<<" Saving "<<root_name<<std::endl;
   TFile mod(root_name,"RECREATE");
   std::string name = m_NvEC->GetName();
   m_NvEC->SetName("Nv"); // I need a default name.
@@ -349,7 +349,7 @@ void GRBobsSim::SaveNv()
   
   char root_name[100];
   sprintf(root_name,"grbobs_%d.root",(int)m_params->GetGRBNumber());
-  std::cout<<" Saving "<<root_name<<std::endl;
+  if(DEBUG) std::cout<<" Saving "<<root_name<<std::endl;
   TFile mod(root_name,"RECREATE");
   std::string name = m_Nv->GetName();
   m_Nv->SetName("Nv"); // I need a default name.
@@ -415,7 +415,7 @@ void GRBobsSim::SaveGBMDefinition(std::string GRBname, double ra, double dec, do
 void GRBobsSim::GetGBMFlux(std::string GRBname)
 {
   //  m_Nv has to  be in [ph/(m² s keV)]
-  std::cout<<" NaI channels: "<<NaIEnergyGrid_Vector.size()<<" BGO channels: "<<BGOEnergyGrid_Vector.size()<<std::endl;
+  if(DEBUG) std::cout<<" NaI channels: "<<NaIEnergyGrid_Vector.size()<<" BGO channels: "<<BGOEnergyGrid_Vector.size()<<std::endl;
   double t    = 0;
   double dt   = m_Nv->GetXaxis()->GetBinWidth(1);
   double tbin = m_Nv->GetXaxis()->GetNbins();
@@ -483,7 +483,6 @@ void GRBobsSim::GetGBMFlux(std::string GRBname)
 	  int    ei_low = m_Nv->GetYaxis()->FindBin(e_low);
 	  int    ei_high = m_Nv->GetYaxis()->FindBin(e_high);
 	  
-	  //	  std::cout<<ei_low<<" "<<ei_high<<std::endl;
 	  int diff = ei_high - ei_low;
 	  for(int i=0;i<diff;i++)
 	    {

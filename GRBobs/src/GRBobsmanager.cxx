@@ -105,8 +105,7 @@ GRBobsmanager::GRBobsmanager(const std::string& params)
       std::cout<<"-------Read the following parameters --------"<<std::endl;
       std::cout<<" m_startTime         = "<<m_startTime<<std::endl;
       std::cout<<"m_GRB_duration       = "<<m_GRB_duration<<std::endl;
-      std::cout<<"m_fluence            = "<<m_fluence<<std::endl;
-      std::cout<<"m_fluence            = "<<m_fluence<<std::endl;
+      std::cout<<" fluence/PF          = "<<m_fluence<<std::endl;
       std::cout<<"m_z                  = "<<m_z<<std::endl;
       std::cout<<"m_alpha              = "<<m_alpha<<std::endl;
       std::cout<<"m_beta               = "<<m_beta<<std::endl;
@@ -136,7 +135,7 @@ GRBobsmanager::GRBobsmanager(const std::string& params)
   
   //  std::cout<<m_par->rnd->GetSeed()<<std::endl;
   //  m_GRBnumber=m_par->rnd->GetSeed();
-  if (m_l > 0 && m_l < 360 && m_b > -90 && m_b < 90)
+  if (m_l >= -180 && m_l <= 180 && m_b >= -90 && m_b <= 90)
     {
       try 
 	{
@@ -166,6 +165,8 @@ GRBobsmanager::GRBobsmanager(const std::string& params)
 	    break;
 	  }
       }
+  m_par->SetGalDir(m_l,m_b); //this generates random direction in the sky
+  m_GalDir = m_par->GetGalDir();      
   //PROMPT
   
   //  astro::EarthCoordinate earthpos()
@@ -312,7 +313,7 @@ void GRBobsmanager::GenerateGRB()
   name+="_PAR.txt";
   //..................................................//
   ofstream os(name.c_str(),ios::out);  
-  os<<"  GRBName      T_start         T_end        L        B    Ra    Dec     Theta      Phi        z     Flux    Alpha     Beta    Epeak     Essc     Fssc      Eco    N_ext  Del_ext  Dur_ext "<<endl;
+  os<<"  GRBName      T_start         T_end        L        B       Ra      Dec    Theta      Phi        z     Flux    Alpha     Beta    Epeak     Essc     Fssc      Eco    N_ext  Del_ext  Dur_ext "<<endl;
   os<<setw(9)<<GRBname<<setw(13)<<setprecision(10)<<m_startTime<<" "<<setw(13)<<m_GRBend;
   os<<" "<<setprecision(4)<<setw(8)<<m_l<<" "<<setw(8)<<m_b;
   os<<" "<<setw(8)<<m_ra<<" "<<setw(8)<<m_dec;
@@ -322,6 +323,7 @@ void GRBobsmanager::GenerateGRB()
   os<<" "<<setw(8)<<m_essc_esyn<<" "<<setw(8)<<m_fssc_fsyn<<" "<<setw(8)<<m_CutOffEnergy;
   os<<" "<<setw(8)<<m_LATphotons <<" "<< setw(8)<<m_EC_delay<<" "<<setw(8)<<m_EC_duration<<endl;
   os.close();  
+
   cout<<"GRB"<<GRBname;
   if( m_z >0)  cout<<" redshift = "<<m_z;
   cout<<setprecision(10)<<" t start "<<m_startTime<<", tend "<<m_endTime
