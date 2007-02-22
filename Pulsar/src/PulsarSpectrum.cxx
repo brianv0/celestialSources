@@ -821,7 +821,7 @@ double PulsarSpectrum::getBaryCorr( double ttInput, int LogCorrFlag)
 double PulsarSpectrum::getIterativeDemodulatedTime(double tInput, int LogFlag)
 {
 
-  double timeDemodulated = tInput+getBinaryDemodulation(tInput,LogFlag);
+  double timeDemodulated = tInput+getBinaryDemodulation(tInput,0);
             
   double TargetTime = tInput;
   double delay = getBinaryDemodulation(tInput,0);

@@ -41,7 +41,7 @@
 *   v1r2p0  14-jun-2006 MR    Pulsar shape model added to Pulsarspectrum class
 *   v1r2p1  17-jul-2006 MR    Minor changes on test program
 *   v1r2p2  11-oct-2006 MR    Chanded MJDREF to be MJDREF(utc)=51910
-*   v2r2p3  06-nov-2006 NO    Fixed the compatibility with the astro package
-*   v2r3    01-feb-2007 MR    Added binary demodulation
+*   v2r1p3  06-nov-2006 NO    Fixed the compatibility with the astro package
+*   v2r2    01-feb-2007 MR    Added binary demodulation
 *@endverbatim
 */
