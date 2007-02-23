@@ -6,15 +6,15 @@
  * $Header$
  */
 
-#ifndef genericSources_ConstParMap_h
-#define genericSources_ConstParMap_h
+#ifndef genericSources_ConstParMapGRB_h
+#define genericSources_ConstParMapGRB_h
 
 #include <map>
 #include <stdexcept>
 
 #include "facilities/Util.h"
 
-namespace genericSources {
+namespace GRBobs {
 
 class ConstParMap {
 
@@ -32,7 +32,6 @@ class ConstParMap {
     if (item == m_parmap.end()) 
       {
 	return name;
-	throw std::runtime_error("Cannot find item named " + name);
       }
     return item->second;
   }
@@ -66,4 +65,4 @@ class ConstParMap {
  
 } // namespace genericSources
 
-#endif // genericSources_ConstParMap_h
+#endif // genericSources_ConstParMapGRB_h

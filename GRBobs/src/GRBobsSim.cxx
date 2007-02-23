@@ -211,14 +211,34 @@ TH2D* GRBobsSim::MakeGRB()
       
       int ei1 = nph->GetYaxis()->FindBin(BATSE2);
       int ei2 = nph->GetYaxis()->FindBin(BATSE4);
+      
+      //////////////////////////////////////////////////
+      double AccumulationTime = 0.256;//s_TimeBinWidth; (BONNELL et al. 1997, Apj.)
       double PF=0.0;
-      for (int ei = ei1; ei<=ei2; ei++)
+      double acc_time=0.0;
+      double PF_acc=0.0;
+      for(int ti = 1; ti<=m_tbin; ti++)
 	{
-	  for(int ti = 1; ti<=m_tbin; ti++)
+	  double PF_t=0.0;
+	  acc_time += s_TimeBinWidth;
+	  for (int ei = ei1; ei<=ei2; ei++)
 	    {
-	      PF= TMath::Max(PF,nph->GetBinContent(ti, ei)/s_TimeBinWidth);//[ph/cm^2/s]
+	      PF_t += nph->GetBinContent(ti, ei); //[ph]
 	    }
+	  
+	  if(acc_time <= AccumulationTime && ti < m_tbin)
+	    {
+	      PF_acc += PF_t;
+	    }
+	  else
+	    {
+	      PF = TMath::Max(PF,PF_acc/acc_time); //[ph/s]
+	      acc_time = 0.0;
+	      PF_acc   = 0.0;
+	    }
+	  //PF = TMath::Max(PF,PF_t); //[ph]
 	}
+      
       norm = 1.0e4 * BATSEPeakFlux/PF;
     }
   

@@ -70,7 +70,7 @@ GRBobsmanager::GRBobsmanager(const std::string& params)
     }
   else
     {
-      genericSources::ConstParMap parmap(params);
+      GRBobs::ConstParMap parmap(params);
       m_startTime       = parmap.value("tstart")+Spectrum::startTime();
       m_GRB_duration    = parmap.value("duration");
       if(params.find("fluence")!= std::string::npos)
