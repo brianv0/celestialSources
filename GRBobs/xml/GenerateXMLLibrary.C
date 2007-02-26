@@ -616,8 +616,7 @@ void GenerateXMLLibrary(int Nbursts=1000)
 	}
       if(Fssc_Fsyn>0.0)
 	osXML<<", essc_esyn="<<Essc_Esyn<<", Fssc_Fsyn="<<Fssc_Fsyn;
-      if (GenerateGBM==true)
-	osXML<<", GBM="<<(int)GenerateGBM;
+      osXML<<", GBM="<<(int)GenerateGBM;
       if(NphLat>0)
 	osXML<<", EC_NLAT="<<NphLat<<", EC_delay="<<DelayTime<<", EC_duration="<<ExtraComponent_Duration;
       if (co_energy>0)
