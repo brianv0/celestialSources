@@ -508,20 +508,40 @@ double SpectObj::GetFluence(double BL, double BH)
   //  return Nv->Integral(0,nt,ei1,ei2,"width")*1.0e-7/(m_TimeBinWidth*erg2meV)/m_AreaDetector; //erg/cm²
 }
 
-double SpectObj::GetPeakFlux(double BL, double BH)
+double SpectObj::GetPeakFlux(double BL, double BH, double AccumulationTime = 0.256)
 {
   if(BH<=0) BH = emax;
   int ei1 = Nv->GetYaxis()->FindBin(TMath::Max(emin,BL));
   int ei2 = Nv->GetYaxis()->FindBin(TMath::Min(emax,BH));
+  
+  // 256 ms comes from (BONNELL et al. 1997, Apj.)
   double PF=0.0;
-  for (int ei = ei1; ei<=ei2; ei++)
+  double acc_time=0.0;
+  double PF_acc=0.0;
+  
+  for(int ti = 1; ti <= nt; ti++)
     {
-      for(int ti = 1; ti<=nt; ti++)
+      double PF_t=0.0;
+      acc_time +=m_TimeBinWidth;
+      for (int ei = ei1; ei<=ei2; ei++)
 	{
-	  PF= TMath::Max(PF,Nv->GetBinContent(ti, ei));//[ph]
-	}  
+	  PF_t += Nv->GetBinContent(ti, ei); //[ph]
+	}
+      
+      if(acc_time <= AccumulationTime && ti < nt)
+      {
+	PF_acc += PF_t;
+      }
+      else
+      {
+	PF = TMath::Max(PF,PF_acc/acc_time); //[ph/s]
+	acc_time=0.0;
+	PF_acc   = 0.0;
+      }
+      //PF = TMath::Max(PF,PF_t); //[ph]
     }
-  return PF*1e-4/(m_AreaDetector*m_TimeBinWidth); //ph/cm²/s
+  
+  return PF*1e-4/(m_AreaDetector); //ph/cm²/s
 }
 
 
@@ -586,7 +606,8 @@ double SpectObj::flux(double time, double enph)
 
 double SpectObj::interval(double time, double enph)
 {
-  return GetPhoton(time,enph).time - time;
+  double intervallo = GetPhoton(time,enph).time - time;
+  return intervallo;
 }
 
 double SpectObj::energy(double time, double enph)
@@ -641,7 +662,7 @@ void SpectObj::GetGBM()
   TH1D *Sp;
 
   int ti = Nv->GetXaxis()->FindBin(t);
-
+  
   TH1D *sp = CloneSpectrum();
   double sp0,sp1,sp2,de;
 
