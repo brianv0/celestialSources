@@ -2,6 +2,7 @@
 #include <iostream>
 #include <iomanip>
 #include <vector>
+#include <algorithm> //sort
 #include <string>
 
 #include <stdexcept>
@@ -68,10 +69,10 @@ double *GRBobsSim::ComputeEnergyBins(int &Nbins)
     }
   // LAT_number_of_energy_bins is in ObsCst!!!
   double delta_e = pow(emax/energy_low,1./LAT_number_of_energy_bins);
-  int i=1;
-  while(i < LAT_number_of_energy_bins)
+  int energy_bin = 1;
+  while(energy_bin < LAT_number_of_energy_bins)
     {
-      EnergyGrid.push_back(energy_low*pow(delta_e,i++));
+      EnergyGrid.push_back(energy_low*pow(delta_e,energy_bin++));
     }
   EnergyGrid.push_back(emax);
   //..................................................//
