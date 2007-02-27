@@ -454,7 +454,7 @@ int main(int argc, char** argv)
   
   double Period  = 0.089; // s
   double flux = 1e-5; // ph/cm2/s
-  int npeaks = 3;
+  int npeaks = 2;
   double ppar1 = 1e6;
   double ppar2 = 8e6;
   double ppar3 = -1.62;
