@@ -508,7 +508,7 @@ double SpectObj::GetFluence(double BL, double BH)
   //  return Nv->Integral(0,nt,ei1,ei2,"width")*1.0e-7/(m_TimeBinWidth*erg2meV)/m_AreaDetector; //erg/cm²
 }
 
-double SpectObj::GetPeakFlux(double BL, double BH, double AccumulationTime = 0.256)
+double SpectObj::GetPeakFlux(double BL, double BH, double AccumulationTime)
 {
   if(BH<=0) BH = emax;
   int ei1 = Nv->GetYaxis()->FindBin(TMath::Max(emin,BL));
