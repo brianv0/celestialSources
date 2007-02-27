@@ -1,9 +1,0 @@
-/** @file release.notes
- * @brief Package celestialSources/microQuasar 
-  $Id$
-       
-@verbatim
- * Coordinators: R.Dubois
-    EOH
-
-   v1r0p3   20-feb-2007 rxd start keeping track of versions!
