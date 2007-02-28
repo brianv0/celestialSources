@@ -10,9 +10,9 @@
 #include <cmath>
 
 #define DEBUG 0
-#define BARYCORRLOG 1
-#define BINDEMODLOG 1
-#define TNOISELOG 1
+#define BARYCORRLOG 0
+#define BINDEMODLOG 0
+#define TNOISELOG 0
 
 using namespace cst;
 
