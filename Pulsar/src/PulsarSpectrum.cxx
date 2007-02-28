@@ -916,7 +916,7 @@ double PulsarSpectrum::getBinaryDemodulation( double tInput, int LogDemodFlag)
   double BinaryRoemerDelay = 0.;
   double dt = tInput-m_t0PeriastrMJD*SecsOneDay;
   double OmegaMean = 2*M_PI/m_Porb;
-  double EccAnConst = OmegaMean*dt - 0.5*(dt*dt*(m_Porb_dot/m_Porb));
+  double EccAnConst = OmegaMean*(dt - 0.5*(dt*dt*(m_Porb_dot/m_Porb)));
   
   //Calculate Eccenctric Anomaly solving Kepler equation using the atKepler function
   double EccentricAnomaly = 0.; 
@@ -929,7 +929,7 @@ double PulsarSpectrum::getBinaryDemodulation( double tInput, int LogDemodFlag)
   
   //Calculate True Anomaly
   double TrueAnomaly = 2.0 * std::atan(std::sqrt((1.0+m_ecc)/(1.0-m_ecc))*std::tan(EccentricAnomaly*0.5));
-  TrueAnomaly == TrueAnomaly + 2*M_PI*floor((EccentricAnomaly - TrueAnomaly)/ (2*M_PI));
+  TrueAnomaly = TrueAnomaly + 2*M_PI*floor((EccentricAnomaly - TrueAnomaly)/ (2*M_PI));
   while ((TrueAnomaly - EccentricAnomaly) > M_PI) TrueAnomaly -= 2*M_PI;
   while ((EccentricAnomaly - TrueAnomaly) > M_PI) TrueAnomaly += 2*M_PI;
   
@@ -1443,8 +1443,8 @@ int PulsarSpectrum::saveBinDbTxtFile()
 double PulsarSpectrum::GetEccentricAnomaly(double mytime)
 {
   double OmegaMean = 2*M_PI/m_Porb;
-  double EccAnConst = OmegaMean*(mytime-m_t0PeriastrMJD*SecsOneDay) -
-    0.5*((mytime-m_t0PeriastrMJD*SecsOneDay)*(mytime-m_t0PeriastrMJD*SecsOneDay)*(m_Porb_dot/m_Porb));
+  double dtime = (mytime-m_t0PeriastrMJD*SecsOneDay);
+  double EccAnConst = OmegaMean*(dtime - 0.5*(m_Porb_dot/m_Porb)*dtime*dtime);
 
   double Edown = 0.;
   double EccAnDown = Edown-(m_ecc*std::sin(Edown))-EccAnConst;

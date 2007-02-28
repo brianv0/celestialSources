@@ -105,7 +105,7 @@ void PlotPulsar(double enph = 0,std::string name="pulsar.root")
   // Fv = Ne * de: [ph/m^2/s]
   TH1D *Fv = (TH1D*) Ne->Clone();
   Fv->SetStats(0);
-  Fv->SetTitle("Fv");
+  Fv->SetTitle("Fv Spectrum of the simulated pulsar");
   Fv->SetName("Fv");
   Fv->SetYTitle("Fv [ph m^{-2}s^{-1} ]");
   
@@ -160,19 +160,17 @@ void PlotPulsar(double enph = 0,std::string name="pulsar.root")
   TCanvas *clc = new TCanvas("LightCurves","LightCurves");
   //clc->Divide(1,2);
 
-  TCanvas *csp = new TCanvas("csp","csp");
+  TCanvas *csp = new TCanvas("csp","csp",1100,700);
   csp->SetLogx();
   csp->SetLogy();
-
-
- 
-
 
   double RunLength = 150.; //lenght of single run in seconds
   int RunCounts =0; // count in a Single Run;
   double RunTime = 0.; //current time in a single run;
   TH1D *hInt = new TH1D("hInt","Interval Distribution",250,0.,500);
-  TH1D *hRun = new TH1D("hRun","Counts in a Run",50,0.,100.);
+  char runtitle[300];
+  sprintf(runtitle,"Counts in a Run of %.1f s.",RunLength);
+  TH1D *hRun = new TH1D("hRun",runtitle,50,0.,100.);
 
   TF1 *pois = new TF1("pois",poissonf,0,100,2); // x in [0;10], 2parameters                  
   pois->SetParName(0,"Const");                                                
@@ -227,22 +225,42 @@ void PlotPulsar(double enph = 0,std::string name="pulsar.root")
 
   csp->cd();
 
-  vFv->Scale(1e-6); //Scale in order to plot the 3 histos on the same canvas
-  
   Ne->SetMinimum(1e-10);
   Fv->SetMinimum(1e-10);
   vFv->SetMinimum(1e-10);
 
   
   Fv->Draw("l");
+  
+
+
+  //  Float_t rightmax = 1.1*vFv->GetMaximum();
+  //Float_t scale = gPad->GetUymax()/rightmax;
+  vFv->Scale(1e-6); //Scale in order to plot the 3 histos on the same canvas
+  vFv->SetLineStyle(7);
   vFv->Draw("lsame");
+
+  //Draw aw additional axis for vFv
+  //TGaxis *axis = new TGaxis(gPad->GetUxmax(),gPad->GetUymin(),
+  //   gPad->GetUxmax(), gPad->GetUymax(),0,rightmax,510,"+L");
+//axis->SetLineColor(4);
+// axis->SetTextColor(4);
+
+//std::cout << "xmax "  << gPad->GetUxmax() << std::endl;
+//std::cout << "xmin "  << gPad->GetUxmin() << std::endl;
+//std::cout << "ymax "  << gPad->GetUymax() << std::endl;
+//std::cout << "ymin "  << gPad->GetUymin() << std::endl;
+//axis->Draw();
+
+
+
   //Ne->Draw("lsame");
   
   std::cout << "****  Ne @ 100 MeV " << Ne->GetBinContent(Ne->FindBin(EGRET2)) << " ph/cm2/kev/s " << std::endl;
 
   //  gDirectory->Delete("band");
   
-  TLegend *leg = new TLegend(0.14,0.14,0.50,0.4);
+  TLegend *leg = new TLegend(0.14,0.14,0.50,0.3);
   leg->SetFillStyle(0);
   //leg->AddEntry(Ne," Ne  [ph/keV/m^2/s] ","lp");
   leg->AddEntry(Fv," Fv  [ph/m^2/s] ","lp");
@@ -251,6 +269,11 @@ void PlotPulsar(double enph = 0,std::string name="pulsar.root")
   
   TH1D *Counts   = sp->GetSpectrum(); //ph
   Counts->SetName("Counts");
+  Counts->SetMarkerStyle(8);
+  Counts->SetMarkerSize(0.8);
+  Counts->SetMarkerColor(1);
+
+
   TH1D *Lc = new TH1D("Lc","Lc",TBIN,0,TMAX);//sp->GetTimes();  
   Lc->SetName("Counts[ph]");
   Lc->SetMarkerStyle(20);
@@ -338,9 +361,10 @@ void PlotPulsar(double enph = 0,std::string name="pulsar.root")
 
       Fv->Draw("l");
       vFv->Draw("lsame");
-      Ne->Draw("lsame");
+      //Ne->Draw("lsame");
 
       Counts->SetStats(1);
+ 
       Counts->Draw("E1same");
       Counts->SetStats(1);
 
@@ -482,7 +506,7 @@ int main(int argc, char** argv)
   double ppar1 = 1e6;
   double ppar2 = 8e6;
   double ppar3 = -1.62;
-  double ppar4 = 1.7;//1.7;
+  double ppar4 = 2.0;//1.7;//1.7;
   int seed = 61443;
 
   PulsarSim* m_pulsar = new PulsarSim("PSRVELA",seed,flux,enphmin, enphmax, Period);
