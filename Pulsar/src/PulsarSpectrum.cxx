@@ -529,7 +529,7 @@ double PulsarSpectrum::interval(double time)
       m_f2 = 0.;
       initTurnsNoNoise = getTurns(timeTildeDemodulated);
 
-      Delta8 = 6.6 + 0.6*log10(m_pdot) + 2.0*(2.*m_PSpectrumRandom->Uniform()-1);
+      Delta8 = 6.6 + 0.6*log10(m_pdot) + m_PSpectrumRandom->Gaus(0,1.0);
      
      double Sign = m_PSpectrumRandom->Uniform();
      if (Sign > 0.5)
