@@ -44,7 +44,6 @@
 *  - Timing Noise;
 *  - Binary demodulation
 */
-
 class PulsarSpectrum : public ISpectrum
 {
   
@@ -59,7 +58,7 @@ class PulsarSpectrum : public ISpectrum
   //! Return the flux of the Pulsar at time t
   double flux(double time)const;
 
-  //! Returns the time interval to the next extracted photon, according to the flux, in a frame where pdot=0 and no barycentric decorrections
+  //! Returns the time interval to the next extracted photon, according to the flux, in a frame where pdot=0 and no barycentric decorrections and also no binary demodulation
   double interval(double time);
 
   //! Returns the number of turns made by the pulsar at a specified time, referred to an inital epoch t0
@@ -69,12 +68,12 @@ class PulsarSpectrum : public ISpectrum
   double retrieveNextTimeTilde( double tTilde, double totalTurns, double err );
 
   //!Apply the barycentric corrections and returns arrival time in TDB
-  double getBaryCorr( double tdbInput, int LogCorrFlag);
+  double getBaryCorr(double tdbInput, int LogCorrFlag);
  
-  //! compute binary demodulation in iterative way
+  //! Compute binary demodulation in iterative way
   double getIterativeDemodulatedTime(double tInput, int LogFlag);
 
-  //!Apply the binary demodulations
+  //! Compute binary demodulation in a single step
   double getBinaryDemodulation( double tInput, int LogDemodFlag);
 
   //! Get the decorrected time in TDB starting from a TT corrected time (inverse of getBaryCorr)
@@ -120,6 +119,7 @@ class PulsarSpectrum : public ISpectrum
   
   PulsarSim *m_Pulsar; 
   SpectObj  *m_spectrum;
+  TRandom *m_PSpectrumRandom;
   
   //! Variables related to Solar System and Astro.
   astro::EarthOrbit *m_earthOrbit;

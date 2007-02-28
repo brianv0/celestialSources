@@ -53,10 +53,10 @@ TH2D *Load(std::string name="pulsar.root")
   
   Nv->SetXTitle("Time [s]");
   Nv->SetYTitle("Energy [keV]");
-  Nv->SetZTitle("N_{v} [ph/m^2/s/keV]");
+  Nv->SetZTitle("N_{v} [ph m^{-2}s^{-1}keV^{-1} ]");
   Nv->GetXaxis()->SetTitleOffset(1.5);
   Nv->GetYaxis()->SetTitleOffset(1.5);
-  Nv->GetZaxis()->SetTitleOffset(1.2);
+  Nv->GetZaxis()->SetTitleOffset(1.3);
   Nv->GetXaxis()->CenterTitle();
   Nv->GetYaxis()->CenterTitle();
   Nv->GetZaxis()->CenterTitle();
@@ -97,13 +97,17 @@ void PlotPulsar(double enph = 0,std::string name="pulsar.root")
 
   TH1D *Ne = (TH1D*) gDirectory->Get("Ne");
 
-  Ne->SetYTitle("Ne [ph/m^2/s/keV]");
+  Ne->SetYTitle("Ne [ph m^{-2}s^{-1}keV^{-1} ]");
+  Ne->GetXaxis()->SetTitleOffset(1.1);
+  Ne->GetYaxis()->SetTitleOffset(1.1);
   Ne->SetXTitle(" Energy[keV] ");
+
   // Fv = Ne * de: [ph/m^2/s]
   TH1D *Fv = (TH1D*) Ne->Clone();
+  Fv->SetStats(0);
   Fv->SetTitle("Fv");
   Fv->SetName("Fv");
-  Fv->SetYTitle("Fv [ph/m^2/s]");
+  Fv->SetYTitle("Fv [ph m^{-2}s^{-1} ]");
   
   // vFv = e * Ne * de: [keV/m^2/s]
   TH1D *vFv = (TH1D*) Ne->Clone();
@@ -114,6 +118,8 @@ void PlotPulsar(double enph = 0,std::string name="pulsar.root")
   vFv->SetStats(0);
 
   Ne->SetLineColor(2);
+  Ne->SetStats(0);
+
   Fv->SetLineColor(3);
   vFv->SetLineColor(4);
 
@@ -136,6 +142,9 @@ void PlotPulsar(double enph = 0,std::string name="pulsar.root")
   //////////////////////////////////////////////////
   
   Nv->SetMinimum(1e-20);
+  Nv->SetStats(0);
+  Nv->SetTitle("N_{v} 2D histogram");
+
   Nv->Draw("surf");
   
   bool ExtractPhotons = true;
@@ -148,8 +157,8 @@ void PlotPulsar(double enph = 0,std::string name="pulsar.root")
   sp->SetAreaDetector(1.21);//EventSource::totalArea());
   std::cout << "**  Effective Area set to : " << sp->GetAreaDetector() << " m2 " << std::endl; 
   //////////////////////////////////////////////////
-  TCanvas *clc = new TCanvas("LightCurves","LightCurves",600,800);
-  clc->Divide(1,2);
+  TCanvas *clc = new TCanvas("LightCurves","LightCurves");
+  //clc->Divide(1,2);
 
   TCanvas *csp = new TCanvas("csp","csp");
   csp->SetLogx();
@@ -196,11 +205,14 @@ void PlotPulsar(double enph = 0,std::string name="pulsar.root")
   Lct_NORM->SetStats(0);
   
 
-  Lct_Pulsar->SetTitle("Flux [ph/cm2/s]");
+  Lct_Pulsar->SetTitle("Flux [ ph cm^{-2} s^{-1} ]");
+  Lct_Pulsar->GetXaxis()->SetTitleOffset(1.2); 
   Lct_Pulsar->SetXTitle("Time (s)");
-  Lct_Pulsar->SetYTitle("ph/cm^2/s");
+  Lct_Pulsar->GetYaxis()->SetTitleOffset(1.2);
+  Lct_Pulsar->SetYTitle("ph cm^{2}s^{-1}");
+
     
-  Lct_Pulsar->SetName("Total Flux  [ph/cm2/s]");
+  Lct_Pulsar->SetName("Total Flux  [ph/cm^{2}/s]");
   Lct_EGRET->SetName("Flux EGRET band [ph]");
   Lct_LAT->SetName("Flux LAT band [ph]"); 
  
@@ -224,15 +236,15 @@ void PlotPulsar(double enph = 0,std::string name="pulsar.root")
   
   Fv->Draw("l");
   vFv->Draw("lsame");
-  Ne->Draw("lsame");
+  //Ne->Draw("lsame");
   
   std::cout << "****  Ne @ 100 MeV " << Ne->GetBinContent(Ne->FindBin(EGRET2)) << " ph/cm2/kev/s " << std::endl;
 
   //  gDirectory->Delete("band");
   
-  TLegend *leg = new TLegend(0.11,0.12,0.37,0.25);
+  TLegend *leg = new TLegend(0.14,0.14,0.50,0.4);
   leg->SetFillStyle(0);
-  leg->AddEntry(Ne," Ne  [ph/keV/m^2/s] ","lp");
+  //leg->AddEntry(Ne," Ne  [ph/keV/m^2/s] ","lp");
   leg->AddEntry(Fv," Fv  [ph/m^2/s] ","lp");
   leg->AddEntry(vFv," vFv [keV/m^2/s] - Scaled by 1e6 -","lp");
   leg->Draw();
@@ -351,18 +363,20 @@ void PlotPulsar(double enph = 0,std::string name="pulsar.root")
       
     }
 
-  TLegend *lcleg = new TLegend(0.30,0.89,0.88,1.0);
+  TLegend *lcleg = new TLegend(0.50,0.91,0.98,0.99);
   lcleg->SetFillStyle(0);
   lcleg->SetTextSize(0.03);
   lcleg->SetFillColor(10);
-  lcleg->AddEntry(Lct_Pulsar,"Total flux in ph/cm2/s (30MeV-400GeV)","lp");
-  lcleg->AddEntry(Lct_EGRET,"EGRET flux in ph/cm2/s (30Mev-30GeV)","lp");
-  lcleg->AddEntry(Lct_LAT,"LAT flux in ph/cm2/s (30 MeV-300GeV)","lp");
-  clc->cd(1);
+  //lcleg->AddEntry(Lct_Pulsar,"Total flux in ph/cm2/s (30MeV-400GeV)","lp");
+  //lcleg->AddEntry(Lct_EGRET,"EGRET flux in ph/cm2/s (30Mev-30GeV)","lp");
+  lcleg->AddEntry(Lct_LAT,"LAT flux in ph cm^{-2}s^{-1} (30 MeV-300GeV)","lp");
+  clc->cd();
+
   Lct_Pulsar->Draw();
+
   Lct_EGRET->Draw("same");
   
-  clc->cd(2);
+  //  clc->cd(2);
 
   std::cout << "****-------------------------------------------------" <<std::endl;
   std::cout << "Fluxes summary: (Eff.Area=" << AreaDetector << " m2 )" << std::endl;
@@ -377,8 +391,6 @@ void PlotPulsar(double enph = 0,std::string name="pulsar.root")
     {
       std::cout << "       LAT band (" << LAT1 <<","<<LAT2<<")  = " 
 		<< Lct_LAT->Integral(0,TBIN)*(DT/TMAX) << " ph/cm2/s" << std::endl;
-
-
   
       //  int en2 = Fv->GetXaxis()->FindBin(EnNormMin);
       //  int en3 = Fv->GetXaxis()->FindBin(EnNormMax);
@@ -393,7 +405,7 @@ void PlotPulsar(double enph = 0,std::string name="pulsar.root")
       Lct_EXT->Scale(nLoops);
       Lct_EXT->SetLineWidth(2);
 
-      Lct_EXT->Draw(); 
+      Lct_EXT->Draw("same"); 
       Lc->SetStats(0);
       Lct_EXT->SetStats(0);
 
@@ -410,8 +422,20 @@ void PlotPulsar(double enph = 0,std::string name="pulsar.root")
       Lct_LAT->Draw("lsame");
     }
 
-  csp->cd();
-  lcleg->Draw("lsame");
+
+  clc->cd();
+  TF1 *MeanFlux = new TF1("MeanFlux","[0]");
+  MeanFlux->SetLineColor(2);
+  MeanFlux->SetLineStyle(7);
+  MeanFlux->SetParameter(0,Lct_NORM->Integral(0,TBIN)*(DT/TMAX));
+
+  MeanFlux->Draw("lsame");
+  lcleg->AddEntry(MeanFlux,"Mean Flux ph cm^{-2}s^{-1} (30Mev-30GeV)","l");
+  lcleg->Draw("same");
+
+  //  csp->cd();
+  //lcleg->Draw("lsame");
+
 
 
   std::cout << "****-------------------------------------------------" <<std::endl;
@@ -454,7 +478,7 @@ int main(int argc, char** argv)
   
   double Period  = 0.089; // s
   double flux = 1e-5; // ph/cm2/s
-  int npeaks = 3;
+  int npeaks = 2;
   double ppar1 = 1e6;
   double ppar2 = 8e6;
   double ppar3 = -1.62;

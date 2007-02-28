@@ -69,10 +69,10 @@ namespace cst
   const double baryCorrTol = 5e-7;
 
   //! Tolerance for the inverse binary demodulation (in s.)
-  const double binDemodTol = 1e-7;
+  const double InverseDemodTol = 1e-6;
 
   //! Tolerance for the iterative binary demodulation
-  const double DemodTol = 1e-9;
+  const double DemodTol = 1e-8;
 
   //! Difference between JD and MJD
   const double JDminusMJD = 2400000.5; 
