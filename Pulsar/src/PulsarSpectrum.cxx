@@ -12,7 +12,7 @@
 #define DEBUG 0
 #define BARYCORRLOG 0
 #define BINDEMODLOG 0
-#define TNOISELOG 0
+#define TNOISELOG 1
 
 using namespace cst;
 
@@ -121,6 +121,10 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
   m_model = 0;
   m_seed = 0;
   m_TimingNoiseModel = 0;
+  RWStrength_PN = 0.;
+  RWStrength_FN = 0.;
+  RWStrength_SN = 0.;
+  RWRate = 0.;
   m_BinaryFlag = 0;
   m_Porb = 0;
   m_Porb_dot = 0.;
@@ -349,6 +353,38 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
 	  TimingNoiseLogFile.close();
 	}
     }
+  else if (m_TimingNoiseModel == 2) 
+    {
+      PulsarLog << "**   Timing Noise Model : " << m_TimingNoiseModel << " (Random Walk; Cordes 1980)" << std::endl;
+      RWRate = 1./(86400.);
+      double RWtype = 3*m_PSpectrumRandom->Uniform();
+
+      double LogPNUp = log10(1.6E-13);
+      double LogPNDown = log10(1.5E-14);
+      double LogFNUp = log10(6.6E-23);
+      double LogFNDown = log10(2E-28);
+      double LogSNUp = log10(1.3E-37);
+      double LogSNDown = log10(2.0E-40);
+
+      if (RWtype < 1.)
+	{
+	  RWStrength_PN = ((m_PSpectrumRandom->Uniform()*(LogPNUp-LogPNDown))+LogPNDown);
+	  RWStrength_PN = pow(10.,RWStrength_PN);
+	  PulsarLog << "**    Random Walk Phase Noise (PN) with Strength Parameter: " << RWStrength_PN << std::endl;
+	}
+      else if ((RWtype >= 1.) && (RWtype < 2.))
+	{
+	  RWStrength_FN = ((m_PSpectrumRandom->Uniform()*(LogFNUp-LogFNDown))+LogFNDown);
+	  RWStrength_FN = pow(10.,RWStrength_FN);
+	  PulsarLog << "**    Random Walk Frequency Noise (FN) with Strength Parameter: " << RWStrength_FN << std::endl;
+	}
+      else if (RWtype >= 2.)
+	{
+	  RWStrength_SN = ((m_PSpectrumRandom->Uniform()*(LogSNUp-LogSNDown))+LogSNDown);
+	  RWStrength_SN = pow(10.,RWStrength_SN);
+	  PulsarLog << "**    Random Walk Slowing Down Noise (SN) with Strength Parameter: " << RWStrength_SN << std::endl;
+	}
+    }
 
   PulsarLog << "**************************************************" << std::endl;
 
@@ -526,17 +562,16 @@ double PulsarSpectrum::interval(double time)
   double initTurnsNoNoise=0.;//
   if (m_TimingNoiseModel ==1)
     {
-      m_f2 = 0.;
-      initTurnsNoNoise = getTurns(timeTildeDemodulated);
-
-      Delta8 = 6.6 + 0.6*log10(m_pdot) + m_PSpectrumRandom->Gaus(0,1.0);
-     
-     double Sign = m_PSpectrumRandom->Uniform();
-     if (Sign > 0.5)
-       m_f2 = ((m_f0*6.*std::pow(10.,Delta8))*1e-24);
-     else
-       m_f2 = -1.0*((m_f0*6.*std::pow(10.,Delta8))*1e-24);
-     
+	  m_f2 = 0.;
+	  initTurnsNoNoise = getTurns(timeTildeDemodulated);
+	  
+	  Delta8 = 6.6 + 0.6*log10(m_pdot) + m_PSpectrumRandom->Gaus(0,1.0);
+	  
+	  double Sign = m_PSpectrumRandom->Uniform();
+	  if (Sign > 0.5)
+	    m_f2 = ((m_f0*6.*std::pow(10.,Delta8))*1e-24);
+	  else
+	    m_f2 = -1.0*((m_f0*6.*std::pow(10.,Delta8))*1e-24);
     }
 
   double initTurns = getTurns(timeTildeDemodulated); //Turns made at this time
