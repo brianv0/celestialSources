@@ -2,6 +2,7 @@
 #define PulsarCONSTANT_HH 
 
 #include <vector> 
+#include <cmath>
 #include <string>
 #include "TRandom.h"
 

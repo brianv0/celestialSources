@@ -113,6 +113,9 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
   m_f0 = 0.0;
   m_f1 = 0.0;
   m_f2 = 0.0;
+  m_f0NoNoise = 0.0;
+  m_f1NoNoise = 0.0;
+  m_f2NoNoise = 0.0;
   m_N0 = 0.0;
   m_t0Init = 0.0;
   m_t0 = 0.0;
@@ -121,10 +124,10 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
   m_model = 0;
   m_seed = 0;
   m_TimingNoiseModel = 0;
-  RWStrength_PN = 0.;
-  RWStrength_FN = 0.;
-  RWStrength_SN = 0.;
-  RWRate = 0.;
+  m_RWStrength_PN = 0.;
+  m_RWStrength_FN = 0.;
+  m_RWStrength_SN = 0.;
+  m_RWRate = 0.;
   m_BinaryFlag = 0;
   m_Porb = 0;
   m_Porb_dot = 0.;
@@ -279,6 +282,10 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
   m_f0 = m_f0Vect[0];
   m_f1 = m_f1Vect[0];
   m_f2 = m_f2Vect[0];
+  m_f0NoNoise = m_f0Vect[0];
+  m_f1NoNoise = m_f1Vect[0];
+  m_f2NoNoise = m_f2Vect[0];
+
   m_phi0 = m_phi0Vect[0];
 
   //Init SolarSystem stuffs useful for barycentric decorrections
@@ -347,17 +354,18 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
       PulsarLog << "**   Timing Noise Model : " << m_TimingNoiseModel << " (Stability parameter, Arzoumanian 1994)" << std::endl;
       if (TNOISELOG==1)
 	{
-	  std::ofstream TimingNoiseLogFile((m_PSRname + "TimingNoise.log").c_str());
+	  std::ofstream TimingNoiseLogFile;
+	  TimingNoiseLogFile.open((m_PSRname + "TimingNoise.log").c_str(),std::ios::out);
 	  TimingNoiseLogFile << "Timing Noise log file using model: " << m_TimingNoiseModel << std::endl;
-	  TimingNoiseLogFile << "tMET\t\P\tf0\tf1\tf2\tDelta8\tdphi"<<std::endl;
+	  TimingNoiseLogFile << "tMET\tphi0\tf0\tf1\tf2\tDelta8\tdphi"<<std::endl;
 	  TimingNoiseLogFile.close();
 	}
     }
   else if (m_TimingNoiseModel == 2) 
     {
       PulsarLog << "**   Timing Noise Model : " << m_TimingNoiseModel << " (Random Walk; Cordes 1980)" << std::endl;
-      RWRate = 1./(86400.);
-      double RWtype = 3*m_PSpectrumRandom->Uniform();
+      m_RWRate = 1./(86400.);
+      double RWtype = 1.5;//3*m_PSpectrumRandom->Uniform();
 
       double LogPNUp = log10(1.6E-13);
       double LogPNDown = log10(1.5E-14);
@@ -368,21 +376,21 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
 
       if (RWtype < 1.)
 	{
-	  RWStrength_PN = ((m_PSpectrumRandom->Uniform()*(LogPNUp-LogPNDown))+LogPNDown);
-	  RWStrength_PN = pow(10.,RWStrength_PN);
-	  PulsarLog << "**    Random Walk Phase Noise (PN) with Strength Parameter: " << RWStrength_PN << std::endl;
+	  m_RWStrength_PN = ((m_PSpectrumRandom->Uniform()*(LogPNUp-LogPNDown))+LogPNDown);
+	  m_RWStrength_PN = pow(10.,m_RWStrength_PN);
+	  PulsarLog << "**    Random Walk Phase Noise (PN) with Strength Parameter: " << m_RWStrength_PN << std::endl;
 	}
       else if ((RWtype >= 1.) && (RWtype < 2.))
 	{
-	  RWStrength_FN = ((m_PSpectrumRandom->Uniform()*(LogFNUp-LogFNDown))+LogFNDown);
-	  RWStrength_FN = pow(10.,RWStrength_FN);
-	  PulsarLog << "**    Random Walk Frequency Noise (FN) with Strength Parameter: " << RWStrength_FN << std::endl;
+	  m_RWStrength_FN = ((m_PSpectrumRandom->Uniform()*(LogFNUp-LogFNDown))+LogFNDown);
+	  m_RWStrength_FN = pow(10.,m_RWStrength_FN);
+	  PulsarLog << "**    Random Walk Frequency Noise (FN) with Strength Parameter: " << m_RWStrength_FN << std::endl;
 	}
       else if (RWtype >= 2.)
 	{
-	  RWStrength_SN = ((m_PSpectrumRandom->Uniform()*(LogSNUp-LogSNDown))+LogSNDown);
-	  RWStrength_SN = pow(10.,RWStrength_SN);
-	  PulsarLog << "**    Random Walk Slowing Down Noise (SN) with Strength Parameter: " << RWStrength_SN << std::endl;
+	  m_RWStrength_SN = ((m_PSpectrumRandom->Uniform()*(LogSNUp-LogSNDown))+LogSNDown);
+	  m_RWStrength_SN = pow(10.,m_RWStrength_SN);
+	  PulsarLog << "**    Random Walk Slowing Down Noise (SN) with Strength Parameter: " << m_RWStrength_SN << std::endl;
 	}
     }
 
@@ -558,6 +566,7 @@ double PulsarSpectrum::interval(double time)
   //Introduce timing noise
   double Delta8=0;
   double intPart=0.; //Integer part
+  //pippo
 
   double initTurnsNoNoise=0.;//
   if (m_TimingNoiseModel ==1)
@@ -573,6 +582,27 @@ double PulsarSpectrum::interval(double time)
 	  else
 	    m_f2 = -1.0*((m_f0*6.*std::pow(10.,Delta8))*1e-24);
     }
+  else if (m_TimingNoiseModel ==2)
+    {
+      int CurrentDay = int((timeTildeDemodulated-(StartMissionDateMJD)*SecsOneDay)/86400);
+      double CurrentDayFrac = 86400*(((timeTildeDemodulated-(StartMissionDateMJD)*SecsOneDay)/86400)-CurrentDay);
+      //std::cout << std::setprecision(30) << CurrentDay << "+ " << CurrentDayFrac << std::endl;
+
+      if (CurrentDayFrac < 100.)
+	{
+	  m_RWRate = 1/86400.;
+	  //  std::cout << "Current day " << CurrentDay << std::endl;
+	  m_phi0 = m_phi0 +  m_PSpectrumRandom->Gaus(0.,(m_RWStrength_PN/m_RWRate));
+	  m_f0 = m_f0 + m_PSpectrumRandom->Gaus(0.,(m_RWStrength_FN/m_RWRate));
+	  m_f1 = m_f1 + m_PSpectrumRandom->Gaus(0.,(m_RWStrength_SN/m_RWRate));
+	  m_f2 = 0.;
+	  std::cout << std::setprecision(30) << "Current day " << CurrentDayFrac 
+		    << " phi0:" << m_phi0 << " f0:" << m_f0 << " f1:" << m_f1 << " f2 " << m_f2 << std::endl;
+
+	}
+    }
+
+
 
   double initTurns = getTurns(timeTildeDemodulated); //Turns made at this time
   double tStart = modf(initTurns,&intPart)*m_period; // Start time for interval
@@ -599,6 +629,9 @@ double PulsarSpectrum::interval(double time)
 	      m_f0 = m_f0Vect[e];
 	      m_f1 = m_f1Vect[e];
 	      m_f2 = m_f2Vect[e];
+	      m_f0NoNoise = m_f0Vect[e];
+	      m_f1NoNoise = m_f1Vect[e];
+	      m_f2NoNoise = m_f2Vect[e];
 	      m_period = m_periodVect[e];
 	      m_pdot = m_pdotVect[e];
 	      m_p2dot = m_p2dotVect[e];
@@ -671,16 +704,30 @@ double PulsarSpectrum::interval(double time)
   if ((m_TimingNoiseModel != 0) && (TNOISELOG==1))
     {
       std::ofstream TimingNoiseLogFile((m_PSRname + "TimingNoise.log").c_str(),std::ios::app);
-
+      double ft_l = GetFt(timeTildeDemodulated,m_f0NoNoise,m_f1NoNoise,m_f2NoNoise);
+      double ft_n = GetFt(timeTildeDemodulated,m_f0,m_f1,m_f2);
+      double ft1_l = 12.;//
+      double ft1_n = 23;//
+      double ft2_l = 11.;//
+      double ft2_n = 33;//
       TimingNoiseLogFile << std::setprecision(30) << nextTimeTildeDemodulated-(StartMissionDateMJD)*SecsOneDay
-			 << "\t" << m_f0 << "\t" << m_f1 << "\t" << m_f2 << "\t" 
-			 << Delta8 << "\t" << DeltaPhiNoise << std::endl;
+			 << "\t" << m_phi0 
+			 << "\t" <<ft_l << "\t" << ft_n 
+			 << "\t" <<ft1_l << "\t" << ft1_n 
+			 << "\t" <<ft2_l << "\t" << ft2_n 			 
+			 << "\t" <<Delta8 << "\t" << DeltaPhiNoise << std::endl;
+      std::cout << std::setprecision(30) << nextTimeTildeDemodulated-(StartMissionDateMJD)*SecsOneDay
+		<< "\t" << m_phi0 
+		<< "\t" <<ft_l << "\t" << ft_n 
+		<< "\t" <<ft1_l << "\t" << ft1_n 
+		<< "\t" <<ft2_l << "\t" << ft2_n 			 
+		<< "\t" <<Delta8 << "\t" << DeltaPhiNoise << std::endl;
+
       /*
       std::cout << std::setprecision(30) << nextTimeTildeDemodulated
 		<< "\t" << m_f0 << "\t" << m_f1 << "\t" << m_f2 << "\t" 
 		<< Delta8 << "\t" << DeltaPhiNoise << std::endl;
       */
-
     }
 
   double nextTimeTilde = 0.;
@@ -1449,7 +1496,7 @@ int PulsarSpectrum::saveBinDbTxtFile()
 
   //Writes out the infos of the file
   DbBinOutputFile.open(DbBinOutputFileName.c_str(),std::ios::app);
-  double tempInt, tempFract;
+  
   DbBinOutputFile << "\"" << m_PSRname << "\" ";                                   // pulsar name
   DbBinOutputFile << std::setprecision(10) << m_Porb << " " << m_Porb_dot << " ";   // Orbital period and derivative
   DbBinOutputFile << std::setprecision(10) << m_asini << " " << m_xdot << " ";      // Projected semi-mayor axis and derivative
@@ -1519,6 +1566,22 @@ double PulsarSpectrum::energy(double time)
 {
   return m_spectrum->energy(time,m_enphmin)*1.0e-3; //MeV
 }
+
+/////////////////////////////////////////////
+/*!
+ * \param time input time for calculating f(t)
+ *
+ * This method computes the frequency at a given instant t
+ *
+ */ 
+double PulsarSpectrum::GetFt(double time, double myf0, double myf1, double myf2)
+{
+  double dt = time - m_t0*SecsOneDay;
+  return myf0 + myf1*dt + 0.5*myf2*dt*dt;
+}
+
+
+
 
 /////////////////////////////////////////////
 /*!

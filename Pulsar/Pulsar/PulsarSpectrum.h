@@ -100,6 +100,9 @@ class PulsarSpectrum : public ISpectrum
   //! calls PulsarSpectrum::energySrc
   double energy(double time);
 
+  //! Return the pulsar frequency at time t
+  double GetFt(double time, double myf0, double myf1, double myf2);
+
   //! direction, taken from PulsarSim
   inline std::pair<double,double>
     
@@ -155,6 +158,8 @@ class PulsarSpectrum : public ISpectrum
 
   //! Frequency and derivatives
   double m_f0, m_f1, m_f2;
+  double m_f0NoNoise, m_f1NoNoise, m_f2NoNoise;
+
   std::vector<double> m_f0Vect, m_f1Vect, m_f2Vect;
 
   //! phase and turns at the epoch t0
@@ -184,7 +189,7 @@ class PulsarSpectrum : public ISpectrum
   int m_TimingNoiseModel;
 
   //! Random Walk Timing Noise
-  double RWStrength_PN,RWStrength_FN,RWStrength_SN,RWRate;
+  double m_RWStrength_PN,m_RWStrength_FN,m_RWStrength_SN,m_RWRate;
 
   //Binary parameters
   double m_Porb,m_asini,m_ecc,m_omega,m_t0PeriastrMJD,m_t0AscNodeMJD,m_PPN;
