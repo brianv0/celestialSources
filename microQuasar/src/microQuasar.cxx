@@ -104,9 +104,8 @@ microQuasar::microQuasar(const std::string &paramString)
 	m_jetProperties.setJetOnDuration(::atof(params[14].c_str()));
 	m_jetProperties.setJetOnDurationFluct(::atof(params[15].c_str()));
 	*/
-	std::pair<float,float> jet = calculateJetStart(false,0.);
-	m_jetStart = jet.first;
-	m_jetEnd = jet.second;
+
+  m_jetStart = 0.;
 
 	std::cerr << "microQuasar created. Total flux = " 
 		<< m_ftot << " m^-2 s^-1 " << " between " 
@@ -174,6 +173,13 @@ double microQuasar::interval(double current_time) {
 	double fTime = m_currentTime;
 	std::pair<double, double> jet;
 	
+	if (m_jetStart == 0.) {
+		std::pair<float,float> jet = calculateJetStart(false,fTime);
+		m_jetStart = jet.first;
+		m_jetEnd = jet.second;
+	}
+
+
 	if (fTime> m_jetEnd) {
 		jet = calculateJetStart(true,fTime);
 		m_jetStart = jet.first;
