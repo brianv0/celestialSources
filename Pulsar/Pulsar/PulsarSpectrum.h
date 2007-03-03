@@ -103,6 +103,9 @@ class PulsarSpectrum : public ISpectrum
   //! Return the pulsar frequency at time t
   double GetFt(double time, double myf0, double myf1, double myf2);
 
+  //! Return the pulsar frequency first derivative at time t
+  double GetF1t(double time, double myf0, double myf1, double myf2);
+
   //! direction, taken from PulsarSim
   inline std::pair<double,double>
     
@@ -190,12 +193,9 @@ class PulsarSpectrum : public ISpectrum
 
   //! Timing Noise activity
   double m_TimingNoiseActivity;
-  double m_timeMETNextNoiseEvent;
-
-
-  //! Random Walk Timing Noise
-  double m_RWStrength_PN,m_RWStrength_FN,m_RWStrength_SN,m_RWRate;
-
+  double m_TimingNoiseMeanRate;
+  double m_TimingNoiseRMS;
+  double m_TimingNoiseTimeNextEvent;
 
   //Binary parameters
   double m_Porb,m_asini,m_ecc,m_omega,m_t0PeriastrMJD,m_t0AscNodeMJD,m_PPN;

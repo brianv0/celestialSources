@@ -125,10 +125,9 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
   m_seed = 0;
   m_TimingNoiseModel = 0;
   m_TimingNoiseActivity = 0.;
-  m_RWStrength_PN = 0.;
-  m_RWStrength_FN = 0.;
-  m_RWStrength_SN = 0.;
-  m_RWRate = 0.;
+  m_TimingNoiseRMS = 0.;
+  m_TimingNoiseMeanRate=0.;
+  m_TimingNoiseTimeNextEvent=0.;
   m_BinaryFlag = 0;
   m_Porb = 0;
   m_Porb_dot = 0.;
@@ -144,7 +143,6 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
   m_t0PeriastrMJD = 0;
   m_t0AscNodeMJD = 0;
   m_PPN =0.;
-  m_timeMETNextNoiseEvent=0;
 
    //Read from XML file
   m_PSRname    = parseParamList(params,0).c_str();            // Pulsar name
@@ -351,55 +349,38 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
   PulsarLog << "**\n**   Mission Reference time: MJD " << StartMissionDateMJD << " (" 
 	    << std::setprecision(12) << (StartMissionDateMJD+JDminusMJD)*SecsOneDay 
 	    << " sec.)" << std::endl;
-  if (m_TimingNoiseModel == 1) 
-    {
-      PulsarLog << "**\n**   Timing Noise Model : " << m_TimingNoiseModel << " (Stability parameter, Arzoumanian 1994)" << std::endl;
+
+  if (m_TimingNoiseModel != 0)
+    { 
       if (TNOISELOG==1)
 	{
-	  std::ofstream TimingNoiseLogFile;
-	  TimingNoiseLogFile.open((m_PSRname + "TimingNoise.log").c_str(),std::ios::out);
+	  std::ofstream TimingNoiseLogFile((m_PSRname + "TimingNoise.log").c_str());
 	  TimingNoiseLogFile << "Timing Noise log file using model: " << m_TimingNoiseModel << std::endl;
-	  TimingNoiseLogFile << "tMET\tphi0\tf0\tf1\tf2\tDelta8\tdphi"<<std::endl;
+	  TimingNoiseLogFile << "tMET\tA\tf0_l\tf0_n\tf1_l\tf1_n\tf2_l\tf2_n\tPhiResid"<<std::endl;
 	  TimingNoiseLogFile.close();
 	}
-    }
-  else if (m_TimingNoiseModel == 2) 
-    {
-      PulsarLog << "**\n**   Timing Noise Model : " << m_TimingNoiseModel << " (Random Walk; Cordes 1980)" << std::endl;
-      m_RWRate = 1./(86400.);
-      PulsarLog << "**          Event Rate: " << m_RWRate << " s^-1 " << std::endl;
-      double alpha = 0.57;
-      double PdotCrab = 422E-15;
-      m_TimingNoiseActivity = -1.0*alpha*std::log10(PdotCrab)+alpha*std::log10(m_pdotVect[0]);
-      PulsarLog << "**          Cordes Activity Parameter A: " <<  m_TimingNoiseActivity << std::endl;
-      double RWtype = 1.5;//3*m_PSpectrumRandom->Uniform();
-      m_timeMETNextNoiseEvent += 400.;
-      
 
-      double LogPNUp = log10(1.6E-13);
-      double LogPNDown = log10(1.5E-14);
-      double LogFNUp = log10(6.6E-23);
-      double LogFNDown = log10(2E-28);
-      double LogSNUp = log10(1.3E-37);
-      double LogSNDown = log10(2.0E-40);
+      //define a default mean rate of about 1 day
+      m_TimingNoiseMeanRate = 1/86400.;
+      //interval according to Poisson statistics
+      m_TimingNoiseTimeNextEvent+= -log(1.-m_PSpectrumRandom->Uniform(1.0))/m_TimingNoiseMeanRate; 
 
-      if (RWtype < 1.)
+      //Determine next Timing noise event according to the rate R m_TimingNoiseRate
+
+
+      if (m_TimingNoiseModel == 1) // Timing model #1 - Delta8 parameter (Arzoumanian94)
 	{
-	  m_RWStrength_PN = ((m_PSpectrumRandom->Uniform()*(LogPNUp-LogPNDown))+LogPNDown);
-	  m_RWStrength_PN = pow(10.,m_RWStrength_PN);
-	  PulsarLog << "**    Random Walk Phase Noise (PN) with Strength Parameter: " << m_RWStrength_PN << std::endl;
+	  PulsarLog << "**\n**   Timing Noise Model : " << m_TimingNoiseModel << " (Stability parameter, Arzoumanian 1994)" << std::endl;
+	  PulsarLog << "**      Timing Noise Events Mean Rate : " << m_TimingNoiseMeanRate << std::endl;
 	}
-      else if ((RWtype >= 1.) && (RWtype < 2.))
+      else if (m_TimingNoiseModel == 2) //Timing model #2 - of Random Walk (Cordes 1980) 
 	{
-	  m_RWStrength_FN = ((m_PSpectrumRandom->Uniform()*(LogFNUp-LogFNDown))+LogFNDown);
-	  m_RWStrength_FN = pow(10.,m_RWStrength_FN);
-	  PulsarLog << "**    Random Walk Frequency Noise (FN) with Strength Parameter: " << m_RWStrength_FN << std::endl;
-	}
-      else if (RWtype >= 2.)
-	{
-	  m_RWStrength_SN = ((m_PSpectrumRandom->Uniform()*(LogSNUp-LogSNDown))+LogSNDown);
-	  m_RWStrength_SN = pow(10.,m_RWStrength_SN);
-	  PulsarLog << "**    Random Walk Slowing Down Noise (SN) with Strength Parameter: " << m_RWStrength_SN << std::endl;
+	  PulsarLog << "**\n**   Timing Noise Model : " << m_TimingNoiseModel << " (Random Walk; Cordes 1980)" << std::endl;
+	  PulsarLog << "**      Timing Noise Events Mean Rate : " << m_TimingNoiseMeanRate << std::endl;
+	  double alpha = 0.57;
+	  double PdotCrab = 422E-15;
+	  m_TimingNoiseActivity = -1.0*alpha*std::log10(PdotCrab)+alpha*std::log10(m_pdotVect[0]);
+	  PulsarLog << "**          Cordes Activity Parameter A: " <<  m_TimingNoiseActivity << std::endl;
 	}
     }
 
@@ -572,12 +553,69 @@ double PulsarSpectrum::interval(double time)
   //Phase assignment
 
 
-  //Introduce timing noise
-  double Delta8=0;
+
   double intPart=0.; //Integer part
+  double PhaseNoNoise,PhaseWithNoise=0.;
+
   //pippo
 
-  double initTurnsNoNoise=0.;//
+  //Apply timing noise
+  if (m_TimingNoiseModel !=0)
+    {
+      //Check for a next Timing noise event
+      if ((timeTildeDemodulated-(StartMissionDateMJD)*SecsOneDay) > m_TimingNoiseTimeNextEvent)
+	{
+	  //interval according to Poisson statistics
+	  m_TimingNoiseTimeNextEvent+= -log(1.-m_PSpectrumRandom->Uniform(1.0))/m_TimingNoiseMeanRate; 
+	  std::cout << std::setprecision(30)<<"Timing Noise Event!Next Event at t=" << m_TimingNoiseTimeNextEvent 
+		    << " |dt=" << m_TimingNoiseTimeNextEvent-(timeTildeDemodulated-(StartMissionDateMJD)*SecsOneDay) <<std::endl;
+
+	  if (m_TimingNoiseModel ==1) // Timing Noise #1
+	    {
+	      m_f2 = 0;
+	      PhaseNoNoise = getTurns(timeTildeDemodulated);
+	      PhaseNoNoise = modf(PhaseNoNoise,&intPart); // phase for linear evolution 
+	      m_TimingNoiseActivity = 6.6 + 0.6*log10(m_pdot) + m_PSpectrumRandom->Gaus(0,0.5);
+	      
+	      //estimate an f2
+	      double Sign = m_PSpectrumRandom->Uniform();
+	      if (Sign > 0.5)
+		m_f2 = ((m_f0*6.*std::pow(10.,m_TimingNoiseActivity))*1e-24);
+	      else
+		m_f2 = -1.0*((m_f0*6.*std::pow(10.,m_TimingNoiseActivity))*1e-24);
+	    }
+	  
+	  
+	  PhaseWithNoise = getTurns(timeTildeDemodulated);
+	  PhaseWithNoise = modf(PhaseWithNoise,&intPart); // phase for linear evolution 
+	  
+	  std::ofstream TimingNoiseLogFile((m_PSRname + "TimingNoise.log").c_str(),std::ios::app);
+	  m_f2NoNoise = 0.;
+	  double ft_l = GetFt(timeTildeDemodulated,m_f0NoNoise,m_f1NoNoise,m_f2NoNoise);
+	  double ft_n = GetFt(timeTildeDemodulated,m_f0,m_f1,m_f2);
+	  double ft1_l = GetF1t(timeTildeDemodulated,m_f0NoNoise,m_f1NoNoise,m_f2NoNoise);
+	  double ft1_n = GetF1t(timeTildeDemodulated,m_f0,m_f1,m_f2);
+	  double ft2_l = m_f2NoNoise;//
+	  double ft2_n = m_f2;//
+	 
+	  if (TNOISELOG==1)
+	    {
+	      TimingNoiseLogFile << std::setprecision(30) << timeTildeDemodulated-(StartMissionDateMJD)*SecsOneDay
+				 << "\t" << m_TimingNoiseActivity
+				 << "\t" <<ft_l << "\t" << ft_n 
+				 << "\t" <<ft1_l << "\t" << ft1_n 
+				 << "\t" <<ft2_l << "\t" << ft2_n 			 
+				 << "\t" << PhaseNoNoise << "\t" << PhaseWithNoise << std::endl;
+	    }
+	  
+
+	  std::cout << std::setprecision(30) << " Activity=" << m_TimingNoiseActivity 
+		    << "f2=" << m_f2 << " PN=" << PhaseWithNoise 
+		    << " dPhi=" << PhaseWithNoise-PhaseNoNoise <<std::endl;
+	}
+    }
+
+  /*
   if (m_TimingNoiseModel ==1)
     {
 	  m_f2 = 0.;
@@ -631,14 +669,15 @@ double PulsarSpectrum::interval(double time)
 	  //	    << " phi0:" << m_phi0 << " f0:" << m_f0 << " nonoise" << m_f0NoNoise << " df0" << Deltaf0 << std::endl;
 	  
 	  //}
-	}
+	 }
     }
+  */
 
 
   double initTurns = getTurns(timeTildeDemodulated); //Turns made at this time
   double tStart = modf(initTurns,&intPart)*m_period; // Start time for interval
 
-  double DeltaPhiNoise = modf(initTurns,&intPart)-modf(initTurnsNoNoise,&intPart);
+  //  double DeltaPhiNoise = modf(initTurns,&intPart)-modf(initTurnsNoNoise,&intPart);
 
 
   //Checks whether ephemerides (period,pdot, etc..) are within validity ranges
@@ -731,12 +770,11 @@ double PulsarSpectrum::interval(double time)
   //Applying timingnoise	     
 
   double nextTimeTildeDemodulated = retrieveNextTimeTilde(timeTildeDemodulated, totTurns, (ephemCorrTol/m_period));
-
+  /*
   if ((m_TimingNoiseModel != 0) && (TNOISELOG==1))
     {
       std::ofstream TimingNoiseLogFile((m_PSRname + "TimingNoise.log").c_str(),std::ios::app);
       m_f2NoNoise = 0.;
-      m_f2 = 0.;
       double ft_l = GetFt(timeTildeDemodulated,m_f0NoNoise,m_f1NoNoise,m_f2NoNoise);
       double ft_n = GetFt(timeTildeDemodulated,m_f0,m_f1,m_f2);
       double ft1_l = 12.;//
@@ -744,26 +782,17 @@ double PulsarSpectrum::interval(double time)
       double ft2_l = 11.;//
       double ft2_n = 33;//
       
+
       TimingNoiseLogFile << std::setprecision(30) << nextTimeTildeDemodulated-(StartMissionDateMJD)*SecsOneDay
-			 << "\t" << m_phi0 
+			 << "\t" << m_TimingNoiseActivity
 			 << "\t" <<ft_l << "\t" << ft_n 
 			 << "\t" <<ft1_l << "\t" << ft1_n 
 			 << "\t" <<ft2_l << "\t" << ft2_n 			 
-			 << "\t" <<Delta8 << "\t" << DeltaPhiNoise << std::endl;
-      /*
-      std::cout << std::setprecision(30) << nextTimeTildeDemodulated-(StartMissionDateMJD)*SecsOneDay
-		<< "\t" << m_phi0 
-		<< "\t" <<ft_l << "\t" << ft_n-ft_l 
-		<< "\t" <<ft1_l << "\t" << ft1_n 
-		<< "\t" <<ft2_l << "\t" << ft2_n 			 
-	 	<< "\t" <<Delta8 << "\t" << DeltaPhiNoise << std::endl;
-      */
-      /*
-      std::cout << std::setprecision(30) << nextTimeTildeDemodulated
-		<< "\t" << m_f0 << "\t" << m_f1 << "\t" << m_f2 << "\t" 
-		<< Delta8 << "\t" << DeltaPhiNoise << std::endl;
-      */
-    }
+			 << "\t" << (tStart/m_period)-PhaseNoise << std::endl;
+
+
+   }
+  */
 
   double nextTimeTilde = 0.;
   double nextTimeTildeDecorr = 0.;
@@ -1615,6 +1644,18 @@ double PulsarSpectrum::GetFt(double time, double myf0, double myf1, double myf2)
   return myf0 + myf1*dt + 0.5*myf2*dt*dt;
 }
 
+/////////////////////////////////////////////
+/*!
+ * \param time input time for calculating f'(t)
+ *
+ * This method computes the frequency first derivativeat a given instant t
+ *
+ */ 
+double PulsarSpectrum::GetF1t(double time, double myf0, double myf1, double myf2)
+{
+  double dt = time - m_t0*SecsOneDay;
+  return myf1 + myf2*dt;
+}
 
 
 
