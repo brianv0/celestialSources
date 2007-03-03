@@ -1,7 +1,6 @@
 #ifndef GRBobsPULSE_HH
 #define GRBobsPULSE_HH 1
 #include <math.h>
-#include "GRBobs/GRBobsConstants.h"
 /*! 
  * \class GRBobsPulse
  * \brief GRB phenomenological pulse description
@@ -16,7 +15,7 @@ class GRBobsPulse
 {
  public:
   GRBobsPulse();
-  GRBobsPulse(double peakTime, GRBobsParameters *params);
+  GRBobsPulse(double, double, double, double, double, double, double, double);
   void Print();
   inline void SetPeakTime(double t)    {m_peakTime  = t;}
   inline void SetRiseTime(double t)    {m_riseTime   = t;}

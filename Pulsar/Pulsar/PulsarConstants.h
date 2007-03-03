@@ -2,7 +2,6 @@
 #define PulsarCONSTANT_HH 
 
 #include <vector> 
-#include <cmath>
 #include <string>
 #include "TRandom.h"
 
@@ -61,28 +60,19 @@ namespace cst
   const double EGRET3=3.0e7;                  
 
   //! Start Mission Date, expressed in MJD (corresponding to TT January 1st, 2007, at 00:00:00)
-  const double StartMissionDateMJD = 51910.0 + 64.184/86400.; ;//54101.0; 
+  const double StartMissionDateMJD = 54101.0; 
   
-  //! Tolerance for the ephemerides decorrection (in s.)
-  const double ephemCorrTol = 1e-6;//1e-6
+  //! Tolerance for the ephemerides decorrection (in us.)
+  const double ephemCorrTol = 1e-6;
 
   //! Tolerance for the barycentri decorrection (in us.)
-  const double baryCorrTol = 5e-7;
-
-  //! Tolerance for the inverse binary demodulation (in s.)
-  const double InverseDemodTol = 1e-6;
-
-  //! Tolerance for the iterative binary demodulation
-  const double DemodTol = 1e-8;
+  const double baryCorrTol = 5e-5;
 
   //! Difference between JD and MJD
   const double JDminusMJD = 2400000.5; 
 
   //! Seconds in one day
   const int SecsOneDay = 86400; 
-
-  //! Degree to Radiants conversion
-  const double DegToRad = M_PI/180.;
 
 };
 

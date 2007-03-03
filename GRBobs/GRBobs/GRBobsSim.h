@@ -9,6 +9,7 @@
 #include "GRBobsConstants.h"
 #include "GRBobsPulse.h"
 #include "GRBobsengine.h"
+#include "TString.h"
 #include "TF1.h"
 #include "TH1D.h"
 #include "TH2D.h"
@@ -28,11 +29,10 @@ class GRBobsSim
   ~GRBobsSim()
     {
       delete m_GRBengine;
-      if(!m_Nv) delete m_Nv;
-      if(!m_NvEC) delete m_NvEC;
+      delete m_Nv;
     }
   /// This method ensures that a unique name is given to the ROOT objects. It is set equal to the pointer address.
-  void GetUniqueName(void *ptr, std::string & name);
+  void GetUniqueName(const void *ptr, std::string & name);
     
   /*!
    * \brief Starts the GRBobs simulation
@@ -40,8 +40,7 @@ class GRBobsSim
    * Initialize the simulation
    */
   TH2D* MakeGRB();
-  TH2D* MakeGRB_ExtraComponent(double ,double);
-  TH2D* CutOff(TH2D *Nv, double E_CO);
+
   /*! 
     Compute the Flux, as a function of time. It returns a matrix.
   */
@@ -53,7 +52,6 @@ class GRBobsSim
   inline double Tmax(){return m_tfinal;} 
   /// This methods save the TH2 histogram in a root file. It is used by GRBROOTTest.cxx
   void SaveNv();
-  void SaveNvEC();
   /*!
     \brief This methods performs a series of fits using the well known Band function. (Band et al.(1993) ApJ.,413:281-292)
     
@@ -61,7 +59,7 @@ class GRBobsSim
     The name of the txt file is chosen in agreement with the GRB name (See GRBmanager).
     \param GRBname is the name of the GRB created in GRBmanager. It is used for naming the GBM output file, and it is usually computed with the dating convention.
   */
-  void GetGBMFlux(std::string GRBname);
+  void GetGBMFlux(TString GRBname);
   /*!
     \brief This methods saves the definition file for GBM simulator.
     
@@ -89,8 +87,8 @@ class GRBobsSim
     \param phi is the elevation (deg) from LAT horizon (zenith -> phi=90)
     \param tstart is the GRB starting time (in second, since the starting time of the simulation).
   */
-  void SaveGBMDefinition(std::string GRBname, double ra, double dec, double theta, double phi, double tstart);
-  double *ComputeEnergyBins(int &Nbins);
+  void SaveGBMDefinition(TString GRBname, double ra, double dec, double theta, double phi, double tstart);
+  
  private:
   
   /// Gathers all relevant constants for the simulation 
@@ -99,11 +97,7 @@ class GRBobsSim
   double m_tfinal;
   double m_fluence;
   int m_tbin;
-
   TH2D *m_Nv;
-  TH2D *m_NvEC;
-  std::vector<double> NaIEnergyGrid_Vector;
-  std::vector<double> BGOEnergyGrid_Vector;
 };
 
 #endif
