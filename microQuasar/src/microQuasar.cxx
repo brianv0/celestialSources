@@ -174,7 +174,7 @@ double microQuasar::interval(double current_time) {
 	std::pair<double, double> jet;
 	
 	if (m_jetStart == 0.) {
-		std::pair<float,float> jet = calculateJetStart(false,fTime);
+		jet = calculateJetStart(false,fTime);
 		m_jetStart = jet.first;
 		m_jetEnd = jet.second;
 	}
