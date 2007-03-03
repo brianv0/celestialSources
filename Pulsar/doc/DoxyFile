@@ -1,6 +1,6 @@
 PROJECT_NAME           = "Pulsar package"
-PROJECT_NUMBER         = "v1r0p9"
-OUTPUT_DIRECTORY       = "PulsarSpDoc"
+PROJECT_NUMBER         = "v1r0p4"
+OUTPUT_DIRECTORY       = "PulsarDoc"
 FILE_PATTERNS          = *.cxx *.cpp *.h
 STRIP_CODE_COMMENTS    = NO
 FULL_PATH_NAMES        = NO
@@ -29,4 +29,4 @@ CLASS_GRAPH            = YES
 COLLABORATION_GRAPH    = YES
 TEMPLATE_RELATIONS     = YES
 INCLUDE_GRAPH          = YES
-DOT_IMAGE_FORMAT       = png gif
+DOT_IMAGE_FORMAT       = png
