@@ -188,8 +188,14 @@ class PulsarSpectrum : public ISpectrum
   //! Flag for enabling timing noise
   int m_TimingNoiseModel;
 
+  //! Timing Noise activity
+  double m_TimingNoiseActivity;
+  double m_timeMETNextNoiseEvent;
+
+
   //! Random Walk Timing Noise
   double m_RWStrength_PN,m_RWStrength_FN,m_RWStrength_SN,m_RWRate;
+
 
   //Binary parameters
   double m_Porb,m_asini,m_ecc,m_omega,m_t0PeriastrMJD,m_t0AscNodeMJD,m_PPN;

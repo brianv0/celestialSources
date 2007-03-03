@@ -124,6 +124,7 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
   m_model = 0;
   m_seed = 0;
   m_TimingNoiseModel = 0;
+  m_TimingNoiseActivity = 0.;
   m_RWStrength_PN = 0.;
   m_RWStrength_FN = 0.;
   m_RWStrength_SN = 0.;
@@ -143,6 +144,7 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
   m_t0PeriastrMJD = 0;
   m_t0AscNodeMJD = 0;
   m_PPN =0.;
+  m_timeMETNextNoiseEvent=0;
 
    //Read from XML file
   m_PSRname    = parseParamList(params,0).c_str();            // Pulsar name
@@ -351,7 +353,7 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
 	    << " sec.)" << std::endl;
   if (m_TimingNoiseModel == 1) 
     {
-      PulsarLog << "**   Timing Noise Model : " << m_TimingNoiseModel << " (Stability parameter, Arzoumanian 1994)" << std::endl;
+      PulsarLog << "**\n**   Timing Noise Model : " << m_TimingNoiseModel << " (Stability parameter, Arzoumanian 1994)" << std::endl;
       if (TNOISELOG==1)
 	{
 	  std::ofstream TimingNoiseLogFile;
@@ -363,9 +365,16 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
     }
   else if (m_TimingNoiseModel == 2) 
     {
-      PulsarLog << "**   Timing Noise Model : " << m_TimingNoiseModel << " (Random Walk; Cordes 1980)" << std::endl;
+      PulsarLog << "**\n**   Timing Noise Model : " << m_TimingNoiseModel << " (Random Walk; Cordes 1980)" << std::endl;
       m_RWRate = 1./(86400.);
+      PulsarLog << "**          Event Rate: " << m_RWRate << " s^-1 " << std::endl;
+      double alpha = 0.57;
+      double PdotCrab = 422E-15;
+      m_TimingNoiseActivity = -1.0*alpha*std::log10(PdotCrab)+alpha*std::log10(m_pdotVect[0]);
+      PulsarLog << "**          Cordes Activity Parameter A: " <<  m_TimingNoiseActivity << std::endl;
       double RWtype = 1.5;//3*m_PSpectrumRandom->Uniform();
+      m_timeMETNextNoiseEvent += 400.;
+      
 
       double LogPNUp = log10(1.6E-13);
       double LogPNDown = log10(1.5E-14);
@@ -584,24 +593,46 @@ double PulsarSpectrum::interval(double time)
     }
   else if (m_TimingNoiseModel ==2)
     {
-      int CurrentDay = int((timeTildeDemodulated-(StartMissionDateMJD)*SecsOneDay)/86400);
-      double CurrentDayFrac = 86400*(((timeTildeDemodulated-(StartMissionDateMJD)*SecsOneDay)/86400)-CurrentDay);
-      //std::cout << std::setprecision(30) << CurrentDay << "+ " << CurrentDayFrac << std::endl;
 
-      if (CurrentDayFrac < 100.)
+      if ((timeTildeDemodulated-(StartMissionDateMJD)*SecsOneDay) > m_timeMETNextNoiseEvent)
 	{
+	  m_timeMETNextNoiseEvent+=400.;
+	  double sigma_r_Crab_1628 = 0.012; // rms residual for crab
+	  double sigma_r = std::sqrt(sigma_r_Crab_1628*pow(10.,m_TimingNoiseActivity)); 
+	  double sigma_m = 8e-5;
+	  double sigma_R = sigma_r;
+	  double coeff = 15.5;
+	  // m_RWStrength_FN = coeff*coeff*(((sigma_r*sigma_r)-(sigma_m*sigma_m))/(sigma_R*sigma_R));
+	  std::cout << std::setprecision(30) << (timeTildeDemodulated-(StartMissionDateMJD)*SecsOneDay)
+		    << "Timing Noise Event! next will be at " << m_timeMETNextNoiseEvent << std::endl;
+	  //" s. MET rms:" << sigma_r 
+	  //    << " Strenght: " << m_RWStrength_FN << std::endl;
+	
+	  int CurrentDay = int((timeTildeDemodulated-(StartMissionDateMJD)*SecsOneDay)/86400);
+	  double CurrentDayFrac = 86400*(((timeTildeDemodulated-(StartMissionDateMJD)*SecsOneDay)/86400)-CurrentDay);
+	  //std::cout << std::setprecision(30) << CurrentDay << "+ " << CurrentDayFrac << std::endl;
+	  
+	  //  if (CurrentDayFrac < 100.)
+	  //{
 	  m_RWRate = 1/86400.;
-	  //  std::cout << "Current day " << CurrentDay << std::endl;
-	  m_phi0 = m_phi0 +  m_PSpectrumRandom->Gaus(0.,(m_RWStrength_PN/m_RWRate));
-	  m_f0 = m_f0 + m_PSpectrumRandom->Gaus(0.,(m_RWStrength_FN/m_RWRate));
-	  m_f1 = m_f1 + m_PSpectrumRandom->Gaus(0.,(m_RWStrength_SN/m_RWRate));
-	  m_f2 = 0.;
-	  std::cout << std::setprecision(30) << "Current day " << CurrentDayFrac 
-		    << " phi0:" << m_phi0 << " f0:" << m_f0 << " f1:" << m_f1 << " f2 " << m_f2 << std::endl;
+	  //std::cout << "Current day " << CurrentDay << std::endl;
+	  double DeltaPhi0 = m_PSpectrumRandom->Gaus(0.,std::sqrt((m_RWStrength_PN/m_RWRate)));
+	  double Deltaf0 = m_PSpectrumRandom->Gaus(0.,std::sqrt((m_RWStrength_FN/m_RWRate)));
+	  double Deltaf1 = m_PSpectrumRandom->Gaus(0.,std::sqrt((m_RWStrength_SN/m_RWRate)));
+	  std::cout << std::setprecision(30) << "dPhi0=" << DeltaPhi0 << " df0=" << Deltaf0 
+		    << " df1=" << Deltaf1 << " f2" << m_f2 << std::endl;
 
+	  m_phi0 = m_phi0 +  DeltaPhi0;
+	  m_f0 = m_f0 + Deltaf0;
+	  m_f1 = m_f1 + Deltaf1;
+	  m_f2 = 0.;
+	  
+	  //std::cout << std::setprecision(30) << "Current day " << CurrentDayFrac 
+	  //	    << " phi0:" << m_phi0 << " f0:" << m_f0 << " nonoise" << m_f0NoNoise << " df0" << Deltaf0 << std::endl;
+	  
+	  //}
 	}
     }
-
 
 
   double initTurns = getTurns(timeTildeDemodulated); //Turns made at this time
@@ -704,25 +735,29 @@ double PulsarSpectrum::interval(double time)
   if ((m_TimingNoiseModel != 0) && (TNOISELOG==1))
     {
       std::ofstream TimingNoiseLogFile((m_PSRname + "TimingNoise.log").c_str(),std::ios::app);
+      m_f2NoNoise = 0.;
+      m_f2 = 0.;
       double ft_l = GetFt(timeTildeDemodulated,m_f0NoNoise,m_f1NoNoise,m_f2NoNoise);
       double ft_n = GetFt(timeTildeDemodulated,m_f0,m_f1,m_f2);
       double ft1_l = 12.;//
       double ft1_n = 23;//
       double ft2_l = 11.;//
       double ft2_n = 33;//
+      
       TimingNoiseLogFile << std::setprecision(30) << nextTimeTildeDemodulated-(StartMissionDateMJD)*SecsOneDay
 			 << "\t" << m_phi0 
 			 << "\t" <<ft_l << "\t" << ft_n 
 			 << "\t" <<ft1_l << "\t" << ft1_n 
 			 << "\t" <<ft2_l << "\t" << ft2_n 			 
 			 << "\t" <<Delta8 << "\t" << DeltaPhiNoise << std::endl;
+      /*
       std::cout << std::setprecision(30) << nextTimeTildeDemodulated-(StartMissionDateMJD)*SecsOneDay
 		<< "\t" << m_phi0 
-		<< "\t" <<ft_l << "\t" << ft_n 
+		<< "\t" <<ft_l << "\t" << ft_n-ft_l 
 		<< "\t" <<ft1_l << "\t" << ft1_n 
 		<< "\t" <<ft2_l << "\t" << ft2_n 			 
-		<< "\t" <<Delta8 << "\t" << DeltaPhiNoise << std::endl;
-
+	 	<< "\t" <<Delta8 << "\t" << DeltaPhiNoise << std::endl;
+      */
       /*
       std::cout << std::setprecision(30) << nextTimeTildeDemodulated
 		<< "\t" << m_f0 << "\t" << m_f1 << "\t" << m_f2 << "\t" 
