@@ -12,7 +12,7 @@
 #define DEBUG 0
 #define BARYCORRLOG 0
 #define BINDEMODLOG 0
-#define TNOISELOG 1
+#define TNOISELOG 0
 
 using namespace cst;
 
@@ -229,48 +229,54 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
 	  }
       }
 
+  //  ListFile.getline(DataListFileName,200); 
+
+
   //Scan for Binary Pulsar if there are
 
-  std::string BinListFileName = pulsar_data + "PulsarBinDataList.txt";
-  
-  //Look to BinDataList.txt for binary pulsar data
-  std::ifstream BinListFile;
-  BinListFile.open(BinListFileName.c_str(), std::ios::in);
-  char BinDataListFileName[200];
-  BinListFile.getline(BinDataListFileName,200); 
-
-  if (! BinListFile.is_open()) 
+  if (m_BinaryFlag ==1)
     {
-      std::cout << "Error opening file containing Binary DataList files" << BinListFileName  
-		<< " (check whether $PULSARDATA is set" << std::endl; 
-      exit(1);
-    }  else 
-      {
+      std::string BinListFileName = pulsar_data + "PulsarBinDataList.txt";
+      
+      //Look to BinDataList.txt for binary pulsar data
+      std::ifstream BinListFile;
+      BinListFile.open(BinListFileName.c_str(), std::ios::in);
+      char BinDataListFileName[200];
+      BinListFile.getline(BinDataListFileName,200); 
 
-	BinListFile >> BinDataListFileName;
-	while (!BinListFile.eof()) 
-	  {	
-	    CompletePathFileName = pulsar_data + std::string(BinDataListFileName);
-	    Retrieved = getOrbitalDataFromBinDataList(CompletePathFileName);
-	    
-	    if (Retrieved == 1)
-	      {
-		std::cout << "Binary Pulsar " << m_PSRname << " found in file " << CompletePathFileName << std::endl;
-		AllRetrieved = 1;
-	      } 
-	    BinListFile >> BinDataListFileName ;	  
- 	  }
-
-	if (AllRetrieved == 0)
+      if (! BinListFile.is_open()) 
+	{
+	  std::cout << "Error opening file containing Binary DataList files" << BinListFileName  
+		    << " (check whether $PULSARDATA is set" << std::endl; 
+	  exit(1);
+	}  else 
 	  {
-	    std::cout << "Binary Pulsar " << m_PSRname 
-		      << " not found in any BinDataList file.Please Check if PULSARDATA is correctly set " 
-		      << std::endl;
-	    exit(1);
-	  }
-       }
 
-  ListFile.getline(DataListFileName,200); 
+	    BinListFile >> BinDataListFileName;
+	    while (!BinListFile.eof()) 
+	      {	
+		CompletePathFileName = pulsar_data + std::string(BinDataListFileName);
+		Retrieved = getOrbitalDataFromBinDataList(CompletePathFileName);
+		
+		if (Retrieved == 1)
+		  {
+		    std::cout << "Binary Pulsar " << m_PSRname << " found in file " << CompletePathFileName << std::endl;
+		    AllRetrieved = 1;
+		  } 
+		BinListFile >> BinDataListFileName ;	  
+	      }
+
+	    if (AllRetrieved == 0)
+	      {
+		std::cout << "Binary Pulsar " << m_PSRname 
+			  << " not found in any BinDataList file.Please Check if PULSARDATA is correctly set " 
+			  << std::endl;
+		exit(1);
+	      }
+	  }
+    }
+
+
 
   //Assign as starting ephemeris the first entry of the vectors... 
   m_t0Init = m_t0InitVect[0];
