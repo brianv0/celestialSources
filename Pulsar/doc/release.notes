@@ -46,5 +46,7 @@
 *   v2r2p0  27-feb-2007 MR    Added Timing Noise model 1
 *   v2r2p1  28-feb-2007 MR    Changed Delta8 timing noise and fix VC8 bug
 *   v2r2p2  28-feb-2007 MR    Binaries fixed and test program changed
+*   v2r2p3  3-mar-2007 MR     Timing Noise code
+*   v2r2p4  5-mar-2007 MR     Added Doxy headers
 *@endverbatim
 */

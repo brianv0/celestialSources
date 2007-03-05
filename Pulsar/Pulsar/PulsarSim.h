@@ -1,8 +1,11 @@
-//////////////////////////////////////////////////
-// File PulsarSim.h
-// Header file for PulsarSim class
-//////////////////////////////////////////////////
-
+/**
+ * @file PulsarSim.h
+ * @brief Class of the core of Pulsar Simulator, PulsarSim.cxx
+ * @ author Massimiliano Razzano (massimiliano.razzano@pi.infn.it
+ * @ author Nicola Omodei (nicola.omodei@pi.infn.it
+ *
+ * $Header$
+ */
 #ifndef PulsarSIM_H
 #define PulsarSIM_H 
 

@@ -1,8 +1,11 @@
-/////////////////////////////////////////////////
-// File PulsarSpectrum.h
-// Header file for PulsarSpectrum class
-//////////////////////////////////////////////////
-
+/**
+ * @file PulsarSpectrum.h
+ * @brief Class Header for PulsarSpectrum.cxx
+ * @ author Massimiliano Razzano (massimiliano.razzano@pi.infn.it
+ * @ author Nicola Omodei (nicola.omodei@pi.infn.it
+ *
+ * $Header$
+ */
 #ifndef PulsarSpectrum_H
 #define PulsarSpectrum_H
 

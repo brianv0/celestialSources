@@ -1,3 +1,11 @@
+/**
+ * @file PulsarConstant.h
+ * @brief Collection of constants useful for PulsarSpectrum simulator
+ * @ author Massimiliano Razzano (massimiliano.razzano@pi.infn.it
+ * @ author Nicola Omodei (nicola.omodei@pi.infn.it
+ *
+ * $Header$
+ */
 #ifndef PulsarCONSTANT_HH
 
 #define  PulsarCONSTANT_HH 
