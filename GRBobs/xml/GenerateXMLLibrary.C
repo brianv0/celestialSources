@@ -3,8 +3,9 @@
 // OPTIONS FOR GENERATING THE XML LIBRARY:
 double MinExtractedPhotonEnergy = 20.0; //MeV
 long FirstBurstTime  =      1000; //1e4
-//double AverageInterval = 86400.0; //s
-double AverageInterval = 48516.9; //s
+//double AverageInterval = 86400.0; //[s] 1 grbs / day
+//double AverageInterval = 48516.9; //[s] 650 grbs / yr
+double AverageInterval = 47351.35135; //[s] 666 grbs / yr
 
 bool  GeneratePF         =   true; // If true: PF is used to normalize Bursts.
                                    // If false Fluence is used to normalize Bursts.
@@ -597,7 +598,7 @@ void GenerateXMLLibrary(int Nbursts=1000)
       if(GeneratePF)
 	osXML<<" <SpectrumClass name=\"GRBobsmanager\" params=\"tstart="<<BurstTime<<", duration="<<Duration<<", peakFlux="<<PeakFlux;
       else 
-	osXML<<" <SpectrumClass name=\"GRBobsmanager\" params=\"tstart="<<BurstTime<<", duration= "<<Duration<<", fluence="<<Fluence;
+	osXML<<" <SpectrumClass name=\"GRBobsmanager\" params=\"tstart="<<BurstTime<<", duration="<<Duration<<", fluence="<<Fluence;
       
       //      if(!GLASTCoordinate)  
 	osXML<<", l="<<gal_l<<", b="<<gal_b;
