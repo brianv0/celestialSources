@@ -226,11 +226,12 @@ void SpectralTransient::readModel(std::string templateFile) {
    }
    for (size_t i = 0; i < m_lightCurve.size(); i++) {
       if (m_lightCurve.at(i).flux < 0) {
-         std::ostringstream message;
-         message << "Model light curve in "
-                 << templateFile << ", for light curve number "
-                 << m_lc << " contains a negative flux value.";
-         throw std::runtime_error(message.str());
+//          std::ostringstream message;
+//          message << "Model light curve in "
+//                  << templateFile << ", for light curve number "
+//                  << m_lc << " contains a negative flux value.";
+//          throw std::runtime_error(message.str());
+         m_lightCurve.at(i).flux = 0;
       }
    }
    rescaleLightCurve();
