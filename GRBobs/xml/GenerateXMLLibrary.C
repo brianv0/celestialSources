@@ -9,7 +9,7 @@ double AverageInterval = 47351.35135; //[s] 666 grbs / yr
 
 bool  GeneratePF         =   true; // If true: PF is used to normalize Bursts.
                                    // If false Fluence is used to normalize Bursts.
-TString GenerateIC        =   "no";//"random"; //"yes", "no"
+TString GenerateIC        =   "random";//"random"; //"yes", "no"
 double Fssc_Fsyn_const   =   10;
 bool  GenerateRedshift   =   true;
 bool  GenerateGBM        =   false;
