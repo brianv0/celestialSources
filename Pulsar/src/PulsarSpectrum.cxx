@@ -599,8 +599,8 @@ double PulsarSpectrum::interval(double time)
 	  m_f2NoNoise = 0.;
 	  double ft_l = GetFt(timeTildeDemodulated,m_f0NoNoise,m_f1NoNoise,m_f2NoNoise);
 	  double ft_n = GetFt(timeTildeDemodulated,m_f0,m_f1,m_f2);
-	  double ft1_l = GetF1t(timeTildeDemodulated,m_f0NoNoise,m_f1NoNoise,m_f2NoNoise);
-	  double ft1_n = GetF1t(timeTildeDemodulated,m_f0,m_f1,m_f2);
+	  double ft1_l = GetF1t(timeTildeDemodulated,m_f1NoNoise,m_f2NoNoise);
+	  double ft1_n = GetF1t(timeTildeDemodulated,m_f1,m_f2);
 	  double ft2_l = m_f2NoNoise;//
 	  double ft2_n = m_f2;//
 	 
@@ -685,6 +685,11 @@ double PulsarSpectrum::interval(double time)
 
   //  double DeltaPhiNoise = modf(initTurns,&intPart)-modf(initTurnsNoNoise,&intPart);
 
+  /*
+  std::cout << std::setprecision(30) << "\n" << timeTilde -(StartMissionDateMJD)*SecsOneDay 
+	    <<  " PulsarSpectrum Phase is " 
+	    << std::setprecision(20) << getTurns(timeTilde) << "phi0 is " << m_phi0 << std::endl;
+  */
 
   //Checks whether ephemerides (period,pdot, etc..) are within validity ranges
   if (((timeTildeDemodulated/SecsOneDay) < m_t0Init) || ((timeTildeDemodulated/SecsOneDay) > m_t0End)) 
@@ -696,8 +701,6 @@ double PulsarSpectrum::interval(double time)
 	for (unsigned int e=0; e < m_t0Vect.size();e++)
 	  if (((timeTildeDemodulated/SecsOneDay) > m_t0InitVect[e]) && ((timeTildeDemodulated/SecsOneDay) < m_t0EndVect[e])) 
 	    {
-	      std::cout << "\n" << timeTilde -(StartMissionDateMJD)*SecsOneDay <<  " PulsarSpectrum Phase is " 
-			<< std::setprecision(20) << getTurns(timeTilde) << "phi0 is " << m_phi0 << std::endl;
 	
 	      m_t0Init = m_t0InitVect[e];
 	      m_t0 = m_t0Vect[e];
@@ -724,21 +727,24 @@ double PulsarSpectrum::interval(double time)
 
 	      //Re-instantiate PulsarSim and SpectObj
 	      delete m_Pulsar;
+
 	      m_Pulsar = new PulsarSim(m_PSRname, m_seed, m_flux, m_enphmin, m_enphmax, m_period);
 
 	      if (m_model == 1)
 		{
+
 		  delete m_spectrum;
 		  m_spectrum = new SpectObj(m_Pulsar->PSRPhenom(double(m_ppar0), m_ppar1,m_ppar2,m_ppar3,m_ppar4),1);
 		  m_spectrum->SetAreaDetector(EventSource::totalArea());
+	      
 		}
 
 	      m_N0 = m_N0 + initTurns - getTurns(timeTildeDemodulated); //Number of turns at next t0
 	      double intN0;
 	      double N0frac = modf(m_N0,&intN0); // Start time for interval
 	      m_N0 = m_N0 - N0frac;
-	      //	       std::cout << std::setprecision(20) << " Turns now are " << initTurns  
-	      //              << " ; at t0 " << m_N0 << std::endl;	           
+	      std::cout << std::setprecision(20) << " Turns now are " << initTurns  
+			<< " ; at t0 " << m_N0 << std::endl;	           
 	       
 	      //m_phi0 = m_phi0 - N0frac;
 	       
@@ -748,7 +754,7 @@ double PulsarSpectrum::interval(double time)
 		}
 	    }
 	 else
-   {
+	   {
 	     std::cout << "Warning! Valid ephemerides not found!Proceeding with the old ones" << std::endl; 
 	   }
     }
@@ -764,8 +770,9 @@ double PulsarSpectrum::interval(double time)
     }
 
   //Log out the barycentric corrections  
+  double bl=0;
   if (BARYCORRLOG)
-    double bl = getBaryCorr(timeTilde,1);
+     bl = getBaryCorr(timeTilde,1);
   
   //Ephemerides calculations...
 
@@ -774,8 +781,9 @@ double PulsarSpectrum::interval(double time)
   double totTurns = initTurns + inteTurns + m_phi0; //Total turns at the nextTimeTilde
 
   //Applying timingnoise	     
-
+  
   double nextTimeTildeDemodulated = retrieveNextTimeTilde(timeTildeDemodulated, totTurns, (ephemCorrTol/m_period));
+  
   /*
   if ((m_TimingNoiseModel != 0) && (TNOISELOG==1))
     {
@@ -863,6 +871,7 @@ double PulsarSpectrum::interval(double time)
  */
 double PulsarSpectrum::getTurns( double time )
 {
+
   double dt = time - m_t0*SecsOneDay;
   return m_phi0 + m_N0 + m_f0*dt + 0.5*m_f1*dt*dt + ((m_f2*dt*dt*dt)/6.0);
 }
@@ -879,10 +888,16 @@ double PulsarSpectrum::getTurns( double time )
 double PulsarSpectrum::retrieveNextTimeTilde( double tTilde, double totalTurns, double err )
 {
 
-  double tTildeUp = tTilde;
-  double tTildeDown = tTilde;  
-  double NTdown = totalTurns - getTurns(tTildeDown); 
-  double NTup = totalTurns - getTurns(tTildeUp);
+  double tTildeUp,NTup = 0.;
+  double tTildeDown,NTdown = 0;  
+
+  tTildeUp = tTilde;
+  tTildeDown = tTilde;  
+
+  NTdown = totalTurns - getTurns(tTildeDown); 
+  NTup = totalTurns - getTurns(tTildeUp);
+
+
   int u = 0;
   while ((NTdown*NTup)>0)
     {
@@ -891,17 +906,19 @@ double PulsarSpectrum::retrieveNextTimeTilde( double tTilde, double totalTurns, 
       NTdown = totalTurns - getTurns(tTildeDown); 
       NTup = totalTurns - getTurns(tTildeUp);
     }
-  
+
   double tTildeMid = (tTildeDown+tTildeUp)/2.0;
   double NTmid = totalTurns - getTurns(tTildeMid);
-
+  
   while(fabs(NTmid) > err )
     { 
+  
       if (fabs(NTmid) < err) break;
       NTmid = totalTurns - getTurns(tTildeMid);
       NTdown = totalTurns - getTurns(tTildeDown); 
       if ((NTmid*NTdown)>0)
 	{
+  
 	  tTildeDown = tTildeMid;
 	  tTildeMid = (tTildeDown+tTildeUp)/2.0;
 	} 
@@ -911,6 +928,7 @@ double PulsarSpectrum::retrieveNextTimeTilde( double tTilde, double totalTurns, 
 	  tTildeMid = (tTildeDown+tTildeUp)/2.0;
 	}
     }
+
   if (DEBUG)
     {
       std::cout << "**  RetrieveNextTimeTilde " << std::endl;
@@ -1274,6 +1292,9 @@ double PulsarSpectrum::getBinaryDemodulationInverse( double CorrectedTime)
  */
 int PulsarSpectrum::getPulsarFromDataList(std::string sourceFileName)
 {
+
+  double startTime = Spectrum::startTime();
+
   int Status = 0;
   std::ifstream PulsarDataTXT;
   
@@ -1306,7 +1327,9 @@ int PulsarSpectrum::getPulsarFromDataList(std::string sourceFileName)
 
       PulsarDataTXT >> tempName >> flux >> ephemType >> ephem0 >> ephem1 >> ephem2 
 		    >> t0Init >> t0 >> t0End  >> txbary >> tnmodel >> binflag;
-     
+      
+      std::cout << t0 << " " << txbary << std::endl;
+
       if (std::string(tempName) == m_PSRname)
 	{
 
@@ -1315,6 +1338,23 @@ int PulsarSpectrum::getPulsarFromDataList(std::string sourceFileName)
 	  m_TimingNoiseModel = tnmodel;
 	  m_ephemType = ephemType;
 	  m_BinaryFlag = binflag;
+
+	  //Check if txbary or t0 are before start of the simulation
+	  double startMJD = StartMissionDateMJD+(startTime/86400.)+550/86400.;
+	  std::cout << "T0 " << t0 << " start " << startMJD << std::endl;
+	  if (t0 < startMJD)
+	    {
+	      std::cout << "Warning! Epoch t0 out the simulation range (t0-tStart=" << (t0-startMJD)
+			<< " s.: changing to MJD " << startMJD << std::endl;
+	      t0 = startMJD;
+	    }
+	  
+	  if (txbary < startMJD)
+	    {
+	      std::cout << "Warning! txbary out the simulation range (t0-tStart=" << (txbary-startMJD)
+			<< " s.: changing to MJD " << startMJD << std::endl;
+	      txbary = startMJD;
+	    }
 
 	  m_t0InitVect.push_back(t0Init);
 	  m_t0Vect.push_back(t0);
@@ -1657,7 +1697,7 @@ double PulsarSpectrum::GetFt(double time, double myf0, double myf1, double myf2)
  * This method computes the frequency first derivativeat a given instant t
  *
  */ 
-double PulsarSpectrum::GetF1t(double time, double myf0, double myf1, double myf2)
+double PulsarSpectrum::GetF1t(double time, double myf1, double myf2)
 {
   double dt = time - m_t0*SecsOneDay;
   return myf1 + myf2*dt;

@@ -8,6 +8,8 @@
 #include "Pulsar/PulsarSim.h"
 
 #define DEBUG 0
+#define SAVETIMEPROFILE 0
+#define SAVENV 1
 
 using namespace cst;
 
@@ -327,8 +329,15 @@ TH2D* PulsarSim::PSRPhenom(double par0, double par1, double par2, double par3, d
   delete nph;
   delete[] e;
   
-  SaveNv(m_Nv); // ph/m2/s/keV
-  SaveTimeProfile(m_Nv); //ph/m2/s/kev
+  if (SAVENV)
+    {
+      SaveNv(m_Nv); // ph/m2/s/keV
+    }
+
+  if (SAVETIMEPROFILE)
+    {
+      SaveTimeProfile(m_Nv); //ph/m2/s/kev
+    }
 
   return m_Nv;
   delete m_Nv;
@@ -429,9 +438,16 @@ TH2D* PulsarSim::PSRShape(std::string ModelShapeName, int NormalizeFlux)
 
   PulsarLogSim.close();
 
-  //Save output
-  SaveNv(m_Nv); // ph/m2/s/keV
-  SaveTimeProfile(m_Nv); //ph/m2/s/kev
+  //Save output if flags are enabled
+  if (SAVENV)
+    {
+      SaveNv(m_Nv); // ph/m2/s/keV
+    }
+
+  if (SAVETIMEPROFILE)
+    {
+      SaveTimeProfile(m_Nv); //ph/m2/s/kev
+    }
 
   return m_Nv;
   delete m_Nv;

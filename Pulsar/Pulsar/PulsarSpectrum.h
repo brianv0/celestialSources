@@ -107,7 +107,7 @@ class PulsarSpectrum : public ISpectrum
   double GetFt(double time, double myf0, double myf1, double myf2);
 
   //! Return the pulsar frequency first derivative at time t
-  double GetF1t(double time, double myf0, double myf1, double myf2);
+  double GetF1t(double time, double myf1, double myf2);
 
   //! direction, taken from PulsarSim
   inline std::pair<double,double>

@@ -138,7 +138,7 @@ namespace cst
 
   //! Tolerance for the ephemerides decorrection (in s.)
 
-  const double ephemCorrTol = 1e-6;//1e-6
+  const double ephemCorrTol = 1e-5;//1e-6
 
 
 
