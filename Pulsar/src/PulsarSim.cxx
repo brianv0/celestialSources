@@ -9,7 +9,7 @@
 
 #define DEBUG 0
 #define SAVETIMEPROFILE 0
-#define SAVENV 1
+#define SAVENV 0
 
 using namespace cst;
 

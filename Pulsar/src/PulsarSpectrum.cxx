@@ -369,7 +369,8 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
       //define a default mean rate of about 1 day
       m_TimingNoiseMeanRate = 1/86400.;
       //interval according to Poisson statistics
-      m_TimingNoiseTimeNextEvent+= -log(1.-m_PSpectrumRandom->Uniform(1.0))/m_TimingNoiseMeanRate; 
+      double startTime = Spectrum::startTime();
+      m_TimingNoiseTimeNextEvent = startTime -log(1.-m_PSpectrumRandom->Uniform(1.0))/m_TimingNoiseMeanRate; 
 
       //Determine next Timing noise event according to the rate R m_TimingNoiseRate
 
@@ -385,8 +386,11 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
 	  PulsarLog << "**      Timing Noise Events Mean Rate : " << m_TimingNoiseMeanRate << std::endl;
 	  double alpha = 0.57;
 	  double PdotCrab = 422E-15;
+	  double SigmaRMSCrab = 0.012/0.033;
 	  m_TimingNoiseActivity = -1.0*alpha*std::log10(PdotCrab)+alpha*std::log10(m_pdotVect[0]);
+	  m_TimingNoiseRMS = pow(10.,m_TimingNoiseActivity)*SigmaRMSCrab;
 	  PulsarLog << "**          Cordes Activity Parameter A: " <<  m_TimingNoiseActivity << std::endl;
+	  PulsarLog << "**          Cordes Activity Timing Noise RMS (phase): " <<  m_TimingNoiseRMS << std::endl;
 	}
     }
 
@@ -581,6 +585,8 @@ double PulsarSpectrum::interval(double time)
 	      m_f2 = 0;
 	      PhaseNoNoise = getTurns(timeTildeDemodulated);
 	      PhaseNoNoise = modf(PhaseNoNoise,&intPart); // phase for linear evolution 
+	      if ( PhaseNoNoise <0.)
+		PhaseNoNoise+=1.;
 	      m_TimingNoiseActivity = 6.6 + 0.6*log10(m_pdot) + m_PSpectrumRandom->Gaus(0,0.5);
 	      
 	      //estimate an f2
@@ -590,10 +596,25 @@ double PulsarSpectrum::interval(double time)
 	      else
 		m_f2 = -1.0*((m_f0*6.*std::pow(10.,m_TimingNoiseActivity))*1e-24);
 	    }
-	  
+	  else  if (m_TimingNoiseModel == 2) // Timing Noise #2
+	    {
+	      m_f2 = 0.;
+	      double tempPhi0 = m_phi0; 
+	      m_phi0 = 0.;
+	      PhaseNoNoise = getTurns(timeTildeDemodulated);
+	      PhaseNoNoise = modf(PhaseNoNoise,&intPart); // phase for linear evolution 
+	      if ( PhaseNoNoise <0.)
+		PhaseNoNoise+=1.;
+
+	      m_phi0 = tempPhi0+m_PSpectrumRandom->Gaus(0,m_TimingNoiseRMS);  
+	    }
+
 	  
 	  PhaseWithNoise = getTurns(timeTildeDemodulated);
 	  PhaseWithNoise = modf(PhaseWithNoise,&intPart); // phase for linear evolution 
+	  if ( PhaseWithNoise <0.)
+	    PhaseWithNoise+=1.;
+
 	  
 	  std::ofstream TimingNoiseLogFile((m_PSRname + "TimingNoise.log").c_str(),std::ios::app);
 	  m_f2NoNoise = 0.;
@@ -615,9 +636,12 @@ double PulsarSpectrum::interval(double time)
 	    }
 	  
 
-	  std::cout << std::setprecision(30) << " Activity=" << m_TimingNoiseActivity 
-		    << "f2=" << m_f2 << " PN=" << PhaseWithNoise 
-		    << " dPhi=" << PhaseWithNoise-PhaseNoNoise <<std::endl;
+	  if (DEBUG)
+	    {
+	      std::cout << std::setprecision(30) << " Activity=" << m_TimingNoiseActivity 
+			<< "f2=" << m_f2 << " PN=" << PhaseWithNoise 
+			<< " dPhi=" << PhaseWithNoise-PhaseNoNoise <<std::endl;
+	    }
 	}
     }
 
@@ -682,13 +706,15 @@ double PulsarSpectrum::interval(double time)
 
   double initTurns = getTurns(timeTildeDemodulated); //Turns made at this time
   double tStart = modf(initTurns,&intPart)*m_period; // Start time for interval
+  if (tStart < 0.)
+    tStart+=m_period;
 
   //  double DeltaPhiNoise = modf(initTurns,&intPart)-modf(initTurnsNoNoise,&intPart);
 
   /*
   std::cout << std::setprecision(30) << "\n" << timeTilde -(StartMissionDateMJD)*SecsOneDay 
-	    <<  " PulsarSpectrum Phase is " 
-	    << std::setprecision(20) << getTurns(timeTilde) << "phi0 is " << m_phi0 << std::endl;
+	    <<  " turns are " << getTurns(timeTilde) 
+	    <<  " phase is " << tStart/m_period << " phi0 is " << m_phi0 << std::endl;
   */
 
   //Checks whether ephemerides (period,pdot, etc..) are within validity ranges
@@ -1328,8 +1354,6 @@ int PulsarSpectrum::getPulsarFromDataList(std::string sourceFileName)
       PulsarDataTXT >> tempName >> flux >> ephemType >> ephem0 >> ephem1 >> ephem2 
 		    >> t0Init >> t0 >> t0End  >> txbary >> tnmodel >> binflag;
       
-      std::cout << t0 << " " << txbary << std::endl;
-
       if (std::string(tempName) == m_PSRname)
 	{
 
@@ -1340,11 +1364,11 @@ int PulsarSpectrum::getPulsarFromDataList(std::string sourceFileName)
 	  m_BinaryFlag = binflag;
 
 	  //Check if txbary or t0 are before start of the simulation
-	  double startMJD = StartMissionDateMJD+(startTime/86400.)+550/86400.;
-	  std::cout << "T0 " << t0 << " start " << startMJD << std::endl;
+	  double startMJD = StartMissionDateMJD+(startTime/86400.)+(550/86400.);
+	  // std::cout << "T0 " << t0 << " start " << startMJD << std::endl;
 	  if (t0 < startMJD)
 	    {
-	      std::cout << "Warning! Epoch t0 out the simulation range (t0-tStart=" << (t0-startMJD)
+	      std::cout << std::setprecision(10) << "Warning! Epoch t0 out the simulation range (t0-tStart=" << (t0-startMJD)
 			<< " s.: changing to MJD " << startMJD << std::endl;
 	      t0 = startMJD;
 	    }
