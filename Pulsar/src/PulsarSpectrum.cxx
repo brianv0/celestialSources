@@ -576,9 +576,15 @@ double PulsarSpectrum::interval(double time)
       if ((timeTildeDemodulated-(StartMissionDateMJD)*SecsOneDay) > m_TimingNoiseTimeNextEvent)
 	{
 	  //interval according to Poisson statistics
-	  m_TimingNoiseTimeNextEvent+= -log(1.-m_PSpectrumRandom->Uniform(1.0))/m_TimingNoiseMeanRate; 
-	  std::cout << std::setprecision(30)<<"Timing Noise Event!Next Event at t=" << m_TimingNoiseTimeNextEvent 
-		    << " |dt=" << m_TimingNoiseTimeNextEvent-(timeTildeDemodulated-(StartMissionDateMJD)*SecsOneDay) <<std::endl;
+	  m_TimingNoiseTimeNextEvent+= -log(1.-m_PSpectrumRandom->Uniform(1.0))/m_TimingNoiseMeanRate;
+ 
+	  if (DEBUG)
+	    {
+	      std::cout << std::setprecision(30)<<"Timing Noise Event!Next Event at t=" 
+			<< m_TimingNoiseTimeNextEvent << " |dt=" 
+			<< m_TimingNoiseTimeNextEvent
+		-(timeTildeDemodulated-(StartMissionDateMJD)*SecsOneDay) <<std::endl;
+	    }
 
 	  if (m_TimingNoiseModel ==1) // Timing Noise #1
 	    {

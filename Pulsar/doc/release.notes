@@ -51,5 +51,6 @@
 *   v2r2p5  5-mar-2007 MR     Added Doxy headers
 *   v2r2p6  8-mar-2007 MR     Fix FT2 problem
 *   v2r2p7  9-mar-2007 MR     Added Cordes timing noise
+*   v2r2p8  10-mar-2007 MR     Remove timing noise output messages
 *@endverbatim
 */
