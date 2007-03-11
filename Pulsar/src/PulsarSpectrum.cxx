@@ -717,11 +717,11 @@ double PulsarSpectrum::interval(double time)
 
   //  double DeltaPhiNoise = modf(initTurns,&intPart)-modf(initTurnsNoNoise,&intPart);
 
-  /*
+  
   std::cout << std::setprecision(30) << "\n" << timeTilde -(StartMissionDateMJD)*SecsOneDay 
 	    <<  " turns are " << getTurns(timeTilde) 
 	    <<  " phase is " << tStart/m_period << " phi0 is " << m_phi0 << std::endl;
-  */
+  
 
   //Checks whether ephemerides (period,pdot, etc..) are within validity ranges
   if (((timeTildeDemodulated/SecsOneDay) < m_t0Init) || ((timeTildeDemodulated/SecsOneDay) > m_t0End)) 
@@ -1326,6 +1326,7 @@ int PulsarSpectrum::getPulsarFromDataList(std::string sourceFileName)
 {
 
   double startTime = Spectrum::startTime();
+  double endTime = astro::GPS::instance()->endTime();
 
   int Status = 0;
   std::ifstream PulsarDataTXT;
@@ -1384,6 +1385,24 @@ int PulsarSpectrum::getPulsarFromDataList(std::string sourceFileName)
 	      std::cout << "Warning! txbary out the simulation range (t0-tStart=" << (txbary-startMJD)
 			<< " s.: changing to MJD " << startMJD << std::endl;
 	      txbary = startMJD;
+	    }
+
+	  //Check if txbary or t0 are after start of the simulation
+	  double endMJD = StartMissionDateMJD+(endTime/86400.)-(550/86400.);
+	  // std::cout << "T0 " << t0 << " start " << startMJD << std::endl;
+	  if (t0 > endMJD)
+	    {
+	      std::cout << std::setprecision(10) << "Warning! Epoch t0 out the simulation range (t0-tEnd=" << (t0-endMJD)
+			<< " s.: changing to MJD " << endMJD << std::endl;
+	      std::cout << "***end at " << endTime << " corresp to " << endMJD << std::endl;
+	      t0 = endMJD;
+	    }
+	  
+	  if (txbary > endMJD)
+	    {
+	      std::cout << "Warning! txbary out the simulation range (t0-tEnd=" << (txbary-endMJD)
+			<< " s.: changing to MJD " << endMJD << std::endl;
+	      txbary = endMJD;
 	    }
 
 	  m_t0InitVect.push_back(t0Init);
