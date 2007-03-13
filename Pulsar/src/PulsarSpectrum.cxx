@@ -717,11 +717,12 @@ double PulsarSpectrum::interval(double time)
 
   //  double DeltaPhiNoise = modf(initTurns,&intPart)-modf(initTurnsNoNoise,&intPart);
 
-  
-  std::cout << std::setprecision(30) << "\n" << timeTilde -(StartMissionDateMJD)*SecsOneDay 
-	    <<  " turns are " << getTurns(timeTilde) 
-	    <<  " phase is " << tStart/m_period << " phi0 is " << m_phi0 << std::endl;
-  
+  if (DEBUG)
+    {
+      std::cout << std::setprecision(30) << "\n" << timeTilde -(StartMissionDateMJD)*SecsOneDay 
+		<<  " turns are " << getTurns(timeTilde) 
+		<<  " phase is " << tStart/m_period << " phi0 is " << m_phi0 << std::endl;
+    }
 
   //Checks whether ephemerides (period,pdot, etc..) are within validity ranges
   if (((timeTildeDemodulated/SecsOneDay) < m_t0Init) || ((timeTildeDemodulated/SecsOneDay) > m_t0End)) 
@@ -859,13 +860,21 @@ double PulsarSpectrum::interval(double time)
     { 
       std::cout << std::setprecision(15) << "\nTimeTildeDecorr at Spacecraft (TT) is: " 
 		<< timeTildeDecorr - (StartMissionDateMJD)*SecsOneDay << "sec." << std::endl;
-      std::cout << std::setprecision(15) <<"  TimeTilde at SSB (in TDB) is: " << timeTilde - (StartMissionDateMJD)*SecsOneDay << "sec." << std::endl;
-      std::cout << std::setprecision(15) <<"  TimeTildeDemodulated : " << timeTildeDemodulated - (StartMissionDateMJD)*SecsOneDay 
+      std::cout << "Arrival time after start of the simulation : " 
+		<< timeTildeDecorr - (StartMissionDateMJD)*SecsOneDay -Spectrum::startTime() << " s." << std::endl; 
+      std::cout << std::setprecision(15) <<"  TimeTilde at SSB (in TDB) is: " 
+		<< timeTilde - (StartMissionDateMJD)*SecsOneDay << "sec." << std::endl;
+      std::cout << std::setprecision(15) <<"  TimeTildeDemodulated : " 
+		<< timeTildeDemodulated - (StartMissionDateMJD)*SecsOneDay 
 		<< "sec.; phase=" << modf(initTurns,&intPart) << std::endl;
-      std::cout << std::setprecision(15) <<"  nextTimeTildeDemodulated at SSB (in TDB) is:" << nextTimeTildeDemodulated - (StartMissionDateMJD)*SecsOneDay << "s." << std::endl;
-      std::cout << std::setprecision(15) <<"  nextTimeTilde at SSB (in TDB) is:" << nextTimeTilde - (StartMissionDateMJD)*SecsOneDay << "s." << std::endl;
-      std::cout << std::setprecision(15) <<"  nextTimeTilde decorrected (TT)is" << nextTimeTildeDecorr - (StartMissionDateMJD)*SecsOneDay << "s." << std::endl;
-      std::cout << " corrected is " << nextTimeTildeDecorr + getBaryCorr(nextTimeTildeDecorr,0) - (StartMissionDateMJD)*SecsOneDay << std::endl;
+      std::cout << std::setprecision(15) <<"  nextTimeTildeDemodulated at SSB (in TDB) is:" 
+		<< nextTimeTildeDemodulated - (StartMissionDateMJD)*SecsOneDay << "s." << std::endl;
+      std::cout << std::setprecision(15) <<"  nextTimeTilde at SSB (in TDB) is:" 
+		<< nextTimeTilde - (StartMissionDateMJD)*SecsOneDay << "s." << std::endl;
+      std::cout << std::setprecision(15) <<"  nextTimeTilde decorrected (TT)is" 
+		<< nextTimeTildeDecorr - (StartMissionDateMJD)*SecsOneDay << "s." << std::endl;
+      std::cout << " corrected is " 
+		<< nextTimeTildeDecorr + getBaryCorr(nextTimeTildeDecorr,0) - (StartMissionDateMJD)*SecsOneDay << std::endl;
       std::cout << std::setprecision(15) <<"  -->Interval is " <<  nextTimeTildeDecorr - timeTildeDecorr << std::endl;
     }
   
