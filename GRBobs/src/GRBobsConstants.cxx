@@ -61,7 +61,6 @@ void GRBobsParameters::SetGRBNumber(long GRBnumber)
   double tmp;
   tmp = rnd->Uniform();
   tmp = rndGalacticDir->Uniform();
-  
 }
 
 void GRBobsParameters::SetMinPhotonEnergy(double enph)

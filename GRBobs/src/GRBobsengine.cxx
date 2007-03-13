@@ -71,10 +71,16 @@ std::vector<GRBobsPulse*> GRBobsengine::CreatePulsesVector()
   double burstEndTime;
   std::vector<GRBobsPulse*> thePulses;
   bool done = false;
-
+  int check       = 0;
+  float threshold = 0.99;
   do {
     burstEndTime = generatePulses(thePulses, duration);
-    if (burstEndTime < 0.99 * duration) 
+    check++;
+    if (check>1000) 
+      {
+	threshold -= threshold/100; // this is for security...
+      }
+    if (burstEndTime < threshold * duration) 
       {    // return resources and start over
 	for (unsigned i = 0; i < thePulses.size(); i++) delete thePulses[i];
 	thePulses.erase(thePulses.begin(), thePulses.end());

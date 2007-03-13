@@ -1,7 +1,7 @@
 #include <iomanip>
 //////////////////////////////////////////////////
 // OPTIONS FOR GENERATING THE XML LIBRARY:
-double MinExtractedPhotonEnergy = 20.0; //MeV
+double MinExtractedPhotonEnergy = 10.0; //MeV
 long FirstBurstTime  =      1000; //1e4
 //double AverageInterval = 86400.0; //[s] 1 grbs / day
 //double AverageInterval = 48516.9; //[s] 650 grbs / yr
@@ -12,13 +12,12 @@ bool  GeneratePF         =   true; // If true: PF is used to normalize Bursts.
 TString GenerateIC        =   "random";//"random"; //"yes", "no"
 double Fssc_Fsyn_const   =   10;
 bool  GenerateRedshift   =   true;
-bool  GenerateGBM        =   false;
+bool  GenerateGBM        =   true;//false;
 bool  GLASTCoordinate    =   false;
 bool  JayDistributions   =   true;
 bool  BN                 =   true;
 //bool  newXML             =   true;
 //////////////////////////////////////////////////
-
 
 double GetRedshiftShort(TRandom *rnd)
 {
