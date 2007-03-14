@@ -52,5 +52,8 @@
 *   v2r2p6  8-mar-2007 MR     Fix FT2 problem
 *   v2r2p7  9-mar-2007 MR     Added Cordes timing noise
 *   v2r2p8  10-mar-2007 MR     Remove timing noise output messages
+*   v2r2p9  11-mar-2007 MR     fix output
+*   v2r2p10  12-mar-2007 MR     Remove output
+*   v2r2p11  14-mar-2007 MR    Fix log problems with binaries
 *@endverbatim
 */
