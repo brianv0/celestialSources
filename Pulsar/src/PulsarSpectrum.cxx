@@ -557,7 +557,14 @@ double PulsarSpectrum::interval(double time)
     }
   else
     {
-      timeTildeDemodulated = getIterativeDemodulatedTime(timeTilde,1);      
+      if (BINDEMODLOG)
+	{
+	  timeTildeDemodulated = getIterativeDemodulatedTime(timeTilde,1);      
+	}
+      else
+	{
+	  timeTildeDemodulated = getIterativeDemodulatedTime(timeTilde,0);      
+	}
     }
 
   //Phase assignment
@@ -1172,7 +1179,7 @@ double PulsarSpectrum::getBinaryDemodulation( double tInput, int LogDemodFlag)
       std::cout << "**  --> Binary Shapiro Delay=" << BinaryShapiroDelay << " s." << std::endl;
   }
   
-  if ((LogDemodFlag ==1) && (tInput-StartMissionDateMJD*SecsOneDay > 0.))
+  if ((LogDemodFlag==1) && (tInput-StartMissionDateMJD*SecsOneDay > 0.))
     {
       std::ofstream BinDemodLogFile((m_PSRname + "BinDemod.log").c_str(),std::ios::app);
       BinDemodLogFile << std::setprecision(15) 
