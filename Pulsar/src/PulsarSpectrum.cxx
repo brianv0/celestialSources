@@ -1596,7 +1596,7 @@ int PulsarSpectrum::saveDbTxtFile()
   double tempInt, tempFract;
   for (unsigned int ep = 0; ep < m_periodVect.size(); ep++)
     {
-      DbOutputFile << "\"" << m_PSRname << std::setprecision(5) << "\" " << m_RA << " " << m_dec << " ";
+      DbOutputFile << "\"" << m_PSRname << std::setprecision(10) << "\" " << m_RA << " " << m_dec << " ";
       tempFract = modf(m_t0Vect[ep],&tempInt);
       DbOutputFile << std::setprecision (8) << tempInt << " " << tempFract << " ";
     

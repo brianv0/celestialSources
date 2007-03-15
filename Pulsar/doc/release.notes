@@ -56,5 +56,6 @@
 *   v2r2p10  12-mar-2007 MR     Remove output
 *   v2r2p11  14-mar-2007 MR    Fix log problems with binaries
 *   v2r2p12  15-mar-2007 MR    Fix db file problem
+*   v2r2p13  15-mar-2007 MR    Fix db file problem in precison of positions
 *@endverbatim
 */
