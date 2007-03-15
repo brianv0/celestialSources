@@ -358,7 +358,7 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
 
   if (m_TimingNoiseModel != 0)
     { 
-      if (TNOISELOG==1)
+      if (TNOISELOG)
 	{
 	  std::ofstream TimingNoiseLogFile((m_PSRname + "TimingNoise.log").c_str());
 	  TimingNoiseLogFile << "Timing Noise log file using model: " << m_TimingNoiseModel << std::endl;
@@ -628,18 +628,18 @@ double PulsarSpectrum::interval(double time)
 	  if ( PhaseWithNoise <0.)
 	    PhaseWithNoise+=1.;
 
-	  
-	  std::ofstream TimingNoiseLogFile((m_PSRname + "TimingNoise.log").c_str(),std::ios::app);
-	  m_f2NoNoise = 0.;
-	  double ft_l = GetFt(timeTildeDemodulated,m_f0NoNoise,m_f1NoNoise,m_f2NoNoise);
-	  double ft_n = GetFt(timeTildeDemodulated,m_f0,m_f1,m_f2);
-	  double ft1_l = GetF1t(timeTildeDemodulated,m_f1NoNoise,m_f2NoNoise);
-	  double ft1_n = GetF1t(timeTildeDemodulated,m_f1,m_f2);
-	  double ft2_l = m_f2NoNoise;//
-	  double ft2_n = m_f2;//
-	 
-	  if (TNOISELOG==1)
+	  if (TNOISELOG)
 	    {
+	      
+	      std::ofstream TimingNoiseLogFile((m_PSRname + "TimingNoise.log").c_str(),std::ios::app);
+	      m_f2NoNoise = 0.;
+	      double ft_l = GetFt(timeTildeDemodulated,m_f0NoNoise,m_f1NoNoise,m_f2NoNoise);
+	      double ft_n = GetFt(timeTildeDemodulated,m_f0,m_f1,m_f2);
+	      double ft1_l = GetF1t(timeTildeDemodulated,m_f1NoNoise,m_f2NoNoise);
+	      double ft1_n = GetF1t(timeTildeDemodulated,m_f1,m_f2);
+	      double ft2_l = m_f2NoNoise;//
+	      double ft2_n = m_f2;//
+	      
 	      TimingNoiseLogFile << std::setprecision(30) << timeTildeDemodulated-(StartMissionDateMJD)*SecsOneDay
 				 << "\t" << m_TimingNoiseActivity
 				 << "\t" <<ft_l << "\t" << ft_n 
@@ -1609,9 +1609,18 @@ int PulsarSpectrum::saveDbTxtFile()
       tempFract = modf(m_txbaryVect[ep],&tempInt);
       DbOutputFile << std::setprecision (8) << tempInt << " " << tempFract << " ";
 
-      DbOutputFile << std::setprecision(14) << m_f0Vect[ep] << " " << m_f1Vect[ep] << " " << m_f2Vect[ep] << " 0.0 " 
-		   << m_t0InitVect[ep] << " " << m_t0EndVect[ep] 
-      		   << " F \"JPL DE200\" P" << std::endl;
+      std::string BinFlag;
+      if (m_BinaryFlag==0)
+	BinFlag = "F";
+      else if (m_BinaryFlag==1)
+	BinFlag = "T";
+	    
+
+	  DbOutputFile << std::setprecision(14) 
+		       << m_f0Vect[ep] << " " << m_f1Vect[ep] << " " << m_f2Vect[ep] << " " 
+		       << m_TimingNoiseRMS*1e3 << " "  
+		       << m_t0InitVect[ep] << " " << m_t0EndVect[ep] << " "
+		       << BinFlag << " \"JPL DE200\" P" << std::endl;
 
     }
   
