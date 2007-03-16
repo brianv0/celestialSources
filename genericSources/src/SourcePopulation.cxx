@@ -29,6 +29,7 @@
 
 #include "genericSources/SourcePopulation.h"
 
+#include "Util.h"
 #include "dgaus8.h"
 
 namespace {
@@ -60,6 +61,7 @@ namespace {
          }
       }
    }
+
 }
 
 IRB::EblAtten * SourcePopulation::PointSource::s_tau(0);
@@ -94,6 +96,7 @@ void SourcePopulation::setEblAtten(const std::string & ebl_par) {
 }
 
 void SourcePopulation::readSourceFile(const std::string & input_file) {
+   genericSources::Util::file_ok(input_file);
    std::vector<std::string> lines;
    ::readLines(input_file, lines, "#", true);
 

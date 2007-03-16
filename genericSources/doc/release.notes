@@ -5,6 +5,7 @@
   @verbatim
   $Id$
 
+  16-Mar-07 v1r7p4  JC    check for validity of input file to SourcePopulation
   06-Mar-07 v1r7p3  JC    set negative fluxes read in from light curve
                           template files to zero in SpectralTransient
   17-Jan-07 v1r7p2  JC    add " /t/n" delimiters in TF1Map, TF1Spectrum
