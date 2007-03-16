@@ -528,10 +528,10 @@ void GRBobsSim::GetGBMFlux(std::string GRBname)
 	  gPad->Update();
 	}
 #endif
-      for(unsigned int ei = 1; ei<=NaIEnergyGrid_Vector.size(); ei++) 
+      for(unsigned int ei = 1; ei<NaIEnergyGrid_Vector.size(); ei++) 
 	file_NaI << std::setprecision(5) << NaISpectrum.GetBinContent(ei)<<"\t";
       file_NaI <<"\n";
-      for(unsigned int ei = 1; ei<=BGOEnergyGrid_Vector.size(); ei++) 
+      for(unsigned int ei = 1; ei<BGOEnergyGrid_Vector.size(); ei++) 
 	file_BGO << std::setprecision(5) << BGOSpectrum.GetBinContent(ei)<<"\t";
       file_BGO <<"\n";
     }
