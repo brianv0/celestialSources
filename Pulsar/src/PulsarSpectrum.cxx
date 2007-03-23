@@ -179,10 +179,18 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
   // if this is in the GLEAM environment, allow for separate path specified by env var PULSARDATA
   std::string pulsar_data(pulsar_root+"/data/"); // the default, perhaps overriden
 
+  /*changed to old settings
   const char * gleam = ::getenv("PULSARDATA");
   if( gleam!=0) {
-      pulsar_data =  std::string(gleam)+"/";
+       pulsar_data =  std::string(gleam)+"/";
   }
+  */
+
+  const char * gleam = ::getenv("SKYMODEL_DIR");
+  if( gleam!=0) {
+       pulsar_data =  std::string(gleam)+"/pulsars/";
+  } else
+    std::cout << "Warning !SKYMODEL_DIR not found!"  <<std::endl;
 
   //Scan PulsarDataList.txt
   std::string ListFileName = pulsar_data + "PulsarDataList.txt";
@@ -213,7 +221,10 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
 	    
 	    if (Retrieved == 1)
 	      {
-		std::cout << "Pulsar " << m_PSRname << " found in file " << CompletePathFileName << std::endl;
+		if (DEBUG)
+		  {
+		    std::cout << "Pulsar " << m_PSRname << " found in file " << CompletePathFileName << std::endl;
+		  }
 		AllRetrieved = 1;
 	      } 
 	    ListFile >> DataListFileName ;	  
@@ -260,7 +271,10 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
 		
 		if (Retrieved == 1)
 		  {
-		    std::cout << "Binary Pulsar " << m_PSRname << " found in file " << CompletePathFileName << std::endl;
+		    if (DEBUG)
+		      {
+			std::cout << "Binary Pulsar " << m_PSRname << " found in file " << CompletePathFileName << std::endl;
+		      }
 		    AllRetrieved = 1;
 		  } 
 		BinListFile >> BinDataListFileName ;	  
