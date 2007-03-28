@@ -54,7 +54,7 @@ microQuasar::microQuasar(const std::string &paramString)
     if(token[0]=="EMAX")
       m_eMax = std::atof(token[1].c_str());
     if(token[0]=="ORBITALPERIOD")
-      m_orbitalPeriod = std::atof(token[1].c_str());
+      m_orbitalPeriod = std::atof(token[1].c_str())*daySecs;
     if(token[0]=="ORBITALMODULATION")
       m_orbitalModulation = std::atof(token[1].c_str());
     if(token[0]=="ORBITALPHASE")
