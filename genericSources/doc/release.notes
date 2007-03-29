@@ -5,6 +5,7 @@
   @verbatim
   $Id$
 
+  29-Mar-07 v1r7p5  JC    read in reference pixel as float in FitsImage.cxx
   16-Mar-07 v1r7p4  JC    check for validity of input file to SourcePopulation
   06-Mar-07 v1r7p3  JC    set negative fluxes read in from light curve
                           template files to zero in SpectralTransient
