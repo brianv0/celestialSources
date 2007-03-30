@@ -376,7 +376,7 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
 	{
 	  std::ofstream TimingNoiseLogFile((m_PSRname + "TimingNoise.log").c_str());
 	  TimingNoiseLogFile << "Timing Noise log file using model: " << m_TimingNoiseModel << std::endl;
-	  TimingNoiseLogFile << "tMET\tA\tf0_l\tf0_n\tf1_l\tf1_n\tf2_l\tf2_n\tPhiResid"<<std::endl;
+	  TimingNoiseLogFile << "tMET\tA\tS0\tS1\tS2\tf0_l\tf0_n\tf1_l\tf1_n\tf2_l\tf2_n\tPhi_l\tPhi_n"<<std::endl;
 	  TimingNoiseLogFile.close();
 	}
 
@@ -394,17 +394,27 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
 	  PulsarLog << "**\n**   Timing Noise Model : " << m_TimingNoiseModel << " (Stability parameter, Arzoumanian 1994)" << std::endl;
 	  PulsarLog << "**      Timing Noise Events Mean Rate : " << m_TimingNoiseMeanRate << std::endl;
 	}
-      else if (m_TimingNoiseModel == 2) //Timing model #2 - of Random Walk (Cordes 1980) 
+      else if (m_TimingNoiseModel == 2) //Timing model #2 - PN Random Walk (Cordes-Downs 1985) 
 	{
-	  PulsarLog << "**\n**   Timing Noise Model : " << m_TimingNoiseModel << " (Random Walk; Cordes 1980)" << std::endl;
+	  PulsarLog << "**\n**   Timing Noise Model : " << m_TimingNoiseModel << " (PN Random Walk; Cordes-Downs 1985)" << std::endl;
 	  PulsarLog << "**      Timing Noise Events Mean Rate : " << m_TimingNoiseMeanRate << std::endl;
-	  double alpha = 0.57;
-	  double PdotCrab = 422E-15;
-	  double SigmaRMSCrab = 0.012/0.033;
-	  m_TimingNoiseActivity = -1.0*alpha*std::log10(PdotCrab)+alpha*std::log10(m_pdotVect[0]);
-	  m_TimingNoiseRMS = pow(10.,m_TimingNoiseActivity)*SigmaRMSCrab;
-	  PulsarLog << "**          Cordes Activity Parameter A: " <<  m_TimingNoiseActivity << std::endl;
-	  PulsarLog << "**          Cordes Activity Timing Noise RMS (phase): " <<  m_TimingNoiseRMS << std::endl;
+	  // double alpha = 0.57;
+	  //double PdotCrab = 422E-15;
+	  //double SigmaRMSCrab = 0.012/0.033;
+	  //m_TimingNoiseActivity = -1.0*alpha*std::log10(PdotCrab)+alpha*std::log10(m_pdotVect[0]);
+	  //m_TimingNoiseRMS = pow(10.,m_TimingNoiseActivity)*SigmaRMSCrab;
+	  //PulsarLog << "**          Cordes Activity Parameter A: " <<  m_TimingNoiseActivity << std::endl;
+	  //PulsarLog << "**          Cordes Activity Timing Noise RMS (phase): " <<  m_TimingNoiseRMS << std::endl;
+	}
+      else if (m_TimingNoiseModel == 3) //Timing model #3 - FN Random Walk (Cordes-Downs 1985) 
+	{
+	  PulsarLog << "**\n**   Timing Noise Model : " << m_TimingNoiseModel << " (FN Random Walk; Cordes-Downs 1985)" << std::endl;
+	  PulsarLog << "**      Timing Noise Events Mean Rate : " << m_TimingNoiseMeanRate << std::endl;
+	}
+      else if (m_TimingNoiseModel == 4) //Timing model #4 - SN Random Walk (Cordes-Downs 1985) 
+	{
+	  PulsarLog << "**\n**   Timing Noise Model : " << m_TimingNoiseModel << " (SN Random Walk; Cordes-Downs 1985)" << std::endl;
+	  PulsarLog << "**      Timing Noise Events Mean Rate : " << m_TimingNoiseMeanRate << std::endl;
 	}
     }
 
@@ -607,6 +617,13 @@ double PulsarSpectrum::interval(double time)
 		-(timeTildeDemodulated-(StartMissionDateMJD)*SecsOneDay) <<std::endl;
 	    }
 
+
+	  //Timing noise managing...
+
+	  double S0=0.;
+	  double S1=0.;
+	  double S2=0.;
+
 	  if (m_TimingNoiseModel ==1) // Timing Noise #1
 	    {
 	      m_f2 = 0;
@@ -623,17 +640,58 @@ double PulsarSpectrum::interval(double time)
 	      else
 		m_f2 = -1.0*((m_f0*6.*std::pow(10.,m_TimingNoiseActivity))*1e-24);
 	    }
-	  else  if (m_TimingNoiseModel == 2) // Timing Noise #2
+	  else if ((m_TimingNoiseModel >1) && (m_TimingNoiseModel < 5)) // Timing Noise RW -Cordes-Downs
 	    {
+
 	      m_f2 = 0.;
 	      double tempPhi0 = m_phi0; 
 	      m_phi0 = 0.;
+	      double tempF0 = m_f0;
+	      m_f0 = m_f0NoNoise;	      
+	      double tempF1 = m_f1;
+	      m_f1 = m_f1NoNoise;	      
+
 	      PhaseNoNoise = getTurns(timeTildeDemodulated);
 	      PhaseNoNoise = modf(PhaseNoNoise,&intPart); // phase for linear evolution 
 	      if ( PhaseNoNoise <0.)
 		PhaseNoNoise+=1.;
 
-	      m_phi0 = tempPhi0+m_PSpectrumRandom->Gaus(0,m_TimingNoiseRMS);  
+	      //Determine Crab RMS
+	      double dt_days = (timeTildeDemodulated-(StartMissionDateMJD)*SecsOneDay)/SecsOneDay;
+	      double s_rms_crab = 0.012*pow((dt_days/1628),1.5);
+
+	      //Activity parameter
+	      m_TimingNoiseActivity = -1.37+0.71*log10(m_pdot*1E15);
+	      double s_rms = pow(10,m_TimingNoiseActivity)*s_rms_crab;
+
+
+	      if (m_TimingNoiseModel ==2) //Case 1 :PN
+		{
+		  S0 = (3.7*3.7*s_rms*s_rms)*(2/(SecsOneDay*dt_days));
+		  m_TimingNoiseRMS = std::sqrt((S0/m_TimingNoiseMeanRate));
+		  m_phi0 = tempPhi0+m_PSpectrumRandom->Gaus(0,m_TimingNoiseRMS);
+		  // std::cout << std::setprecision(30) << "A="<<m_TimingNoiseActivity<<" dt"<<dt_days << " s_rms" << s_rms << 
+		  //" S0 " << S0 << " RMS " << m_TimingNoiseRMS << " phi0 " << m_phi0 << std::endl;
+		}
+	      else if (m_TimingNoiseModel ==3) //Case 2 :PN
+		{
+		  S1 =(15.5*15.5*s_rms*s_rms)*(12./pow((SecsOneDay*dt_days),3));
+		  m_TimingNoiseRMS = std::sqrt((S1/m_TimingNoiseMeanRate));
+		  m_f0 = tempF0+m_PSpectrumRandom->Gaus(0,m_TimingNoiseRMS);
+		  //std::cout << std::setprecision(30) << "A="<<m_TimingNoiseActivity<<" dt"<<dt_days << " s_rms" << s_rms << 
+		  //" S1 " << S1 << " RMS " << m_TimingNoiseRMS << " f0 " << m_f0 << std::endl;
+		}
+	      else if (m_TimingNoiseModel ==4) //Case 3 :SN
+		{
+		  S2 =(23.7*23.7*s_rms*s_rms)*(120./pow((SecsOneDay*dt_days),5));
+		  m_TimingNoiseRMS = std::sqrt((S2/m_TimingNoiseMeanRate));
+		  m_f1 = tempF1+m_PSpectrumRandom->Gaus(0,m_TimingNoiseRMS);
+		  //std::cout << std::setprecision(30) << "A="<<m_TimingNoiseActivity<<" dt"<<dt_days << " s_rms" << s_rms << 
+		  //  " S2 " << S2 << " RMS " << m_TimingNoiseRMS << " f1 " << m_f1 << std::endl;
+		}
+
+
+
 	    }
 
 	  
@@ -656,6 +714,9 @@ double PulsarSpectrum::interval(double time)
 	      
 	      TimingNoiseLogFile << std::setprecision(30) << timeTildeDemodulated-(StartMissionDateMJD)*SecsOneDay
 				 << "\t" << m_TimingNoiseActivity
+				 << "\t" << S0 
+				 << "\t" << S1
+				 << "\t" << S2 
 				 << "\t" <<ft_l << "\t" << ft_n 
 				 << "\t" <<ft1_l << "\t" << ft1_n 
 				 << "\t" <<ft2_l << "\t" << ft2_n 			 

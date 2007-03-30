@@ -58,5 +58,6 @@
 *   v2r2p12  15-mar-2007 MR    Fix db file problem
 *   v2r2p13  15-mar-2007 MR    Fix db file problem in precison of positions
 *   v2r2p14  23-mar-2007 MR    changes ome output settings
+*   v2r3     30-mar-2007 MR    Timing noise Random Walk finished
 *@endverbatim
 */
