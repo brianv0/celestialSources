@@ -662,7 +662,7 @@ double PulsarSpectrum::interval(double time)
 
 	      //Activity parameter
 	      m_TimingNoiseActivity = -1.37+0.71*log10(m_pdot*1E15);
-	      double s_rms = pow(10,m_TimingNoiseActivity)*s_rms_crab;
+	      double s_rms = pow(10.0,m_TimingNoiseActivity)*s_rms_crab;
 
 
 	      if (m_TimingNoiseModel ==2) //Case 1 :PN
