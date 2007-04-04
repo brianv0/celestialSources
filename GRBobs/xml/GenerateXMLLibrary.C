@@ -1,4 +1,17 @@
+#include "TFile.h"
+#include "TGraph.h"
+#include "TH1D.h"
+#include "TH2D.h"
+#include "TRandom3.h"
+#include "TCanvas.h"
+#include "TPad.h"
+#include "TStyle.h"
+#include <iostream>
 #include <iomanip>
+#include <vector>
+#include <string>
+#include <fstream>
+
 //////////////////////////////////////////////////
 // OPTIONS FOR GENERATING THE XML LIBRARY:
 double MinExtractedPhotonEnergy = 10.0; //MeV
@@ -10,6 +23,8 @@ double AverageInterval = 47351.35135; //[s] 666 grbs / yr
 bool  GeneratePF         =   true; // If true: PF is used to normalize Bursts.
                                    // If false Fluence is used to normalize Bursts.
 TString GenerateIC        =   "random";//"random"; //"yes", "no"
+TString RepointFile       = "none";
+
 double Fssc_Fsyn_const   =   10;
 bool  GenerateRedshift   =   true;
 bool  GenerateGBM        =   true;//false;
@@ -18,31 +33,135 @@ bool  JayDistributions   =   true;
 bool  BN                 =   true;
 //bool  newXML             =   true;
 //////////////////////////////////////////////////
-
-double GetRedshiftShort(TRandom *rnd)
+void GenerateGalDir(TRandom3 *rnd, double &l, double &b)
 {
-  do {
-    double z=0.0, y=0.0;
-    double func;
-    z = rnd->Uniform(0.,10.0);
-    y  = rnd->Uniform(0.,1.0);
-    func = binary1(z);
-  } while (y>func);
- return z;
+  double r1 = rnd->Uniform();
+  double r2 = rnd->Uniform();
+  l = 180.-360.*r1;
+  b = (180.0/TMath::Pi())*acos(1.0-2.0*r2)-90.0;
 }
 
-double GetRedshiftLong(TRandom *rnd)
+
+
+//////////////////////////////////////////////////
+class point
 {
-  do {
-    double z=0.0, y=0.0;
-    double func;
-    z = rnd->Uniform(0.,10.0);
-    y  = rnd->Uniform(0.,1.0);
-    // you can change the simulated z distrib, by changing GRB_SF1a 
-    // to GRB_SF2a or GRB_SF3a.
-    func = GRB_SF1a(z);
-  } while (y>func);
-  return z;
+public:
+  point(){;}
+  bool is_ARR(){return is_arr;}
+  double get_l(){return l;}
+  double get_b(){return b;}
+  long int get_time(){return time;}
+
+  void set_ARR(bool f){is_arr=f;}
+  void set_time(long int  t){time=t;}
+  void set_l(double v){l=v;}
+  void set_b(double v){b=v;}
+  
+private:
+  bool is_arr;
+  long time;
+  double l;
+  double b;
+};
+
+
+
+std::vector<point*> getPointingFromFile()
+{
+  //  std::string filename = "l_b_coord.txt";
+  std::ifstream grb_positions(RepointFile,std::ios::in);
+  std::vector<point*> positions;
+  if(!grb_positions.is_open()) 
+    return positions;
+
+  double t, l, b;
+  long t0=-1;
+      
+  while(!grb_positions.eof())
+    {
+      point *a_position = new point;
+      grb_positions >> t;
+      grb_positions >> l;
+      grb_positions >> b;
+      if(long(t)!=t0)
+	{
+      	  a_position->set_time(long(t));
+	  a_position->set_l(l);
+	  a_position->set_b(b);
+	  a_position->set_ARR(true);
+	  positions.push_back(a_position);
+	  t0=long(t);
+	}
+    }
+  
+  std::cout<<"---------- Pointings: ---------- " <<positions.size()<<std::endl;
+  for(unsigned int i=0;i<positions.size();i++)
+    std::cout<<i<<" "<<positions[i]->get_time()<<" l= "<<positions[i]->get_l()<<" b= "<<positions[i]->get_b()<<std::endl;
+  std::cout<<" -------------------------------------------------- " <<std::endl;
+  
+  return positions;
+}
+
+
+int GetClosestPointing(std::vector<point*> pointings, long time)
+{
+  int i=0;
+  int N=pointings.size();
+  long t = (pointings[i])->get_time();
+  while (t<time && i<N-2)
+    {
+      t = (pointings[++i])->get_time();
+    }
+  if(time - pointings[i]->get_time() < pointings[i+1]->get_time()-time)
+    return i;
+  else 
+    return i+1;
+}
+
+std::vector<point*> GetBurstPositions(int N=1000)
+{
+  TRandom3 *rnd_2 = new TRandom3();
+  rnd_2->SetSeed(65540);
+  
+  std::vector<point*> pointings        = getPointingFromFile();
+  std::vector<point*> bursts_positions;
+  
+  unsigned S=pointings.size();
+  long BurstTime=FirstBurstTime;
+  double l, b;
+  for (int i=0;i<N;i++)
+    {
+      point *a_position = new point;
+      GenerateGalDir(rnd_2,l,b);
+      
+      a_position->set_time(BurstTime);
+      a_position->set_l(l);
+      a_position->set_b(b);
+      a_position->set_ARR(false);
+      
+      BurstTime+=(int) rnd_2->Exp(AverageInterval);
+      
+      bursts_positions.push_back(a_position);
+    }
+  for (unsigned i=0;i<S;i++)
+    {
+      long time = (pointings[i])->get_time();
+      int ti = GetClosestPointing(bursts_positions,time);
+      bursts_positions[ti]->set_time(pointings[i]->get_time());
+      bursts_positions[ti]->set_l(pointings[i]->get_l());
+      bursts_positions[ti]->set_b(pointings[i]->get_b());
+      bursts_positions[ti]->set_ARR(true);
+      //std::cout<<bursts_positions[ti]->get_time()<<", l= "<<bursts_positions[ti]->get_l()<<",b= "<<bursts_positions[ti]->get_b()<<std::endl;
+    }
+  delete rnd_2;
+  for (unsigned i=0;i<S;i++) delete pointings[i];
+  std::cout<<" -------------------------------------------------- "<<std::endl;
+  std::cout<<"                 Final positions:                   "<<std::endl;
+  for(unsigned i=0;i<bursts_positions.size();i++) 
+    std::cout<<i<<" "<<bursts_positions[i]->get_time()<<", l= "<<bursts_positions[i]->get_l()<<",b= "<<bursts_positions[i]->get_b()<<std::endl;
+  std::cout<<" -------------------------------------------------- "<<std::endl;
+  return bursts_positions;
 }
 
 double binary1(double z){
@@ -60,6 +179,18 @@ double binary1(double z){
   return val/4.99383068084716797;
                                                                               
 }
+double GetRedshiftShort(TRandom3 *rnd)
+{
+  double z=0.0, y=0.0;
+  double func=1.;
+  do {
+    z = rnd->Uniform(0.,10.0);
+    y  = rnd->Uniform(0.,1.0);
+    func = binary1(z);
+  } while (y>func);
+ return z;
+}
+
 
 double GRB_SF1a(double z){
   // from Porciani and Madau, ApJ, 526,L522 1999.
@@ -83,8 +214,22 @@ double GRB_SF3a(double z){
   return(val);
 }
 
+double GetRedshiftLong(TRandom3 *rnd)
+{
+  double z=0.0, y=0.0;
+  double func=1.0;
+  do {
+    z = rnd->Uniform(0.,10.0);
+    y  = rnd->Uniform(0.,1.0);
+    // you can change the simulated z distrib, by changing GRB_SF1a 
+    // to GRB_SF2a or GRB_SF3a.
+    func = GRB_SF1a(z);
+  } while (y>func);
+  return z;
+}
 
-double GetPeakFluxLong(TRandom *rnd)
+
+double GetPeakFluxLong(TRandom3 *rnd)
 {
   // Peak Flux Distributions, from Jay and Jerry IDL code.
   static const int NentriesL = 31;
@@ -100,7 +245,7 @@ double GetPeakFluxLong(TRandom *rnd)
 				       0.595,  0.500,  0.389,  0.240 };
   
   // Long:
-  static double MaxP = TMath::MaxElement(NentriesL,P);
+  //  static double MaxP = TMath::MaxElement(NentriesL,P);
   static double MaxN = TMath::MaxElement(NentriesL,N);
   static double MinN = TMath::MinElement(NentriesL,N);
   double Ni = rnd->Uniform(MinN,MaxN);  
@@ -119,7 +264,7 @@ double GetPeakFluxLong(TRandom *rnd)
   return Fp;
 }
 
-double GetPeakFluxShort(TRandom *rnd)
+double GetPeakFluxShort(TRandom3 *rnd)
 {
   // Peak Flux Distributions, from Jay and Jerry IDL code.
   static const int NentriesS = 24;
@@ -132,7 +277,7 @@ double GetPeakFluxShort(TRandom *rnd)
 				       9.845,  7.996,  7.318,  6.415,  5.344,  4.795,  4.191,  3.437,  2.998,   
 				       2.335,  1.908,  1.572,  1.001,  0.817,  0.371 };
   
-  static double MaxQ = TMath::MaxElement(NentriesS,Q);
+  //  static double MaxQ = TMath::MaxElement(NentriesS,Q);
   static double MaxM = TMath::MaxElement(NentriesS,M);
   static double MinM = TMath::MinElement(NentriesS,M);
   double Mi = rnd->Uniform(MinM,MaxM);
@@ -153,35 +298,24 @@ double GetPeakFluxShort(TRandom *rnd)
   return Fp;
 }
 
-double GetEPeak(TRandom *rnd, int Type, double Stretch)
+double GetEPeak(TRandom3 *rnd, int Type, double Stretch)
 {
   double Ep =  pow(10.,rnd->Gaus(log10(235.0),log10(1.75))); //Short
   if(Type==2 && (GeneratePF)) Ep/=Stretch; //Long
   return Ep;
 }
 //////////////////////////////////////////////////
-void GenerateGalDir(TRandom *rnd, double &l, double &b)
-{
-  double r1 = rnd->Uniform();
-  double r2 = rnd->Uniform();
-  l = 180.-360.*r1;
-  b = (180.0/TMath::Pi())*acos(1.0-2.0*r2)-90.0;
-}
 
-
-
-//////////////////////////////////////////////////
 void GenerateXMLLibrary(int Nbursts=1000)
 {
-  
+  std::vector<point*> burst_positions= GetBurstPositions(Nbursts);
   //////////////////////////////////////////////////
-  
   double FL=-1e-5;
   double PF=-1.0;
-  double Fluence,PeakFlux;
+  double Fluence=FL;
+  double PeakFlux=PF;
   double z=0;
   double Duration;
-  double Epeak;
   int BURSTtype = 0; // 1->S, 2->L, else S+L
   // If Glast Coordinae = true:
   double theta = 45.0;
@@ -207,14 +341,14 @@ void GenerateXMLLibrary(int Nbursts=1000)
   //////////////////////////////////////////////////
   if (GenerateRedshift && (CO_Energy!=0)) std::cout<<" WARNING!!! Generate redshift is true and CO_Energy!=0"<<std::endl;
   
-  TRandom *rnd = new TRandom();
+  TRandom3 *rnd = new TRandom3();
   rnd->SetSeed(65540);
   
-  TRandom *rnd_1 = new TRandom();
+  TRandom3 *rnd_1 = new TRandom3();
   rnd_1->SetSeed(65540);
   
-  TRandom *rnd_2 = new TRandom();
-  rnd_2->SetSeed(65540);
+  //  TRandom3 *rnd_2 = new TRandom3();
+  //  rnd_2->SetSeed(65540);
   
   //  rnd->SetSeed(19741205);
   //rnd->SetSeed(20030914);
@@ -409,10 +543,8 @@ void GenerateXMLLibrary(int Nbursts=1000)
   osXML<<"<!-- $Header -->"<<std::endl;
   osXML<<"<!-- ************************************************************************** -->"<<std::endl;
   osXML<<"<source_library title=\"GRBobs_user_library\">"<<std::endl;
-  char SourceName[100]="GRB";
   
-  long BurstTime=1000;//FirstBurstTime;
-
+  long BurstTime=FirstBurstTime;
   //  FILE osTest("../src/test/GRBParam.txt");
   
   
@@ -449,7 +581,10 @@ void GenerateXMLLibrary(int Nbursts=1000)
     {
       double gal_l = 0.0; 
       double gal_b = 0.0; 
-      GenerateGalDir(rnd_2,gal_l,gal_b);
+      //GenerateGalDir(rnd_2,gal_l,gal_b);
+      gal_l = burst_positions[i]->get_l();
+      gal_b = burst_positions[i]->get_b();
+      BurstTime = burst_positions[i]->get_time();
       
       if(BURSTtype==1) 
 	{
@@ -469,19 +604,44 @@ void GenerateXMLLibrary(int Nbursts=1000)
       double alpha = alpha0;
       double beta  = beta0;
       double Ep    = 1.0;
-      //      while (alpha < alpha_min || alpha > alpha_max) alpha = rnd->Gaus(-1.0,0.4);
-      //      while(beta >= alpha || beta >= beta_max || beta < beta_min) beta = rnd->Gaus(-2.25,0.4);
+      
+      // Handle the Autonomous repoint case.
+      double my_beta_min = beta_min;
+      if (burst_positions[i]->is_ARR())
+	{
+	  my_beta_min= -2.0;
+	  
+	  if(GenerateIC=="random")
+	    {
+	      double randomNumber = rnd_1->Uniform();
+	      if(randomNumber      > 0.6)
+		Fssc_Fsyn =   10.0;
+	    }
+	  else 
+	    Fssc_Fsyn = 0.0;
+	}
+      else if(GenerateIC=="random")
+	{
+	  double randomNumber = rnd_1->Uniform();
+	  if(randomNumber > 0.95)
+	    Fssc_Fsyn =    1.0;
+	  else
+	    Fssc_Fsyn =    0.0;
+	}
+
+      
       if(JayDistributions)
 	{
 	  while (alpha < alpha_min || alpha > alpha_max) alpha = AlphaHisto->GetRandom();
-	  while(beta >= alpha || beta >= beta_max || beta < beta_min) beta = BetaHisto->GetRandom();
+	  while(beta >= alpha || beta >= beta_max || beta < my_beta_min) beta = BetaHisto->GetRandom();
 	}
       else
 	{
 	  while (alpha < alpha_min || alpha > alpha_max) alpha = rnd->Gaus(-1.0,0.4);
-	  while(beta >= alpha || beta >= beta_max || beta < beta_min) beta = rnd->Gaus(-2.25,0.4);
+	  while(beta >= alpha || beta >= beta_max || beta < my_beta_min) beta = rnd->Gaus(-2.25,0.4);
 	  
 	}
+      
       double PFRND_S       = GetPeakFluxShort(rnd); //ph/cm^2/s (Short Bursts)
       double FluenceRND_S  = pow(10.0,(double)rnd->Gaus(-6.8,0.43));
       double Duration_S    = pow(10.0,(double)rnd->Gaus(log_mean_short,log_sigma_short)); //(Short Bursts)
@@ -527,7 +687,7 @@ void GenerateXMLLibrary(int Nbursts=1000)
 	    z = 0.0;
 	  
 	  Duration = Duration_S;
-	  Ep = GetEPeak(rnd, type,1.0);
+	  Ep = GetEPeak(rnd, type, 1.0);
 	  
 	  T90short->Fill(log10(Duration));
 	  Zshort->Fill(z);
@@ -571,7 +731,7 @@ void GenerateXMLLibrary(int Nbursts=1000)
 	    z = 0.0;
 	  
 	  
-	  Ep=GetEPeak(rnd, type,Stretch);
+	  Ep=GetEPeak(rnd, type, Stretch);
 	  
 	  alphalong->Fill(alpha);
 	  betalong->Fill(beta); 
@@ -604,16 +764,6 @@ void GenerateXMLLibrary(int Nbursts=1000)
       
       osXML<<", redshift="<<z<<", alpha="<<alpha<<", beta="<<beta<<", Ep="<<Ep<<", emin="<<MinExtractedPhotonEnergy;
       
-      if(GenerateIC=="random")
-	{
-	  double randomNumber = rnd_1->Uniform();
-	  if(randomNumber      > 0.9)
-	    Fssc_Fsyn =   10.0;
-	  else if(randomNumber > 0.8)
-	    Fssc_Fsyn =    1.0;
-	  else
-	    Fssc_Fsyn =    0.0;
-	}
       if(Fssc_Fsyn>0.0)
 	osXML<<", essc_esyn="<<Essc_Esyn<<", Fssc_Fsyn="<<Fssc_Fsyn;
       osXML<<", GBM="<<(int)GenerateGBM;
@@ -638,7 +788,10 @@ void GenerateXMLLibrary(int Nbursts=1000)
       
       osTest<<setw(8)<<z<<" "<<setw(8)<<alpha<<" "<<setw(8)<<beta<<" "<<setw(8)<<Ep<<" "<<setw(8)<<Essc_Esyn<<setw(8)<<Fssc_Fsyn<<setw(8)<<co_energy<<std::endl;
       //////////////////////////////////////////////////
-      BurstTime+=(int) rnd->Exp(AverageInterval);
+      //      BurstTime+=(int) rnd->Exp(AverageInterval);
+      //      time = GetClosesTime(pointings,BurstTime);
+    
+      
     }
   //////////////////////////////////////////////////
   osXML<<" "<<std::endl;
@@ -780,7 +933,7 @@ void GenerateXMLLibrary(int Nbursts=1000)
   Correlation->Print("GeneratedCorrelations.eps");
   //  if (GenerateRedshift)  Redshifts->Print("GeneratedRedshift.eps");
 
-
+  //  for (int i=0;i<burst_positions.size();i++) delete burst_positions[i];
 }
 
 
