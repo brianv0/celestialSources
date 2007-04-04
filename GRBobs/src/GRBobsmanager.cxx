@@ -33,6 +33,40 @@ void ComputeCoordinates(double time, double l, double b, double& ra, double& dec
   phi   = scdir.phi()*180.0/M_PI;
 }
 
+void ComputeCoordinates_2(double time, double theta_zenith, double phi, 
+			  double& l, double& b, 
+			  double& ra, double& dec)
+{
+
+  HepRotation GLASTtoCel =   (astro::GPS::instance()->transformToGlast(time,astro::GPS::CELESTIAL)).inverse();
+  
+  double _theta= theta_zenith * M_PI/180;
+  double _phi  = phi   * M_PI/180;
+  
+  Hep3Vector scdir(sin(_theta)*cos(_phi),sin(_theta)*sin(_phi),cos(_theta));
+  Hep3Vector skydir = GLASTtoCel * scdir.unit();
+  astro::SkyDir sky(skydir, astro::SkyDir::EQUATORIAL);
+  ra    = sky.ra();
+  dec   = sky.dec();
+  l   = sky.l();
+  b   = sky.b();
+  if(l>180)
+    l-=360.0;
+  if(l<-180)
+    l+=360.0;
+
+  if(b>90)
+    b-=180.0;
+  if(b<-90)
+    b+=-180.0;
+ 
+  _theta = scdir.theta()*180.0/M_PI;
+  _phi   = scdir.phi()*180.0/M_PI;
+  
+  if(DEBUG)
+    std::cout<<"theta = "<<theta_zenith<<", "<<_theta<<" phi = "<<phi <<", "<<_phi<<" l,b = "<<l<<" , "<<b<<std::endl;
+}
+
 GRBobsmanager::GRBobsmanager(const std::string& params)
   : m_params(params)
 {
@@ -44,8 +78,13 @@ GRBobsmanager::GRBobsmanager(const std::string& params)
 
   m_GenerateGBMOutputs = false;
   //  facilities::Util::expandEnvVar(&paramFile);  
-  m_l=-200;
-  m_b=-200;
+  m_l     = -200.0;
+  m_b     = -200.0;
+  m_ra    = -200.0;
+  m_dec   = -200.0;
+  m_theta = -200.0;
+  m_phi   =    0.0;
+  
 
   if (params.find("=") == std::string::npos) 
     {
@@ -72,7 +111,16 @@ GRBobsmanager::GRBobsmanager(const std::string& params)
     {
       GRBobs::ConstParMap parmap(params);
       m_startTime       =  parmap.value("tstart");
-      m_GRBnumber = (long) floor(65540+m_startTime);
+
+      if(params.find("seed")!= std::string::npos)
+	{
+	  m_GRBnumber = (long) parmap.value("seed");
+	  m_GRBnumber = (long) floor(65540+m_GRBnumber);
+	}
+      else
+	{
+	  m_GRBnumber = (long) floor(65540+m_startTime);
+	}
       m_startTime       += Spectrum::startTime();
       m_GRB_duration    =  parmap.value("duration");
       if(params.find("fluence")!= std::string::npos)
@@ -83,6 +131,10 @@ GRBobsmanager::GRBobsmanager(const std::string& params)
 	{
 	  m_fluence         = parmap.value("peakFlux");
 	}
+
+      m_theta = parmap.value("theta"); // from zenith
+      m_phi   = parmap.value("phi");
+      
       m_l = parmap.value("l");
       m_b = parmap.value("b");
       
@@ -133,11 +185,19 @@ GRBobsmanager::GRBobsmanager(const std::string& params)
   m_par->SetFssc_Fsyn(m_fssc_fsyn);
   m_par->SetMinPhotonEnergy(m_MinPhotonEnergy); //keV  
   m_par->SetRedshift(m_z);
-  m_theta = -1000000.0;
-  
   //  std::cout<<m_par->rnd->GetSeed()<<std::endl;
   //  m_GRBnumber=m_par->rnd->GetSeed();
-  if (m_l >= -180 && m_l <= 180 && m_b >= -90 && m_b <= 90)
+  //////////////////////////////////////////////////
+  //           COMPUTE BURST COORDINATES          //
+  //////////////////////////////////////////////////
+
+  if(m_theta>=0.0)
+    {
+      ComputeCoordinates_2(m_startTime,m_theta,m_phi,m_l,m_b,m_ra,m_dec);
+      m_grbdeleted      = false;
+      m_theta = 90.0 - m_theta; // this is from horizon
+    }
+  else if (m_l >= -180 && m_l <= 180 && m_b >= -90 && m_b <= 90)
     {
       try 
 	{
@@ -167,17 +227,14 @@ GRBobsmanager::GRBobsmanager(const std::string& params)
 	    break;
 	  }
       }
-  m_par->SetGalDir(m_l,m_b); //this generates random direction in the sky
-  m_GalDir = m_par->GetGalDir();      
-  //PROMPT
   
-  //  astro::EarthCoordinate earthpos()
-  
-  
-  //  m_inSAA =   astro::EarthCoordinate::insideSAA();
+  m_par->SetGalDir(m_l,m_b); // THIS SETS THE COORDINATES
+  m_GalDir = m_par->GetGalDir(); 
+  //////////////////////////////////////////////////
+  //     PROMPT
   m_endTime    = m_startTime  +    m_GRB_duration; //check this in GRBobsSim !!!!!
   m_GRBend     = m_endTime;
-  //AG
+  //     AG
   if(m_LATphotons>0)
     {
       m_startTime_EC = m_startTime    + m_EC_delay;
