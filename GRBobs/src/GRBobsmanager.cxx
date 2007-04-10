@@ -115,7 +115,7 @@ GRBobsmanager::GRBobsmanager(const std::string& params)
       if(params.find("seed")!= std::string::npos)
 	{
 	  m_GRBnumber = (long) parmap.value("seed");
-	  m_GRBnumber = (long) floor(65540+m_GRBnumber);
+	  m_GRBnumber = 65540+ (long) m_GRBnumber;
 	}
       else
 	{

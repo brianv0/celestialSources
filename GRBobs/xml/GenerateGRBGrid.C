@@ -17,23 +17,23 @@ double z=0;
 
 //////////////////////////////////////////////////
 
-double t90_min   = 0.1;
-double t90_max   = 1000.0;
-int    NlogT90   = 4;
+double t90_min   = 1.0;
+double t90_max   = 100.0;
+int    NlogT90   = 3;
 
 
 double beta_min  = -3.2;
 double beta_max  = -1.2;
-int    NBeta     = 10;
+int    NBeta     = 5;
 double deltaBeta = (beta_max-beta_min)/(NBeta-1);
 
 double PF_min    =  0.1;
 double PF_max    = 10.0;
-int    NlogPF       = 10;
+int    NlogPF       = 5;
 
 double theta_min  = 0.0;
 double theta_max  = 90.0;
-int    Ntheta     = 10;
+int    Ntheta     = 5;
 double Dtheta     = (theta_max - theta_min)/(Ntheta-1);
 //////////////////////////////////////////////////
 long seed = 1;
@@ -43,7 +43,8 @@ double co_energy=0.0;
 
 void GenerateGRBGrid()
 {
-  std::cout<<" Number of bursts: "<<NlogT90*NBeta*NlogPF*Ntheta<<std::endl;
+  int Nbursts = NlogT90*NBeta*NlogPF*Ntheta;
+  std::cout<<" Number of bursts: "<<Nbursts<<std::endl;
 
   //////////////////////////////////////////////////
   std::ofstream osXML("GRBobs_grid_library.xml",std::ios::out);
@@ -111,41 +112,6 @@ void GenerateGRBGrid()
 	    }
 	}
     }
-  //////////////////////////////////////////////////
-  osXML<<" "<<std::endl;
-  osXML<<"<source name=\" GRBobs-10\" >"<<std::endl;
-  for(int i = 0; i<10 ; i++)
-    {
-      if(i<10) osXML<<"     <nestedSource sourceRef=\" GRB_0000"<<i<<" \"/>"<<std::endl;
-    }
-  
-  osXML<<"</source>"<<std::endl;
-  //////////////////////////////////////////////////
-  
-  //////////////////////////////////////////////////
-  osXML<<""<<std::endl;
-  osXML<<"<source name=\" GRBobs-100\" >"<<std::endl;
-  for(int i = 0; i<100 ; i++)
-    {
-      if(i<10) osXML<<"     <nestedSource sourceRef=\" GRB_0000"<<i<<" \"/>"<<std::endl;
-      else if(i<100) osXML<<"     <nestedSource sourceRef=\" GRB_000"<<i<<" \"/>"<<std::endl;
-      else osXML<<"     <nestedSource sourceRef=\" GRB_"<<i<<" \"/>"<<std::endl;
-    }
-  osXML<<"</source>"<<std::endl;
-  //////////////////////////////////////////////////
-  
-  //////////////////////////////////////////////////
-  osXML<<""<<std::endl;
-  osXML<<"<source name=\" GRBobs-1000\" >"<<std::endl;
-  for(int i = 0; i<1000 ; i++)
-    {
-      if(i<10) osXML<<"     <nestedSource sourceRef=\" GRB_0000"<<i<<" \"/>"<<std::endl;
-      else if(i<100) osXML<<"     <nestedSource sourceRef=\" GRB_000"<<i<<" \"/>"<<std::endl;
-      else if(i<1000) osXML<<"     <nestedSource sourceRef=\" GRB_00"<<i<<" \"/>"<<std::endl;
-    }
-  osXML<<"</source>"<<std::endl;
-  //////////////////////////////////////////////////
-  
   osXML<<""<<std::endl;
   osXML<<"<source name=\" AllGRBobs\" >"<<std::endl;
   for(int i = 0; i<NGRBs ; i++)

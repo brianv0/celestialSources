@@ -23,7 +23,7 @@ double AverageInterval = 47351.35135; //[s] 666 grbs / yr
 bool  GeneratePF         =   true; // If true: PF is used to normalize Bursts.
                                    // If false Fluence is used to normalize Bursts.
 TString GenerateIC        =   "random";//"random"; //"yes", "no"
-TString RepointFile       = "none";
+TString RepointFile       = "none"; //"l_b_coords.txt";
 
 double Fssc_Fsyn_const   =   10;
 bool  GenerateRedshift   =   true;
@@ -69,7 +69,6 @@ private:
 
 std::vector<point*> getPointingFromFile()
 {
-  //  std::string filename = "l_b_coord.txt";
   std::ifstream grb_positions(RepointFile,std::ios::in);
   std::vector<point*> positions;
   if(!grb_positions.is_open()) 
@@ -159,7 +158,12 @@ std::vector<point*> GetBurstPositions(int N=1000)
   std::cout<<" -------------------------------------------------- "<<std::endl;
   std::cout<<"                 Final positions:                   "<<std::endl;
   for(unsigned i=0;i<bursts_positions.size();i++) 
-    std::cout<<i<<" "<<bursts_positions[i]->get_time()<<", l= "<<bursts_positions[i]->get_l()<<",b= "<<bursts_positions[i]->get_b()<<std::endl;
+    {
+      std::cout<<i<<" "<<bursts_positions[i]->get_time()<<", l= "<<bursts_positions[i]->get_l()<<",b= "<<bursts_positions[i]->get_b();
+      if(bursts_positions[i]->is_ARR())std::cout<< "<-- this is a repoint!";
+      std::cout<<" "<<std::endl;
+
+    }
   std::cout<<" -------------------------------------------------- "<<std::endl;
   return bursts_positions;
 }
@@ -614,8 +618,8 @@ void GenerateXMLLibrary(int Nbursts=1000)
 	  if(GenerateIC=="random")
 	    {
 	      double randomNumber = rnd_1->Uniform();
-	      if(randomNumber      > 0.6)
-		Fssc_Fsyn =   10.0;
+	      if(randomNumber      <= 0.3)
+		Fssc_Fsyn =   1.0;
 	    }
 	  else 
 	    Fssc_Fsyn = 0.0;
@@ -624,7 +628,7 @@ void GenerateXMLLibrary(int Nbursts=1000)
 	{
 	  double randomNumber = rnd_1->Uniform();
 	  if(randomNumber > 0.95)
-	    Fssc_Fsyn =    1.0;
+	    Fssc_Fsyn =    10.0;
 	  else
 	    Fssc_Fsyn =    0.0;
 	}

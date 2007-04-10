@@ -670,7 +670,7 @@
 
 <source name=" GRB_00111 ">
 <spectrum escale="MeV">
- <SpectrumClass name="GRBobsmanager" params="tstart=5131573, duration=6.32, peakFlux=1.525, l=69.64, b=69.75, redshift=1.552, alpha=-0.6843, beta=-2.694, Ep=222.3, emin=10, essc_esyn=1e+04, Fssc_Fsyn=1, GBM=1 "/>
+ <SpectrumClass name="GRBobsmanager" params="tstart=5131573, duration=6.32, peakFlux=1.525, l=69.64, b=69.75, redshift=1.552, alpha=-0.6843, beta=-2.694, Ep=222.3, emin=10, essc_esyn=1e+04, Fssc_Fsyn=10, GBM=1 "/>
 <use_spectrum frame="galaxy" />
 </spectrum> </source>
 
@@ -718,7 +718,7 @@
 
 <source name=" GRB_00119 ">
 <spectrum escale="MeV">
- <SpectrumClass name="GRBobsmanager" params="tstart=5418029, duration=30.44, peakFlux=1.134, l=-82.68, b=39.87, redshift=2.618, alpha=-1.182, beta=-2.019, Ep=96.26, emin=10, essc_esyn=1e+04, Fssc_Fsyn=1, GBM=1 "/>
+ <SpectrumClass name="GRBobsmanager" params="tstart=5418029, duration=30.44, peakFlux=1.134, l=-82.68, b=39.87, redshift=2.618, alpha=-1.182, beta=-2.019, Ep=96.26, emin=10, essc_esyn=1e+04, Fssc_Fsyn=10, GBM=1 "/>
 <use_spectrum frame="galaxy" />
 </spectrum> </source>
 
@@ -754,7 +754,7 @@
 
 <source name=" GRB_00125 ">
 <spectrum escale="MeV">
- <SpectrumClass name="GRBobsmanager" params="tstart=5674347, duration=16.24, peakFlux=0.6343, l=22.59, b=-45.1, redshift=3.073, alpha=-0.2837, beta=-3.08, Ep=175.3, emin=10, essc_esyn=1e+04, Fssc_Fsyn=1, GBM=1 "/>
+ <SpectrumClass name="GRBobsmanager" params="tstart=5674347, duration=16.24, peakFlux=0.6343, l=22.59, b=-45.1, redshift=3.073, alpha=-0.2837, beta=-3.08, Ep=175.3, emin=10, essc_esyn=1e+04, Fssc_Fsyn=10, GBM=1 "/>
 <use_spectrum frame="galaxy" />
 </spectrum> </source>
 
@@ -952,7 +952,7 @@
 
 <source name=" GRB_00158 ">
 <spectrum escale="MeV">
- <SpectrumClass name="GRBobsmanager" params="tstart=7155871, duration=72.06, peakFlux=0.9351, l=-85.77, b=30.39, redshift=4.75, alpha=-1.365, beta=-2.24, Ep=169.4, emin=10, essc_esyn=1e+04, Fssc_Fsyn=1, GBM=1 "/>
+ <SpectrumClass name="GRBobsmanager" params="tstart=7155871, duration=72.06, peakFlux=0.9351, l=-85.77, b=30.39, redshift=4.75, alpha=-1.365, beta=-2.24, Ep=169.4, emin=10, essc_esyn=1e+04, Fssc_Fsyn=10, GBM=1 "/>
 <use_spectrum frame="galaxy" />
 </spectrum> </source>
 
@@ -1156,7 +1156,7 @@
 
 <source name=" GRB_00192 ">
 <spectrum escale="MeV">
- <SpectrumClass name="GRBobsmanager" params="tstart=8520065, duration=0.2371, peakFlux=6.924, l=-65.51, b=57.36, redshift=1.545, alpha=-1.088, beta=-2.221, Ep=289.9, emin=10, essc_esyn=1e+04, Fssc_Fsyn=1, GBM=1 "/>
+ <SpectrumClass name="GRBobsmanager" params="tstart=8520065, duration=0.2371, peakFlux=6.924, l=-65.51, b=57.36, redshift=1.545, alpha=-1.088, beta=-2.221, Ep=289.9, emin=10, essc_esyn=1e+04, Fssc_Fsyn=10, GBM=1 "/>
 <use_spectrum frame="galaxy" />
 </spectrum> </source>
 
@@ -1294,7 +1294,7 @@
 
 <source name=" GRB_00215 ">
 <spectrum escale="MeV">
- <SpectrumClass name="GRBobsmanager" params="tstart=9491592, duration=0.1123, peakFlux=1.241, l=168.9, b=43.54, redshift=3.032, alpha=-1.043, beta=-2.866, Ep=141.8, emin=10, essc_esyn=1e+04, Fssc_Fsyn=1, GBM=1 "/>
+ <SpectrumClass name="GRBobsmanager" params="tstart=9491592, duration=0.1123, peakFlux=1.241, l=168.9, b=43.54, redshift=3.032, alpha=-1.043, beta=-2.866, Ep=141.8, emin=10, essc_esyn=1e+04, Fssc_Fsyn=10, GBM=1 "/>
 <use_spectrum frame="galaxy" />
 </spectrum> </source>
 
@@ -1414,7 +1414,7 @@
 
 <source name=" GRB_00235 ">
 <spectrum escale="MeV">
- <SpectrumClass name="GRBobsmanager" params="tstart=10819398, duration=111.8, peakFlux=0.9099, l=14.76, b=53.56, redshift=5.588, alpha=-0.5984, beta=-2.377, Ep=153, emin=10, essc_esyn=1e+04, Fssc_Fsyn=1, GBM=1 "/>
+ <SpectrumClass name="GRBobsmanager" params="tstart=10819398, duration=111.8, peakFlux=0.9099, l=14.76, b=53.56, redshift=5.588, alpha=-0.5984, beta=-2.377, Ep=153, emin=10, essc_esyn=1e+04, Fssc_Fsyn=10, GBM=1 "/>
 <use_spectrum frame="galaxy" />
 </spectrum> </source>
 
@@ -1618,7 +1618,7 @@
 
 <source name=" GRB_00269 ">
 <spectrum escale="MeV">
- <SpectrumClass name="GRBobsmanager" params="tstart=12331320, duration=31.73, peakFlux=0.9887, l=-16.19, b=-14.47, redshift=4.206, alpha=-0.9713, beta=-2.282, Ep=95.78, emin=10, essc_esyn=1e+04, Fssc_Fsyn=1, GBM=1 "/>
+ <SpectrumClass name="GRBobsmanager" params="tstart=12331320, duration=31.73, peakFlux=0.9887, l=-16.19, b=-14.47, redshift=4.206, alpha=-0.9713, beta=-2.282, Ep=95.78, emin=10, essc_esyn=1e+04, Fssc_Fsyn=10, GBM=1 "/>
 <use_spectrum frame="galaxy" />
 </spectrum> </source>
 
@@ -1660,7 +1660,7 @@
 
 <source name=" GRB_00276 ">
 <spectrum escale="MeV">
- <SpectrumClass name="GRBobsmanager" params="tstart=12696245, duration=6.744, peakFlux=0.6434, l=-74.53, b=47.81, redshift=2.558, alpha=-1.054, beta=-1.979, Ep=110.3, emin=10, essc_esyn=1e+04, Fssc_Fsyn=1, GBM=1 "/>
+ <SpectrumClass name="GRBobsmanager" params="tstart=12696245, duration=6.744, peakFlux=0.6434, l=-74.53, b=47.81, redshift=2.558, alpha=-1.054, beta=-1.979, Ep=110.3, emin=10, essc_esyn=1e+04, Fssc_Fsyn=10, GBM=1 "/>
 <use_spectrum frame="galaxy" />
 </spectrum> </source>
 
@@ -1900,13 +1900,13 @@
 
 <source name=" GRB_00316 ">
 <spectrum escale="MeV">
- <SpectrumClass name="GRBobsmanager" params="tstart=14801820, duration=5.852, peakFlux=0.5435, l=-131.8, b=18.48, redshift=2.73, alpha=-1.467, beta=-2.599, Ep=252.7, emin=10, essc_esyn=1e+04, Fssc_Fsyn=1, GBM=1 "/>
+ <SpectrumClass name="GRBobsmanager" params="tstart=14801820, duration=5.852, peakFlux=0.5435, l=-131.8, b=18.48, redshift=2.73, alpha=-1.467, beta=-2.599, Ep=252.7, emin=10, essc_esyn=1e+04, Fssc_Fsyn=10, GBM=1 "/>
 <use_spectrum frame="galaxy" />
 </spectrum> </source>
 
 <source name=" GRB_00317 ">
 <spectrum escale="MeV">
- <SpectrumClass name="GRBobsmanager" params="tstart=14963458, duration=31.85, peakFlux=1.14, l=115.1, b=29.93, redshift=3.703, alpha=-1.324, beta=-2.319, Ep=89.72, emin=10, essc_esyn=1e+04, Fssc_Fsyn=1, GBM=1 "/>
+ <SpectrumClass name="GRBobsmanager" params="tstart=14963458, duration=31.85, peakFlux=1.14, l=115.1, b=29.93, redshift=3.703, alpha=-1.324, beta=-2.319, Ep=89.72, emin=10, essc_esyn=1e+04, Fssc_Fsyn=10, GBM=1 "/>
 <use_spectrum frame="galaxy" />
 </spectrum> </source>
 
@@ -2008,7 +2008,7 @@
 
 <source name=" GRB_00334 ">
 <spectrum escale="MeV">
- <SpectrumClass name="GRBobsmanager" params="tstart=15587092, duration=38.53, peakFlux=0.5531, l=-3.484, b=-42.24, redshift=6.401, alpha=-1.233, beta=-2.425, Ep=106.7, emin=10, essc_esyn=1e+04, Fssc_Fsyn=1, GBM=1 "/>
+ <SpectrumClass name="GRBobsmanager" params="tstart=15587092, duration=38.53, peakFlux=0.5531, l=-3.484, b=-42.24, redshift=6.401, alpha=-1.233, beta=-2.425, Ep=106.7, emin=10, essc_esyn=1e+04, Fssc_Fsyn=10, GBM=1 "/>
 <use_spectrum frame="galaxy" />
 </spectrum> </source>
 
@@ -2410,7 +2410,7 @@
 
 <source name=" GRB_00401 ">
 <spectrum escale="MeV">
- <SpectrumClass name="GRBobsmanager" params="tstart=19293923, duration=0.5002, peakFlux=1.79, l=-139.6, b=-18.85, redshift=2.819, alpha=-0.6789, beta=-2.474, Ep=374.7, emin=10, essc_esyn=1e+04, Fssc_Fsyn=1, GBM=1 "/>
+ <SpectrumClass name="GRBobsmanager" params="tstart=19293923, duration=0.5002, peakFlux=1.79, l=-139.6, b=-18.85, redshift=2.819, alpha=-0.6789, beta=-2.474, Ep=374.7, emin=10, essc_esyn=1e+04, Fssc_Fsyn=10, GBM=1 "/>
 <use_spectrum frame="galaxy" />
 </spectrum> </source>
 
@@ -2464,7 +2464,7 @@
 
 <source name=" GRB_00410 ">
 <spectrum escale="MeV">
- <SpectrumClass name="GRBobsmanager" params="tstart=19752067, duration=18.75, peakFlux=0.4994, l=152.2, b=52.39, redshift=1.807, alpha=-1.121, beta=-2.674, Ep=245.4, emin=10, essc_esyn=1e+04, Fssc_Fsyn=1, GBM=1 "/>
+ <SpectrumClass name="GRBobsmanager" params="tstart=19752067, duration=18.75, peakFlux=0.4994, l=152.2, b=52.39, redshift=1.807, alpha=-1.121, beta=-2.674, Ep=245.4, emin=10, essc_esyn=1e+04, Fssc_Fsyn=10, GBM=1 "/>
 <use_spectrum frame="galaxy" />
 </spectrum> </source>
 
@@ -2560,7 +2560,7 @@
 
 <source name=" GRB_00426 ">
 <spectrum escale="MeV">
- <SpectrumClass name="GRBobsmanager" params="tstart=20266915, duration=0.1155, peakFlux=2.373, l=-20.97, b=60.92, redshift=1.729, alpha=-0.6998, beta=-2.203, Ep=149.6, emin=10, essc_esyn=1e+04, Fssc_Fsyn=1, GBM=1 "/>
+ <SpectrumClass name="GRBobsmanager" params="tstart=20266915, duration=0.1155, peakFlux=2.373, l=-20.97, b=60.92, redshift=1.729, alpha=-0.6998, beta=-2.203, Ep=149.6, emin=10, essc_esyn=1e+04, Fssc_Fsyn=10, GBM=1 "/>
 <use_spectrum frame="galaxy" />
 </spectrum> </source>
 
@@ -2608,7 +2608,7 @@
 
 <source name=" GRB_00434 ">
 <spectrum escale="MeV">
- <SpectrumClass name="GRBobsmanager" params="tstart=20707729, duration=0.3511, peakFlux=3.782, l=-89.64, b=26.24, redshift=1.403, alpha=-0.3177, beta=-2.791, Ep=268, emin=10, essc_esyn=1e+04, Fssc_Fsyn=1, GBM=1 "/>
+ <SpectrumClass name="GRBobsmanager" params="tstart=20707729, duration=0.3511, peakFlux=3.782, l=-89.64, b=26.24, redshift=1.403, alpha=-0.3177, beta=-2.791, Ep=268, emin=10, essc_esyn=1e+04, Fssc_Fsyn=10, GBM=1 "/>
 <use_spectrum frame="galaxy" />
 </spectrum> </source>
 
@@ -2638,7 +2638,7 @@
 
 <source name=" GRB_00439 ">
 <spectrum escale="MeV">
- <SpectrumClass name="GRBobsmanager" params="tstart=21152817, duration=88.02, peakFlux=1.431, l=148.5, b=-13.66, redshift=4.698, alpha=-1.129, beta=-2.15, Ep=171.4, emin=10, essc_esyn=1e+04, Fssc_Fsyn=1, GBM=1 "/>
+ <SpectrumClass name="GRBobsmanager" params="tstart=21152817, duration=88.02, peakFlux=1.431, l=148.5, b=-13.66, redshift=4.698, alpha=-1.129, beta=-2.15, Ep=171.4, emin=10, essc_esyn=1e+04, Fssc_Fsyn=10, GBM=1 "/>
 <use_spectrum frame="galaxy" />
 </spectrum> </source>
 
@@ -2746,7 +2746,7 @@
 
 <source name=" GRB_00457 ">
 <spectrum escale="MeV">
- <SpectrumClass name="GRBobsmanager" params="tstart=22050415, duration=27.27, peakFlux=1.406, l=135.3, b=20.32, redshift=1.031, alpha=-1.14, beta=-2.453, Ep=114.6, emin=10, essc_esyn=1e+04, Fssc_Fsyn=1, GBM=1 "/>
+ <SpectrumClass name="GRBobsmanager" params="tstart=22050415, duration=27.27, peakFlux=1.406, l=135.3, b=20.32, redshift=1.031, alpha=-1.14, beta=-2.453, Ep=114.6, emin=10, essc_esyn=1e+04, Fssc_Fsyn=10, GBM=1 "/>
 <use_spectrum frame="galaxy" />
 </spectrum> </source>
 
@@ -2896,7 +2896,7 @@
 
 <source name=" GRB_00482 ">
 <spectrum escale="MeV">
- <SpectrumClass name="GRBobsmanager" params="tstart=22966708, duration=31.9, peakFlux=8.322, l=-78.78, b=19.04, redshift=6.21, alpha=-1.317, beta=-2.726, Ep=347.4, emin=10, essc_esyn=1e+04, Fssc_Fsyn=1, GBM=1 "/>
+ <SpectrumClass name="GRBobsmanager" params="tstart=22966708, duration=31.9, peakFlux=8.322, l=-78.78, b=19.04, redshift=6.21, alpha=-1.317, beta=-2.726, Ep=347.4, emin=10, essc_esyn=1e+04, Fssc_Fsyn=10, GBM=1 "/>
 <use_spectrum frame="galaxy" />
 </spectrum> </source>
 
@@ -3052,7 +3052,7 @@
 
 <source name=" GRB_00508 ">
 <spectrum escale="MeV">
- <SpectrumClass name="GRBobsmanager" params="tstart=24126206, duration=0.9625, peakFlux=0.6835, l=-82.83, b=37.91, redshift=1.538, alpha=0.09705, beta=-2.087, Ep=120.5, emin=10, essc_esyn=1e+04, Fssc_Fsyn=1, GBM=1 "/>
+ <SpectrumClass name="GRBobsmanager" params="tstart=24126206, duration=0.9625, peakFlux=0.6835, l=-82.83, b=37.91, redshift=1.538, alpha=0.09705, beta=-2.087, Ep=120.5, emin=10, essc_esyn=1e+04, Fssc_Fsyn=10, GBM=1 "/>
 <use_spectrum frame="galaxy" />
 </spectrum> </source>
 
@@ -3262,7 +3262,7 @@
 
 <source name=" GRB_00543 ">
 <spectrum escale="MeV">
- <SpectrumClass name="GRBobsmanager" params="tstart=26158010, duration=144.5, peakFlux=4.98, l=13.17, b=42.98, redshift=4.387, alpha=-1.605, beta=-1.983, Ep=382.9, emin=10, essc_esyn=1e+04, Fssc_Fsyn=1, GBM=1 "/>
+ <SpectrumClass name="GRBobsmanager" params="tstart=26158010, duration=144.5, peakFlux=4.98, l=13.17, b=42.98, redshift=4.387, alpha=-1.605, beta=-1.983, Ep=382.9, emin=10, essc_esyn=1e+04, Fssc_Fsyn=10, GBM=1 "/>
 <use_spectrum frame="galaxy" />
 </spectrum> </source>
 
@@ -3334,7 +3334,7 @@
 
 <source name=" GRB_00555 ">
 <spectrum escale="MeV">
- <SpectrumClass name="GRBobsmanager" params="tstart=26566038, duration=33.83, peakFlux=0.4946, l=173.2, b=-1.465, redshift=2.721, alpha=-0.8044, beta=-3.052, Ep=109.3, emin=10, essc_esyn=1e+04, Fssc_Fsyn=1, GBM=1 "/>
+ <SpectrumClass name="GRBobsmanager" params="tstart=26566038, duration=33.83, peakFlux=0.4946, l=173.2, b=-1.465, redshift=2.721, alpha=-0.8044, beta=-3.052, Ep=109.3, emin=10, essc_esyn=1e+04, Fssc_Fsyn=10, GBM=1 "/>
 <use_spectrum frame="galaxy" />
 </spectrum> </source>
 
@@ -3496,7 +3496,7 @@
 
 <source name=" GRB_00582 ">
 <spectrum escale="MeV">
- <SpectrumClass name="GRBobsmanager" params="tstart=27723925, duration=15.09, peakFlux=8.849, l=-45.88, b=81.13, redshift=5.088, alpha=-1.161, beta=-2.131, Ep=466.2, emin=10, essc_esyn=1e+04, Fssc_Fsyn=1, GBM=1 "/>
+ <SpectrumClass name="GRBobsmanager" params="tstart=27723925, duration=15.09, peakFlux=8.849, l=-45.88, b=81.13, redshift=5.088, alpha=-1.161, beta=-2.131, Ep=466.2, emin=10, essc_esyn=1e+04, Fssc_Fsyn=10, GBM=1 "/>
 <use_spectrum frame="galaxy" />
 </spectrum> </source>
 
@@ -3634,7 +3634,7 @@
 
 <source name=" GRB_00605 ">
 <spectrum escale="MeV">
- <SpectrumClass name="GRBobsmanager" params="tstart=28847972, duration=0.59, peakFlux=9.026, l=34.05, b=15.01, redshift=1.595, alpha=-0.7783, beta=-2.557, Ep=244.4, emin=10, essc_esyn=1e+04, Fssc_Fsyn=1, GBM=1 "/>
+ <SpectrumClass name="GRBobsmanager" params="tstart=28847972, duration=0.59, peakFlux=9.026, l=34.05, b=15.01, redshift=1.595, alpha=-0.7783, beta=-2.557, Ep=244.4, emin=10, essc_esyn=1e+04, Fssc_Fsyn=10, GBM=1 "/>
 <use_spectrum frame="galaxy" />
 </spectrum> </source>
 
@@ -3724,7 +3724,7 @@
 
 <source name=" GRB_00620 ">
 <spectrum escale="MeV">
- <SpectrumClass name="GRBobsmanager" params="tstart=29366030, duration=30.64, peakFlux=4.48, l=77.39, b=-20.95, redshift=4.58, alpha=-0.3326, beta=-3.718, Ep=219, emin=10, essc_esyn=1e+04, Fssc_Fsyn=1, GBM=1 "/>
+ <SpectrumClass name="GRBobsmanager" params="tstart=29366030, duration=30.64, peakFlux=4.48, l=77.39, b=-20.95, redshift=4.58, alpha=-0.3326, beta=-3.718, Ep=219, emin=10, essc_esyn=1e+04, Fssc_Fsyn=10, GBM=1 "/>
 <use_spectrum frame="galaxy" />
 </spectrum> </source>
 
@@ -4072,7 +4072,7 @@
 
 <source name=" GRB_00678 ">
 <spectrum escale="MeV">
- <SpectrumClass name="GRBobsmanager" params="tstart=32609219, duration=61.56, peakFlux=1.769, l=-63.33, b=-40.58, redshift=0.928, alpha=-2.152, beta=-2.319, Ep=273, emin=10, essc_esyn=1e+04, Fssc_Fsyn=1, GBM=1 "/>
+ <SpectrumClass name="GRBobsmanager" params="tstart=32609219, duration=61.56, peakFlux=1.769, l=-63.33, b=-40.58, redshift=0.928, alpha=-2.152, beta=-2.319, Ep=273, emin=10, essc_esyn=1e+04, Fssc_Fsyn=10, GBM=1 "/>
 <use_spectrum frame="galaxy" />
 </spectrum> </source>
 
@@ -4330,7 +4330,7 @@
 
 <source name=" GRB_00721 ">
 <spectrum escale="MeV">
- <SpectrumClass name="GRBobsmanager" params="tstart=34759035, duration=13.5, peakFlux=1.878, l=-32.75, b=50.96, redshift=5.092, alpha=-0.5689, beta=-2.013, Ep=61.37, emin=10, essc_esyn=1e+04, Fssc_Fsyn=1, GBM=1 "/>
+ <SpectrumClass name="GRBobsmanager" params="tstart=34759035, duration=13.5, peakFlux=1.878, l=-32.75, b=50.96, redshift=5.092, alpha=-0.5689, beta=-2.013, Ep=61.37, emin=10, essc_esyn=1e+04, Fssc_Fsyn=10, GBM=1 "/>
 <use_spectrum frame="galaxy" />
 </spectrum> </source>
 
@@ -4348,7 +4348,7 @@
 
 <source name=" GRB_00724 ">
 <spectrum escale="MeV">
- <SpectrumClass name="GRBobsmanager" params="tstart=34923892, duration=35.38, peakFlux=0.3299, l=93.8, b=62.62, redshift=3.146, alpha=-1.272, beta=-2.135, Ep=68.29, emin=10, essc_esyn=1e+04, Fssc_Fsyn=1, GBM=1 "/>
+ <SpectrumClass name="GRBobsmanager" params="tstart=34923892, duration=35.38, peakFlux=0.3299, l=93.8, b=62.62, redshift=3.146, alpha=-1.272, beta=-2.135, Ep=68.29, emin=10, essc_esyn=1e+04, Fssc_Fsyn=10, GBM=1 "/>
 <use_spectrum frame="galaxy" />
 </spectrum> </source>
 
@@ -4540,7 +4540,7 @@
 
 <source name=" GRB_00756 ">
 <spectrum escale="MeV">
- <SpectrumClass name="GRBobsmanager" params="tstart=36579073, duration=38.36, peakFlux=2.582, l=-16.99, b=-57.49, redshift=3.366, alpha=-0.682, beta=-3.218, Ep=123.2, emin=10, essc_esyn=1e+04, Fssc_Fsyn=1, GBM=1 "/>
+ <SpectrumClass name="GRBobsmanager" params="tstart=36579073, duration=38.36, peakFlux=2.582, l=-16.99, b=-57.49, redshift=3.366, alpha=-0.682, beta=-3.218, Ep=123.2, emin=10, essc_esyn=1e+04, Fssc_Fsyn=10, GBM=1 "/>
 <use_spectrum frame="galaxy" />
 </spectrum> </source>
 
@@ -4612,7 +4612,7 @@
 
 <source name=" GRB_00768 ">
 <spectrum escale="MeV">
- <SpectrumClass name="GRBobsmanager" params="tstart=37030206, duration=1.865, peakFlux=1.045, l=55.3, b=-67, redshift=2.024, alpha=-0.9791, beta=-2.206, Ep=378.7, emin=10, essc_esyn=1e+04, Fssc_Fsyn=1, GBM=1 "/>
+ <SpectrumClass name="GRBobsmanager" params="tstart=37030206, duration=1.865, peakFlux=1.045, l=55.3, b=-67, redshift=2.024, alpha=-0.9791, beta=-2.206, Ep=378.7, emin=10, essc_esyn=1e+04, Fssc_Fsyn=10, GBM=1 "/>
 <use_spectrum frame="galaxy" />
 </spectrum> </source>
 
@@ -4738,13 +4738,13 @@
 
 <source name=" GRB_00789 ">
 <spectrum escale="MeV">
- <SpectrumClass name="GRBobsmanager" params="tstart=38063167, duration=25.07, peakFlux=3.387, l=-103, b=8.059, redshift=4.604, alpha=-1.307, beta=-2.671, Ep=263.1, emin=10, essc_esyn=1e+04, Fssc_Fsyn=1, GBM=1 "/>
+ <SpectrumClass name="GRBobsmanager" params="tstart=38063167, duration=25.07, peakFlux=3.387, l=-103, b=8.059, redshift=4.604, alpha=-1.307, beta=-2.671, Ep=263.1, emin=10, essc_esyn=1e+04, Fssc_Fsyn=10, GBM=1 "/>
 <use_spectrum frame="galaxy" />
 </spectrum> </source>
 
 <source name=" GRB_00790 ">
 <spectrum escale="MeV">
- <SpectrumClass name="GRBobsmanager" params="tstart=38101712, duration=4.188, peakFlux=1.741, l=-138.6, b=0.2442, redshift=1.17, alpha=-0.9933, beta=-1.963, Ep=99.44, emin=10, essc_esyn=1e+04, Fssc_Fsyn=1, GBM=1 "/>
+ <SpectrumClass name="GRBobsmanager" params="tstart=38101712, duration=4.188, peakFlux=1.741, l=-138.6, b=0.2442, redshift=1.17, alpha=-0.9933, beta=-1.963, Ep=99.44, emin=10, essc_esyn=1e+04, Fssc_Fsyn=10, GBM=1 "/>
 <use_spectrum frame="galaxy" />
 </spectrum> </source>
 
@@ -4792,7 +4792,7 @@
 
 <source name=" GRB_00798 ">
 <spectrum escale="MeV">
- <SpectrumClass name="GRBobsmanager" params="tstart=38414432, duration=18.92, peakFlux=2.524, l=138.3, b=39.67, redshift=2.523, alpha=-0.7174, beta=-2.107, Ep=132.1, emin=10, essc_esyn=1e+04, Fssc_Fsyn=1, GBM=1 "/>
+ <SpectrumClass name="GRBobsmanager" params="tstart=38414432, duration=18.92, peakFlux=2.524, l=138.3, b=39.67, redshift=2.523, alpha=-0.7174, beta=-2.107, Ep=132.1, emin=10, essc_esyn=1e+04, Fssc_Fsyn=10, GBM=1 "/>
 <use_spectrum frame="galaxy" />
 </spectrum> </source>
 
@@ -4822,7 +4822,7 @@
 
 <source name=" GRB_00803 ">
 <spectrum escale="MeV">
- <SpectrumClass name="GRBobsmanager" params="tstart=38630922, duration=11.43, peakFlux=5.344, l=7.952, b=10.71, redshift=3.411, alpha=-0.3585, beta=-2.196, Ep=251.6, emin=10, essc_esyn=1e+04, Fssc_Fsyn=1, GBM=1 "/>
+ <SpectrumClass name="GRBobsmanager" params="tstart=38630922, duration=11.43, peakFlux=5.344, l=7.952, b=10.71, redshift=3.411, alpha=-0.3585, beta=-2.196, Ep=251.6, emin=10, essc_esyn=1e+04, Fssc_Fsyn=10, GBM=1 "/>
 <use_spectrum frame="galaxy" />
 </spectrum> </source>
 
@@ -5170,7 +5170,7 @@
 
 <source name=" GRB_00861 ">
 <spectrum escale="MeV">
- <SpectrumClass name="GRBobsmanager" params="tstart=41376615, duration=54.63, peakFlux=1.292, l=55.48, b=27.64, redshift=2.869, alpha=-0.9523, beta=-2.585, Ep=73.08, emin=10, essc_esyn=1e+04, Fssc_Fsyn=1, GBM=1 "/>
+ <SpectrumClass name="GRBobsmanager" params="tstart=41376615, duration=54.63, peakFlux=1.292, l=55.48, b=27.64, redshift=2.869, alpha=-0.9523, beta=-2.585, Ep=73.08, emin=10, essc_esyn=1e+04, Fssc_Fsyn=10, GBM=1 "/>
 <use_spectrum frame="galaxy" />
 </spectrum> </source>
 
@@ -5284,7 +5284,7 @@
 
 <source name=" GRB_00880 ">
 <spectrum escale="MeV">
- <SpectrumClass name="GRBobsmanager" params="tstart=42065426, duration=220.7, peakFlux=0.8833, l=-63.84, b=12.43, redshift=4.545, alpha=-1.475, beta=-2.366, Ep=204.6, emin=10, essc_esyn=1e+04, Fssc_Fsyn=1, GBM=1 "/>
+ <SpectrumClass name="GRBobsmanager" params="tstart=42065426, duration=220.7, peakFlux=0.8833, l=-63.84, b=12.43, redshift=4.545, alpha=-1.475, beta=-2.366, Ep=204.6, emin=10, essc_esyn=1e+04, Fssc_Fsyn=10, GBM=1 "/>
 <use_spectrum frame="galaxy" />
 </spectrum> </source>
 
@@ -5428,7 +5428,7 @@
 
 <source name=" GRB_00904 ">
 <spectrum escale="MeV">
- <SpectrumClass name="GRBobsmanager" params="tstart=42960393, duration=8.665, peakFlux=0.7214, l=3.118, b=-47.03, redshift=1.695, alpha=-0.9008, beta=-2.865, Ep=161.8, emin=10, essc_esyn=1e+04, Fssc_Fsyn=1, GBM=1 "/>
+ <SpectrumClass name="GRBobsmanager" params="tstart=42960393, duration=8.665, peakFlux=0.7214, l=3.118, b=-47.03, redshift=1.695, alpha=-0.9008, beta=-2.865, Ep=161.8, emin=10, essc_esyn=1e+04, Fssc_Fsyn=10, GBM=1 "/>
 <use_spectrum frame="galaxy" />
 </spectrum> </source>
 
@@ -5542,7 +5542,7 @@
 
 <source name=" GRB_00923 ">
 <spectrum escale="MeV">
- <SpectrumClass name="GRBobsmanager" params="tstart=43814992, duration=122.6, peakFlux=1.041, l=2.988, b=-4.815, redshift=3.433, alpha=-1.304, beta=-2.277, Ep=172.2, emin=10, essc_esyn=1e+04, Fssc_Fsyn=1, GBM=1 "/>
+ <SpectrumClass name="GRBobsmanager" params="tstart=43814992, duration=122.6, peakFlux=1.041, l=2.988, b=-4.815, redshift=3.433, alpha=-1.304, beta=-2.277, Ep=172.2, emin=10, essc_esyn=1e+04, Fssc_Fsyn=10, GBM=1 "/>
 <use_spectrum frame="galaxy" />
 </spectrum> </source>
 
@@ -5578,7 +5578,7 @@
 
 <source name=" GRB_00929 ">
 <spectrum escale="MeV">
- <SpectrumClass name="GRBobsmanager" params="tstart=43932651, duration=0.4196, peakFlux=2.498, l=122.1, b=-47.45, redshift=1.189, alpha=-0.7885, beta=-2.822, Ep=134.7, emin=10, essc_esyn=1e+04, Fssc_Fsyn=1, GBM=1 "/>
+ <SpectrumClass name="GRBobsmanager" params="tstart=43932651, duration=0.4196, peakFlux=2.498, l=122.1, b=-47.45, redshift=1.189, alpha=-0.7885, beta=-2.822, Ep=134.7, emin=10, essc_esyn=1e+04, Fssc_Fsyn=10, GBM=1 "/>
 <use_spectrum frame="galaxy" />
 </spectrum> </source>
 
@@ -5794,7 +5794,7 @@
 
 <source name=" GRB_00965 ">
 <spectrum escale="MeV">
- <SpectrumClass name="GRBobsmanager" params="tstart=45761819, duration=103.1, peakFlux=0.7658, l=7.602, b=-31.01, redshift=3.683, alpha=-1.307, beta=-2.285, Ep=170.3, emin=10, essc_esyn=1e+04, Fssc_Fsyn=1, GBM=1 "/>
+ <SpectrumClass name="GRBobsmanager" params="tstart=45761819, duration=103.1, peakFlux=0.7658, l=7.602, b=-31.01, redshift=3.683, alpha=-1.307, beta=-2.285, Ep=170.3, emin=10, essc_esyn=1e+04, Fssc_Fsyn=10, GBM=1 "/>
 <use_spectrum frame="galaxy" />
 </spectrum> </source>
 
@@ -5818,7 +5818,7 @@
 
 <source name=" GRB_00969 ">
 <spectrum escale="MeV">
- <SpectrumClass name="GRBobsmanager" params="tstart=45858972, duration=49.62, peakFlux=7.005, l=24.55, b=21.08, redshift=3.399, alpha=-1.449, beta=-2.599, Ep=450.6, emin=10, essc_esyn=1e+04, Fssc_Fsyn=1, GBM=1 "/>
+ <SpectrumClass name="GRBobsmanager" params="tstart=45858972, duration=49.62, peakFlux=7.005, l=24.55, b=21.08, redshift=3.399, alpha=-1.449, beta=-2.599, Ep=450.6, emin=10, essc_esyn=1e+04, Fssc_Fsyn=10, GBM=1 "/>
 <use_spectrum frame="galaxy" />
 </spectrum> </source>
 
@@ -5836,7 +5836,7 @@
 
 <source name=" GRB_00972 ">
 <spectrum escale="MeV">
- <SpectrumClass name="GRBobsmanager" params="tstart=45971336, duration=0.9228, peakFlux=1.952, l=-162.8, b=34.81, redshift=5.151, alpha=-0.5787, beta=-2.057, Ep=390.6, emin=10, essc_esyn=1e+04, Fssc_Fsyn=1, GBM=1 "/>
+ <SpectrumClass name="GRBobsmanager" params="tstart=45971336, duration=0.9228, peakFlux=1.952, l=-162.8, b=34.81, redshift=5.151, alpha=-0.5787, beta=-2.057, Ep=390.6, emin=10, essc_esyn=1e+04, Fssc_Fsyn=10, GBM=1 "/>
 <use_spectrum frame="galaxy" />
 </spectrum> </source>
 
@@ -5998,7 +5998,7 @@
 
 <source name=" GRB_00999 ">
 <spectrum escale="MeV">
- <SpectrumClass name="GRBobsmanager" params="tstart=47341617, duration=1.825, peakFlux=1.024, l=104.4, b=26.07, redshift=5.031, alpha=-1.023, beta=-3.355, Ep=581.7, emin=10, essc_esyn=1e+04, Fssc_Fsyn=1, GBM=1 "/>
+ <SpectrumClass name="GRBobsmanager" params="tstart=47341617, duration=1.825, peakFlux=1.024, l=104.4, b=26.07, redshift=5.031, alpha=-1.023, beta=-3.355, Ep=581.7, emin=10, essc_esyn=1e+04, Fssc_Fsyn=10, GBM=1 "/>
 <use_spectrum frame="galaxy" />
 </spectrum> </source>
  
