@@ -1,0 +1,2632 @@
+<!-- $Header -->
+<!-- ************************************************************************** -->
+<source_library title="GRBobs_user_library">
+
+<source name=" GRB_00000 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=1000, duration=1, peakFlux=0.1, theta=0, phi=0, redshift=0, alpha=-1.001, beta=-3.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00001 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=2000, duration=1, peakFlux=0.3162, theta=0, phi=0, redshift=0, alpha=-1.001, beta=-3.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00002 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=3000, duration=1, peakFlux=1, theta=0, phi=0, redshift=0, alpha=-1.001, beta=-3.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00003 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=4000, duration=1, peakFlux=3.162, theta=0, phi=0, redshift=0, alpha=-1.001, beta=-3.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00004 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=5000, duration=1, peakFlux=10, theta=0, phi=0, redshift=0, alpha=-1.001, beta=-3.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00005 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=6000, duration=1, peakFlux=0.1, theta=0, phi=0, redshift=0, alpha=-1.001, beta=-2.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00006 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=7000, duration=1, peakFlux=0.3162, theta=0, phi=0, redshift=0, alpha=-1.001, beta=-2.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00007 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=8000, duration=1, peakFlux=1, theta=0, phi=0, redshift=0, alpha=-1.001, beta=-2.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00008 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=9000, duration=1, peakFlux=3.162, theta=0, phi=0, redshift=0, alpha=-1.001, beta=-2.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00009 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=10000, duration=1, peakFlux=10, theta=0, phi=0, redshift=0, alpha=-1.001, beta=-2.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00010 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=11000, duration=1, peakFlux=0.1, theta=0, phi=0, redshift=0, alpha=-1.001, beta=-2.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00011 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=12000, duration=1, peakFlux=0.3162, theta=0, phi=0, redshift=0, alpha=-1.001, beta=-2.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00012 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=13000, duration=1, peakFlux=1, theta=0, phi=0, redshift=0, alpha=-1.001, beta=-2.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00013 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=14000, duration=1, peakFlux=3.162, theta=0, phi=0, redshift=0, alpha=-1.001, beta=-2.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00014 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=15000, duration=1, peakFlux=10, theta=0, phi=0, redshift=0, alpha=-1.001, beta=-2.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00015 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=16000, duration=1, peakFlux=0.1, theta=0, phi=0, redshift=0, alpha=-1.001, beta=-1.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00016 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=17000, duration=1, peakFlux=0.3162, theta=0, phi=0, redshift=0, alpha=-1.001, beta=-1.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00017 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=18000, duration=1, peakFlux=1, theta=0, phi=0, redshift=0, alpha=-1.001, beta=-1.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00018 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=19000, duration=1, peakFlux=3.162, theta=0, phi=0, redshift=0, alpha=-1.001, beta=-1.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00019 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=20000, duration=1, peakFlux=10, theta=0, phi=0, redshift=0, alpha=-1.001, beta=-1.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00020 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=21000, duration=1, peakFlux=0.1, theta=0, phi=0, redshift=0, alpha=-1.001, beta=-1.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00021 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=22000, duration=1, peakFlux=0.3162, theta=0, phi=0, redshift=0, alpha=-1.001, beta=-1.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00022 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=23000, duration=1, peakFlux=1, theta=0, phi=0, redshift=0, alpha=-1.001, beta=-1.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00023 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=24000, duration=1, peakFlux=3.162, theta=0, phi=0, redshift=0, alpha=-1.001, beta=-1.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00024 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=25000, duration=1, peakFlux=10, theta=0, phi=0, redshift=0, alpha=-1.001, beta=-1.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00025 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=26000, duration=10, peakFlux=0.1, theta=0, phi=0, redshift=0, alpha=-1.001, beta=-3.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00026 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=27000, duration=10, peakFlux=0.3162, theta=0, phi=0, redshift=0, alpha=-1.001, beta=-3.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00027 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=28000, duration=10, peakFlux=1, theta=0, phi=0, redshift=0, alpha=-1.001, beta=-3.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00028 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=29000, duration=10, peakFlux=3.162, theta=0, phi=0, redshift=0, alpha=-1.001, beta=-3.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00029 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=30000, duration=10, peakFlux=10, theta=0, phi=0, redshift=0, alpha=-1.001, beta=-3.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00030 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=31000, duration=10, peakFlux=0.1, theta=0, phi=0, redshift=0, alpha=-1.001, beta=-2.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00031 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=32000, duration=10, peakFlux=0.3162, theta=0, phi=0, redshift=0, alpha=-1.001, beta=-2.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00032 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=33000, duration=10, peakFlux=1, theta=0, phi=0, redshift=0, alpha=-1.001, beta=-2.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00033 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=34000, duration=10, peakFlux=3.162, theta=0, phi=0, redshift=0, alpha=-1.001, beta=-2.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00034 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=35000, duration=10, peakFlux=10, theta=0, phi=0, redshift=0, alpha=-1.001, beta=-2.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00035 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=36000, duration=10, peakFlux=0.1, theta=0, phi=0, redshift=0, alpha=-1.001, beta=-2.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00036 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=37000, duration=10, peakFlux=0.3162, theta=0, phi=0, redshift=0, alpha=-1.001, beta=-2.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00037 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=38000, duration=10, peakFlux=1, theta=0, phi=0, redshift=0, alpha=-1.001, beta=-2.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00038 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=39000, duration=10, peakFlux=3.162, theta=0, phi=0, redshift=0, alpha=-1.001, beta=-2.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00039 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=40000, duration=10, peakFlux=10, theta=0, phi=0, redshift=0, alpha=-1.001, beta=-2.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00040 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=41000, duration=10, peakFlux=0.1, theta=0, phi=0, redshift=0, alpha=-1.001, beta=-1.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00041 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=42000, duration=10, peakFlux=0.3162, theta=0, phi=0, redshift=0, alpha=-1.001, beta=-1.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00042 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=43000, duration=10, peakFlux=1, theta=0, phi=0, redshift=0, alpha=-1.001, beta=-1.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00043 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=44000, duration=10, peakFlux=3.162, theta=0, phi=0, redshift=0, alpha=-1.001, beta=-1.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00044 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=45000, duration=10, peakFlux=10, theta=0, phi=0, redshift=0, alpha=-1.001, beta=-1.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00045 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=46000, duration=10, peakFlux=0.1, theta=0, phi=0, redshift=0, alpha=-1.001, beta=-1.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00046 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=47000, duration=10, peakFlux=0.3162, theta=0, phi=0, redshift=0, alpha=-1.001, beta=-1.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00047 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=48000, duration=10, peakFlux=1, theta=0, phi=0, redshift=0, alpha=-1.001, beta=-1.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00048 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=49000, duration=10, peakFlux=3.162, theta=0, phi=0, redshift=0, alpha=-1.001, beta=-1.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00049 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=50000, duration=10, peakFlux=10, theta=0, phi=0, redshift=0, alpha=-1.001, beta=-1.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00050 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=51000, duration=100, peakFlux=0.1, theta=0, phi=0, redshift=0, alpha=-1.001, beta=-3.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00051 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=52000, duration=100, peakFlux=0.3162, theta=0, phi=0, redshift=0, alpha=-1.001, beta=-3.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00052 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=53000, duration=100, peakFlux=1, theta=0, phi=0, redshift=0, alpha=-1.001, beta=-3.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00053 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=54000, duration=100, peakFlux=3.162, theta=0, phi=0, redshift=0, alpha=-1.001, beta=-3.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00054 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=55000, duration=100, peakFlux=10, theta=0, phi=0, redshift=0, alpha=-1.001, beta=-3.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00055 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=56000, duration=100, peakFlux=0.1, theta=0, phi=0, redshift=0, alpha=-1.001, beta=-2.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00056 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=57000, duration=100, peakFlux=0.3162, theta=0, phi=0, redshift=0, alpha=-1.001, beta=-2.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00057 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=58000, duration=100, peakFlux=1, theta=0, phi=0, redshift=0, alpha=-1.001, beta=-2.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00058 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=59000, duration=100, peakFlux=3.162, theta=0, phi=0, redshift=0, alpha=-1.001, beta=-2.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00059 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=60000, duration=100, peakFlux=10, theta=0, phi=0, redshift=0, alpha=-1.001, beta=-2.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00060 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=61000, duration=100, peakFlux=0.1, theta=0, phi=0, redshift=0, alpha=-1.001, beta=-2.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00061 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=62000, duration=100, peakFlux=0.3162, theta=0, phi=0, redshift=0, alpha=-1.001, beta=-2.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00062 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=63000, duration=100, peakFlux=1, theta=0, phi=0, redshift=0, alpha=-1.001, beta=-2.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00063 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=64000, duration=100, peakFlux=3.162, theta=0, phi=0, redshift=0, alpha=-1.001, beta=-2.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00064 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=65000, duration=100, peakFlux=10, theta=0, phi=0, redshift=0, alpha=-1.001, beta=-2.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00065 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=66000, duration=100, peakFlux=0.1, theta=0, phi=0, redshift=0, alpha=-1.001, beta=-1.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00066 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=67000, duration=100, peakFlux=0.3162, theta=0, phi=0, redshift=0, alpha=-1.001, beta=-1.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00067 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=68000, duration=100, peakFlux=1, theta=0, phi=0, redshift=0, alpha=-1.001, beta=-1.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00068 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=69000, duration=100, peakFlux=3.162, theta=0, phi=0, redshift=0, alpha=-1.001, beta=-1.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00069 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=70000, duration=100, peakFlux=10, theta=0, phi=0, redshift=0, alpha=-1.001, beta=-1.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00070 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=71000, duration=100, peakFlux=0.1, theta=0, phi=0, redshift=0, alpha=-1.001, beta=-1.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00071 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=72000, duration=100, peakFlux=0.3162, theta=0, phi=0, redshift=0, alpha=-1.001, beta=-1.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00072 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=73000, duration=100, peakFlux=1, theta=0, phi=0, redshift=0, alpha=-1.001, beta=-1.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00073 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=74000, duration=100, peakFlux=3.162, theta=0, phi=0, redshift=0, alpha=-1.001, beta=-1.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00074 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=75000, duration=100, peakFlux=10, theta=0, phi=0, redshift=0, alpha=-1.001, beta=-1.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00075 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=76000, duration=1, peakFlux=0.1, theta=22.5, phi=0, redshift=0, alpha=-1.001, beta=-3.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00076 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=77000, duration=1, peakFlux=0.3162, theta=22.5, phi=0, redshift=0, alpha=-1.001, beta=-3.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00077 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=78000, duration=1, peakFlux=1, theta=22.5, phi=0, redshift=0, alpha=-1.001, beta=-3.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00078 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=79000, duration=1, peakFlux=3.162, theta=22.5, phi=0, redshift=0, alpha=-1.001, beta=-3.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00079 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=80000, duration=1, peakFlux=10, theta=22.5, phi=0, redshift=0, alpha=-1.001, beta=-3.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00080 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=81000, duration=1, peakFlux=0.1, theta=22.5, phi=0, redshift=0, alpha=-1.001, beta=-2.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00081 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=82000, duration=1, peakFlux=0.3162, theta=22.5, phi=0, redshift=0, alpha=-1.001, beta=-2.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00082 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=83000, duration=1, peakFlux=1, theta=22.5, phi=0, redshift=0, alpha=-1.001, beta=-2.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00083 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=84000, duration=1, peakFlux=3.162, theta=22.5, phi=0, redshift=0, alpha=-1.001, beta=-2.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00084 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=85000, duration=1, peakFlux=10, theta=22.5, phi=0, redshift=0, alpha=-1.001, beta=-2.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00085 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=86000, duration=1, peakFlux=0.1, theta=22.5, phi=0, redshift=0, alpha=-1.001, beta=-2.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00086 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=87000, duration=1, peakFlux=0.3162, theta=22.5, phi=0, redshift=0, alpha=-1.001, beta=-2.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00087 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=88000, duration=1, peakFlux=1, theta=22.5, phi=0, redshift=0, alpha=-1.001, beta=-2.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00088 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=89000, duration=1, peakFlux=3.162, theta=22.5, phi=0, redshift=0, alpha=-1.001, beta=-2.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00089 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=90000, duration=1, peakFlux=10, theta=22.5, phi=0, redshift=0, alpha=-1.001, beta=-2.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00090 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=91000, duration=1, peakFlux=0.1, theta=22.5, phi=0, redshift=0, alpha=-1.001, beta=-1.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00091 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=92000, duration=1, peakFlux=0.3162, theta=22.5, phi=0, redshift=0, alpha=-1.001, beta=-1.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00092 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=93000, duration=1, peakFlux=1, theta=22.5, phi=0, redshift=0, alpha=-1.001, beta=-1.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00093 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=94000, duration=1, peakFlux=3.162, theta=22.5, phi=0, redshift=0, alpha=-1.001, beta=-1.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00094 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=95000, duration=1, peakFlux=10, theta=22.5, phi=0, redshift=0, alpha=-1.001, beta=-1.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00095 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=96000, duration=1, peakFlux=0.1, theta=22.5, phi=0, redshift=0, alpha=-1.001, beta=-1.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00096 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=97000, duration=1, peakFlux=0.3162, theta=22.5, phi=0, redshift=0, alpha=-1.001, beta=-1.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00097 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=98000, duration=1, peakFlux=1, theta=22.5, phi=0, redshift=0, alpha=-1.001, beta=-1.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00098 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=99000, duration=1, peakFlux=3.162, theta=22.5, phi=0, redshift=0, alpha=-1.001, beta=-1.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00099 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=100000, duration=1, peakFlux=10, theta=22.5, phi=0, redshift=0, alpha=-1.001, beta=-1.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00100 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=101000, duration=10, peakFlux=0.1, theta=22.5, phi=0, redshift=0, alpha=-1.001, beta=-3.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00101 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=102000, duration=10, peakFlux=0.3162, theta=22.5, phi=0, redshift=0, alpha=-1.001, beta=-3.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00102 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=103000, duration=10, peakFlux=1, theta=22.5, phi=0, redshift=0, alpha=-1.001, beta=-3.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00103 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=104000, duration=10, peakFlux=3.162, theta=22.5, phi=0, redshift=0, alpha=-1.001, beta=-3.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00104 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=105000, duration=10, peakFlux=10, theta=22.5, phi=0, redshift=0, alpha=-1.001, beta=-3.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00105 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=106000, duration=10, peakFlux=0.1, theta=22.5, phi=0, redshift=0, alpha=-1.001, beta=-2.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00106 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=107000, duration=10, peakFlux=0.3162, theta=22.5, phi=0, redshift=0, alpha=-1.001, beta=-2.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00107 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=108000, duration=10, peakFlux=1, theta=22.5, phi=0, redshift=0, alpha=-1.001, beta=-2.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00108 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=109000, duration=10, peakFlux=3.162, theta=22.5, phi=0, redshift=0, alpha=-1.001, beta=-2.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00109 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=110000, duration=10, peakFlux=10, theta=22.5, phi=0, redshift=0, alpha=-1.001, beta=-2.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00110 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=111000, duration=10, peakFlux=0.1, theta=22.5, phi=0, redshift=0, alpha=-1.001, beta=-2.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00111 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=112000, duration=10, peakFlux=0.3162, theta=22.5, phi=0, redshift=0, alpha=-1.001, beta=-2.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00112 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=113000, duration=10, peakFlux=1, theta=22.5, phi=0, redshift=0, alpha=-1.001, beta=-2.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00113 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=114000, duration=10, peakFlux=3.162, theta=22.5, phi=0, redshift=0, alpha=-1.001, beta=-2.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00114 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=115000, duration=10, peakFlux=10, theta=22.5, phi=0, redshift=0, alpha=-1.001, beta=-2.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00115 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=116000, duration=10, peakFlux=0.1, theta=22.5, phi=0, redshift=0, alpha=-1.001, beta=-1.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00116 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=117000, duration=10, peakFlux=0.3162, theta=22.5, phi=0, redshift=0, alpha=-1.001, beta=-1.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00117 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=118000, duration=10, peakFlux=1, theta=22.5, phi=0, redshift=0, alpha=-1.001, beta=-1.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00118 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=119000, duration=10, peakFlux=3.162, theta=22.5, phi=0, redshift=0, alpha=-1.001, beta=-1.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00119 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=120000, duration=10, peakFlux=10, theta=22.5, phi=0, redshift=0, alpha=-1.001, beta=-1.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00120 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=121000, duration=10, peakFlux=0.1, theta=22.5, phi=0, redshift=0, alpha=-1.001, beta=-1.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00121 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=122000, duration=10, peakFlux=0.3162, theta=22.5, phi=0, redshift=0, alpha=-1.001, beta=-1.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00122 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=123000, duration=10, peakFlux=1, theta=22.5, phi=0, redshift=0, alpha=-1.001, beta=-1.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00123 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=124000, duration=10, peakFlux=3.162, theta=22.5, phi=0, redshift=0, alpha=-1.001, beta=-1.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00124 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=125000, duration=10, peakFlux=10, theta=22.5, phi=0, redshift=0, alpha=-1.001, beta=-1.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00125 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=126000, duration=100, peakFlux=0.1, theta=22.5, phi=0, redshift=0, alpha=-1.001, beta=-3.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00126 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=127000, duration=100, peakFlux=0.3162, theta=22.5, phi=0, redshift=0, alpha=-1.001, beta=-3.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00127 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=128000, duration=100, peakFlux=1, theta=22.5, phi=0, redshift=0, alpha=-1.001, beta=-3.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00128 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=129000, duration=100, peakFlux=3.162, theta=22.5, phi=0, redshift=0, alpha=-1.001, beta=-3.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00129 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=130000, duration=100, peakFlux=10, theta=22.5, phi=0, redshift=0, alpha=-1.001, beta=-3.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00130 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=131000, duration=100, peakFlux=0.1, theta=22.5, phi=0, redshift=0, alpha=-1.001, beta=-2.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00131 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=132000, duration=100, peakFlux=0.3162, theta=22.5, phi=0, redshift=0, alpha=-1.001, beta=-2.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00132 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=133000, duration=100, peakFlux=1, theta=22.5, phi=0, redshift=0, alpha=-1.001, beta=-2.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00133 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=134000, duration=100, peakFlux=3.162, theta=22.5, phi=0, redshift=0, alpha=-1.001, beta=-2.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00134 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=135000, duration=100, peakFlux=10, theta=22.5, phi=0, redshift=0, alpha=-1.001, beta=-2.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00135 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=136000, duration=100, peakFlux=0.1, theta=22.5, phi=0, redshift=0, alpha=-1.001, beta=-2.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00136 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=137000, duration=100, peakFlux=0.3162, theta=22.5, phi=0, redshift=0, alpha=-1.001, beta=-2.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00137 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=138000, duration=100, peakFlux=1, theta=22.5, phi=0, redshift=0, alpha=-1.001, beta=-2.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00138 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=139000, duration=100, peakFlux=3.162, theta=22.5, phi=0, redshift=0, alpha=-1.001, beta=-2.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00139 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=140000, duration=100, peakFlux=10, theta=22.5, phi=0, redshift=0, alpha=-1.001, beta=-2.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00140 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=141000, duration=100, peakFlux=0.1, theta=22.5, phi=0, redshift=0, alpha=-1.001, beta=-1.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00141 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=142000, duration=100, peakFlux=0.3162, theta=22.5, phi=0, redshift=0, alpha=-1.001, beta=-1.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00142 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=143000, duration=100, peakFlux=1, theta=22.5, phi=0, redshift=0, alpha=-1.001, beta=-1.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00143 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=144000, duration=100, peakFlux=3.162, theta=22.5, phi=0, redshift=0, alpha=-1.001, beta=-1.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00144 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=145000, duration=100, peakFlux=10, theta=22.5, phi=0, redshift=0, alpha=-1.001, beta=-1.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00145 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=146000, duration=100, peakFlux=0.1, theta=22.5, phi=0, redshift=0, alpha=-1.001, beta=-1.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00146 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=147000, duration=100, peakFlux=0.3162, theta=22.5, phi=0, redshift=0, alpha=-1.001, beta=-1.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00147 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=148000, duration=100, peakFlux=1, theta=22.5, phi=0, redshift=0, alpha=-1.001, beta=-1.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00148 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=149000, duration=100, peakFlux=3.162, theta=22.5, phi=0, redshift=0, alpha=-1.001, beta=-1.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00149 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=150000, duration=100, peakFlux=10, theta=22.5, phi=0, redshift=0, alpha=-1.001, beta=-1.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00150 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=151000, duration=1, peakFlux=0.1, theta=45, phi=0, redshift=0, alpha=-1.001, beta=-3.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00151 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=152000, duration=1, peakFlux=0.3162, theta=45, phi=0, redshift=0, alpha=-1.001, beta=-3.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00152 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=153000, duration=1, peakFlux=1, theta=45, phi=0, redshift=0, alpha=-1.001, beta=-3.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00153 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=154000, duration=1, peakFlux=3.162, theta=45, phi=0, redshift=0, alpha=-1.001, beta=-3.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00154 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=155000, duration=1, peakFlux=10, theta=45, phi=0, redshift=0, alpha=-1.001, beta=-3.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00155 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=156000, duration=1, peakFlux=0.1, theta=45, phi=0, redshift=0, alpha=-1.001, beta=-2.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00156 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=157000, duration=1, peakFlux=0.3162, theta=45, phi=0, redshift=0, alpha=-1.001, beta=-2.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00157 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=158000, duration=1, peakFlux=1, theta=45, phi=0, redshift=0, alpha=-1.001, beta=-2.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00158 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=159000, duration=1, peakFlux=3.162, theta=45, phi=0, redshift=0, alpha=-1.001, beta=-2.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00159 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=160000, duration=1, peakFlux=10, theta=45, phi=0, redshift=0, alpha=-1.001, beta=-2.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00160 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=161000, duration=1, peakFlux=0.1, theta=45, phi=0, redshift=0, alpha=-1.001, beta=-2.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00161 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=162000, duration=1, peakFlux=0.3162, theta=45, phi=0, redshift=0, alpha=-1.001, beta=-2.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00162 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=163000, duration=1, peakFlux=1, theta=45, phi=0, redshift=0, alpha=-1.001, beta=-2.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00163 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=164000, duration=1, peakFlux=3.162, theta=45, phi=0, redshift=0, alpha=-1.001, beta=-2.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00164 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=165000, duration=1, peakFlux=10, theta=45, phi=0, redshift=0, alpha=-1.001, beta=-2.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00165 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=166000, duration=1, peakFlux=0.1, theta=45, phi=0, redshift=0, alpha=-1.001, beta=-1.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00166 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=167000, duration=1, peakFlux=0.3162, theta=45, phi=0, redshift=0, alpha=-1.001, beta=-1.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00167 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=168000, duration=1, peakFlux=1, theta=45, phi=0, redshift=0, alpha=-1.001, beta=-1.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00168 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=169000, duration=1, peakFlux=3.162, theta=45, phi=0, redshift=0, alpha=-1.001, beta=-1.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00169 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=170000, duration=1, peakFlux=10, theta=45, phi=0, redshift=0, alpha=-1.001, beta=-1.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00170 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=171000, duration=1, peakFlux=0.1, theta=45, phi=0, redshift=0, alpha=-1.001, beta=-1.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00171 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=172000, duration=1, peakFlux=0.3162, theta=45, phi=0, redshift=0, alpha=-1.001, beta=-1.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00172 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=173000, duration=1, peakFlux=1, theta=45, phi=0, redshift=0, alpha=-1.001, beta=-1.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00173 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=174000, duration=1, peakFlux=3.162, theta=45, phi=0, redshift=0, alpha=-1.001, beta=-1.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00174 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=175000, duration=1, peakFlux=10, theta=45, phi=0, redshift=0, alpha=-1.001, beta=-1.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00175 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=176000, duration=10, peakFlux=0.1, theta=45, phi=0, redshift=0, alpha=-1.001, beta=-3.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00176 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=177000, duration=10, peakFlux=0.3162, theta=45, phi=0, redshift=0, alpha=-1.001, beta=-3.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00177 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=178000, duration=10, peakFlux=1, theta=45, phi=0, redshift=0, alpha=-1.001, beta=-3.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00178 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=179000, duration=10, peakFlux=3.162, theta=45, phi=0, redshift=0, alpha=-1.001, beta=-3.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00179 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=180000, duration=10, peakFlux=10, theta=45, phi=0, redshift=0, alpha=-1.001, beta=-3.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00180 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=181000, duration=10, peakFlux=0.1, theta=45, phi=0, redshift=0, alpha=-1.001, beta=-2.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00181 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=182000, duration=10, peakFlux=0.3162, theta=45, phi=0, redshift=0, alpha=-1.001, beta=-2.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00182 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=183000, duration=10, peakFlux=1, theta=45, phi=0, redshift=0, alpha=-1.001, beta=-2.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00183 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=184000, duration=10, peakFlux=3.162, theta=45, phi=0, redshift=0, alpha=-1.001, beta=-2.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00184 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=185000, duration=10, peakFlux=10, theta=45, phi=0, redshift=0, alpha=-1.001, beta=-2.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00185 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=186000, duration=10, peakFlux=0.1, theta=45, phi=0, redshift=0, alpha=-1.001, beta=-2.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00186 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=187000, duration=10, peakFlux=0.3162, theta=45, phi=0, redshift=0, alpha=-1.001, beta=-2.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00187 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=188000, duration=10, peakFlux=1, theta=45, phi=0, redshift=0, alpha=-1.001, beta=-2.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00188 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=189000, duration=10, peakFlux=3.162, theta=45, phi=0, redshift=0, alpha=-1.001, beta=-2.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00189 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=190000, duration=10, peakFlux=10, theta=45, phi=0, redshift=0, alpha=-1.001, beta=-2.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00190 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=191000, duration=10, peakFlux=0.1, theta=45, phi=0, redshift=0, alpha=-1.001, beta=-1.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00191 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=192000, duration=10, peakFlux=0.3162, theta=45, phi=0, redshift=0, alpha=-1.001, beta=-1.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00192 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=193000, duration=10, peakFlux=1, theta=45, phi=0, redshift=0, alpha=-1.001, beta=-1.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00193 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=194000, duration=10, peakFlux=3.162, theta=45, phi=0, redshift=0, alpha=-1.001, beta=-1.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00194 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=195000, duration=10, peakFlux=10, theta=45, phi=0, redshift=0, alpha=-1.001, beta=-1.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00195 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=196000, duration=10, peakFlux=0.1, theta=45, phi=0, redshift=0, alpha=-1.001, beta=-1.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00196 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=197000, duration=10, peakFlux=0.3162, theta=45, phi=0, redshift=0, alpha=-1.001, beta=-1.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00197 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=198000, duration=10, peakFlux=1, theta=45, phi=0, redshift=0, alpha=-1.001, beta=-1.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00198 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=199000, duration=10, peakFlux=3.162, theta=45, phi=0, redshift=0, alpha=-1.001, beta=-1.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00199 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=200000, duration=10, peakFlux=10, theta=45, phi=0, redshift=0, alpha=-1.001, beta=-1.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00200 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=201000, duration=100, peakFlux=0.1, theta=45, phi=0, redshift=0, alpha=-1.001, beta=-3.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00201 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=202000, duration=100, peakFlux=0.3162, theta=45, phi=0, redshift=0, alpha=-1.001, beta=-3.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00202 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=203000, duration=100, peakFlux=1, theta=45, phi=0, redshift=0, alpha=-1.001, beta=-3.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00203 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=204000, duration=100, peakFlux=3.162, theta=45, phi=0, redshift=0, alpha=-1.001, beta=-3.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00204 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=205000, duration=100, peakFlux=10, theta=45, phi=0, redshift=0, alpha=-1.001, beta=-3.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00205 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=206000, duration=100, peakFlux=0.1, theta=45, phi=0, redshift=0, alpha=-1.001, beta=-2.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00206 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=207000, duration=100, peakFlux=0.3162, theta=45, phi=0, redshift=0, alpha=-1.001, beta=-2.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00207 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=208000, duration=100, peakFlux=1, theta=45, phi=0, redshift=0, alpha=-1.001, beta=-2.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00208 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=209000, duration=100, peakFlux=3.162, theta=45, phi=0, redshift=0, alpha=-1.001, beta=-2.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00209 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=210000, duration=100, peakFlux=10, theta=45, phi=0, redshift=0, alpha=-1.001, beta=-2.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00210 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=211000, duration=100, peakFlux=0.1, theta=45, phi=0, redshift=0, alpha=-1.001, beta=-2.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00211 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=212000, duration=100, peakFlux=0.3162, theta=45, phi=0, redshift=0, alpha=-1.001, beta=-2.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00212 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=213000, duration=100, peakFlux=1, theta=45, phi=0, redshift=0, alpha=-1.001, beta=-2.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00213 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=214000, duration=100, peakFlux=3.162, theta=45, phi=0, redshift=0, alpha=-1.001, beta=-2.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00214 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=215000, duration=100, peakFlux=10, theta=45, phi=0, redshift=0, alpha=-1.001, beta=-2.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00215 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=216000, duration=100, peakFlux=0.1, theta=45, phi=0, redshift=0, alpha=-1.001, beta=-1.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00216 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=217000, duration=100, peakFlux=0.3162, theta=45, phi=0, redshift=0, alpha=-1.001, beta=-1.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00217 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=218000, duration=100, peakFlux=1, theta=45, phi=0, redshift=0, alpha=-1.001, beta=-1.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00218 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=219000, duration=100, peakFlux=3.162, theta=45, phi=0, redshift=0, alpha=-1.001, beta=-1.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00219 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=220000, duration=100, peakFlux=10, theta=45, phi=0, redshift=0, alpha=-1.001, beta=-1.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00220 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=221000, duration=100, peakFlux=0.1, theta=45, phi=0, redshift=0, alpha=-1.001, beta=-1.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00221 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=222000, duration=100, peakFlux=0.3162, theta=45, phi=0, redshift=0, alpha=-1.001, beta=-1.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00222 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=223000, duration=100, peakFlux=1, theta=45, phi=0, redshift=0, alpha=-1.001, beta=-1.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00223 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=224000, duration=100, peakFlux=3.162, theta=45, phi=0, redshift=0, alpha=-1.001, beta=-1.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00224 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=225000, duration=100, peakFlux=10, theta=45, phi=0, redshift=0, alpha=-1.001, beta=-1.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00225 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=226000, duration=1, peakFlux=0.1, theta=67.5, phi=0, redshift=0, alpha=-1.001, beta=-3.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00226 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=227000, duration=1, peakFlux=0.3162, theta=67.5, phi=0, redshift=0, alpha=-1.001, beta=-3.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00227 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=228000, duration=1, peakFlux=1, theta=67.5, phi=0, redshift=0, alpha=-1.001, beta=-3.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00228 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=229000, duration=1, peakFlux=3.162, theta=67.5, phi=0, redshift=0, alpha=-1.001, beta=-3.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00229 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=230000, duration=1, peakFlux=10, theta=67.5, phi=0, redshift=0, alpha=-1.001, beta=-3.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00230 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=231000, duration=1, peakFlux=0.1, theta=67.5, phi=0, redshift=0, alpha=-1.001, beta=-2.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00231 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=232000, duration=1, peakFlux=0.3162, theta=67.5, phi=0, redshift=0, alpha=-1.001, beta=-2.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00232 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=233000, duration=1, peakFlux=1, theta=67.5, phi=0, redshift=0, alpha=-1.001, beta=-2.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00233 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=234000, duration=1, peakFlux=3.162, theta=67.5, phi=0, redshift=0, alpha=-1.001, beta=-2.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00234 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=235000, duration=1, peakFlux=10, theta=67.5, phi=0, redshift=0, alpha=-1.001, beta=-2.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00235 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=236000, duration=1, peakFlux=0.1, theta=67.5, phi=0, redshift=0, alpha=-1.001, beta=-2.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00236 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=237000, duration=1, peakFlux=0.3162, theta=67.5, phi=0, redshift=0, alpha=-1.001, beta=-2.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00237 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=238000, duration=1, peakFlux=1, theta=67.5, phi=0, redshift=0, alpha=-1.001, beta=-2.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00238 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=239000, duration=1, peakFlux=3.162, theta=67.5, phi=0, redshift=0, alpha=-1.001, beta=-2.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00239 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=240000, duration=1, peakFlux=10, theta=67.5, phi=0, redshift=0, alpha=-1.001, beta=-2.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00240 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=241000, duration=1, peakFlux=0.1, theta=67.5, phi=0, redshift=0, alpha=-1.001, beta=-1.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00241 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=242000, duration=1, peakFlux=0.3162, theta=67.5, phi=0, redshift=0, alpha=-1.001, beta=-1.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00242 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=243000, duration=1, peakFlux=1, theta=67.5, phi=0, redshift=0, alpha=-1.001, beta=-1.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00243 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=244000, duration=1, peakFlux=3.162, theta=67.5, phi=0, redshift=0, alpha=-1.001, beta=-1.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00244 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=245000, duration=1, peakFlux=10, theta=67.5, phi=0, redshift=0, alpha=-1.001, beta=-1.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00245 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=246000, duration=1, peakFlux=0.1, theta=67.5, phi=0, redshift=0, alpha=-1.001, beta=-1.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00246 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=247000, duration=1, peakFlux=0.3162, theta=67.5, phi=0, redshift=0, alpha=-1.001, beta=-1.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00247 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=248000, duration=1, peakFlux=1, theta=67.5, phi=0, redshift=0, alpha=-1.001, beta=-1.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00248 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=249000, duration=1, peakFlux=3.162, theta=67.5, phi=0, redshift=0, alpha=-1.001, beta=-1.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00249 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=250000, duration=1, peakFlux=10, theta=67.5, phi=0, redshift=0, alpha=-1.001, beta=-1.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00250 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=251000, duration=10, peakFlux=0.1, theta=67.5, phi=0, redshift=0, alpha=-1.001, beta=-3.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00251 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=252000, duration=10, peakFlux=0.3162, theta=67.5, phi=0, redshift=0, alpha=-1.001, beta=-3.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00252 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=253000, duration=10, peakFlux=1, theta=67.5, phi=0, redshift=0, alpha=-1.001, beta=-3.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00253 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=254000, duration=10, peakFlux=3.162, theta=67.5, phi=0, redshift=0, alpha=-1.001, beta=-3.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00254 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=255000, duration=10, peakFlux=10, theta=67.5, phi=0, redshift=0, alpha=-1.001, beta=-3.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00255 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=256000, duration=10, peakFlux=0.1, theta=67.5, phi=0, redshift=0, alpha=-1.001, beta=-2.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00256 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=257000, duration=10, peakFlux=0.3162, theta=67.5, phi=0, redshift=0, alpha=-1.001, beta=-2.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00257 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=258000, duration=10, peakFlux=1, theta=67.5, phi=0, redshift=0, alpha=-1.001, beta=-2.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00258 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=259000, duration=10, peakFlux=3.162, theta=67.5, phi=0, redshift=0, alpha=-1.001, beta=-2.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00259 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=260000, duration=10, peakFlux=10, theta=67.5, phi=0, redshift=0, alpha=-1.001, beta=-2.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00260 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=261000, duration=10, peakFlux=0.1, theta=67.5, phi=0, redshift=0, alpha=-1.001, beta=-2.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00261 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=262000, duration=10, peakFlux=0.3162, theta=67.5, phi=0, redshift=0, alpha=-1.001, beta=-2.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00262 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=263000, duration=10, peakFlux=1, theta=67.5, phi=0, redshift=0, alpha=-1.001, beta=-2.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00263 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=264000, duration=10, peakFlux=3.162, theta=67.5, phi=0, redshift=0, alpha=-1.001, beta=-2.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00264 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=265000, duration=10, peakFlux=10, theta=67.5, phi=0, redshift=0, alpha=-1.001, beta=-2.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00265 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=266000, duration=10, peakFlux=0.1, theta=67.5, phi=0, redshift=0, alpha=-1.001, beta=-1.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00266 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=267000, duration=10, peakFlux=0.3162, theta=67.5, phi=0, redshift=0, alpha=-1.001, beta=-1.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00267 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=268000, duration=10, peakFlux=1, theta=67.5, phi=0, redshift=0, alpha=-1.001, beta=-1.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00268 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=269000, duration=10, peakFlux=3.162, theta=67.5, phi=0, redshift=0, alpha=-1.001, beta=-1.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00269 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=270000, duration=10, peakFlux=10, theta=67.5, phi=0, redshift=0, alpha=-1.001, beta=-1.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00270 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=271000, duration=10, peakFlux=0.1, theta=67.5, phi=0, redshift=0, alpha=-1.001, beta=-1.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00271 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=272000, duration=10, peakFlux=0.3162, theta=67.5, phi=0, redshift=0, alpha=-1.001, beta=-1.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00272 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=273000, duration=10, peakFlux=1, theta=67.5, phi=0, redshift=0, alpha=-1.001, beta=-1.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00273 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=274000, duration=10, peakFlux=3.162, theta=67.5, phi=0, redshift=0, alpha=-1.001, beta=-1.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00274 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=275000, duration=10, peakFlux=10, theta=67.5, phi=0, redshift=0, alpha=-1.001, beta=-1.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00275 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=276000, duration=100, peakFlux=0.1, theta=67.5, phi=0, redshift=0, alpha=-1.001, beta=-3.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00276 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=277000, duration=100, peakFlux=0.3162, theta=67.5, phi=0, redshift=0, alpha=-1.001, beta=-3.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00277 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=278000, duration=100, peakFlux=1, theta=67.5, phi=0, redshift=0, alpha=-1.001, beta=-3.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00278 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=279000, duration=100, peakFlux=3.162, theta=67.5, phi=0, redshift=0, alpha=-1.001, beta=-3.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00279 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=280000, duration=100, peakFlux=10, theta=67.5, phi=0, redshift=0, alpha=-1.001, beta=-3.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00280 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=281000, duration=100, peakFlux=0.1, theta=67.5, phi=0, redshift=0, alpha=-1.001, beta=-2.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00281 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=282000, duration=100, peakFlux=0.3162, theta=67.5, phi=0, redshift=0, alpha=-1.001, beta=-2.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00282 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=283000, duration=100, peakFlux=1, theta=67.5, phi=0, redshift=0, alpha=-1.001, beta=-2.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00283 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=284000, duration=100, peakFlux=3.162, theta=67.5, phi=0, redshift=0, alpha=-1.001, beta=-2.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00284 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=285000, duration=100, peakFlux=10, theta=67.5, phi=0, redshift=0, alpha=-1.001, beta=-2.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00285 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=286000, duration=100, peakFlux=0.1, theta=67.5, phi=0, redshift=0, alpha=-1.001, beta=-2.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00286 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=287000, duration=100, peakFlux=0.3162, theta=67.5, phi=0, redshift=0, alpha=-1.001, beta=-2.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00287 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=288000, duration=100, peakFlux=1, theta=67.5, phi=0, redshift=0, alpha=-1.001, beta=-2.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00288 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=289000, duration=100, peakFlux=3.162, theta=67.5, phi=0, redshift=0, alpha=-1.001, beta=-2.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00289 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=290000, duration=100, peakFlux=10, theta=67.5, phi=0, redshift=0, alpha=-1.001, beta=-2.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00290 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=291000, duration=100, peakFlux=0.1, theta=67.5, phi=0, redshift=0, alpha=-1.001, beta=-1.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00291 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=292000, duration=100, peakFlux=0.3162, theta=67.5, phi=0, redshift=0, alpha=-1.001, beta=-1.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00292 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=293000, duration=100, peakFlux=1, theta=67.5, phi=0, redshift=0, alpha=-1.001, beta=-1.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00293 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=294000, duration=100, peakFlux=3.162, theta=67.5, phi=0, redshift=0, alpha=-1.001, beta=-1.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00294 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=295000, duration=100, peakFlux=10, theta=67.5, phi=0, redshift=0, alpha=-1.001, beta=-1.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00295 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=296000, duration=100, peakFlux=0.1, theta=67.5, phi=0, redshift=0, alpha=-1.001, beta=-1.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00296 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=297000, duration=100, peakFlux=0.3162, theta=67.5, phi=0, redshift=0, alpha=-1.001, beta=-1.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00297 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=298000, duration=100, peakFlux=1, theta=67.5, phi=0, redshift=0, alpha=-1.001, beta=-1.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00298 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=299000, duration=100, peakFlux=3.162, theta=67.5, phi=0, redshift=0, alpha=-1.001, beta=-1.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00299 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=300000, duration=100, peakFlux=10, theta=67.5, phi=0, redshift=0, alpha=-1.001, beta=-1.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00300 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=301000, duration=1, peakFlux=0.1, theta=90, phi=0, redshift=0, alpha=-1.001, beta=-3.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00301 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=302000, duration=1, peakFlux=0.3162, theta=90, phi=0, redshift=0, alpha=-1.001, beta=-3.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00302 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=303000, duration=1, peakFlux=1, theta=90, phi=0, redshift=0, alpha=-1.001, beta=-3.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00303 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=304000, duration=1, peakFlux=3.162, theta=90, phi=0, redshift=0, alpha=-1.001, beta=-3.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00304 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=305000, duration=1, peakFlux=10, theta=90, phi=0, redshift=0, alpha=-1.001, beta=-3.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00305 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=306000, duration=1, peakFlux=0.1, theta=90, phi=0, redshift=0, alpha=-1.001, beta=-2.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00306 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=307000, duration=1, peakFlux=0.3162, theta=90, phi=0, redshift=0, alpha=-1.001, beta=-2.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00307 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=308000, duration=1, peakFlux=1, theta=90, phi=0, redshift=0, alpha=-1.001, beta=-2.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00308 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=309000, duration=1, peakFlux=3.162, theta=90, phi=0, redshift=0, alpha=-1.001, beta=-2.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00309 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=310000, duration=1, peakFlux=10, theta=90, phi=0, redshift=0, alpha=-1.001, beta=-2.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00310 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=311000, duration=1, peakFlux=0.1, theta=90, phi=0, redshift=0, alpha=-1.001, beta=-2.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00311 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=312000, duration=1, peakFlux=0.3162, theta=90, phi=0, redshift=0, alpha=-1.001, beta=-2.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00312 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=313000, duration=1, peakFlux=1, theta=90, phi=0, redshift=0, alpha=-1.001, beta=-2.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00313 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=314000, duration=1, peakFlux=3.162, theta=90, phi=0, redshift=0, alpha=-1.001, beta=-2.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00314 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=315000, duration=1, peakFlux=10, theta=90, phi=0, redshift=0, alpha=-1.001, beta=-2.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00315 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=316000, duration=1, peakFlux=0.1, theta=90, phi=0, redshift=0, alpha=-1.001, beta=-1.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00316 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=317000, duration=1, peakFlux=0.3162, theta=90, phi=0, redshift=0, alpha=-1.001, beta=-1.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00317 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=318000, duration=1, peakFlux=1, theta=90, phi=0, redshift=0, alpha=-1.001, beta=-1.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00318 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=319000, duration=1, peakFlux=3.162, theta=90, phi=0, redshift=0, alpha=-1.001, beta=-1.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00319 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=320000, duration=1, peakFlux=10, theta=90, phi=0, redshift=0, alpha=-1.001, beta=-1.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00320 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=321000, duration=1, peakFlux=0.1, theta=90, phi=0, redshift=0, alpha=-1.001, beta=-1.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00321 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=322000, duration=1, peakFlux=0.3162, theta=90, phi=0, redshift=0, alpha=-1.001, beta=-1.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00322 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=323000, duration=1, peakFlux=1, theta=90, phi=0, redshift=0, alpha=-1.001, beta=-1.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00323 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=324000, duration=1, peakFlux=3.162, theta=90, phi=0, redshift=0, alpha=-1.001, beta=-1.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00324 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=325000, duration=1, peakFlux=10, theta=90, phi=0, redshift=0, alpha=-1.001, beta=-1.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00325 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=326000, duration=10, peakFlux=0.1, theta=90, phi=0, redshift=0, alpha=-1.001, beta=-3.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00326 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=327000, duration=10, peakFlux=0.3162, theta=90, phi=0, redshift=0, alpha=-1.001, beta=-3.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00327 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=328000, duration=10, peakFlux=1, theta=90, phi=0, redshift=0, alpha=-1.001, beta=-3.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00328 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=329000, duration=10, peakFlux=3.162, theta=90, phi=0, redshift=0, alpha=-1.001, beta=-3.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00329 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=330000, duration=10, peakFlux=10, theta=90, phi=0, redshift=0, alpha=-1.001, beta=-3.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00330 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=331000, duration=10, peakFlux=0.1, theta=90, phi=0, redshift=0, alpha=-1.001, beta=-2.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00331 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=332000, duration=10, peakFlux=0.3162, theta=90, phi=0, redshift=0, alpha=-1.001, beta=-2.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00332 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=333000, duration=10, peakFlux=1, theta=90, phi=0, redshift=0, alpha=-1.001, beta=-2.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00333 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=334000, duration=10, peakFlux=3.162, theta=90, phi=0, redshift=0, alpha=-1.001, beta=-2.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00334 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=335000, duration=10, peakFlux=10, theta=90, phi=0, redshift=0, alpha=-1.001, beta=-2.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00335 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=336000, duration=10, peakFlux=0.1, theta=90, phi=0, redshift=0, alpha=-1.001, beta=-2.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00336 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=337000, duration=10, peakFlux=0.3162, theta=90, phi=0, redshift=0, alpha=-1.001, beta=-2.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00337 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=338000, duration=10, peakFlux=1, theta=90, phi=0, redshift=0, alpha=-1.001, beta=-2.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00338 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=339000, duration=10, peakFlux=3.162, theta=90, phi=0, redshift=0, alpha=-1.001, beta=-2.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00339 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=340000, duration=10, peakFlux=10, theta=90, phi=0, redshift=0, alpha=-1.001, beta=-2.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00340 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=341000, duration=10, peakFlux=0.1, theta=90, phi=0, redshift=0, alpha=-1.001, beta=-1.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00341 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=342000, duration=10, peakFlux=0.3162, theta=90, phi=0, redshift=0, alpha=-1.001, beta=-1.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00342 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=343000, duration=10, peakFlux=1, theta=90, phi=0, redshift=0, alpha=-1.001, beta=-1.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00343 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=344000, duration=10, peakFlux=3.162, theta=90, phi=0, redshift=0, alpha=-1.001, beta=-1.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00344 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=345000, duration=10, peakFlux=10, theta=90, phi=0, redshift=0, alpha=-1.001, beta=-1.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00345 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=346000, duration=10, peakFlux=0.1, theta=90, phi=0, redshift=0, alpha=-1.001, beta=-1.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00346 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=347000, duration=10, peakFlux=0.3162, theta=90, phi=0, redshift=0, alpha=-1.001, beta=-1.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00347 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=348000, duration=10, peakFlux=1, theta=90, phi=0, redshift=0, alpha=-1.001, beta=-1.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00348 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=349000, duration=10, peakFlux=3.162, theta=90, phi=0, redshift=0, alpha=-1.001, beta=-1.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00349 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=350000, duration=10, peakFlux=10, theta=90, phi=0, redshift=0, alpha=-1.001, beta=-1.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00350 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=351000, duration=100, peakFlux=0.1, theta=90, phi=0, redshift=0, alpha=-1.001, beta=-3.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00351 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=352000, duration=100, peakFlux=0.3162, theta=90, phi=0, redshift=0, alpha=-1.001, beta=-3.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00352 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=353000, duration=100, peakFlux=1, theta=90, phi=0, redshift=0, alpha=-1.001, beta=-3.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00353 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=354000, duration=100, peakFlux=3.162, theta=90, phi=0, redshift=0, alpha=-1.001, beta=-3.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00354 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=355000, duration=100, peakFlux=10, theta=90, phi=0, redshift=0, alpha=-1.001, beta=-3.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00355 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=356000, duration=100, peakFlux=0.1, theta=90, phi=0, redshift=0, alpha=-1.001, beta=-2.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00356 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=357000, duration=100, peakFlux=0.3162, theta=90, phi=0, redshift=0, alpha=-1.001, beta=-2.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00357 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=358000, duration=100, peakFlux=1, theta=90, phi=0, redshift=0, alpha=-1.001, beta=-2.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00358 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=359000, duration=100, peakFlux=3.162, theta=90, phi=0, redshift=0, alpha=-1.001, beta=-2.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00359 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=360000, duration=100, peakFlux=10, theta=90, phi=0, redshift=0, alpha=-1.001, beta=-2.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00360 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=361000, duration=100, peakFlux=0.1, theta=90, phi=0, redshift=0, alpha=-1.001, beta=-2.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00361 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=362000, duration=100, peakFlux=0.3162, theta=90, phi=0, redshift=0, alpha=-1.001, beta=-2.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00362 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=363000, duration=100, peakFlux=1, theta=90, phi=0, redshift=0, alpha=-1.001, beta=-2.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00363 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=364000, duration=100, peakFlux=3.162, theta=90, phi=0, redshift=0, alpha=-1.001, beta=-2.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00364 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=365000, duration=100, peakFlux=10, theta=90, phi=0, redshift=0, alpha=-1.001, beta=-2.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00365 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=366000, duration=100, peakFlux=0.1, theta=90, phi=0, redshift=0, alpha=-1.001, beta=-1.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00366 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=367000, duration=100, peakFlux=0.3162, theta=90, phi=0, redshift=0, alpha=-1.001, beta=-1.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00367 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=368000, duration=100, peakFlux=1, theta=90, phi=0, redshift=0, alpha=-1.001, beta=-1.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00368 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=369000, duration=100, peakFlux=3.162, theta=90, phi=0, redshift=0, alpha=-1.001, beta=-1.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00369 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=370000, duration=100, peakFlux=10, theta=90, phi=0, redshift=0, alpha=-1.001, beta=-1.7, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00370 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=371000, duration=100, peakFlux=0.1, theta=90, phi=0, redshift=0, alpha=-1.001, beta=-1.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00371 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=372000, duration=100, peakFlux=0.3162, theta=90, phi=0, redshift=0, alpha=-1.001, beta=-1.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00372 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=373000, duration=100, peakFlux=1, theta=90, phi=0, redshift=0, alpha=-1.001, beta=-1.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00373 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=374000, duration=100, peakFlux=3.162, theta=90, phi=0, redshift=0, alpha=-1.001, beta=-1.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRB_00374 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBobsmanager" params="seed=1, tstart=375000, duration=100, peakFlux=10, theta=90, phi=0, redshift=0, alpha=-1.001, beta=-1.2, Ep=500, emin=10, GBM=1 "/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" AllGRBobs" >
+     <nestedSource sourceRef=" GRB_00000 "/>
+     <nestedSource sourceRef=" GRB_00001 "/>
+     <nestedSource sourceRef=" GRB_00002 "/>
+     <nestedSource sourceRef=" GRB_00003 "/>
+     <nestedSource sourceRef=" GRB_00004 "/>
+     <nestedSource sourceRef=" GRB_00005 "/>
+     <nestedSource sourceRef=" GRB_00006 "/>
+     <nestedSource sourceRef=" GRB_00007 "/>
+     <nestedSource sourceRef=" GRB_00008 "/>
+     <nestedSource sourceRef=" GRB_00009 "/>
+     <nestedSource sourceRef=" GRB_00010 "/>
+     <nestedSource sourceRef=" GRB_00011 "/>
+     <nestedSource sourceRef=" GRB_00012 "/>
+     <nestedSource sourceRef=" GRB_00013 "/>
+     <nestedSource sourceRef=" GRB_00014 "/>
+     <nestedSource sourceRef=" GRB_00015 "/>
+     <nestedSource sourceRef=" GRB_00016 "/>
+     <nestedSource sourceRef=" GRB_00017 "/>
+     <nestedSource sourceRef=" GRB_00018 "/>
+     <nestedSource sourceRef=" GRB_00019 "/>
+     <nestedSource sourceRef=" GRB_00020 "/>
+     <nestedSource sourceRef=" GRB_00021 "/>
+     <nestedSource sourceRef=" GRB_00022 "/>
+     <nestedSource sourceRef=" GRB_00023 "/>
+     <nestedSource sourceRef=" GRB_00024 "/>
+     <nestedSource sourceRef=" GRB_00025 "/>
+     <nestedSource sourceRef=" GRB_00026 "/>
+     <nestedSource sourceRef=" GRB_00027 "/>
+     <nestedSource sourceRef=" GRB_00028 "/>
+     <nestedSource sourceRef=" GRB_00029 "/>
+     <nestedSource sourceRef=" GRB_00030 "/>
+     <nestedSource sourceRef=" GRB_00031 "/>
+     <nestedSource sourceRef=" GRB_00032 "/>
+     <nestedSource sourceRef=" GRB_00033 "/>
+     <nestedSource sourceRef=" GRB_00034 "/>
+     <nestedSource sourceRef=" GRB_00035 "/>
+     <nestedSource sourceRef=" GRB_00036 "/>
+     <nestedSource sourceRef=" GRB_00037 "/>
+     <nestedSource sourceRef=" GRB_00038 "/>
+     <nestedSource sourceRef=" GRB_00039 "/>
+     <nestedSource sourceRef=" GRB_00040 "/>
+     <nestedSource sourceRef=" GRB_00041 "/>
+     <nestedSource sourceRef=" GRB_00042 "/>
+     <nestedSource sourceRef=" GRB_00043 "/>
+     <nestedSource sourceRef=" GRB_00044 "/>
+     <nestedSource sourceRef=" GRB_00045 "/>
+     <nestedSource sourceRef=" GRB_00046 "/>
+     <nestedSource sourceRef=" GRB_00047 "/>
+     <nestedSource sourceRef=" GRB_00048 "/>
+     <nestedSource sourceRef=" GRB_00049 "/>
+     <nestedSource sourceRef=" GRB_00050 "/>
+     <nestedSource sourceRef=" GRB_00051 "/>
+     <nestedSource sourceRef=" GRB_00052 "/>
+     <nestedSource sourceRef=" GRB_00053 "/>
+     <nestedSource sourceRef=" GRB_00054 "/>
+     <nestedSource sourceRef=" GRB_00055 "/>
+     <nestedSource sourceRef=" GRB_00056 "/>
+     <nestedSource sourceRef=" GRB_00057 "/>
+     <nestedSource sourceRef=" GRB_00058 "/>
+     <nestedSource sourceRef=" GRB_00059 "/>
+     <nestedSource sourceRef=" GRB_00060 "/>
+     <nestedSource sourceRef=" GRB_00061 "/>
+     <nestedSource sourceRef=" GRB_00062 "/>
+     <nestedSource sourceRef=" GRB_00063 "/>
+     <nestedSource sourceRef=" GRB_00064 "/>
+     <nestedSource sourceRef=" GRB_00065 "/>
+     <nestedSource sourceRef=" GRB_00066 "/>
+     <nestedSource sourceRef=" GRB_00067 "/>
+     <nestedSource sourceRef=" GRB_00068 "/>
+     <nestedSource sourceRef=" GRB_00069 "/>
+     <nestedSource sourceRef=" GRB_00070 "/>
+     <nestedSource sourceRef=" GRB_00071 "/>
+     <nestedSource sourceRef=" GRB_00072 "/>
+     <nestedSource sourceRef=" GRB_00073 "/>
+     <nestedSource sourceRef=" GRB_00074 "/>
+     <nestedSource sourceRef=" GRB_00075 "/>
+     <nestedSource sourceRef=" GRB_00076 "/>
+     <nestedSource sourceRef=" GRB_00077 "/>
+     <nestedSource sourceRef=" GRB_00078 "/>
+     <nestedSource sourceRef=" GRB_00079 "/>
+     <nestedSource sourceRef=" GRB_00080 "/>
+     <nestedSource sourceRef=" GRB_00081 "/>
+     <nestedSource sourceRef=" GRB_00082 "/>
+     <nestedSource sourceRef=" GRB_00083 "/>
+     <nestedSource sourceRef=" GRB_00084 "/>
+     <nestedSource sourceRef=" GRB_00085 "/>
+     <nestedSource sourceRef=" GRB_00086 "/>
+     <nestedSource sourceRef=" GRB_00087 "/>
+     <nestedSource sourceRef=" GRB_00088 "/>
+     <nestedSource sourceRef=" GRB_00089 "/>
+     <nestedSource sourceRef=" GRB_00090 "/>
+     <nestedSource sourceRef=" GRB_00091 "/>
+     <nestedSource sourceRef=" GRB_00092 "/>
+     <nestedSource sourceRef=" GRB_00093 "/>
+     <nestedSource sourceRef=" GRB_00094 "/>
+     <nestedSource sourceRef=" GRB_00095 "/>
+     <nestedSource sourceRef=" GRB_00096 "/>
+     <nestedSource sourceRef=" GRB_00097 "/>
+     <nestedSource sourceRef=" GRB_00098 "/>
+     <nestedSource sourceRef=" GRB_00099 "/>
+     <nestedSource sourceRef=" GRB_00100 "/>
+     <nestedSource sourceRef=" GRB_00101 "/>
+     <nestedSource sourceRef=" GRB_00102 "/>
+     <nestedSource sourceRef=" GRB_00103 "/>
+     <nestedSource sourceRef=" GRB_00104 "/>
+     <nestedSource sourceRef=" GRB_00105 "/>
+     <nestedSource sourceRef=" GRB_00106 "/>
+     <nestedSource sourceRef=" GRB_00107 "/>
+     <nestedSource sourceRef=" GRB_00108 "/>
+     <nestedSource sourceRef=" GRB_00109 "/>
+     <nestedSource sourceRef=" GRB_00110 "/>
+     <nestedSource sourceRef=" GRB_00111 "/>
+     <nestedSource sourceRef=" GRB_00112 "/>
+     <nestedSource sourceRef=" GRB_00113 "/>
+     <nestedSource sourceRef=" GRB_00114 "/>
+     <nestedSource sourceRef=" GRB_00115 "/>
+     <nestedSource sourceRef=" GRB_00116 "/>
+     <nestedSource sourceRef=" GRB_00117 "/>
+     <nestedSource sourceRef=" GRB_00118 "/>
+     <nestedSource sourceRef=" GRB_00119 "/>
+     <nestedSource sourceRef=" GRB_00120 "/>
+     <nestedSource sourceRef=" GRB_00121 "/>
+     <nestedSource sourceRef=" GRB_00122 "/>
+     <nestedSource sourceRef=" GRB_00123 "/>
+     <nestedSource sourceRef=" GRB_00124 "/>
+     <nestedSource sourceRef=" GRB_00125 "/>
+     <nestedSource sourceRef=" GRB_00126 "/>
+     <nestedSource sourceRef=" GRB_00127 "/>
+     <nestedSource sourceRef=" GRB_00128 "/>
+     <nestedSource sourceRef=" GRB_00129 "/>
+     <nestedSource sourceRef=" GRB_00130 "/>
+     <nestedSource sourceRef=" GRB_00131 "/>
+     <nestedSource sourceRef=" GRB_00132 "/>
+     <nestedSource sourceRef=" GRB_00133 "/>
+     <nestedSource sourceRef=" GRB_00134 "/>
+     <nestedSource sourceRef=" GRB_00135 "/>
+     <nestedSource sourceRef=" GRB_00136 "/>
+     <nestedSource sourceRef=" GRB_00137 "/>
+     <nestedSource sourceRef=" GRB_00138 "/>
+     <nestedSource sourceRef=" GRB_00139 "/>
+     <nestedSource sourceRef=" GRB_00140 "/>
+     <nestedSource sourceRef=" GRB_00141 "/>
+     <nestedSource sourceRef=" GRB_00142 "/>
+     <nestedSource sourceRef=" GRB_00143 "/>
+     <nestedSource sourceRef=" GRB_00144 "/>
+     <nestedSource sourceRef=" GRB_00145 "/>
+     <nestedSource sourceRef=" GRB_00146 "/>
+     <nestedSource sourceRef=" GRB_00147 "/>
+     <nestedSource sourceRef=" GRB_00148 "/>
+     <nestedSource sourceRef=" GRB_00149 "/>
+     <nestedSource sourceRef=" GRB_00150 "/>
+     <nestedSource sourceRef=" GRB_00151 "/>
+     <nestedSource sourceRef=" GRB_00152 "/>
+     <nestedSource sourceRef=" GRB_00153 "/>
+     <nestedSource sourceRef=" GRB_00154 "/>
+     <nestedSource sourceRef=" GRB_00155 "/>
+     <nestedSource sourceRef=" GRB_00156 "/>
+     <nestedSource sourceRef=" GRB_00157 "/>
+     <nestedSource sourceRef=" GRB_00158 "/>
+     <nestedSource sourceRef=" GRB_00159 "/>
+     <nestedSource sourceRef=" GRB_00160 "/>
+     <nestedSource sourceRef=" GRB_00161 "/>
+     <nestedSource sourceRef=" GRB_00162 "/>
+     <nestedSource sourceRef=" GRB_00163 "/>
+     <nestedSource sourceRef=" GRB_00164 "/>
+     <nestedSource sourceRef=" GRB_00165 "/>
+     <nestedSource sourceRef=" GRB_00166 "/>
+     <nestedSource sourceRef=" GRB_00167 "/>
+     <nestedSource sourceRef=" GRB_00168 "/>
+     <nestedSource sourceRef=" GRB_00169 "/>
+     <nestedSource sourceRef=" GRB_00170 "/>
+     <nestedSource sourceRef=" GRB_00171 "/>
+     <nestedSource sourceRef=" GRB_00172 "/>
+     <nestedSource sourceRef=" GRB_00173 "/>
+     <nestedSource sourceRef=" GRB_00174 "/>
+     <nestedSource sourceRef=" GRB_00175 "/>
+     <nestedSource sourceRef=" GRB_00176 "/>
+     <nestedSource sourceRef=" GRB_00177 "/>
+     <nestedSource sourceRef=" GRB_00178 "/>
+     <nestedSource sourceRef=" GRB_00179 "/>
+     <nestedSource sourceRef=" GRB_00180 "/>
+     <nestedSource sourceRef=" GRB_00181 "/>
+     <nestedSource sourceRef=" GRB_00182 "/>
+     <nestedSource sourceRef=" GRB_00183 "/>
+     <nestedSource sourceRef=" GRB_00184 "/>
+     <nestedSource sourceRef=" GRB_00185 "/>
+     <nestedSource sourceRef=" GRB_00186 "/>
+     <nestedSource sourceRef=" GRB_00187 "/>
+     <nestedSource sourceRef=" GRB_00188 "/>
+     <nestedSource sourceRef=" GRB_00189 "/>
+     <nestedSource sourceRef=" GRB_00190 "/>
+     <nestedSource sourceRef=" GRB_00191 "/>
+     <nestedSource sourceRef=" GRB_00192 "/>
+     <nestedSource sourceRef=" GRB_00193 "/>
+     <nestedSource sourceRef=" GRB_00194 "/>
+     <nestedSource sourceRef=" GRB_00195 "/>
+     <nestedSource sourceRef=" GRB_00196 "/>
+     <nestedSource sourceRef=" GRB_00197 "/>
+     <nestedSource sourceRef=" GRB_00198 "/>
+     <nestedSource sourceRef=" GRB_00199 "/>
+     <nestedSource sourceRef=" GRB_00200 "/>
+     <nestedSource sourceRef=" GRB_00201 "/>
+     <nestedSource sourceRef=" GRB_00202 "/>
+     <nestedSource sourceRef=" GRB_00203 "/>
+     <nestedSource sourceRef=" GRB_00204 "/>
+     <nestedSource sourceRef=" GRB_00205 "/>
+     <nestedSource sourceRef=" GRB_00206 "/>
+     <nestedSource sourceRef=" GRB_00207 "/>
+     <nestedSource sourceRef=" GRB_00208 "/>
+     <nestedSource sourceRef=" GRB_00209 "/>
+     <nestedSource sourceRef=" GRB_00210 "/>
+     <nestedSource sourceRef=" GRB_00211 "/>
+     <nestedSource sourceRef=" GRB_00212 "/>
+     <nestedSource sourceRef=" GRB_00213 "/>
+     <nestedSource sourceRef=" GRB_00214 "/>
+     <nestedSource sourceRef=" GRB_00215 "/>
+     <nestedSource sourceRef=" GRB_00216 "/>
+     <nestedSource sourceRef=" GRB_00217 "/>
+     <nestedSource sourceRef=" GRB_00218 "/>
+     <nestedSource sourceRef=" GRB_00219 "/>
+     <nestedSource sourceRef=" GRB_00220 "/>
+     <nestedSource sourceRef=" GRB_00221 "/>
+     <nestedSource sourceRef=" GRB_00222 "/>
+     <nestedSource sourceRef=" GRB_00223 "/>
+     <nestedSource sourceRef=" GRB_00224 "/>
+     <nestedSource sourceRef=" GRB_00225 "/>
+     <nestedSource sourceRef=" GRB_00226 "/>
+     <nestedSource sourceRef=" GRB_00227 "/>
+     <nestedSource sourceRef=" GRB_00228 "/>
+     <nestedSource sourceRef=" GRB_00229 "/>
+     <nestedSource sourceRef=" GRB_00230 "/>
+     <nestedSource sourceRef=" GRB_00231 "/>
+     <nestedSource sourceRef=" GRB_00232 "/>
+     <nestedSource sourceRef=" GRB_00233 "/>
+     <nestedSource sourceRef=" GRB_00234 "/>
+     <nestedSource sourceRef=" GRB_00235 "/>
+     <nestedSource sourceRef=" GRB_00236 "/>
+     <nestedSource sourceRef=" GRB_00237 "/>
+     <nestedSource sourceRef=" GRB_00238 "/>
+     <nestedSource sourceRef=" GRB_00239 "/>
+     <nestedSource sourceRef=" GRB_00240 "/>
+     <nestedSource sourceRef=" GRB_00241 "/>
+     <nestedSource sourceRef=" GRB_00242 "/>
+     <nestedSource sourceRef=" GRB_00243 "/>
+     <nestedSource sourceRef=" GRB_00244 "/>
+     <nestedSource sourceRef=" GRB_00245 "/>
+     <nestedSource sourceRef=" GRB_00246 "/>
+     <nestedSource sourceRef=" GRB_00247 "/>
+     <nestedSource sourceRef=" GRB_00248 "/>
+     <nestedSource sourceRef=" GRB_00249 "/>
+     <nestedSource sourceRef=" GRB_00250 "/>
+     <nestedSource sourceRef=" GRB_00251 "/>
+     <nestedSource sourceRef=" GRB_00252 "/>
+     <nestedSource sourceRef=" GRB_00253 "/>
+     <nestedSource sourceRef=" GRB_00254 "/>
+     <nestedSource sourceRef=" GRB_00255 "/>
+     <nestedSource sourceRef=" GRB_00256 "/>
+     <nestedSource sourceRef=" GRB_00257 "/>
+     <nestedSource sourceRef=" GRB_00258 "/>
+     <nestedSource sourceRef=" GRB_00259 "/>
+     <nestedSource sourceRef=" GRB_00260 "/>
+     <nestedSource sourceRef=" GRB_00261 "/>
+     <nestedSource sourceRef=" GRB_00262 "/>
+     <nestedSource sourceRef=" GRB_00263 "/>
+     <nestedSource sourceRef=" GRB_00264 "/>
+     <nestedSource sourceRef=" GRB_00265 "/>
+     <nestedSource sourceRef=" GRB_00266 "/>
+     <nestedSource sourceRef=" GRB_00267 "/>
+     <nestedSource sourceRef=" GRB_00268 "/>
+     <nestedSource sourceRef=" GRB_00269 "/>
+     <nestedSource sourceRef=" GRB_00270 "/>
+     <nestedSource sourceRef=" GRB_00271 "/>
+     <nestedSource sourceRef=" GRB_00272 "/>
+     <nestedSource sourceRef=" GRB_00273 "/>
+     <nestedSource sourceRef=" GRB_00274 "/>
+     <nestedSource sourceRef=" GRB_00275 "/>
+     <nestedSource sourceRef=" GRB_00276 "/>
+     <nestedSource sourceRef=" GRB_00277 "/>
+     <nestedSource sourceRef=" GRB_00278 "/>
+     <nestedSource sourceRef=" GRB_00279 "/>
+     <nestedSource sourceRef=" GRB_00280 "/>
+     <nestedSource sourceRef=" GRB_00281 "/>
+     <nestedSource sourceRef=" GRB_00282 "/>
+     <nestedSource sourceRef=" GRB_00283 "/>
+     <nestedSource sourceRef=" GRB_00284 "/>
+     <nestedSource sourceRef=" GRB_00285 "/>
+     <nestedSource sourceRef=" GRB_00286 "/>
+     <nestedSource sourceRef=" GRB_00287 "/>
+     <nestedSource sourceRef=" GRB_00288 "/>
+     <nestedSource sourceRef=" GRB_00289 "/>
+     <nestedSource sourceRef=" GRB_00290 "/>
+     <nestedSource sourceRef=" GRB_00291 "/>
+     <nestedSource sourceRef=" GRB_00292 "/>
+     <nestedSource sourceRef=" GRB_00293 "/>
+     <nestedSource sourceRef=" GRB_00294 "/>
+     <nestedSource sourceRef=" GRB_00295 "/>
+     <nestedSource sourceRef=" GRB_00296 "/>
+     <nestedSource sourceRef=" GRB_00297 "/>
+     <nestedSource sourceRef=" GRB_00298 "/>
+     <nestedSource sourceRef=" GRB_00299 "/>
+     <nestedSource sourceRef=" GRB_00300 "/>
+     <nestedSource sourceRef=" GRB_00301 "/>
+     <nestedSource sourceRef=" GRB_00302 "/>
+     <nestedSource sourceRef=" GRB_00303 "/>
+     <nestedSource sourceRef=" GRB_00304 "/>
+     <nestedSource sourceRef=" GRB_00305 "/>
+     <nestedSource sourceRef=" GRB_00306 "/>
+     <nestedSource sourceRef=" GRB_00307 "/>
+     <nestedSource sourceRef=" GRB_00308 "/>
+     <nestedSource sourceRef=" GRB_00309 "/>
+     <nestedSource sourceRef=" GRB_00310 "/>
+     <nestedSource sourceRef=" GRB_00311 "/>
+     <nestedSource sourceRef=" GRB_00312 "/>
+     <nestedSource sourceRef=" GRB_00313 "/>
+     <nestedSource sourceRef=" GRB_00314 "/>
+     <nestedSource sourceRef=" GRB_00315 "/>
+     <nestedSource sourceRef=" GRB_00316 "/>
+     <nestedSource sourceRef=" GRB_00317 "/>
+     <nestedSource sourceRef=" GRB_00318 "/>
+     <nestedSource sourceRef=" GRB_00319 "/>
+     <nestedSource sourceRef=" GRB_00320 "/>
+     <nestedSource sourceRef=" GRB_00321 "/>
+     <nestedSource sourceRef=" GRB_00322 "/>
+     <nestedSource sourceRef=" GRB_00323 "/>
+     <nestedSource sourceRef=" GRB_00324 "/>
+     <nestedSource sourceRef=" GRB_00325 "/>
+     <nestedSource sourceRef=" GRB_00326 "/>
+     <nestedSource sourceRef=" GRB_00327 "/>
+     <nestedSource sourceRef=" GRB_00328 "/>
+     <nestedSource sourceRef=" GRB_00329 "/>
+     <nestedSource sourceRef=" GRB_00330 "/>
+     <nestedSource sourceRef=" GRB_00331 "/>
+     <nestedSource sourceRef=" GRB_00332 "/>
+     <nestedSource sourceRef=" GRB_00333 "/>
+     <nestedSource sourceRef=" GRB_00334 "/>
+     <nestedSource sourceRef=" GRB_00335 "/>
+     <nestedSource sourceRef=" GRB_00336 "/>
+     <nestedSource sourceRef=" GRB_00337 "/>
+     <nestedSource sourceRef=" GRB_00338 "/>
+     <nestedSource sourceRef=" GRB_00339 "/>
+     <nestedSource sourceRef=" GRB_00340 "/>
+     <nestedSource sourceRef=" GRB_00341 "/>
+     <nestedSource sourceRef=" GRB_00342 "/>
+     <nestedSource sourceRef=" GRB_00343 "/>
+     <nestedSource sourceRef=" GRB_00344 "/>
+     <nestedSource sourceRef=" GRB_00345 "/>
+     <nestedSource sourceRef=" GRB_00346 "/>
+     <nestedSource sourceRef=" GRB_00347 "/>
+     <nestedSource sourceRef=" GRB_00348 "/>
+     <nestedSource sourceRef=" GRB_00349 "/>
+     <nestedSource sourceRef=" GRB_00350 "/>
+     <nestedSource sourceRef=" GRB_00351 "/>
+     <nestedSource sourceRef=" GRB_00352 "/>
+     <nestedSource sourceRef=" GRB_00353 "/>
+     <nestedSource sourceRef=" GRB_00354 "/>
+     <nestedSource sourceRef=" GRB_00355 "/>
+     <nestedSource sourceRef=" GRB_00356 "/>
+     <nestedSource sourceRef=" GRB_00357 "/>
+     <nestedSource sourceRef=" GRB_00358 "/>
+     <nestedSource sourceRef=" GRB_00359 "/>
+     <nestedSource sourceRef=" GRB_00360 "/>
+     <nestedSource sourceRef=" GRB_00361 "/>
+     <nestedSource sourceRef=" GRB_00362 "/>
+     <nestedSource sourceRef=" GRB_00363 "/>
+     <nestedSource sourceRef=" GRB_00364 "/>
+     <nestedSource sourceRef=" GRB_00365 "/>
+     <nestedSource sourceRef=" GRB_00366 "/>
+     <nestedSource sourceRef=" GRB_00367 "/>
+     <nestedSource sourceRef=" GRB_00368 "/>
+     <nestedSource sourceRef=" GRB_00369 "/>
+     <nestedSource sourceRef=" GRB_00370 "/>
+     <nestedSource sourceRef=" GRB_00371 "/>
+     <nestedSource sourceRef=" GRB_00372 "/>
+     <nestedSource sourceRef=" GRB_00373 "/>
+     <nestedSource sourceRef=" GRB_00374 "/>
+</source>
+  </source_library>

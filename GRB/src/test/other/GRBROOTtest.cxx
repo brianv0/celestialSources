@@ -346,7 +346,7 @@ int main(int argc, char** argv)
   params = new Parameters();  
   long seedN = params->GetGRBNumber();
   //  if(seed>=0) params->SetGRBNumber(seedN+seed);
-  if(seed<0) seed=0;
+  if(seed<1) seed=1;
   //////////////////////////////////////////////////
   params->ReadParametersFromFile(paramFile,seed);
   params->PrintParameters();
