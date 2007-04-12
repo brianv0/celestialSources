@@ -60,5 +60,6 @@
 *   v2r2p14  23-mar-2007 MR    changes ome output settings
 *   v2r3     30-mar-2007 MR    Timing noise Random Walk finished
 *   v2r3p1   3-apr-2007  THB   Patch for windows compiler
+*   v2r3p2   11-apr-2007  THB   Fixetstarttime and endtime problem
 *@endverbatim
 */

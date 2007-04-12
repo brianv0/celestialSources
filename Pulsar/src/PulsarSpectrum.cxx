@@ -572,6 +572,14 @@ double PulsarSpectrum::interval(double time)
   //this should be corrected before applying barycentryc decorr + ephem de-corrections
   double timeTilde = timeTildeDecorr + getBaryCorr(timeTildeDecorr,0); 
 
+
+  //std::cout << std::setprecision(15)<< "start" << StartTimeMET 
+  //    << "tTilde=" << timeTilde << "tFildeDEcorr" <<  timeTildeDecorr << std::endl; 
+  //if (timeTilde<StartTimeMET)
+  //{
+  //  std::cout << "OCCHIO CASINO!!!" << std::endl;
+  //}
+
   double timeTildeDemodulated =0.;
   
   //binary demodulation
@@ -927,14 +935,58 @@ double PulsarSpectrum::interval(double time)
   double nextTimeTildeDecorr = 0.;
 
   //inverse of binary demodulation and of barycentric corrections
+
+  double StartTimeMET =(StartMissionDateMJD)*SecsOneDay+Spectrum::startTime();
+  double EndTimeMET = (StartMissionDateMJD)*SecsOneDay+astro::GPS::instance()->endTime();
+
   if (m_BinaryFlag == 0)
     {
       nextTimeTilde = nextTimeTildeDemodulated;
+      if ((nextTimeTilde-510.0) < StartTimeMET)
+	{
+	  std::cout << "WARNING!!Barycentric decorrection need time before tStart: adding 510 s." << std::endl;
+	  nextTimeTilde+=510.;
+	}
+      
+      //std::cout << "end" << EndTimeMET << std::endl;
+      if ((nextTimeTilde+510.0) > EndTimeMET)
+	{
+	  std::cout << "WARNING!!Barycentric decorrection need time after tEnd: set t to end" << std::endl;
+	  nextTimeTilde=EndTimeMET;
+	}
+
       nextTimeTildeDecorr = getDecorrectedTime(nextTimeTilde); //Barycentric decorrections
     }
   else 
     {
+
+      if ((nextTimeTildeDemodulated-m_t0PeriastrMJD*SecsOneDay) < StartTimeMET)
+	{
+	  std::cout << "WARNING!!Inverse binary demodulation need time before tStart: adding 510 s." << std::endl;
+	  nextTimeTildeDemodulated+=m_t0PeriastrMJD*SecsOneDay;
+	}
+      
+      //std::cout << "end" << EndTimeMET << std::endl;
+      if ((nextTimeTildeDemodulated+m_t0PeriastrMJD*SecsOneDay) > EndTimeMET)
+	{
+	  std::cout << "WARNING!!Inverse binary demodulation need time after tEnd: set t to end" << std::endl;
+	  nextTimeTildeDemodulated=EndTimeMET;
+	}
       nextTimeTilde = getBinaryDemodulationInverse(nextTimeTildeDemodulated);
+
+      if ((nextTimeTilde-510.0) < StartTimeMET)
+	{
+	  std::cout << "WARNING!!Barycentric decorrection need time before tStart: adding 510 s." << std::endl;
+	  nextTimeTilde+=510.;
+	}
+      
+      //std::cout << "end" << EndTimeMET << std::endl;
+      if ((nextTimeTilde+510.0) > EndTimeMET)
+	{
+	  std::cout << "WARNING!!Barycentric decorrection need time after tEnd: set t to end" << std::endl;
+	  nextTimeTilde=EndTimeMET;
+	}
+
       nextTimeTildeDecorr = getDecorrectedTime(nextTimeTilde); //Barycentric decorrections
     }
  
@@ -1289,7 +1341,10 @@ double PulsarSpectrum::getDecorrectedTime(double CorrectedTime)
 {
   //Use the bisection method to find the inverse of the de-corrected time, i.e. the time (in TT)
   //that after correction is equal to Time in TDB
-
+  if (DEBUG)
+    {
+      std::cout << "Get decorrected time from time t=" << CorrectedTime << std::endl;
+    }
   double deltaMax = 510.0; //max deltat (s)
   double ttUp = CorrectedTime + deltaMax;
   double ttDown = CorrectedTime - deltaMax;
@@ -1302,7 +1357,6 @@ double PulsarSpectrum::getDecorrectedTime(double CorrectedTime)
     {
       double hDown = (CorrectedTime - (ttDown + getBaryCorr(ttDown,0)));
       hMid = (CorrectedTime - (ttMid + getBaryCorr(ttMid,0)));
-                
       //std::cout << std::setprecision(30) 
       //	<< "\n" << i << "**ttUp " << ttUp << " ttDown " << ttDown << " mid " << ttMid << std::endl;
              
