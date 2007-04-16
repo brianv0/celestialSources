@@ -28,6 +28,7 @@
 #include "astro/EarthOrbit.h"
 #include "astro/SolarSystem.h"
 #include "astro/GPS.h"
+#include "astro/PointingHistory.h"
 
 /*! 
 * \class PulsarSpectrum

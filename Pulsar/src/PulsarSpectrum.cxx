@@ -570,7 +570,19 @@ double PulsarSpectrum::interval(double time)
   
   double timeTildeDecorr = time + (StartMissionDateMJD)*SecsOneDay; //Arrival time decorrected
   //this should be corrected before applying barycentryc decorr + ephem de-corrections
-  double timeTilde = timeTildeDecorr + getBaryCorr(timeTildeDecorr,0); 
+
+  double timeTilde = 0;
+
+  timeTilde = timeTildeDecorr + getBaryCorr(timeTildeDecorr,0); 
+
+
+  //  double StartTimeMET =Spectrum::startTime();
+  //double EndTimeMET = astro::GPS::instance()->endTime();
+
+  //  double const StartTimeMET = astro::PointingHistory::startTime();
+  //double const EndTimeMET = astro::PointingHistory::endTime();
+
+  //std::cout << std::setprecision(30) << "Start"<< StartTimeMET << " end" << EndTimeMET<<std::endl;
 
 
   //std::cout << std::setprecision(15)<< "start" << StartTimeMET 
@@ -936,56 +948,56 @@ double PulsarSpectrum::interval(double time)
 
   //inverse of binary demodulation and of barycentric corrections
 
-  double StartTimeMET =(StartMissionDateMJD)*SecsOneDay+Spectrum::startTime();
-  double EndTimeMET = (StartMissionDateMJD)*SecsOneDay+astro::GPS::instance()->endTime();
+  //  double StartTimeMET =(StartMissionDateMJD)*SecsOneDay+Spectrum::startTime();
+  //  double EndTimeMET = (StartMissionDateMJD)*SecsOneDay+astro::GPS::instance()->endTime();
 
   if (m_BinaryFlag == 0)
     {
       nextTimeTilde = nextTimeTildeDemodulated;
-      if ((nextTimeTilde-510.0) < StartTimeMET)
-	{
-	  std::cout << "WARNING!!Barycentric decorrection need time before tStart: adding 510 s." << std::endl;
-	  nextTimeTilde+=510.;
-	}
+      //      if ((nextTimeTilde-510.0) < StartTimeMET)
+      //{
+      //  std::cout << "WARNING!!Barycentric decorrection need time before tStart: adding 510 s." << std::endl;
+      //  nextTimeTilde+=510.;
+      //}
       
       //std::cout << "end" << EndTimeMET << std::endl;
-      if ((nextTimeTilde+510.0) > EndTimeMET)
-	{
-	  std::cout << "WARNING!!Barycentric decorrection need time after tEnd: set t to end" << std::endl;
-	  nextTimeTilde=EndTimeMET;
-	}
+      //      if ((nextTimeTilde+510.0) > EndTimeMET)
+      //{
+      //  std::cout << "WARNING!!Barycentric decorrection need time after tEnd: set t to end" << std::endl;
+      //  nextTimeTilde=EndTimeMET;
+      //}
 
       nextTimeTildeDecorr = getDecorrectedTime(nextTimeTilde); //Barycentric decorrections
     }
   else 
     {
 
-      if ((nextTimeTildeDemodulated-m_t0PeriastrMJD*SecsOneDay) < StartTimeMET)
-	{
-	  std::cout << "WARNING!!Inverse binary demodulation need time before tStart: adding 510 s." << std::endl;
-	  nextTimeTildeDemodulated+=m_t0PeriastrMJD*SecsOneDay;
-	}
+      //if ((nextTimeTildeDemodulated-m_t0PeriastrMJD*SecsOneDay) < StartTimeMET)
+      //{
+      //  std::cout << "WARNING!!Inverse binary demodulation need time before tStart: adding 510 s." << std::endl;
+      //  nextTimeTildeDemodulated+=m_t0PeriastrMJD*SecsOneDay;
+      //}
       
       //std::cout << "end" << EndTimeMET << std::endl;
-      if ((nextTimeTildeDemodulated+m_t0PeriastrMJD*SecsOneDay) > EndTimeMET)
-	{
-	  std::cout << "WARNING!!Inverse binary demodulation need time after tEnd: set t to end" << std::endl;
-	  nextTimeTildeDemodulated=EndTimeMET;
-	}
+      //  if ((nextTimeTildeDemodulated+m_t0PeriastrMJD*SecsOneDay) > EndTimeMET)
+      //{
+      //  std::cout << "WARNING!!Inverse binary demodulation need time after tEnd: set t to end" << std::endl;
+      //  nextTimeTildeDemodulated=EndTimeMET;
+      //}
       nextTimeTilde = getBinaryDemodulationInverse(nextTimeTildeDemodulated);
 
-      if ((nextTimeTilde-510.0) < StartTimeMET)
-	{
-	  std::cout << "WARNING!!Barycentric decorrection need time before tStart: adding 510 s." << std::endl;
-	  nextTimeTilde+=510.;
-	}
+      //if ((nextTimeTilde-510.0) < StartTimeMET)
+      //{
+      //  std::cout << "WARNING!!Barycentric decorrection need time before tStart: adding 510 s." << std::endl;
+      //  nextTimeTilde+=510.;
+      //}
       
       //std::cout << "end" << EndTimeMET << std::endl;
-      if ((nextTimeTilde+510.0) > EndTimeMET)
-	{
-	  std::cout << "WARNING!!Barycentric decorrection need time after tEnd: set t to end" << std::endl;
-	  nextTimeTilde=EndTimeMET;
-	}
+      //if ((nextTimeTilde+510.0) > EndTimeMET)
+      //{
+      //  std::cout << "WARNING!!Barycentric decorrection need time after tEnd: set t to end" << std::endl;
+      //  nextTimeTilde=EndTimeMET;
+      //}
 
       nextTimeTildeDecorr = getDecorrectedTime(nextTimeTilde); //Barycentric decorrections
     }
@@ -1147,34 +1159,37 @@ double PulsarSpectrum::getBaryCorr( double ttInput, int LogCorrFlag)
   CLHEP::Hep3Vector scPos;
 
   //Exception error in case of time not in the range of available position (when using a FT2 file)
-
+  
   try {
     //    std::cout<<astro::GPS::time()<<std::endl;
     //astro::GPS::update(timeMET);
     //    std::cout<<astro::GPS::time()<<std::endl;
     astro::GPS::instance()->time(timeMET);
     scPos = astro::GPS::instance()->position(timeMET);
-  }  catch (std::runtime_error  & eObj) {
-    // check to see this is the exception I want to ignore, rethrowing if it is not:
-    std::string message(eObj.what());
-    if (message.find("WARNING: Time out of Range!") == std::string::npos) {
-      throw;
+  } catch (astro::PointingHistory::TimeRangeError & eObj)
+    {
+      //do nothing...
     }
-    // if so, do nothing....
-  }
 
   //Correction due to geometric time delay of light propagation 
   //GLAST position
   CLHEP::Hep3Vector GeomVect = (scPos/clight);
   double GLASTPosGeom = GeomVect.dot(m_PulsarVectDir);
+  double GeomCorr = 0;
+  double EarthPosGeom =0.;
 
-  //Earth position
-  GeomVect = - m_solSys.getBarycenter(ttJD);
-  double EarthPosGeom = GeomVect.dot(m_PulsarVectDir);
+  try{
+    //Earth position
+    GeomVect = - m_solSys.getBarycenter(ttJD);
+    EarthPosGeom = GeomVect.dot(m_PulsarVectDir);
+    GeomVect = (scPos/clight) - m_solSys.getBarycenter(ttJD);
+    GeomCorr = GeomVect.dot(m_PulsarVectDir);
+  } catch (astro::SolarSystem::BadDate & eObj)
+    {
+      GeomCorr = 0.;  
+    }
 
-  GeomVect = (scPos/clight) - m_solSys.getBarycenter(ttJD);
 
-  double GeomCorr = GeomVect.dot(m_PulsarVectDir);
 
   //Correction due to Shapiro delay.
   CLHEP::Hep3Vector sunV = m_solSys.getSolarVector(ttJD);
@@ -1520,15 +1535,22 @@ int PulsarSpectrum::getPulsarFromDataList(std::string sourceFileName)
 	  // std::cout << "T0 " << t0 << " start " << startMJD << std::endl;
 	  if (t0 < startMJD)
 	    {
-	      std::cout << std::setprecision(10) << "Warning! Epoch t0 out the simulation range (t0-tStart=" << (t0-startMJD)
-			<< " s.: changing to MJD " << startMJD << std::endl;
+	      if (DEBUG)
+		{
+		  std::cout << std::setprecision(10) 
+			    << "Warning! Epoch t0 out the simulation range (t0-tStart=" << (t0-startMJD)
+			    << " s.: changing to MJD " << startMJD << std::endl;
+		}
 	      t0 = startMJD;
 	    }
 	  
 	  if (txbary < startMJD)
 	    {
-	      std::cout << "Warning! txbary out the simulation range (t0-tStart=" << (txbary-startMJD)
-			<< " s.: changing to MJD " << startMJD << std::endl;
+	      if (DEBUG)
+		{
+		  std::cout << "Warning! txbary out the simulation range (t0-tStart=" << (txbary-startMJD)
+			    << " s.: changing to MJD " << startMJD << std::endl;
+		}
 	      txbary = startMJD;
 	    }
 
@@ -1537,17 +1559,24 @@ int PulsarSpectrum::getPulsarFromDataList(std::string sourceFileName)
 	  // std::cout << "T0 " << t0 << " start " << startMJD << std::endl;
 	  if (t0 > endMJD)
 	    {
-	      std::cout << std::setprecision(10) << "Warning! Epoch t0 out the simulation range (t0-tEnd=" << (t0-endMJD)
-			<< " s.: changing to MJD " << endMJD << std::endl;
-	      std::cout << "***end at " << endTime << " corresp to " << endMJD << std::endl;
+	      if (DEBUG)
+		{
+		  std::cout << std::setprecision(10) 
+			    << "Warning! Epoch t0 out the simulation range (t0-tEnd=" << (t0-endMJD)
+			    << " s.: changing to MJD " << endMJD << std::endl;
+		  std::cout << "***end at " << endTime << " corresp to " << endMJD << std::endl;
+		}
 	      t0 = endMJD;
 	    }
 	  
 	  if (txbary > endMJD)
 	    {
-	      std::cout << "Warning! txbary out the simulation range (t0-tEnd=" << (txbary-endMJD)
-			<< " s.: changing to MJD " << endMJD << std::endl;
-	      txbary = endMJD;
+	      if (DEBUG)
+		{
+		  std::cout << "Warning! txbary out the simulation range (t0-tEnd=" << (txbary-endMJD)
+			    << " s.: changing to MJD " << endMJD << std::endl;
+		}
+		  txbary = endMJD;
 	    }
 
 	  m_t0InitVect.push_back(t0Init);
