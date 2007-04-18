@@ -101,6 +101,9 @@ class PulsarSpectrum : public ISpectrum
   //! Get the eccentric anomaly at time t (only for binaries)
   double GetEccentricAnomaly(double mytime);
 
+  //! Check if the time is in orbit file or not
+  double CheckTimeRange(double TimeToCheck, double deltaTime);
+
   //! calls PulsarSpectrum::energySrc
   double energy(double time);
 
@@ -185,6 +188,10 @@ class PulsarSpectrum : public ISpectrum
 
   //!Minimum and maximum energy of the extracted photons
   double m_enphmin, m_enphmax;
+
+  //! start and end of pointing history
+  double m_FT2_startMET,m_FT2_stopMET; 
+  int m_UseFT2;
 
   //! Random seed
   int m_seed;

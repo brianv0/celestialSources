@@ -143,6 +143,10 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
   m_t0PeriastrMJD = 0;
   m_t0AscNodeMJD = 0;
   m_PPN =0.;
+  m_FT2_startMET = -1.;
+  m_FT2_stopMET =-1.; 
+  m_UseFT2 = 0;
+
 
    //Read from XML file
   m_PSRname    = parseParamList(params,0).c_str();            // Pulsar name
@@ -172,6 +176,17 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
 	m_PSRShapeName = parseParamList(params,8).c_str();        // model parameters
       }
 
+  // Determine start and end time for FT2 or orbit file 
+  try {
+    const astro::PointingHistory & history = astro::GPS::instance()->history();
+    m_FT2_startMET = history.startTime();
+    m_FT2_stopMET = history.endTime();
+    m_UseFT2 = 1;
+  } catch (astro::GPS::NoHistoryError & eObj)
+    {
+      m_FT2_startMET = Spectrum::startTime();
+      m_FT2_stopMET = astro::GPS::instance()->endTime();
+    }
 
   //Retrieve pulsar data from a list of DataList file.
   std::string pulsar_root = ::getenv("PULSARROOT");
@@ -290,8 +305,6 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
 	  }
     }
 
-
-
   //Assign as starting ephemeris the first entry of the vectors... 
   m_t0Init = m_t0InitVect[0];
   m_t0 = m_t0Vect[0];
@@ -339,7 +352,20 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
   PulsarLog << "**\n**   Flux above 100 MeV : " << m_flux << " ph/cm2/s " << std::endl;
   PulsarLog << "**   Enphmin: " << m_enphmin << " keV | Enphmax: " << m_enphmax << " keV" << std::endl;
   PulsarLog << "**************************************************" << std::endl;
+
+  //Write info about FT2 
+  if (m_UseFT2 == 0)
+    {
+      PulsarLog << "** No FT2 file used " << std::endl;
+    }
+  else
+    PulsarLog << "** FT2 file used " << std::endl;
   
+  PulsarLog << "** Start time:" << std::setprecision(30) << m_FT2_startMET << " s. MET |  End time:" 
+	    << m_FT2_stopMET << " s. MET" << std::endl;
+  PulsarLog << "**************************************************" << std::endl;
+
+
   //Writes down on Log all the ephemerides
   for (unsigned int n=0; n < m_t0Vect.size(); n++)
     {
@@ -617,8 +643,6 @@ double PulsarSpectrum::interval(double time)
 
   double intPart=0.; //Integer part
   double PhaseNoNoise,PhaseWithNoise=0.;
-
-  //pippo
 
   //Apply timing noise
   if (m_TimingNoiseModel !=0)
@@ -954,51 +978,17 @@ double PulsarSpectrum::interval(double time)
   if (m_BinaryFlag == 0)
     {
       nextTimeTilde = nextTimeTildeDemodulated;
-      //      if ((nextTimeTilde-510.0) < StartTimeMET)
-      //{
-      //  std::cout << "WARNING!!Barycentric decorrection need time before tStart: adding 510 s." << std::endl;
-      //  nextTimeTilde+=510.;
-      //}
-      
-      //std::cout << "end" << EndTimeMET << std::endl;
-      //      if ((nextTimeTilde+510.0) > EndTimeMET)
-      //{
-      //  std::cout << "WARNING!!Barycentric decorrection need time after tEnd: set t to end" << std::endl;
-      //  nextTimeTilde=EndTimeMET;
-      //}
-
+      double trc = CheckTimeRange(nextTimeTilde,510.);
+      nextTimeTilde = trc;
       nextTimeTildeDecorr = getDecorrectedTime(nextTimeTilde); //Barycentric decorrections
     }
   else 
     {
-
-      //if ((nextTimeTildeDemodulated-m_t0PeriastrMJD*SecsOneDay) < StartTimeMET)
-      //{
-      //  std::cout << "WARNING!!Inverse binary demodulation need time before tStart: adding 510 s." << std::endl;
-      //  nextTimeTildeDemodulated+=m_t0PeriastrMJD*SecsOneDay;
-      //}
-      
-      //std::cout << "end" << EndTimeMET << std::endl;
-      //  if ((nextTimeTildeDemodulated+m_t0PeriastrMJD*SecsOneDay) > EndTimeMET)
-      //{
-      //  std::cout << "WARNING!!Inverse binary demodulation need time after tEnd: set t to end" << std::endl;
-      //  nextTimeTildeDemodulated=EndTimeMET;
-      //}
+      double trc = CheckTimeRange(nextTimeTildeDemodulated, (m_asini*(1-m_ecc)+m_asini*std::sqrt(1-m_ecc*m_ecc)));
+      nextTimeTildeDemodulated = trc;
       nextTimeTilde = getBinaryDemodulationInverse(nextTimeTildeDemodulated);
-
-      //if ((nextTimeTilde-510.0) < StartTimeMET)
-      //{
-      //  std::cout << "WARNING!!Barycentric decorrection need time before tStart: adding 510 s." << std::endl;
-      //  nextTimeTilde+=510.;
-      //}
-      
-      //std::cout << "end" << EndTimeMET << std::endl;
-      //if ((nextTimeTilde+510.0) > EndTimeMET)
-      //{
-      //  std::cout << "WARNING!!Barycentric decorrection need time after tEnd: set t to end" << std::endl;
-      //  nextTimeTilde=EndTimeMET;
-      //}
-
+      trc = CheckTimeRange(nextTimeTilde,510.);
+      nextTimeTilde = trc;
       nextTimeTildeDecorr = getDecorrectedTime(nextTimeTilde); //Barycentric decorrections
     }
  
@@ -1362,8 +1352,9 @@ double PulsarSpectrum::getDecorrectedTime(double CorrectedTime)
   //  std::cout << "Get decorrected time from time t=" << CorrectedTime << std::endl;
       //}
   double deltaMax = 510.0; //max deltat (s)
-  double ttUp = CorrectedTime + deltaMax;
   double ttDown = CorrectedTime - deltaMax;
+  double ttUp = CorrectedTime + deltaMax;
+
   double ttMid = (ttUp + ttDown)/2;
 
   int i = 0;
@@ -1536,22 +1527,22 @@ int PulsarSpectrum::getPulsarFromDataList(std::string sourceFileName)
 	  // std::cout << "T0 " << t0 << " start " << startMJD << std::endl;
 	  if (t0 < startMJD)
 	    {
-	      //   if (DEBUG)
-	      //{
+	      if (DEBUG)
+		{
 		  std::cout << std::setprecision(10) 
 			    << "Warning! Epoch t0 out the simulation range (t0-tStart=" << (t0-startMJD)
 			    << " s.: changing to MJD " << startMJD << std::endl;
-		  //}
+		}
 	      t0 = startMJD;
 	    }
 	  
 	  if (txbary < startMJD)
 	    {
-	      //	      if (DEBUG)
-	      //{
+	      if (DEBUG)
+		{
 		  std::cout << "Warning! txbary out the simulation range (t0-tStart=" << (txbary-startMJD)
 			    << " s.: changing to MJD " << startMJD << std::endl;
-		  //}
+		}
 	      txbary = startMJD;
 	    }
 
@@ -1560,23 +1551,23 @@ int PulsarSpectrum::getPulsarFromDataList(std::string sourceFileName)
 	  // std::cout << "T0 " << t0 << " start " << startMJD << std::endl;
 	  if (t0 > endMJD)
 	    {
-	      //	      if (DEBUG)
-	      //{
+	      if (DEBUG)
+		{
 		  std::cout << std::setprecision(10) 
 			    << "Warning! Epoch t0 out the simulation range (t0-tEnd=" << (t0-endMJD)
 			    << " s.: changing to MJD " << endMJD << std::endl;
 		  std::cout << "***end at " << endTime << " corresp to " << endMJD << std::endl;
-		  //}
+		}
 	      t0 = endMJD;
 	    }
 	  
 	  if (txbary > endMJD)
 	    {
-	      //	      if (DEBUG)
-	      //{
+	      if (DEBUG)
+		{
 		  std::cout << "Warning! txbary out the simulation range (t0-tEnd=" << (txbary-endMJD)
 			    << " s.: changing to MJD " << endMJD << std::endl;
-		  //}
+		}
 		  txbary = endMJD;
 	    }
 
@@ -1963,3 +1954,29 @@ std::string PulsarSpectrum::parseParamList(std::string input, unsigned int index
   if(index>=output.size()) return "";
   return output[index];
 };
+
+/////////////////////////////////////////////
+/*!
+ * \param TimeToCheck time to check for orbit
+ */
+double PulsarSpectrum::CheckTimeRange(double TimeToCheck, double deltaTime)
+{
+
+  if (m_UseFT2!=0)
+    {
+      if ((TimeToCheck-(StartMissionDateMJD)*SecsOneDay-deltaTime) < m_FT2_startMET)
+	{
+	  std::cout << "paura1!!!" << std::endl;
+	  TimeToCheck+=deltaTime;
+	}
+      if ((TimeToCheck-(StartMissionDateMJD)*SecsOneDay+deltaTime) > m_FT2_stopMET)
+	{
+	  std::cout << "paura2!!!" << std::endl;
+	  TimeToCheck=m_FT2_stopMET-deltaTime-10.;
+	}
+    }
+
+  return TimeToCheck;
+}
+
+
