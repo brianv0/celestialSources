@@ -894,15 +894,15 @@ double PulsarSpectrum::interval(double time)
 	   }
     }
 
-  if (DEBUG)
-    {
+  //  if (DEBUG)
+  //{
       if ((int(timeTilde - (StartMissionDateMJD)*SecsOneDay) % 1000) < 1.5)
 	std::cout << "\n\n** " << m_PSRname << " Time is: " 
 		  << timeTildeDecorr-(StartMissionDateMJD)*SecsOneDay << " s MET in TT | "
 		  << timeTilde-(StartMissionDateMJD)*SecsOneDay << "s. MET in SSB in TDB (barycorr.) | "
 		  << timeTildeDemodulated-(StartMissionDateMJD)*SecsOneDay << "s. MET in SSB in TDB (barycorr. + demod.)| "
 		  << std::endl;
-    }
+      //}
 
   //Log out the barycentric corrections  
   double bl=0;
@@ -1168,7 +1168,7 @@ double PulsarSpectrum::getBaryCorr( double ttInput, int LogCorrFlag)
     scPos = astro::GPS::instance()->position(timeMET);
   } catch (astro::PointingHistory::TimeRangeError & eObj)
     {
-      //do nothing...
+      std::cout << "Time Error! " << std::setprecision(30) << timeMET << std::endl;
     }
 
   //Correction due to geometric time delay of light propagation 
@@ -1186,6 +1186,7 @@ double PulsarSpectrum::getBaryCorr( double ttInput, int LogCorrFlag)
     GeomCorr = GeomVect.dot(m_PulsarVectDir);
   } catch (astro::SolarSystem::BadDate & eObj)
     {
+      std::cout << "Time Error JD! " << ttJD << std::endl;
       GeomCorr = 0.;  
     }
 
@@ -1356,10 +1357,10 @@ double PulsarSpectrum::getDecorrectedTime(double CorrectedTime)
 {
   //Use the bisection method to find the inverse of the de-corrected time, i.e. the time (in TT)
   //that after correction is equal to Time in TDB
-  if (DEBUG)
-    {
-      std::cout << "Get decorrected time from time t=" << CorrectedTime << std::endl;
-    }
+  //if (DEBUG)
+  //{
+  //  std::cout << "Get decorrected time from time t=" << CorrectedTime << std::endl;
+      //}
   double deltaMax = 510.0; //max deltat (s)
   double ttUp = CorrectedTime + deltaMax;
   double ttDown = CorrectedTime - deltaMax;
@@ -1535,22 +1536,22 @@ int PulsarSpectrum::getPulsarFromDataList(std::string sourceFileName)
 	  // std::cout << "T0 " << t0 << " start " << startMJD << std::endl;
 	  if (t0 < startMJD)
 	    {
-	      if (DEBUG)
-		{
+	      //   if (DEBUG)
+	      //{
 		  std::cout << std::setprecision(10) 
 			    << "Warning! Epoch t0 out the simulation range (t0-tStart=" << (t0-startMJD)
 			    << " s.: changing to MJD " << startMJD << std::endl;
-		}
+		  //}
 	      t0 = startMJD;
 	    }
 	  
 	  if (txbary < startMJD)
 	    {
-	      if (DEBUG)
-		{
+	      //	      if (DEBUG)
+	      //{
 		  std::cout << "Warning! txbary out the simulation range (t0-tStart=" << (txbary-startMJD)
 			    << " s.: changing to MJD " << startMJD << std::endl;
-		}
+		  //}
 	      txbary = startMJD;
 	    }
 
@@ -1559,23 +1560,23 @@ int PulsarSpectrum::getPulsarFromDataList(std::string sourceFileName)
 	  // std::cout << "T0 " << t0 << " start " << startMJD << std::endl;
 	  if (t0 > endMJD)
 	    {
-	      if (DEBUG)
-		{
+	      //	      if (DEBUG)
+	      //{
 		  std::cout << std::setprecision(10) 
 			    << "Warning! Epoch t0 out the simulation range (t0-tEnd=" << (t0-endMJD)
 			    << " s.: changing to MJD " << endMJD << std::endl;
 		  std::cout << "***end at " << endTime << " corresp to " << endMJD << std::endl;
-		}
+		  //}
 	      t0 = endMJD;
 	    }
 	  
 	  if (txbary > endMJD)
 	    {
-	      if (DEBUG)
-		{
+	      //	      if (DEBUG)
+	      //{
 		  std::cout << "Warning! txbary out the simulation range (t0-tEnd=" << (txbary-endMJD)
 			    << " s.: changing to MJD " << endMJD << std::endl;
-		}
+		  //}
 		  txbary = endMJD;
 	    }
 
