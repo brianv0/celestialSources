@@ -408,7 +408,7 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
 
       //define a default mean rate of about 1 day
       m_TimingNoiseMeanRate = 1/86400.;
-      //interval according to Poisson statistics
+      // according to Poisson statistics
       double startTime = Spectrum::startTime();
       m_TimingNoiseTimeNextEvent = startTime -log(1.-m_PSpectrumRandom->Uniform(1.0))/m_TimingNoiseMeanRate; 
 
@@ -593,13 +593,32 @@ double PulsarSpectrum::flux(double time) const
  */
 double PulsarSpectrum::interval(double time)
 {  
-  
   double timeTildeDecorr = time + (StartMissionDateMJD)*SecsOneDay; //Arrival time decorrected
+  if (time < m_FT2_startMET)
+    {
+      timeTildeDecorr+=(m_FT2_startMET-time)+511.;
+    }
+
+  //  if (time > m_FT2_stopMET)
+  //{
+  //  timeTildeDecorr-=(time-m_FT2_stopMET)-511.;
+  //}
+
+
+  //double timeTildeDecorr = time + (StartMissionDateMJD)*SecsOneDay; //Arrival time decorrected
+
+  //  std::cout << "Begin check!" << std::endl;
+  //double trc1 = CheckTimeRange(timeTildeDecorr,0.);
+  //timeTildeDecorr = trc1;
+
+
   //this should be corrected before applying barycentryc decorr + ephem de-corrections
 
   double timeTilde = 0;
 
   timeTilde = timeTildeDecorr + getBaryCorr(timeTildeDecorr,0); 
+
+
 
 
   //  double StartTimeMET =Spectrum::startTime();
@@ -984,40 +1003,40 @@ double PulsarSpectrum::interval(double time)
     }
   else 
     {
-      double trc = CheckTimeRange(nextTimeTildeDemodulated, (m_asini*(1-m_ecc)+m_asini*std::sqrt(1-m_ecc*m_ecc)));
-      nextTimeTildeDemodulated = trc;
+      //double trc = CheckTimeRange(nextTimeTildeDemodulated, (m_asini*(1-m_ecc)+m_asini*std::sqrt(1-m_ecc*m_ecc)));
+      //nextTimeTildeDemodulated = trc;
       nextTimeTilde = getBinaryDemodulationInverse(nextTimeTildeDemodulated);
-      trc = CheckTimeRange(nextTimeTilde,510.);
+      double trc = CheckTimeRange(nextTimeTilde,510.);
       nextTimeTilde = trc;
       nextTimeTildeDecorr = getDecorrectedTime(nextTimeTilde); //Barycentric decorrections
     }
  
-  if (DEBUG)
-    { 
+  // if (DEBUG)
+  //{ 
       std::cout << std::setprecision(15) << "\nTimeTildeDecorr at Spacecraft (TT) is: " 
-		<< timeTildeDecorr - (StartMissionDateMJD)*SecsOneDay << "sec." << std::endl;
+		<< timeTildeDecorr - (StartMissionDateMJD)*SecsOneDay << "s." << std::endl;
       std::cout << "Arrival time after start of the simulation : " 
 		<< timeTildeDecorr - (StartMissionDateMJD)*SecsOneDay -Spectrum::startTime() << " s." << std::endl; 
       std::cout << std::setprecision(15) <<"  TimeTilde at SSB (in TDB) is: " 
 		<< timeTilde - (StartMissionDateMJD)*SecsOneDay << "sec." << std::endl;
-      std::cout << std::setprecision(15) <<"  TimeTildeDemodulated : " 
+      std::cout << std::setprecision(15) <<"  TimeTildeDemodulated: " 
 		<< timeTildeDemodulated - (StartMissionDateMJD)*SecsOneDay 
 		<< "sec.; phase=" << modf(initTurns,&intPart) << std::endl;
-      std::cout << std::setprecision(15) <<"  nextTimeTildeDemodulated at SSB (in TDB) is:" 
-		<< nextTimeTildeDemodulated - (StartMissionDateMJD)*SecsOneDay << "s." << std::endl;
-      std::cout << std::setprecision(15) <<"  nextTimeTilde at SSB (in TDB) is:" 
-		<< nextTimeTilde - (StartMissionDateMJD)*SecsOneDay << "s." << std::endl;
-      std::cout << std::setprecision(15) <<"  nextTimeTilde decorrected (TT)is" 
-		<< nextTimeTildeDecorr - (StartMissionDateMJD)*SecsOneDay << "s." << std::endl;
+      std::cout << std::setprecision(15) <<"  nextTimeTildeDemodulated at SSB (in TDB) is: " 
+		<< nextTimeTildeDemodulated - (StartMissionDateMJD)*SecsOneDay << " s." << std::endl;
+      std::cout << std::setprecision(15) <<"  nextTimeTilde at SSB (in TDB) is: " 
+		<< nextTimeTilde - (StartMissionDateMJD)*SecsOneDay << " s." << std::endl;
+      std::cout << std::setprecision(15) <<"  nextTimeTilde decorrected (TT) is: " 
+		<< nextTimeTildeDecorr - (StartMissionDateMJD)*SecsOneDay << " s." << std::endl;
       std::cout << " corrected is " 
 		<< nextTimeTildeDecorr + getBaryCorr(nextTimeTildeDecorr,0) - (StartMissionDateMJD)*SecsOneDay << std::endl;
       std::cout << std::setprecision(15) <<"  -->Interval is " <<  nextTimeTildeDecorr - timeTildeDecorr << std::endl;
-    }
-  
-  double interv = nextTimeTildeDecorr - timeTildeDecorr;
+      //   }
+    //  double interv = nextTimeTildeDecorr - timeTildeDecorr;
+  double interv = 520+nextTimeTildeDecorr-(time + (StartMissionDateMJD)*SecsOneDay);
   if (interv < 0.)
     interv = m_periodVect[0]/100.;
-  
+
   return interv;
   
 }
@@ -1961,19 +1980,26 @@ std::string PulsarSpectrum::parseParamList(std::string input, unsigned int index
  */
 double PulsarSpectrum::CheckTimeRange(double TimeToCheck, double deltaTime)
 {
+  double DeltaCorrection =0.;
 
   if (m_UseFT2!=0)
     {
       if ((TimeToCheck-(StartMissionDateMJD)*SecsOneDay-deltaTime) < m_FT2_startMET)
 	{
-	  std::cout << "paura1!!!" << std::endl;
-	  TimeToCheck+=deltaTime;
+	  DeltaCorrection = m_FT2_startMET-(TimeToCheck-(StartMissionDateMJD)*SecsOneDay-deltaTime)+1.;
+	  TimeToCheck+=DeltaCorrection;
+	  std::cout << std::setprecision(30) << "tf-d < FT2start: correction " << DeltaCorrection
+		    << " -->" << TimeToCheck << std::endl;
 	}
+      
       if ((TimeToCheck-(StartMissionDateMJD)*SecsOneDay+deltaTime) > m_FT2_stopMET)
 	{
-	  std::cout << "paura2!!!" << std::endl;
-	  TimeToCheck=m_FT2_stopMET-deltaTime-10.;
+	  DeltaCorrection = (TimeToCheck-(StartMissionDateMJD)*SecsOneDay+deltaTime)-m_FT2_stopMET-1.;
+	  TimeToCheck-=DeltaCorrection;
+	  std::cout << std::setprecision(30) << "tf+d > FT2stop: correction " << DeltaCorrection
+		    << " -->" << TimeToCheck << std::endl;
 	}
+      
     }
 
   return TimeToCheck;
