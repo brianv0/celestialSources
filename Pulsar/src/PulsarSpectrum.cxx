@@ -145,6 +145,9 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
   m_PPN =0.;
   m_FT2_startMET = -1.;
   m_FT2_stopMET =-1.; 
+  m_Sim_startMET = -1.;
+  m_Sim_stopMET =-1.; 
+
   m_UseFT2 = 0;
 
 
@@ -187,6 +190,9 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
       m_FT2_startMET = Spectrum::startTime();
       m_FT2_stopMET = astro::GPS::instance()->endTime();
     }
+
+  m_Sim_startMET = Spectrum::startTime();
+  m_Sim_stopMET = astro::GPS::instance()->endTime();
 
   //Retrieve pulsar data from a list of DataList file.
   std::string pulsar_root = ::getenv("PULSARROOT");
@@ -364,7 +370,8 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
   PulsarLog << "** Start time:" << std::setprecision(30) << m_FT2_startMET << " s. MET |  End time:" 
 	    << m_FT2_stopMET << " s. MET" << std::endl;
   PulsarLog << "**************************************************" << std::endl;
-
+  PulsarLog << "** Simulation start at " << m_Sim_startMET << " s. MET and ends at :" << m_Sim_stopMET << std::endl;
+  PulsarLog << "**************************************************" << std::endl;
 
   //Writes down on Log all the ephemerides
   for (unsigned int n=0; n < m_t0Vect.size(); n++)
@@ -593,16 +600,24 @@ double PulsarSpectrum::flux(double time) const
  */
 double PulsarSpectrum::interval(double time)
 {  
+  std::cout <<"cutu1" <<std::endl;
+  if ((time+510.) > m_FT2_stopMET)
+    {
+      std::cout <<"cutu2" <<std::endl;
+      return -1;
+    }
+
   double timeTildeDecorr = time + (StartMissionDateMJD)*SecsOneDay; //Arrival time decorrected
   if (time < m_FT2_startMET)
     {
       timeTildeDecorr+=(m_FT2_startMET-time)+511.;
     }
 
-  //  if (time > m_FT2_stopMET)
-  //{
-  //  timeTildeDecorr-=(time-m_FT2_stopMET)-511.;
-  //}
+  std::cout <<"cutu3" <<std::endl;
+  if (time > m_FT2_stopMET)
+    {
+      timeTildeDecorr-=(time-m_FT2_stopMET)-511.;
+    }
 
 
   //double timeTildeDecorr = time + (StartMissionDateMJD)*SecsOneDay; //Arrival time decorrected
@@ -617,7 +632,7 @@ double PulsarSpectrum::interval(double time)
   double timeTilde = 0;
 
   timeTilde = timeTildeDecorr + getBaryCorr(timeTildeDecorr,0); 
-
+  std::cout << "pippo3" << std::endl;
 
 
 
@@ -937,15 +952,16 @@ double PulsarSpectrum::interval(double time)
 	   }
     }
 
-  //  if (DEBUG)
-  //{
+  if (DEBUG)
+    {
       if ((int(timeTilde - (StartMissionDateMJD)*SecsOneDay) % 1000) < 1.5)
 	std::cout << "\n\n** " << m_PSRname << " Time is: " 
 		  << timeTildeDecorr-(StartMissionDateMJD)*SecsOneDay << " s MET in TT | "
 		  << timeTilde-(StartMissionDateMJD)*SecsOneDay << "s. MET in SSB in TDB (barycorr.) | "
-		  << timeTildeDemodulated-(StartMissionDateMJD)*SecsOneDay << "s. MET in SSB in TDB (barycorr. + demod.)| "
+		  << timeTildeDemodulated-(StartMissionDateMJD)*SecsOneDay 
+		  << "s. MET in SSB in TDB (barycorr. + demod.)| "
 		  << std::endl;
-      //}
+    }
 
   //Log out the barycentric corrections  
   double bl=0;
@@ -1011,8 +1027,8 @@ double PulsarSpectrum::interval(double time)
       nextTimeTildeDecorr = getDecorrectedTime(nextTimeTilde); //Barycentric decorrections
     }
  
-  // if (DEBUG)
-  //{ 
+  if (DEBUG)
+    { 
       std::cout << std::setprecision(15) << "\nTimeTildeDecorr at Spacecraft (TT) is: " 
 		<< timeTildeDecorr - (StartMissionDateMJD)*SecsOneDay << "s." << std::endl;
       std::cout << "Arrival time after start of the simulation : " 
@@ -1031,9 +1047,10 @@ double PulsarSpectrum::interval(double time)
       std::cout << " corrected is " 
 		<< nextTimeTildeDecorr + getBaryCorr(nextTimeTildeDecorr,0) - (StartMissionDateMJD)*SecsOneDay << std::endl;
       std::cout << std::setprecision(15) <<"  -->Interval is " <<  nextTimeTildeDecorr - timeTildeDecorr << std::endl;
-      //   }
+    }
     //  double interv = nextTimeTildeDecorr - timeTildeDecorr;
-  double interv = 520+nextTimeTildeDecorr-(time + (StartMissionDateMJD)*SecsOneDay);
+
+  double interv = nextTimeTildeDecorr-(time + (StartMissionDateMJD)*SecsOneDay);
   if (interv < 0.)
     interv = m_periodVect[0]/100.;
 
@@ -1155,7 +1172,6 @@ double PulsarSpectrum::getBaryCorr( double ttInput, int LogCorrFlag)
   //Start Date;
   astro::JulianDate ttJD(StartMissionDateMJD+JDminusMJD);
   ttJD = ttJD+(ttInput - (StartMissionDateMJD)*SecsOneDay)/SecsOneDay;
-
   if (DEBUG)
     {
       std::cout << std::setprecision(30) << "\nBarycentric Corrections for time " << ttJD << " (JD)" << std::endl;
@@ -1168,7 +1184,6 @@ double PulsarSpectrum::getBaryCorr( double ttInput, int LogCorrFlag)
   CLHEP::Hep3Vector scPos;
 
   //Exception error in case of time not in the range of available position (when using a FT2 file)
-  
   try {
     //    std::cout<<astro::GPS::time()<<std::endl;
     //astro::GPS::update(timeMET);
@@ -1178,15 +1193,17 @@ double PulsarSpectrum::getBaryCorr( double ttInput, int LogCorrFlag)
   } catch (astro::PointingHistory::TimeRangeError & eObj)
     {
       std::cout << "Time Error! " << std::setprecision(30) << timeMET << std::endl;
+      if (timeMET>=m_FT2_stopMET)
+	{
+	  return 3e8;
+	}
     }
-
   //Correction due to geometric time delay of light propagation 
   //GLAST position
   CLHEP::Hep3Vector GeomVect = (scPos/clight);
   double GLASTPosGeom = GeomVect.dot(m_PulsarVectDir);
   double GeomCorr = 0;
   double EarthPosGeom =0.;
-
   try{
     //Earth position
     GeomVect = - m_solSys.getBarycenter(ttJD);
@@ -1200,7 +1217,6 @@ double PulsarSpectrum::getBaryCorr( double ttInput, int LogCorrFlag)
     }
 
 
-
   //Correction due to Shapiro delay.
   CLHEP::Hep3Vector sunV = m_solSys.getSolarVector(ttJD);
 
@@ -1208,7 +1224,6 @@ double PulsarSpectrum::getBaryCorr( double ttInput, int LogCorrFlag)
   double costheta = - sunV.dot(m_PulsarVectDir) / ( sunV.mag() * m_PulsarVectDir.mag() );
   double m = 4.9271e-6; // m = G * Msun / c^3
   double ShapiroCorr = 2.0 * m * log(1+costheta);
-
   if (DEBUG)
     {
       std::cout << std::setprecision(20) << "** --> TDB-TT = " << tdb_min_tt << std::endl;
@@ -1230,7 +1245,6 @@ double PulsarSpectrum::getBaryCorr( double ttInput, int LogCorrFlag)
   return tdb_min_tt + GeomCorr + ShapiroCorr; //seconds
   
 }
-
 
 /////////////////////////////////////////////
 /*!
@@ -1986,20 +2000,21 @@ double PulsarSpectrum::CheckTimeRange(double TimeToCheck, double deltaTime)
     {
       if ((TimeToCheck-(StartMissionDateMJD)*SecsOneDay-deltaTime) < m_FT2_startMET)
 	{
-	  DeltaCorrection = m_FT2_startMET-(TimeToCheck-(StartMissionDateMJD)*SecsOneDay-deltaTime)+1.;
+	  DeltaCorrection = m_FT2_startMET-(TimeToCheck-(StartMissionDateMJD)*SecsOneDay-deltaTime);
 	  TimeToCheck+=DeltaCorrection;
-	  std::cout << std::setprecision(30) << "tf-d < FT2start: correction " << DeltaCorrection
-		    << " -->" << TimeToCheck << std::endl;
+	  //	  std::cout << std::setprecision(30) << "tf-d < FT2start: correction " << DeltaCorrection
+	  //    << " -->" << TimeToCheck-(StartMissionDateMJD)*SecsOneDay << std::endl;
 	}
       
       if ((TimeToCheck-(StartMissionDateMJD)*SecsOneDay+deltaTime) > m_FT2_stopMET)
 	{
-	  DeltaCorrection = (TimeToCheck-(StartMissionDateMJD)*SecsOneDay+deltaTime)-m_FT2_stopMET-1.;
-	  TimeToCheck-=DeltaCorrection;
-	  std::cout << std::setprecision(30) << "tf+d > FT2stop: correction " << DeltaCorrection
-		    << " -->" << TimeToCheck << std::endl;
+	  DeltaCorrection = (TimeToCheck-(StartMissionDateMJD)*SecsOneDay+deltaTime)-m_FT2_stopMET;
+	  TimeToCheck = m_FT2_stopMET+(StartMissionDateMJD)*SecsOneDay;
+	  //std::cout << std::setprecision(30) << "tf+d > FT2stop: correction " << DeltaCorrection
+	  //    << " -1->" << TimeToCheck-(StartMissionDateMJD)*SecsOneDay << std::endl;
 	}
       
+
     }
 
   return TimeToCheck;

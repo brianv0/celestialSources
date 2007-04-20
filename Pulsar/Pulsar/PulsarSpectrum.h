@@ -193,6 +193,8 @@ class PulsarSpectrum : public ISpectrum
   double m_FT2_startMET,m_FT2_stopMET; 
   int m_UseFT2;
 
+  double m_Sim_startMET,m_Sim_stopMET; 
+
   //! Random seed
   int m_seed;
 
