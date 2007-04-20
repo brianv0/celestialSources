@@ -18,11 +18,12 @@
 
 #include "flux/SpectrumFactory.h"
 #include "flux/EventSource.h"
-#include "CLHEP/Random/RandFlat.h"
 
 #include "microQuasar/microQuasar.h"
 
-
+#include "astro/GPS.h"
+#include "astro/PointingHistory.h"
+#include "CLHEP/Random/RandFlat.h"
 
 ISpectrumFactory &microQuasarFactory() { // a.k.a. microQuasarFactory, see http://www.bbc.co.uk/dna/h2g2/A105265
 	static SpectrumFactory<microQuasar> myFactory;
@@ -36,76 +37,77 @@ microQuasar::microQuasar(const std::string &paramString)
 , m_randPhase(0)
 {
 
-  std::vector<std::string> tokens = tokenize(paramString,',');
+	std::vector<std::string> tokens = tokenize(paramString,',');
 
-  float daySecs = 86400.;
-  
-  float specOrbital1,specOrbital2=-1;
-  float phaseOrbital1,phaseOrbital2=-1;
+	float daySecs = 86400.;
+	m_burstSeed = 124556789.;  // default see for burst generation
+	m_randGenBurst.setTheSeed(m_burstSeed);
 
-  std::vector<std::string>::iterator curToken = tokens.begin();
-  while(curToken!=tokens.end()){
-    std::vector<std::string> token = tokenize(*curToken,'=');
-    std::transform(token[0].begin(),token[0].end(),token[0].begin(),(int(*)(int))toupper);
-    if(token[0]=="FLUX")
-      m_ftot = std::atof(token[1].c_str());
-    if(token[0]=="EMIN")
-      m_eMin = std::atof(token[1].c_str());
-    if(token[0]=="EMAX")
-      m_eMax = std::atof(token[1].c_str());
-    if(token[0]=="ORBITALPERIOD")
-      m_orbitalPeriod = std::atof(token[1].c_str())*daySecs;
-    if(token[0]=="ORBITALMODULATION")
-      m_orbitalModulation = std::atof(token[1].c_str());
-    if(token[0]=="ORBITALPHASE")
-      m_phi0 = std::atof(token[1].c_str());
-    if(token[0]=="SPECTRALORBITALREGION1")
-      specOrbital1 = std::atof(token[1].c_str());
-    if(token[0]=="SPECTRALORBITALREGION2")
-      specOrbital2 = std::atof(token[1].c_str());
-    if(token[0]=="ORBITALPHASEREGION1")
-      phaseOrbital1 = std::atof(token[1].c_str());
-    if(token[0]=="ORBITALPHASEREGION2")
-      phaseOrbital2 = std::atof(token[1].c_str());
-    if(token[0]=="DISKCYCLEDURATION")
-      m_diskProperties.setCycleDuration(std::atof(token[1].c_str())*daySecs);
-    if(token[0]=="DISKCYCLEFLUCTUATION")
-      m_diskProperties.setCycleDurationFluct(std::atof(token[1].c_str()));
-    if(token[0]=="JETONCYCLE")
-      m_jetProperties.setJetOnCycle(std::atof(token[1].c_str()));
-    if(token[0]=="JETONCYCLEFLUCTUATION")
-      m_jetProperties.setJetOnCycleFluct(std::atof(token[1].c_str()));
-    if(token[0]=="JETONDURATION")
-      m_jetProperties.setJetOnDuration(std::atof(token[1].c_str()));
-    if(token[0]=="JETONDURATIONFLUCTUATION")
-      m_jetProperties.setJetOnDurationFluct(std::atof(token[1].c_str()));
-	curToken++;
-  } 
-  if(specOrbital1!=-1 && specOrbital2!=-1)
-    m_orbitalRegion.setSpectralIndex(specOrbital1,specOrbital2);
-  if(phaseOrbital1!=-1 && phaseOrbital2!=-1)
-    m_orbitalRegion.setOrbitalPhase(phaseOrbital1,phaseOrbital2);
-	/*
-	m_ftot = ::atof(params[0].c_str());
-	m_eMin = ::atof(params[1].c_str());
-	m_eMax = ::atof(params[2].c_str());
-	m_orbitalPeriod = ::atof(params[3].c_str()) * daySecs;
-	m_orbitalModulation = ::atof(params[4].c_str());
-	m_phi0 = ::atof(params[5].c_str());
+	float specOrbital1,specOrbital2=-1;
+	float phaseOrbital1,phaseOrbital2=-1;
 
-	m_orbitalRegion.setSpectralIndex(::atof(params[6].c_str()),::atof(params[7].c_str()));
-	m_orbitalRegion.setOrbitalPhase(::atof(params[8].c_str()),::atof(params[9].c_str()));
+	std::vector<std::string>::iterator curToken = tokens.begin();
+	while(curToken!=tokens.end()){
+		std::vector<std::string> token = tokenize(*curToken,'=');
+		std::transform(token[0].begin(),token[0].end(),token[0].begin(),(int(*)(int))toupper);
+		if(token[0]=="FLUX")
+			m_ftot = std::atof(token[1].c_str());
+		if(token[0]=="EMIN")
+			m_eMin = std::atof(token[1].c_str());
+		if(token[0]=="EMAX")
+			m_eMax = std::atof(token[1].c_str());
+		if(token[0]=="ORBITALPERIOD")
+			m_orbitalPeriod = std::atof(token[1].c_str())*daySecs;
+		if(token[0]=="ORBITALMODULATION")
+			m_orbitalModulation = std::atof(token[1].c_str());
+		if(token[0]=="ORBITALPHASE")
+			m_phi0 = std::atof(token[1].c_str());
+		if(token[0]=="SPECTRALORBITALREGION1")
+			specOrbital1 = std::atof(token[1].c_str());
+		if(token[0]=="SPECTRALORBITALREGION2")
+			specOrbital2 = std::atof(token[1].c_str());
+		if(token[0]=="ORBITALPHASEREGION1")
+			phaseOrbital1 = std::atof(token[1].c_str());
+		if(token[0]=="ORBITALPHASEREGION2")
+			phaseOrbital2 = std::atof(token[1].c_str());
+		if(token[0]=="DISKCYCLEDURATION")
+			m_diskProperties.setCycleDuration(std::atof(token[1].c_str())*daySecs);
+		if(token[0]=="DISKCYCLEFLUCTUATION")
+			m_diskProperties.setCycleDurationFluct(std::atof(token[1].c_str()));
+		if(token[0]=="JETONCYCLE")
+			m_jetProperties.setJetOnCycle(std::atof(token[1].c_str()));
+		if(token[0]=="JETONCYCLEFLUCTUATION")
+			m_jetProperties.setJetOnCycleFluct(std::atof(token[1].c_str()));
+		if(token[0]=="JETONDURATION")
+			m_jetProperties.setJetOnDuration(std::atof(token[1].c_str()));
+		if(token[0]=="JETONDURATIONFLUCTUATION")
+			m_jetProperties.setJetOnDurationFluct(std::atof(token[1].c_str()));
+		curToken++;
+	} 
+	if(specOrbital1!=-1 && specOrbital2!=-1)
+		m_orbitalRegion.setSpectralIndex(specOrbital1,specOrbital2);
+	if(phaseOrbital1!=-1 && phaseOrbital2!=-1)
+		m_orbitalRegion.setOrbitalPhase(phaseOrbital1,phaseOrbital2);
 
-	m_diskProperties.setCycleDuration(::atof(params[10].c_str())* daySecs);
-	m_diskProperties.setCycleDurationFluct(::atof(params[11].c_str()));
+	double time = 0.;
+	burstPairs burstTimes;
 
-	m_jetProperties.setJetOnCycle(::atof(params[12].c_str()));
-	m_jetProperties.setJetOnCycleFluct(::atof(params[13].c_str()));
-	m_jetProperties.setJetOnDuration(::atof(params[14].c_str()));
-	m_jetProperties.setJetOnDurationFluct(::atof(params[15].c_str()));
-	*/
+	// get the time window for creating the burst list from the pointing history start/stop times
+	astro::GPS* gps = astro::GPS::instance();
+	const astro::PointingHistory& pHistory = gps->history();
+    double tMin( pHistory.startTime() );
+	double tMax( pHistory.endTime() );
+	time = tMin;
 
-  m_jetStart = 0.;
+	if (m_jetProperties.getJetOnDuration() != 1.) {
+		while (time < tMax) {
+			burstTimes = calculateJetStart(time);
+			m_bursts.push_back(burstTimes);
+			time = m_jetEnd;
+		}
+	}
+
+	m_jetStart = 0.;
 
 	std::cerr << "microQuasar created. Total flux = " 
 		<< m_ftot << " m^-2 s^-1 " << " between " 
@@ -114,22 +116,22 @@ microQuasar::microQuasar(const std::string &paramString)
 }
 
 std::vector<std::string> microQuasar::tokenize(std::string params, char token){
-  std::vector<std::string> tokens;
-  while(params.length()!=0){
-    std::string::size_type pos = params.find(token,0);
-    std::string token = params.substr(0,pos);
-    while(token.at(0)==' ')
-      token.erase(0,1);
-    while(token.at(token.length()-1)==' ')
-      token.erase(token.length()-1,1);
-    tokens.push_back(token);
-    params.erase(0,pos);
-    if(params.length()!=0)
-      params.erase(0,1);
-    while(params.length()!=0 && params.at(0)==' ')
-      params.erase(0,1);
-  }
-  return tokens;
+	std::vector<std::string> tokens;
+	while(params.length()!=0){
+		std::string::size_type pos = params.find(token,0);
+		std::string token = params.substr(0,pos);
+		while(token.at(0)==' ')
+			token.erase(0,1);
+		while(token.at(token.length()-1)==' ')
+			token.erase(token.length()-1,1);
+		tokens.push_back(token);
+		params.erase(0,pos);
+		if(params.length()!=0)
+			params.erase(0,1);
+		while(params.length()!=0 && params.at(0)==' ')
+			params.erase(0,1);
+	}
+	return tokens;
 }
 
 float microQuasar::operator()(float xi) const {
@@ -172,19 +174,7 @@ double microQuasar::interval(double current_time) {
 
 	double fTime = m_currentTime;
 	std::pair<double, double> jet;
-	
-	if (m_jetStart == 0.) {
-		jet = calculateJetStart(false,fTime);
-		m_jetStart = jet.first;
-		m_jetEnd = jet.second;
-	}
 
-
-	if (fTime> m_jetEnd) {
-		jet = calculateJetStart(true,fTime);
-		m_jetStart = jet.first;
-		m_jetEnd = jet.second;
-	}
 
 	double deltaT;
 	double twoPi = 2.*M_PI;
@@ -203,16 +193,20 @@ double microQuasar::interval(double current_time) {
 			continue;
 		}
 		deltaT = m_orbitalPeriod/twoPi*(funcZero + twoPi*m_nTurns);
-		
+
 		// if steady source, don't worry about artificial jet-on boundaries
 		if (m_jetProperties.getJetOnDuration() == 1.) break;
+
+		jet = getJetStart(fTime);
+		m_jetStart = jet.first;
+		m_jetEnd = jet.second;
 
 		double nextTime = m_currentTime+deltaT;
 		if ((nextTime >= m_jetStart) && (nextTime <= m_jetEnd)) break;
 
 		// if we're still in the current jet, don't recalculate it (because of
 		// fluctuations as much as efficiency)
-		if (nextTime > m_jetEnd) jet = calculateJetStart(true, nextTime);
+		if (nextTime > m_jetEnd) jet = getJetStart(nextTime);
 		m_jetStart = jet.first;
 		m_jetEnd = jet.second;
 
@@ -225,25 +219,28 @@ double microQuasar::interval(double current_time) {
 }
 
 
-std::pair<double,double> microQuasar::calculateJetStart(bool nextOn, double time) {
+std::pair<double,double> microQuasar::getJetStart(double time) {
+	return std::make_pair(0.,0.);
+}
+
+microQuasar::burstPairs microQuasar::calculateJetStart(double time) {
 
 	double jetOn = m_jetProperties.getJetOnCycle() * 
-		(1. + m_jetProperties.getJetOnCycleFluct()*(0.5*CLHEP::RandFlat::shoot()-1.));
+		(1. + m_jetProperties.getJetOnCycleFluct()*(0.5*m_randGenBurst.flat()-1.));
 
 	double diskCycle = m_diskProperties.getCycleDuration() *
-		(1. + m_diskProperties.getCycleDurationFluct()*(0.5*CLHEP::RandFlat::shoot()-1.));
+		(1. + m_diskProperties.getCycleDurationFluct()*(0.5*m_randGenBurst.flat()-1.));
 
 	double jetCycle = jetOn * diskCycle;
-		
+
 	double jetLength = m_jetProperties.getJetOnDuration()* 
-		(1. + m_jetProperties.getJetOnDurationFluct()*(0.5*CLHEP::RandFlat::shoot()-1.)) *
+		(1. + m_jetProperties.getJetOnDurationFluct()*(0.5*m_randGenBurst.flat()-1.)) *
 		diskCycle;
 
 	double nJet = floor((time+jetLength+jetCycle)/diskCycle);
-	if (nextOn) nJet++;
 	double jetStart = jetCycle + nJet*diskCycle;
 	double jetEnd = jetStart + jetLength;
-	return std::make_pair(jetStart, jetEnd);
+	return burstPairs(jetStart,jetEnd);
 }
 
 int microQuasar::OrbitalRegion::findRegion(double time, float period) {

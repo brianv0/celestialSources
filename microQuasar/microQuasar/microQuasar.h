@@ -13,6 +13,7 @@
 #include <vector>
 
 #include "flux/Spectrum.h"
+#include "CLHEP/Random/Random.h"
 
 /**
 * @class microQuasar
@@ -158,7 +159,26 @@ private:
 
 	/// fiddle of Numerical Recipe's rtsafe to avoid function passing
 	double rtsafe(const double x1, const double x2, const double xacc);
-	std::pair<double,double> calculateJetStart(bool nextOn, double time);
+	std::pair<double,double> getJetStart(double time);
+
+	class burstPairs {
+	public:
+		burstPairs() {};
+		burstPairs(double start, double end) {
+		m_start = start;
+		m_end =end;
+		}
+		~burstPairs() {};
+		const bool operator () (burstPairs* before, burstPairs* after) {
+		return before->m_start == after->m_start;
+		}
+		std::pair<double,double> getBurstPairs() { return std::make_pair(m_start,m_end);}
+	private:
+		double m_start;
+		double m_end;
+	};
+
+	burstPairs calculateJetStart(double time);
 
 	/// flux (ph s^-1 cm^-2)
 	float m_ftot;
@@ -181,6 +201,11 @@ private:
 	double m_currentTime;
 	double m_jetStart;
 	double m_jetEnd;
+	// random see for burst generation
+	double m_burstSeed;
+	CLHEP::HepRandom m_randGenBurst;
+	std::vector<burstPairs > m_bursts;
+
 	/// disk-cycle properties
 	DiskCycleProperties m_diskProperties;
 	/// jet timing properties
