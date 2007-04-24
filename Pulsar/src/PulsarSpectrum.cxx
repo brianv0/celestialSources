@@ -600,57 +600,20 @@ double PulsarSpectrum::flux(double time) const
  */
 double PulsarSpectrum::interval(double time)
 {  
-  std::cout <<"cutu1" <<std::endl;
-  if ((time+510.) > m_FT2_stopMET)
-    {
-      std::cout <<"cutu2" <<std::endl;
-      return -1;
-    }
 
   double timeTildeDecorr = time + (StartMissionDateMJD)*SecsOneDay; //Arrival time decorrected
+
+  //check if time is before FT2 start
   if (time < m_FT2_startMET)
     {
-      timeTildeDecorr+=(m_FT2_startMET-time)+511.;
+      timeTildeDecorr+=(m_FT2_startMET-time)+510.;
     }
-
-  std::cout <<"cutu3" <<std::endl;
-  if (time > m_FT2_stopMET)
-    {
-      timeTildeDecorr-=(time-m_FT2_stopMET)-511.;
-    }
-
-
-  //double timeTildeDecorr = time + (StartMissionDateMJD)*SecsOneDay; //Arrival time decorrected
-
-  //  std::cout << "Begin check!" << std::endl;
-  //double trc1 = CheckTimeRange(timeTildeDecorr,0.);
-  //timeTildeDecorr = trc1;
-
 
   //this should be corrected before applying barycentryc decorr + ephem de-corrections
 
   double timeTilde = 0;
 
   timeTilde = timeTildeDecorr + getBaryCorr(timeTildeDecorr,0); 
-  std::cout << "pippo3" << std::endl;
-
-
-
-  //  double StartTimeMET =Spectrum::startTime();
-  //double EndTimeMET = astro::GPS::instance()->endTime();
-
-  //  double const StartTimeMET = astro::PointingHistory::startTime();
-  //double const EndTimeMET = astro::PointingHistory::endTime();
-
-  //std::cout << std::setprecision(30) << "Start"<< StartTimeMET << " end" << EndTimeMET<<std::endl;
-
-
-  //std::cout << std::setprecision(15)<< "start" << StartTimeMET 
-  //    << "tTilde=" << timeTilde << "tFildeDEcorr" <<  timeTildeDecorr << std::endl; 
-  //if (timeTilde<StartTimeMET)
-  //{
-  //  std::cout << "OCCHIO CASINO!!!" << std::endl;
-  //}
 
   double timeTildeDemodulated =0.;
   
@@ -672,8 +635,6 @@ double PulsarSpectrum::interval(double time)
     }
 
   //Phase assignment
-
-
 
   double intPart=0.; //Integer part
   double PhaseNoNoise,PhaseWithNoise=0.;
@@ -811,71 +772,11 @@ double PulsarSpectrum::interval(double time)
 	}
     }
 
-  /*
-  if (m_TimingNoiseModel ==1)
-    {
-	  m_f2 = 0.;
-	  initTurnsNoNoise = getTurns(timeTildeDemodulated);
-	  
-	  Delta8 = 6.6 + 0.6*log10(m_pdot) + m_PSpectrumRandom->Gaus(0,1.0);
-	  
-	  double Sign = m_PSpectrumRandom->Uniform();
-	  if (Sign > 0.5)
-	    m_f2 = ((m_f0*6.*std::pow(10.,Delta8))*1e-24);
-	  else
-	    m_f2 = -1.0*((m_f0*6.*std::pow(10.,Delta8))*1e-24);
-    }
-  else if (m_TimingNoiseModel ==2)
-    {
-
-      if ((timeTildeDemodulated-(StartMissionDateMJD)*SecsOneDay) > m_timeMETNextNoiseEvent)
-	{
-	  m_timeMETNextNoiseEvent+=400.;
-	  double sigma_r_Crab_1628 = 0.012; // rms residual for crab
-	  double sigma_r = std::sqrt(sigma_r_Crab_1628*pow(10.,m_TimingNoiseActivity)); 
-	  double sigma_m = 8e-5;
-	  double sigma_R = sigma_r;
-	  double coeff = 15.5;
-	  // m_RWStrength_FN = coeff*coeff*(((sigma_r*sigma_r)-(sigma_m*sigma_m))/(sigma_R*sigma_R));
-	  std::cout << std::setprecision(30) << (timeTildeDemodulated-(StartMissionDateMJD)*SecsOneDay)
-		    << "Timing Noise Event! next will be at " << m_timeMETNextNoiseEvent << std::endl;
-	  //" s. MET rms:" << sigma_r 
-	  //    << " Strenght: " << m_RWStrength_FN << std::endl;
-	
-	  int CurrentDay = int((timeTildeDemodulated-(StartMissionDateMJD)*SecsOneDay)/86400);
-	  double CurrentDayFrac = 86400*(((timeTildeDemodulated-(StartMissionDateMJD)*SecsOneDay)/86400)-CurrentDay);
-	  //std::cout << std::setprecision(30) << CurrentDay << "+ " << CurrentDayFrac << std::endl;
-	  
-	  //  if (CurrentDayFrac < 100.)
-	  //{
-	  m_RWRate = 1/86400.;
-	  //std::cout << "Current day " << CurrentDay << std::endl;
-	  double DeltaPhi0 = m_PSpectrumRandom->Gaus(0.,std::sqrt((m_RWStrength_PN/m_RWRate)));
-	  double Deltaf0 = m_PSpectrumRandom->Gaus(0.,std::sqrt((m_RWStrength_FN/m_RWRate)));
-	  double Deltaf1 = m_PSpectrumRandom->Gaus(0.,std::sqrt((m_RWStrength_SN/m_RWRate)));
-	  std::cout << std::setprecision(30) << "dPhi0=" << DeltaPhi0 << " df0=" << Deltaf0 
-		    << " df1=" << Deltaf1 << " f2" << m_f2 << std::endl;
-
-	  m_phi0 = m_phi0 +  DeltaPhi0;
-	  m_f0 = m_f0 + Deltaf0;
-	  m_f1 = m_f1 + Deltaf1;
-	  m_f2 = 0.;
-	  
-	  //std::cout << std::setprecision(30) << "Current day " << CurrentDayFrac 
-	  //	    << " phi0:" << m_phi0 << " f0:" << m_f0 << " nonoise" << m_f0NoNoise << " df0" << Deltaf0 << std::endl;
-	  
-	  //}
-	 }
-    }
-  */
-
 
   double initTurns = getTurns(timeTildeDemodulated); //Turns made at this time
   double tStart = modf(initTurns,&intPart)*m_period; // Start time for interval
   if (tStart < 0.)
     tStart+=m_period;
-
-  //  double DeltaPhiNoise = modf(initTurns,&intPart)-modf(initTurnsNoNoise,&intPart);
 
   if (DEBUG)
     {
@@ -978,52 +879,28 @@ double PulsarSpectrum::interval(double time)
   
   double nextTimeTildeDemodulated = retrieveNextTimeTilde(timeTildeDemodulated, totTurns, (ephemCorrTol/m_period));
   
-  /*
-  if ((m_TimingNoiseModel != 0) && (TNOISELOG==1))
-    {
-      std::ofstream TimingNoiseLogFile((m_PSRname + "TimingNoise.log").c_str(),std::ios::app);
-      m_f2NoNoise = 0.;
-      double ft_l = GetFt(timeTildeDemodulated,m_f0NoNoise,m_f1NoNoise,m_f2NoNoise);
-      double ft_n = GetFt(timeTildeDemodulated,m_f0,m_f1,m_f2);
-      double ft1_l = 12.;//
-      double ft1_n = 23;//
-      double ft2_l = 11.;//
-      double ft2_n = 33;//
-      
-
-      TimingNoiseLogFile << std::setprecision(30) << nextTimeTildeDemodulated-(StartMissionDateMJD)*SecsOneDay
-			 << "\t" << m_TimingNoiseActivity
-			 << "\t" <<ft_l << "\t" << ft_n 
-			 << "\t" <<ft1_l << "\t" << ft1_n 
-			 << "\t" <<ft2_l << "\t" << ft2_n 			 
-			 << "\t" << (tStart/m_period)-PhaseNoise << std::endl;
-
-
-   }
-  */
-
   double nextTimeTilde = 0.;
   double nextTimeTildeDecorr = 0.;
 
   //inverse of binary demodulation and of barycentric corrections
 
-  //  double StartTimeMET =(StartMissionDateMJD)*SecsOneDay+Spectrum::startTime();
-  //  double EndTimeMET = (StartMissionDateMJD)*SecsOneDay+astro::GPS::instance()->endTime();
-
   if (m_BinaryFlag == 0)
     {
       nextTimeTilde = nextTimeTildeDemodulated;
-      double trc = CheckTimeRange(nextTimeTilde,510.);
-      nextTimeTilde = trc;
+
+      /* need Bug fix
+      if (((nextTimeTilde-(StartMissionDateMJD)*SecsOneDay)+510)>m_FT2_stopMET)
+	{
+	  std::cout << "aiutoooo!!! " << std::endl;
+	  return 3e10;
+	}
+	End code that need bug fix */
+
       nextTimeTildeDecorr = getDecorrectedTime(nextTimeTilde); //Barycentric decorrections
     }
   else 
     {
-      //double trc = CheckTimeRange(nextTimeTildeDemodulated, (m_asini*(1-m_ecc)+m_asini*std::sqrt(1-m_ecc*m_ecc)));
-      //nextTimeTildeDemodulated = trc;
       nextTimeTilde = getBinaryDemodulationInverse(nextTimeTildeDemodulated);
-      double trc = CheckTimeRange(nextTimeTilde,510.);
-      nextTimeTilde = trc;
       nextTimeTildeDecorr = getDecorrectedTime(nextTimeTilde); //Barycentric decorrections
     }
  
@@ -1169,6 +1046,17 @@ double PulsarSpectrum::retrieveNextTimeTilde( double tTilde, double totalTurns, 
  */
 double PulsarSpectrum::getBaryCorr( double ttInput, int LogCorrFlag)
 {
+
+  if (((ttInput-(StartMissionDateMJD)*SecsOneDay)+510)>m_FT2_stopMET)
+    {
+      if (DEBUG)
+	{
+	  std::cout << "WARNING!!!Arrival time after FT2 end. No barycentric correction! " << ttInput << std::endl;
+	}
+      return 0.;
+    }
+
+
   //Start Date;
   astro::JulianDate ttJD(StartMissionDateMJD+JDminusMJD);
   ttJD = ttJD+(ttInput - (StartMissionDateMJD)*SecsOneDay)/SecsOneDay;
@@ -1183,6 +1071,7 @@ double PulsarSpectrum::getBaryCorr( double ttInput, int LogCorrFlag)
   double timeMET = ttInput - (StartMissionDateMJD)*SecsOneDay;
   CLHEP::Hep3Vector scPos;
 
+
   //Exception error in case of time not in the range of available position (when using a FT2 file)
   try {
     //    std::cout<<astro::GPS::time()<<std::endl;
@@ -1192,11 +1081,16 @@ double PulsarSpectrum::getBaryCorr( double ttInput, int LogCorrFlag)
     scPos = astro::GPS::instance()->position(timeMET);
   } catch (astro::PointingHistory::TimeRangeError & eObj)
     {
-      std::cout << "Time Error! " << std::setprecision(30) << timeMET << std::endl;
-      if (timeMET>=m_FT2_stopMET)
+      if (DEBUG)
 	{
-	  return 3e8;
+	  std::cout << "Time Error! " << std::setprecision(30) << timeMET << std::endl;
 	}
+  
+      if ((timeMET+510)>=m_FT2_stopMET)
+	{
+	  return 0.;
+	}
+      
     }
   //Correction due to geometric time delay of light propagation 
   //GLAST position
@@ -1987,37 +1881,5 @@ std::string PulsarSpectrum::parseParamList(std::string input, unsigned int index
   if(index>=output.size()) return "";
   return output[index];
 };
-
-/////////////////////////////////////////////
-/*!
- * \param TimeToCheck time to check for orbit
- */
-double PulsarSpectrum::CheckTimeRange(double TimeToCheck, double deltaTime)
-{
-  double DeltaCorrection =0.;
-
-  if (m_UseFT2!=0)
-    {
-      if ((TimeToCheck-(StartMissionDateMJD)*SecsOneDay-deltaTime) < m_FT2_startMET)
-	{
-	  DeltaCorrection = m_FT2_startMET-(TimeToCheck-(StartMissionDateMJD)*SecsOneDay-deltaTime);
-	  TimeToCheck+=DeltaCorrection;
-	  //	  std::cout << std::setprecision(30) << "tf-d < FT2start: correction " << DeltaCorrection
-	  //    << " -->" << TimeToCheck-(StartMissionDateMJD)*SecsOneDay << std::endl;
-	}
-      
-      if ((TimeToCheck-(StartMissionDateMJD)*SecsOneDay+deltaTime) > m_FT2_stopMET)
-	{
-	  DeltaCorrection = (TimeToCheck-(StartMissionDateMJD)*SecsOneDay+deltaTime)-m_FT2_stopMET;
-	  TimeToCheck = m_FT2_stopMET+(StartMissionDateMJD)*SecsOneDay;
-	  //std::cout << std::setprecision(30) << "tf+d > FT2stop: correction " << DeltaCorrection
-	  //    << " -1->" << TimeToCheck-(StartMissionDateMJD)*SecsOneDay << std::endl;
-	}
-      
-
-    }
-
-  return TimeToCheck;
-}
 
 

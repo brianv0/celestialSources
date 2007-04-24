@@ -101,9 +101,6 @@ class PulsarSpectrum : public ISpectrum
   //! Get the eccentric anomaly at time t (only for binaries)
   double GetEccentricAnomaly(double mytime);
 
-  //! Check if the time is in orbit file or not
-  double CheckTimeRange(double TimeToCheck, double deltaTime);
-
   //! calls PulsarSpectrum::energySrc
   double energy(double time);
 
