@@ -159,7 +159,6 @@ private:
 
 	/// fiddle of Numerical Recipe's rtsafe to avoid function passing
 	double rtsafe(const double x1, const double x2, const double xacc);
-	std::pair<double,double> getJetStart(double time);
 
 	class burstPairs {
 	public:
@@ -169,14 +168,48 @@ private:
 		m_end =end;
 		}
 		~burstPairs() {};
-		const bool operator () (burstPairs* before, burstPairs* after) {
-		return before->m_start == after->m_start;
+		const bool operator () (const burstPairs* before, const burstPairs* after) const 
+        {
+		    return before->m_start == after->m_start;
 		}
-		std::pair<double,double> getBurstPairs() { return std::make_pair(m_start,m_end);}
+		std::pair<double,double> getBurstPairs() const { return std::make_pair(m_start,m_end);}
 	private:
 		double m_start;
 		double m_end;
 	};
+
+    class InBurst
+    {
+    public:
+        InBurst(double time = 0.) : m_time(time) {}
+        const bool operator()(const microQuasar::burstPairs& pair) const
+        {
+            const std::pair<double,double> pairVals = pair.getBurstPairs();
+
+            if (pairVals.first <= m_time && pairVals.second >= m_time) return true;
+            return false;
+        }
+    private:
+        double m_time;
+    };
+
+    class NextBurst
+    {
+    public:
+        NextBurst(double time = 0.) : m_time(time) {}
+        const bool operator()(const microQuasar::burstPairs& pair) const
+        {
+            const std::pair<double,double> pairVals = pair.getBurstPairs();
+
+            if (pairVals.first >= m_time) return true;
+            return false;
+        }
+    private:
+        double m_time;
+    };
+
+	std::vector<burstPairs>::iterator getJetStart(double time);
+	bool inJet(double time);
 
 	burstPairs calculateJetStart(double time);
 
@@ -216,4 +249,3 @@ private:
 };
 
 #endif 
-

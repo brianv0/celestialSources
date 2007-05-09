@@ -103,7 +103,9 @@ microQuasar::microQuasar(const std::string &paramString)
 		while (time < tMax) {
 			burstTimes = calculateJetStart(time);
 			m_bursts.push_back(burstTimes);
-			time = m_jetEnd;
+			time = burstTimes.getBurstPairs().second;
+			std::cout << " Burst start " << burstTimes.getBurstPairs().first << 
+				" Burst end " << time << std::endl;
 		}
 	}
 
@@ -196,21 +198,25 @@ double microQuasar::interval(double current_time) {
 
 		// if steady source, don't worry about artificial jet-on boundaries
 		if (m_jetProperties.getJetOnDuration() == 1.) break;
-
-		jet = getJetStart(fTime);
-		m_jetStart = jet.first;
-		m_jetEnd = jet.second;
+/*		Handling 4 conditions for outbursts:
+			1. current time is before first outburst: move clock to first outburst and get new time
+			2. during an outburst - accept time
+			3. between outburst - same as 1
+			4. after last outburst - terminate
+*/
+//		jet = getJetStart(fTime);
+//		m_jetStart = jet.first;
+//		m_jetEnd = jet.second;
 
 		double nextTime = m_currentTime+deltaT;
-		if ((nextTime >= m_jetStart) && (nextTime <= m_jetEnd)) break;
+		if (inJet(nextTime)) break;
 
-		// if we're still in the current jet, don't recalculate it (because of
-		// fluctuations as much as efficiency)
-		if (nextTime > m_jetEnd) jet = getJetStart(nextTime);
-		m_jetStart = jet.first;
-		m_jetEnd = jet.second;
-
-		m_currentTime = m_jetStart;
+		std::vector<burstPairs>::iterator jet = getJetStart(nextTime);
+		if (jet != m_bursts.end())	m_currentTime = (*jet).getBurstPairs().first;
+		else {
+			deltaT = 1.E8;
+			break;
+		}
 	}
 	if (i==100) std::cerr << " microQuasar::interval - exiting with max iterations " << std::endl;
 
@@ -218,11 +224,18 @@ double microQuasar::interval(double current_time) {
 	return dT;
 }
 
-
-std::pair<double,double> microQuasar::getJetStart(double time) {
-	return std::make_pair(0.,0.);
+bool microQuasar::inJet(double time) 
+{
+    std::vector<burstPairs>::iterator burstIter = std::find_if(m_bursts.begin(), m_bursts.end(), InBurst(time));
+    if (burstIter!= m_bursts.end()) return true;
+	return false;
 }
 
+std::vector<microQuasar::burstPairs>::iterator microQuasar::getJetStart(double time) 
+{
+    std::vector<burstPairs>::iterator burstIter = std::find_if(m_bursts.begin(), m_bursts.end(), NextBurst(time));
+    return burstIter;
+}
 microQuasar::burstPairs microQuasar::calculateJetStart(double time) {
 
 	double jetOn = m_jetProperties.getJetOnCycle() * 
@@ -295,4 +308,3 @@ double microQuasar::rtsafe(const double x1, const double x2,	const double xacc)
 	std::cerr << "Maximum number of iterations exceeded in rtsafe" << std::endl;
 	return 0.0;
 }
-
