@@ -36,15 +36,21 @@ microQuasar::microQuasar(const std::string &paramString)
 , m_currentSpectralIndex(2)
 , m_randPhase(0)
 {
-
-	std::vector<std::string> tokens = tokenize(paramString,',');
-
 	float daySecs = 86400.;
+
 	m_burstSeed = 124556789.;  // default see for burst generation
-	m_randGenBurst.setTheSeed(m_burstSeed);
 
 	float specOrbital1,specOrbital2=-1;
 	float phaseOrbital1,phaseOrbital2=-1;
+
+	// allow bursts to be off by default
+
+	m_jetProperties.setJetOnDuration(1.);
+	m_jetProperties.setJetOnCycle(1.);
+	m_jetProperties.setJetOnCycleFluct(1.);
+	m_jetProperties.setJetOnDurationFluct(1.);
+
+	std::vector<std::string> tokens = tokenize(paramString,',');
 
 	std::vector<std::string>::iterator curToken = tokens.begin();
 	while(curToken!=tokens.end()){
@@ -82,12 +88,22 @@ microQuasar::microQuasar(const std::string &paramString)
 			m_jetProperties.setJetOnDuration(std::atof(token[1].c_str()));
 		if(token[0]=="JETONDURATIONFLUCTUATION")
 			m_jetProperties.setJetOnDurationFluct(std::atof(token[1].c_str()));
+		if(token[0]=="BURSTRANDOMSEED")
+			m_burstSeed = std::atof(token[1].c_str());
 		curToken++;
 	} 
-	if(specOrbital1!=-1 && specOrbital2!=-1)
+
+	// default to same spectral index in both regions
+	if(specOrbital2=-1) {
+		m_orbitalRegion.setSpectralIndex(specOrbital1,specOrbital1);
+		m_orbitalRegion.setOrbitalPhase(0.5,1.0);
+	}
+	else {
 		m_orbitalRegion.setSpectralIndex(specOrbital1,specOrbital2);
-	if(phaseOrbital1!=-1 && phaseOrbital2!=-1)
-		m_orbitalRegion.setOrbitalPhase(phaseOrbital1,phaseOrbital2);
+		m_orbitalRegion.setOrbitalPhase(phaseOrbital1, phaseOrbital2);
+	}
+
+	m_randGenBurst.setTheSeed(m_burstSeed);
 
 	double time = 0.;
 	burstPairs burstTimes;
@@ -99,7 +115,9 @@ microQuasar::microQuasar(const std::string &paramString)
 	double tMax( pHistory.endTime() );
 	time = tMin;
 
-	std::cout << "Pointing start time (d) " << tMin/daySecs << " end time (d) " << tMax/daySecs << std::endl;
+//	std::cout << "Pointing start time (d) " << tMin/daySecs << " end time (d) " << tMax/daySecs << std::endl;
+
+	// precompute the bursts if needed
 
 	if (m_jetProperties.getJetOnDuration() != 1.) {
 		while (time < tMax) {
@@ -111,8 +129,8 @@ microQuasar::microQuasar(const std::string &paramString)
 			}
 			m_bursts.push_back(burstTimes);
 			time = std::min(tMax,burstTimes.getBurstPairs().second);
-			std::cout << " Burst start (d) " << burstTimes.getBurstPairs().first/daySecs << 
-				" Burst end (d) " << time/daySecs << std::endl;
+//			std::cout << " Burst start (d) " << burstTimes.getBurstPairs().first/daySecs << 
+//				" Burst end (d) " << time/daySecs << std::endl;
 		}
 	}
 

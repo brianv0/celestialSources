@@ -16,24 +16,26 @@
 * <br>
 * <a href="http://d0.phys.washington.edu/~burnett/glast/generate_periodic/oscilations.htm">http://d0.phys.washington.edu/~burnett/glast/generate_periodic/oscilations.htm </a>
 *
-* There are 16 parameters to drive this model, supplied in the source xml file:
+* There are 16 parameters (case insensitive) to drive this model, supplied in the source xml file:
 *
-* - 0 - flux (p/s/cm^2)
-* - 1 - E(min) (Mev)
-* - 2 - E(max) (MeV)
-* - 3 - Orbital period (days)
-* - 4 - orbital modulation (0 to 1)
-* - 5 - orbital phase (0 to 1)
-* - 6 - spectral index in orbital region 1 (positive)
-* - 7 - spectral index in orbital region 2 (positive)
-* - 8 - min orbital phase region 1 (0 to 1)
-* - 9 - max orbital phase region 1 (0 to 1)
-* - 10 - disk cycle duration (days)
-* - 11 - disk cycle duration fluctuation (fraction: 0-1) - not implemented yet
-* - 12 - start jet-on period in disk cycle (fraction: 0-1)
-* - 13 - fluctuation on jet start (fraction of jet-on start time: 0-1) - not implemented yet
-* - 14 - duration of jet-on period (fraction disk cycle: 0-1)
-* - 15 - fluctuatian on jet-on duration (fraction of jet-on time: 0-1) - not implemented yet
+* flux - flux (p/s/cm^2)
+* EMin - E(min) (Mev)
+* EMax - E(max) (MeV)
+* OrbitalPeriod - Orbital period (days)
+* OrbitalModulation - orbital modulation (0 to 1)
+* OrbitalPhase - orbital phase (0 to 1)
+* SpectralOrbitalRegion1 - spectral index in orbital region 1 (positive)
+* SpectralOrbitalRegion2(*) - spectral index in orbital region 2 (positive)
+* OrbitalPhaseRegion1 - min orbital phase region 1 (0 to 1)
+* OrbitalPhaseRegion2(*) - max orbital phase region 2 (0 to 1)
+* DiskCycleDuration - disk cycle duration (days)
+* DiskCycleFluctuation - disk cycle duration fluctuation (fraction: 0-1) - not implemented yet
+* JetOnCycle(**) - start jet-on period in disk cycle (fraction: 0-1)
+* JetOnCycleFluctuation(**) - fluctuation on jet start (fraction of jet-on start time: 0-1) - not implemented yet
+* JetOnDuration(**) - duration of jet-on period (fraction disk cycle: 0-1)
+* JetOnDurationFluctuation(**) - fluctuatian on jet-on duration (fraction of jet-on time: 0-1) - not implemented yet
 *
+*  (*) - optional if SpectralOrbitalRegion = -1; then only one region used
+*  (**) - optional if JetOnCycle = 1; then no outbursts, just steady emission
 */
 
