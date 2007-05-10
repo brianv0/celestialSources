@@ -99,13 +99,20 @@ microQuasar::microQuasar(const std::string &paramString)
 	double tMax( pHistory.endTime() );
 	time = tMin;
 
+	std::cout << "Pointing start time (d) " << tMin/daySecs << " end time (d) " << tMax/daySecs << std::endl;
+
 	if (m_jetProperties.getJetOnDuration() != 1.) {
 		while (time < tMax) {
 			burstTimes = calculateJetStart(time);
+			if (burstTimes.getBurstPairs().first > tMax) break;
+			else if (burstTimes.getBurstPairs().second > tMax) {
+				m_jetStart = burstTimes.getBurstPairs().first;
+				burstTimes = burstPairs(m_jetStart,tMax);
+			}
 			m_bursts.push_back(burstTimes);
-			time = burstTimes.getBurstPairs().second;
-			std::cout << " Burst start " << burstTimes.getBurstPairs().first << 
-				" Burst end " << time << std::endl;
+			time = std::min(tMax,burstTimes.getBurstPairs().second);
+			std::cout << " Burst start (d) " << burstTimes.getBurstPairs().first/daySecs << 
+				" Burst end (d) " << time/daySecs << std::endl;
 		}
 	}
 
@@ -176,6 +183,7 @@ double microQuasar::interval(double current_time) {
 
 	double fTime = m_currentTime;
 	std::pair<double, double> jet;
+	float daySecs = 86400.;
 
 
 	double deltaT;
@@ -214,13 +222,14 @@ double microQuasar::interval(double current_time) {
 		std::vector<burstPairs>::iterator jet = getJetStart(nextTime);
 		if (jet != m_bursts.end())	m_currentTime = (*jet).getBurstPairs().first;
 		else {
-			deltaT = 1.E8;
+			deltaT = 1.E9;
 			break;
 		}
 	}
 	if (i==100) std::cerr << " microQuasar::interval - exiting with max iterations " << std::endl;
 
 	double dT = m_currentTime - fTime + deltaT;
+//	std::cout << "input t (d) " << fTime/daySecs << " interval (sec) " << dT << std::endl;
 	return dT;
 }
 
@@ -238,16 +247,19 @@ std::vector<microQuasar::burstPairs>::iterator microQuasar::getJetStart(double t
 }
 microQuasar::burstPairs microQuasar::calculateJetStart(double time) {
 
+	double randJet = 0.5*(2.*m_randGenBurst.flat()-1.);
 	double jetOn = m_jetProperties.getJetOnCycle() * 
-		(1. + m_jetProperties.getJetOnCycleFluct()*(0.5*m_randGenBurst.flat()-1.));
+		(1. + m_jetProperties.getJetOnCycleFluct()* randJet);
 
-	double diskCycle = m_diskProperties.getCycleDuration() *
-		(1. + m_diskProperties.getCycleDurationFluct()*(0.5*m_randGenBurst.flat()-1.));
+	randJet = 0.5*(2.*m_randGenBurst.flat()-1.);
+	double diskCycle = m_diskProperties.getCycleDuration() * 
+		(1. + m_diskProperties.getCycleDurationFluct()* randJet);
 
 	double jetCycle = jetOn * diskCycle;
 
+	randJet = 0.5*(2.*m_randGenBurst.flat()-1.);
 	double jetLength = m_jetProperties.getJetOnDuration()* 
-		(1. + m_jetProperties.getJetOnDurationFluct()*(0.5*m_randGenBurst.flat()-1.)) *
+		(1. + m_jetProperties.getJetOnDurationFluct()* randJet) *
 		diskCycle;
 
 	double nJet = floor((time+jetLength+jetCycle)/diskCycle);
