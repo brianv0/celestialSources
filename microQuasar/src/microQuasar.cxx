@@ -119,6 +119,7 @@ microQuasar::microQuasar(const std::string &paramString)
 
 	// precompute the bursts if needed
 
+	m_nJet = 0;
 	if (m_jetProperties.getJetOnDuration() != 1.) {
 		while (time < tMax) {
 			burstTimes = calculateJetStart(time);
@@ -129,8 +130,8 @@ microQuasar::microQuasar(const std::string &paramString)
 			}
 			m_bursts.push_back(burstTimes);
 			time = std::min(tMax,burstTimes.getBurstPairs().second);
-//			std::cout << " Burst start (d) " << burstTimes.getBurstPairs().first/daySecs << 
-//				" Burst end (d) " << time/daySecs << std::endl;
+			std::cout << " Burst start (d) " << burstTimes.getBurstPairs().first/daySecs << 
+				" Burst end (d) " << time/daySecs << std::endl;
 		}
 	}
 
@@ -280,8 +281,10 @@ microQuasar::burstPairs microQuasar::calculateJetStart(double time) {
 		(1. + m_jetProperties.getJetOnDurationFluct()* randJet) *
 		diskCycle;
 
-	double nJet = floor((time+jetLength+jetCycle)/diskCycle);
-	double jetStart = jetCycle + nJet*diskCycle;
+	if (m_nJet== 0) m_nJet = floor((time+jetLength+jetCycle)/diskCycle);
+	else m_nJet++;
+
+	double jetStart = jetCycle + m_nJet*diskCycle;
 	double jetEnd = jetStart + jetLength;
 	return burstPairs(jetStart,jetEnd);
 }
