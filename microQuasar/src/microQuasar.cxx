@@ -115,7 +115,7 @@ microQuasar::microQuasar(const std::string &paramString)
 	double tMax( pHistory.endTime() );
 	time = tMin;
 
-//	std::cout << "Pointing start time (d) " << tMin/daySecs << " end time (d) " << tMax/daySecs << std::endl;
+	std::cout << "Pointing start time (d) " << tMin/daySecs << " end time (d) " << tMax/daySecs << std::endl;
 
 	// precompute the bursts if needed
 
@@ -281,10 +281,17 @@ microQuasar::burstPairs microQuasar::calculateJetStart(double time) {
 		(1. + m_jetProperties.getJetOnDurationFluct()* randJet) *
 		diskCycle;
 
-	if (m_nJet== 0) m_nJet = floor((time+jetLength+jetCycle)/diskCycle);
-	else m_nJet++;
+//	if (m_nJet== 0) m_nJet = floor((time+jetLength+jetCycle)/diskCycle);
+	if (m_nJet== 0) {
+		m_nJet = time/diskCycle;
+		m_cycleStart = time;
+	}
+	else {
+		m_nJet++;
+		m_cycleStart += diskCycle;
+	}
 
-	double jetStart = jetCycle + m_nJet*diskCycle;
+	double jetStart = jetCycle + m_cycleStart;  
 	double jetEnd = jetStart + jetLength;
 	return burstPairs(jetStart,jetEnd);
 }

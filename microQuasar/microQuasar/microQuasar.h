@@ -234,7 +234,8 @@ private:
 	double m_currentTime;
 	double m_jetStart;
 	double m_jetEnd;
-	int m_nJet;
+	double m_nJet;
+	double m_cycleStart;
 	// random see for burst generation
 	double m_burstSeed;
 	CLHEP::HepRandom m_randGenBurst;
