@@ -6,6 +6,7 @@
  * Coordinators: R.Dubois
     EOH
 
+   v1r0p7   16-May-2007  richard upgrade to pre-compute burst; allow optional params
    v1r0p6   28-Mar-2007  richard fix bug in parm setting. back to days.
    v1r0p5   2-Mar-2007  richard oops. hadn't quite fixed it last time.
    v1r0p4   2-Mar-2007  richard fix start time of first jet on period
