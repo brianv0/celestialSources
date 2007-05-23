@@ -115,7 +115,7 @@ microQuasar::microQuasar(const std::string &paramString)
 	double tMax( pHistory.endTime() );
 	time = tMin;
 
-	std::cout << "Pointing start time (d) " << tMin/daySecs << " end time (d) " << tMax/daySecs << std::endl;
+//	std::cout << "Pointing start time (d) " << tMin/daySecs << " end time (d) " << tMax/daySecs << std::endl;
 
 	// precompute the bursts if needed
 
@@ -130,8 +130,8 @@ microQuasar::microQuasar(const std::string &paramString)
 			}
 			m_bursts.push_back(burstTimes);
 			time = std::min(tMax,burstTimes.getBurstPairs().second);
-			std::cout << " Burst start (d) " << burstTimes.getBurstPairs().first/daySecs << 
-				" Burst end (d) " << time/daySecs << std::endl;
+//			std::cout << " Burst start (d) " << burstTimes.getBurstPairs().first/daySecs << 
+//				" Burst end (d) " << time/daySecs << std::endl;
 		}
 	}
 
