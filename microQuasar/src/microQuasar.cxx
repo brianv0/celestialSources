@@ -108,19 +108,19 @@ microQuasar::microQuasar(const std::string &paramString)
 	double time = 0.;
 	burstPairs burstTimes;
 
-	// get the time window for creating the burst list from the pointing history start/stop times
-	astro::GPS* gps = astro::GPS::instance();
-	const astro::PointingHistory& pHistory = gps->history();
-    double tMin( pHistory.startTime() );
-	double tMax( pHistory.endTime() );
-	time = tMin;
-
-//	std::cout << "Pointing start time (d) " << tMin/daySecs << " end time (d) " << tMax/daySecs << std::endl;
 
 	// precompute the bursts if needed
 
 	m_nJet = 0;
 	if (m_jetProperties.getJetOnDuration() != 1.) {
+		// get the time window for creating the burst list from the pointing history start/stop times
+		astro::GPS* gps = astro::GPS::instance();
+		const astro::PointingHistory& pHistory = gps->history();
+		double tMin( pHistory.startTime() );
+		double tMax( pHistory.endTime() );
+		time = tMin;
+
+		//	std::cout << "Pointing start time (d) " << tMin/daySecs << " end time (d) " << tMax/daySecs << std::endl;
 		while (time < tMax) {
 			burstTimes = calculateJetStart(time);
 			if (burstTimes.getBurstPairs().first > tMax) break;
@@ -130,8 +130,8 @@ microQuasar::microQuasar(const std::string &paramString)
 			}
 			m_bursts.push_back(burstTimes);
 			time = std::min(tMax,burstTimes.getBurstPairs().second);
-//			std::cout << " Burst start (d) " << burstTimes.getBurstPairs().first/daySecs << 
-//				" Burst end (d) " << time/daySecs << std::endl;
+			//			std::cout << " Burst start (d) " << burstTimes.getBurstPairs().first/daySecs << 
+			//				" Burst end (d) " << time/daySecs << std::endl;
 		}
 	}
 
@@ -225,15 +225,15 @@ double microQuasar::interval(double current_time) {
 
 		// if steady source, don't worry about artificial jet-on boundaries
 		if (m_jetProperties.getJetOnDuration() == 1.) break;
-/*		Handling 4 conditions for outbursts:
-			1. current time is before first outburst: move clock to first outburst and get new time
-			2. during an outburst - accept time
-			3. between outburst - same as 1
-			4. after last outburst - terminate
-*/
-//		jet = getJetStart(fTime);
-//		m_jetStart = jet.first;
-//		m_jetEnd = jet.second;
+		/*		Handling 4 conditions for outbursts:
+		1. current time is before first outburst: move clock to first outburst and get new time
+		2. during an outburst - accept time
+		3. between outburst - same as 1
+		4. after last outburst - terminate
+		*/
+		//		jet = getJetStart(fTime);
+		//		m_jetStart = jet.first;
+		//		m_jetEnd = jet.second;
 
 		double nextTime = m_currentTime+deltaT;
 		if (inJet(nextTime)) break;
@@ -248,21 +248,21 @@ double microQuasar::interval(double current_time) {
 	if (i==100) std::cerr << " microQuasar::interval - exiting with max iterations " << std::endl;
 
 	double dT = m_currentTime - fTime + deltaT;
-//	std::cout << "input t (d) " << fTime/daySecs << " interval (sec) " << dT << std::endl;
+	//	std::cout << "input t (d) " << fTime/daySecs << " interval (sec) " << dT << std::endl;
 	return dT;
 }
 
 bool microQuasar::inJet(double time) 
 {
-    std::vector<burstPairs>::iterator burstIter = std::find_if(m_bursts.begin(), m_bursts.end(), InBurst(time));
-    if (burstIter!= m_bursts.end()) return true;
+	std::vector<burstPairs>::iterator burstIter = std::find_if(m_bursts.begin(), m_bursts.end(), InBurst(time));
+	if (burstIter!= m_bursts.end()) return true;
 	return false;
 }
 
 std::vector<microQuasar::burstPairs>::iterator microQuasar::getJetStart(double time) 
 {
-    std::vector<burstPairs>::iterator burstIter = std::find_if(m_bursts.begin(), m_bursts.end(), NextBurst(time));
-    return burstIter;
+	std::vector<burstPairs>::iterator burstIter = std::find_if(m_bursts.begin(), m_bursts.end(), NextBurst(time));
+	return burstIter;
 }
 microQuasar::burstPairs microQuasar::calculateJetStart(double time) {
 
@@ -281,7 +281,7 @@ microQuasar::burstPairs microQuasar::calculateJetStart(double time) {
 		(1. + m_jetProperties.getJetOnDurationFluct()* randJet) *
 		diskCycle;
 
-//	if (m_nJet== 0) m_nJet = floor((time+jetLength+jetCycle)/diskCycle);
+	//	if (m_nJet== 0) m_nJet = floor((time+jetLength+jetCycle)/diskCycle);
 	if (m_nJet== 0) {
 		m_nJet = time/diskCycle;
 		m_cycleStart = time;
