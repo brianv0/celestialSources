@@ -33,19 +33,19 @@
     </source>
 
     <source name=" PSRGemingaPolarPhen " >
-       <spectrum escale="MeV"> <SpectrumClass name="PulsarSpectrum" params="PSRGEMINGA, 98.48, 17.78, 1.0e5, 2.0e7, 1, 61445, 2, 1e6, 5e6, -1.42, 2.2"/>
+       <spectrum escale="MeV"> <SpectrumClass name="PulsarSpectrum" params="PSRGEMINGA, 98.48, 17.78, 1.0e5, 2.0e7, 1, 61445, 3, 1e6, 5e6, -1.42, 2.2"/>
         <use_spectrum frame="galaxy"/> 
        </spectrum> 
     </source>
   
     <source name=" PSR1706-44PolarPhen " >
-       <spectrum escale="MeV"> <SpectrumClass name="PulsarSpectrum" params="PSR1706-44, 257.43, -44.49, 1.0e5, 2.0e7, 1, 53445, 2, 1e6, 40e6, -2.1, 2.0"/>
+       <spectrum escale="MeV"> <SpectrumClass name="PulsarSpectrum" params="PSR1706-44, 257.43, -44.49, 1.0e5, 2.0e7, 1, 53445, 3, 1e6, 40e6, -2.1, 2.0"/>
         <use_spectrum frame="galaxy"/> 
       </spectrum> 
     </source>
 
     <source name=" PSR1055-52PolarPhen " >
-       <spectrum escale="MeV"> <SpectrumClass name="PulsarSpectrum" params="PSR1055-52, 164.49, -52.45, 1.0e5, 2.0e7, 1, 3678, 2, 1e6, 20e6, -1.8, 2.0"/>
+       <spectrum escale="MeV"> <SpectrumClass name="PulsarSpectrum" params="PSR1055-52, 164.49, -52.45, 1.0e5, 2.0e7, 1, 3678, 3, 1e6, 20e6, -1.8, 2.0"/>
         <use_spectrum frame="galaxy"/> 
        </spectrum> 
     </source>
@@ -65,62 +65,22 @@
     </source>
 
     <source name=" PSRGemingaOuterPhen " >
-       <spectrum escale="MeV"> <SpectrumClass name="PulsarSpectrum" params="PSRGEMINGA, 98.48, 17.78, 1.0e5, 2.0e7, 1, 61445, 2, 1e6, 5e6, -1.42, 1.0"/>
+       <spectrum escale="MeV"> <SpectrumClass name="PulsarSpectrum" params="PSRGEMINGA, 98.48, 17.78, 1.0e5, 2.0e7, 1, 61445, 3, 1e6, 5e6, -1.42, 1.0"/>
         <use_spectrum frame="galaxy"/> 
        </spectrum> 
     </source>
   
     <source name=" PSR1706-44OuterPhen " >
-       <spectrum escale="MeV"> <SpectrumClass name="PulsarSpectrum" params="PSR1706-44, 257.43, -44.49, 1.0e5, 2.0e7, 1, 53445, 2, 1e6, 40e6, -2.1, 1.0"/>
+       <spectrum escale="MeV"> <SpectrumClass name="PulsarSpectrum" params="PSR1706-44, 257.43, -44.49, 1.0e5, 2.0e7, 1, 53445, 3, 1e6, 40e6, -2.1, 1.0"/>
         <use_spectrum frame="galaxy"/> 
       </spectrum> 
     </source>
 
     <source name=" PSR1055-52OuterPhen " >
-       <spectrum escale="MeV"> <SpectrumClass name="PulsarSpectrum" params="PSR1055-52, 164.49, -52.45, 1.0e5, 2.0e7, 1, 3678, 2, 1e6, 20e6, -1.8, 1.0"/>
+       <spectrum escale="MeV"> <SpectrumClass name="PulsarSpectrum" params="PSR1055-52, 164.49, -52.45, 1.0e5, 2.0e7, 1, 3678, 3, 1e6, 20e6, -1.8, 1.0"/>
         <use_spectrum frame="galaxy"/> 
        </spectrum> 
     </source>
-
-  <!-- Diagnostic source - Dirac's Delta -->
-
-  <source name=" PSRMuroSingle " >
-     <spectrum escale="MeV"> 
-      <SpectrumClass name="PulsarSpectrum" params="PSRMUROS, 50.0, -25.0, 1.0e5, 3.0e8, 1, 63443, 3, 1e6, 30e6, -1.9, 2.0"/>
-        <use_spectrum frame="galaxy"/> 
-     </spectrum> 
-  </source>
-
-  <source name=" PSRMuroMulti " >
-     <spectrum escale="MeV"> 
-      <SpectrumClass name="PulsarSpectrum" params="PSRMUROM, 50.0, -25.0, 1.0e5, 3.0e8, 1, 63443, 3, 1e6, 30e6, -1.9, 2.0"/>
-        <use_spectrum frame="galaxy"/> 
-     </spectrum> 
-  </source>
-
-  <source name=" PSRMuroBinary " >
-     <spectrum escale="MeV"> 
-      <SpectrumClass name="PulsarSpectrum" params="PSRMUROB, 50.0, -25.0, 1.0e5, 3.0e8, 1, 63443, 3, 1e6, 30e6, -1.9, 2.0"/>
-        <use_spectrum frame="galaxy"/> 
-     </spectrum> 
-  </source>
-
-<!-- Pulsars for testing timing noise model N1 -->
-
-  <source name=" PSRMuroN1 " >
-     <spectrum escale="MeV"> 
-      <SpectrumClass name="PulsarSpectrum" params="PSRMURON1, 50.0, -25.0, 1.0e5, 3.0e8, 1, 63443, 3, 1e6, 30e6, -1.9, 2.0"/>
-        <use_spectrum frame="galaxy"/> 
-     </spectrum> 
-  </source>
-
-  <source name=" PSRMuroN2 " >
-     <spectrum escale="MeV"> 
-      <SpectrumClass name="PulsarSpectrum" params="PSRMURON2, 50.0, -25.0, 1.0e5, 3.0e8, 1, 63443, 3, 1e6, 30e6, -1.9, 2.0"/>
-        <use_spectrum frame="galaxy"/> 
-     </spectrum> 
-  </source>
-
 
 <!-- All EGRET Pulsars in Polar Cap or Outer Gap -->
 
@@ -138,19 +98,6 @@
        <nestedSource sourceRef="PSRGemingaOuterPhen" />
        <nestedSource sourceRef="PSR1706-44OuterPhen" />
        <nestedSource sourceRef="PSR1055-52OuterPhen" />
-    </source>
-
-</source_library>
-
-
-<source_library title="PulsarShape">
-
- <!-- Pulsar shapes models -->
-
-    <source name=" PSRVelaShapePCH " >
-       <spectrum escale="MeV"> <SpectrumClass name="PulsarSpectrum" params="PSRVELA, 128.83, -45.18, 1.0e5, 3.0e8, 2, 61243, 1,PsrPCHShape, 0., 0., 0."/>
-        <use_spectrum frame="galaxy"/> 
-       </spectrum> 
     </source>
 
 </source_library>

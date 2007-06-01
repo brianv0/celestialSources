@@ -1,11 +1,8 @@
-/**
- * @file PulsarSpectrum.h
- * @brief Class Header for PulsarSpectrum.cxx
- * @ author Massimiliano Razzano (massimiliano.razzano@pi.infn.it
- * @ author Nicola Omodei (nicola.omodei@pi.infn.it
- *
- * $Header$
- */
+/////////////////////////////////////////////////
+// File PulsarSpectrum.h
+// Header file for PulsarSpectrum class
+//////////////////////////////////////////////////
+
 #ifndef PulsarSpectrum_H
 #define PulsarSpectrum_H
 
@@ -16,11 +13,10 @@
 #include <fstream>
 #include <map>
 #include <cmath>
-#include <stdexcept>
 #include "PulsarConstants.h"
 #include "PulsarSim.h"
 #include "SpectObj/SpectObj.h"
-#include "flux/Spectrum.h"
+#include "flux/ISpectrum.h"
 #include "CLHEP/Vector/ThreeVector.h"
 #include "flux/EventSource.h"
 #include "facilities/Util.h"
@@ -28,7 +24,6 @@
 #include "astro/EarthOrbit.h"
 #include "astro/SolarSystem.h"
 #include "astro/GPS.h"
-#include "astro/PointingHistory.h"
 
 /*! 
 * \class PulsarSpectrum
@@ -42,12 +37,9 @@
 * and the energy range of the extracted photons. Then it looks in the PulsarDataList.txt file ( in the <i>/data</i> directory)
 * for the name of the pulsar and then extracts the specific parameters of the pulsar (period, flux, ephemerides, etc.) related 
 * to that pulsar. 
-* Then it computes all the needed decorretions for timing, in particular:
-*  - Period changes according to some ephemerides;
-*  - Barycentric corrections:
-*  - Timing Noise;
-*  - Binary demodulation
+* Then it computes all the needed decorretions for timing, in particular the period changes and the barycentric decorrections.
 */
+
 class PulsarSpectrum : public ISpectrum
 {
   
@@ -62,7 +54,7 @@ class PulsarSpectrum : public ISpectrum
   //! Return the flux of the Pulsar at time t
   double flux(double time)const;
 
-  //! Returns the time interval to the next extracted photon, according to the flux, in a frame where pdot=0 and no barycentric decorrections and also no binary demodulation
+  //! Returns the time interval to the next extracted photon, according to the flux, in a frame where pdot=0 and no barycentric decorrections
   double interval(double time);
 
   //! Returns the number of turns made by the pulsar at a specified time, referred to an inital epoch t0
@@ -72,52 +64,27 @@ class PulsarSpectrum : public ISpectrum
   double retrieveNextTimeTilde( double tTilde, double totalTurns, double err );
 
   //!Apply the barycentric corrections and returns arrival time in TDB
-  double getBaryCorr(double tdbInput, int LogCorrFlag);
- 
-  //! Compute binary demodulation in iterative way
-  double getIterativeDemodulatedTime(double tInput, int LogFlag);
+  double getBaryCorr( double tdbInput ); 
 
-  //! Compute binary demodulation in a single step
-  double getBinaryDemodulation( double tInput, int LogDemodFlag);
-
-  //! Get the decorrected time in TDB starting from a TT corrected time (inverse of getBaryCorr)
+  //! Get the decorrected time in TDB starting from a TT corrected time
   double getDecorrectedTime( double CorrectedTime);
-
-  //! Get the binary modulated time (inverse of getBinaryDemodulation)
-  double getBinaryDemodulationInverse( double CorrectedTime);
   
   //! Get the pulsar ephemerides and data from the DataList
-  int getPulsarFromDataList(std::string sourceFileName);
+  int getPulsarFromDataList();
 
-  //! Get the binary pulsar orbital data from the BinDataList
-  int getOrbitalDataFromBinDataList(std::string sourceBinFileName);
-
-  //! Save an output txt file with pulsar ephemerides compatible with D4 file
+  //! Save an output txt file compatible with D4 file
   int saveDbTxtFile();
-
-  //! Save an output txt file with pulsar orbital data compatible with D4 file
-  int saveBinDbTxtFile();
-
-  //! Get the eccentric anomaly at time t (only for binaries)
-  double GetEccentricAnomaly(double mytime);
-
-  //! calls PulsarSpectrum::energySrc
-  double energy(double time);
-
-  //! Return the pulsar frequency at time t
-  double GetFt(double time, double myf0, double myf1, double myf2);
-
-  //! Return the pulsar frequency first derivative at time t
-  double GetF1t(double time, double myf1, double myf2);
 
   //! direction, taken from PulsarSim
   inline std::pair<double,double>
-    
     dir(double energy) 
     {
       return m_GalDir;
     } 
-
+  
+  //! calls PulsarSpectrum::energySrc
+  double energy(double time);
+  
   std::string title() const {return "PulsarSpectrum";} 
   const char * particleName() const {return "gamma";}
   const char * nameOf() const {return "PulsarSpectrum";}
@@ -129,90 +96,29 @@ class PulsarSpectrum : public ISpectrum
   
   PulsarSim *m_Pulsar; 
   SpectObj  *m_spectrum;
-  TRandom *m_PSpectrumRandom;
   
-  //! Variables related to Solar System and Astro.
   astro::EarthOrbit *m_earthOrbit;
-  astro::SolarSystem m_solSys; 
+  astro::SolarSystem m_solSys;
+ 
   astro::SkyDir m_PulsarDir;
-  CLHEP::Hep3Vector m_PulsarVectDir;
+  Hep3Vector m_PulsarVectDir;
+
+  std::pair<double,double> m_GalDir;
   
   const std::string& m_params; 
-
-  //! Pulsar name  
+  
   std::string m_PSRname;
 
-  //! Name of file containing shape spectrum for model PSRShape
-  std::string m_PSRShapeName;
-  
-  bool m_ff;
-
-  //! Pulsar Coordinates and Directions
-  double m_RA, m_dec;
-  double m_l, m_b;  
-  std::pair<double,double> m_GalDir;
-
-  //! Ephemerides type
+  double m_RA, m_dec, m_l, m_b;  
+  double m_period, m_pdot, m_p2dot, m_t0, m_t0Init, m_t0End, m_phi0, m_f0, m_f1, m_f2;
   std::string m_ephemType;
-
-  //! Period and derivatives
-  double m_period, m_pdot, m_p2dot;
-  std::vector<double> m_periodVect, m_pdotVect, m_p2dotVect;
-
-  //!Epoch and ephemerides validity range
-  double m_t0, m_t0Init, m_t0End;
-  std::vector<double> m_t0Vect, m_t0InitVect, m_t0EndVect;
-
-  //! Frequency and derivatives
-  double m_f0, m_f1, m_f2;
-  double m_f0NoNoise, m_f1NoNoise, m_f2NoNoise;
-
-  std::vector<double> m_f0Vect, m_f1Vect, m_f2Vect;
-
-  //! phase and turns at the epoch t0
-  double m_phi0,m_N0;
-  std::vector<double> m_phi0Vect,m_txbaryVect;
-
-  //!Type of model
+  std::vector<double> m_periodVect, m_pdotVect, m_p2dotVect, m_f0Vect, m_f1Vect, m_f2Vect, m_phi0Vect, m_t0Vect, m_t0InitVect, m_t0EndVect, m_txbaryVect;
+  
+  int m_numpeaks;
   int m_model;
-
-  //!Pulsar flux
-  double m_flux;
-
-  //! model-dependent parameters
-  int m_ppar0;
-  double m_ppar1,m_ppar2,m_ppar3,m_ppar4;
-
-  //!Minimum and maximum energy of the extracted photons
-  double m_enphmin, m_enphmax;
-
-  //! start and end of pointing history
-  double m_FT2_startMET,m_FT2_stopMET; 
-  int m_UseFT2;
-
-  double m_Sim_startMET,m_Sim_stopMET; 
-
-  //! Random seed
+  double m_flux, m_enphmin, m_enphmax;
   int m_seed;
 
-  //! Flag for binary demodulation
-  int m_BinaryFlag;
-
-  //! Flag for enabling timing noise
-  int m_TimingNoiseModel;
-
-  //! Timing Noise activity
-  double m_TimingNoiseActivity;
-  double m_TimingNoiseMeanRate;
-  double m_TimingNoiseRMS;
-  double m_TimingNoiseTimeNextEvent;
-
-  //Binary parameters
-  double m_Porb,m_asini,m_ecc,m_omega,m_t0PeriastrMJD,m_t0AscNodeMJD,m_PPN;
-
-  //! Binary parameters - relative to PPN
-  double m_Porb_dot,m_xdot,m_ecc_dot,m_omega_dot,m_gamma;
-  double m_shapiro_r, m_shapiro_s;
 
 };
 #endif
