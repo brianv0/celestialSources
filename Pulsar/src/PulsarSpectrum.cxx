@@ -1306,6 +1306,12 @@ double PulsarSpectrum::getDecorrectedTime(double CorrectedTime)
 	  ttMid = (ttUp+ttDown)/2;
 	}
        i++;
+
+       if (i>50)
+	 {
+	   break;
+	 }
+
     }
    
    return ttMid;

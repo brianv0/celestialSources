@@ -63,5 +63,6 @@
 *   v2r3p2   11-apr-2007  THB   Fixetstarttime and endtime problem
 *   v2r3p3   16-apr-2007  THB   Another fix for FT2 problem
 *   v2r3p4   24-apr-2007  THB   Another fix for FT2 problem
+*   v2r3p5   6-jun-2007  THB   Fix infinite loop problem
 *@endverbatim
 */
