@@ -1334,11 +1334,14 @@ double PulsarSpectrum::getDecorrectedTime(double CorrectedTime)
 	  s++;
 	  deltaStep =  pow(10.,(2.-s));
 	  //std::cout << "\n" << m_PSRname << "  Target superated, decreasing to " << deltaStep 
-	  //    << " and starting again from " << tcurr << std::endl;
+	  //    << " and starting again1 from " << tcurr << std::endl;
 	  //std::cout << std::setprecision(30) << CorrectedTime << 
 	  //" <--" << fcurr << " df=" << CorrectedTime-fcurr << std::endl;
-	  if (s > 30)
-	    break;
+	  if ((s > 8) || (deltaStep < 1e-7))
+	    {
+	      //std::cout << "Skipping ! " << std::endl;
+	      break;
+	    }
 	}
 
       //      std::cout << std::setprecision(30) <<  s << " -> " << CorrectedTime 
