@@ -1306,7 +1306,7 @@ double PulsarSpectrum::getDecorrectedTime(double CorrectedTime)
 
   double deltaStep =  pow(10.,(2.-s));
 
-      while ( fabs(CorrectedTime-fcurr) > InverseDemodTol)
+      while ( fabs(CorrectedTime-fcurr) > baryCorrTol)
 	{
 
 	  if (SignDirection == 1)
@@ -1324,8 +1324,8 @@ double PulsarSpectrum::getDecorrectedTime(double CorrectedTime)
 	      { 
 		tcurr = tcurr+deltaStep;
 		fcurr = tcurr + getBaryCorr(tcurr,0); //fx(tcurr);
-		std::cout << std::setprecision(30) << " tcurr=>" << tcurr << " fcurr " << fcurr 
-			  << "df=" << CorrectedTime-fcurr << std::endl; 
+		//std::cout << std::setprecision(30) << " tcurr=>" << tcurr << " fcurr " << fcurr 
+		//  << "df=" << CorrectedTime-fcurr << std::endl; 
 	      }
 	    
 	  
@@ -1333,27 +1333,19 @@ double PulsarSpectrum::getDecorrectedTime(double CorrectedTime)
 	  fcurr = tcurr + getBaryCorr(tcurr,0); //fx(tcurr);
 	  s++;
 	  deltaStep =  pow(10.,(2.-s));
-	  std::cout << "\n" << m_PSRname << "  Target superated, decreasing to " << deltaStep 
-		    << " and starting again from " << tcurr << std::endl;
-	  std::cout << std::setprecision(30) << CorrectedTime << 
-	    " <--" << fcurr << " df=" << CorrectedTime-fcurr << std::endl;
+	  //std::cout << "\n" << m_PSRname << "  Target superated, decreasing to " << deltaStep 
+	  //    << " and starting again from " << tcurr << std::endl;
+	  //std::cout << std::setprecision(30) << CorrectedTime << 
+	  //" <--" << fcurr << " df=" << CorrectedTime-fcurr << std::endl;
 	  if (s > 30)
 	    break;
 	}
 
-      std::cout << std::setprecision(30) <<  s << " -> " << CorrectedTime 
-		<< " <--" << fcurr 
-		<< " df=" << CorrectedTime-fcurr << std::endl;
+      //      std::cout << std::setprecision(30) <<  s << " -> " << CorrectedTime 
+      //	<< " <--" << fcurr 
+      //	<< " df=" << CorrectedTime-fcurr << std::endl;
   
       return tcurr;
-
-
-
-
-
-
-
-
 
 
   // Begin old algorithm..

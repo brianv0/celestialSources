@@ -144,13 +144,13 @@ namespace cst
 
   //! Tolerance for the barycentri decorrection (in us.)
 
-  const double baryCorrTol = 5e-7;
+  const double baryCorrTol = 5e-6;
 
 
 
   //! Tolerance for the inverse binary demodulation (in s.)
 
-  const double InverseDemodTol = 1e-6;
+  const double InverseDemodTol = 5e-6;
 
 
 
