@@ -88,7 +88,7 @@ ISpectrumFactory &PulsarSpectrumFactory()
  *  <li> Model choosen (default = 1, phenomenological);
  *  <li> Random seed;
  *  <li> Model-dependend parameters;
- * </ul>
+* </ul>
  * Then it calls the PulsarSim class in order to have the TH2D histogram.
  * For more informations and for a brief tutorial about the use of PulsarSpectrum you can look at:
  * <br>
@@ -1272,12 +1272,99 @@ double PulsarSpectrum::getBinaryDemodulation( double tInput, int LogDemodFlag)
  */
 double PulsarSpectrum::getDecorrectedTime(double CorrectedTime)
 {
+  //  double CorrectedTime = 54.2342.;
+  double deltaT = 510.;
+
+  //  int DEBUG = 1;
+
+  double tcurr = CorrectedTime-deltaT;
+  double fcurr = tcurr + getBaryCorr(tcurr,0); // fx(tcurr);
+  double fcurr_ct = CorrectedTime;
+
+  if (DEBUG)
+    {
+      std::cout << "Get decorrected time from time t=" << CorrectedTime << std::endl;
+    }
+
+  //double deltaStep = 10.;
+  int s = 0;
+  int SignDirection = 0;
+
+  //std::cout << "\n\n***\ntstart= " << tcurr << " -->fcurr= " << fcurr 
+  //    << " -->fcurr_CT= " << fcurr_ct << " inital delta=" << deltaStep << std::endl;
+
+  if (CorrectedTime <= fcurr) // function increasing
+    {
+      //      std::cout << "Case 1: de-crescent function" << std::endl;
+      SignDirection = 1;
+    }
+  else
+    {
+      //std::cout << "Case 2: crescent function" << std::endl;
+      SignDirection = 2;
+    }
+
+  double deltaStep =  pow(10.,(2.-s));
+
+      while ( fabs(CorrectedTime-fcurr) > InverseDemodTol)
+	{
+
+	  if (SignDirection == 1)
+	    {
+	      while (fcurr > CorrectedTime)
+		{ 
+		  tcurr = tcurr+deltaStep;
+		  fcurr = tcurr + getBaryCorr(tcurr,0); //fx(tcurr);
+		  //      std::cout << std::setprecision(30) << " tcurr=>" << tcurr << " fcurr " << fcurr 
+		  //	<< "df=" << CorrectedTime-fcurr << std::endl; 
+		}
+	    }
+	  else
+	    while (fcurr < CorrectedTime)
+	      { 
+		tcurr = tcurr+deltaStep;
+		fcurr = tcurr + getBaryCorr(tcurr,0); //fx(tcurr);
+		std::cout << std::setprecision(30) << " tcurr=>" << tcurr << " fcurr " << fcurr 
+			  << "df=" << CorrectedTime-fcurr << std::endl; 
+	      }
+	    
+	  
+	  tcurr = tcurr-deltaStep;
+	  fcurr = tcurr + getBaryCorr(tcurr,0); //fx(tcurr);
+	  s++;
+	  deltaStep =  pow(10.,(2.-s));
+	  std::cout << "\n" << m_PSRname << "  Target superated, decreasing to " << deltaStep 
+		    << " and starting again from " << tcurr << std::endl;
+	  std::cout << std::setprecision(30) << CorrectedTime << 
+	    " <--" << fcurr << " df=" << CorrectedTime-fcurr << std::endl;
+	  if (s > 30)
+	    break;
+	}
+
+      std::cout << std::setprecision(30) <<  s << " -> " << CorrectedTime 
+		<< " <--" << fcurr 
+		<< " df=" << CorrectedTime-fcurr << std::endl;
+  
+      return tcurr;
+
+
+
+
+
+
+
+
+
+
+  // Begin old algorithm..
+  /*
   //Use the bisection method to find the inverse of the de-corrected time, i.e. the time (in TT)
   //that after correction is equal to Time in TDB
-  //if (DEBUG)
-  //{
-  //  std::cout << "Get decorrected time from time t=" << CorrectedTime << std::endl;
-      //}
+
+  if (DEBUG)
+    {
+      std::cout << "Get decorrected time from time t=" << CorrectedTime << std::endl;
+    }
   double deltaMax = 510.0; //max deltat (s)
   double ttDown = CorrectedTime - deltaMax;
   double ttUp = CorrectedTime + deltaMax;
@@ -1294,7 +1381,7 @@ double PulsarSpectrum::getDecorrectedTime(double CorrectedTime)
       //std::cout << std::setprecision(30) 
       //	<< "\n" << i << "**ttUp " << ttUp << " ttDown " << ttDown << " mid " << ttMid << std::endl;
              
-      if (fabs(hMid) < baryCorrTol) break;
+       if (fabs(hMid) < baryCorrTol) break;
       if ((hDown*hMid)>0)
 	{
 	  ttDown = ttMid;
@@ -1315,6 +1402,11 @@ double PulsarSpectrum::getDecorrectedTime(double CorrectedTime)
     }
    
    return ttMid;
+  */
+  // End old algorithm..
+
+
+
 }
 
 /////////////////////////////////////////////

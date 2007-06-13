@@ -367,6 +367,9 @@ void PlotPulsar(double enph = 0,std::string name="pulsar.root")
  
       Counts->Draw("E1same");
       Counts->SetStats(1);
+      leg->AddEntry(Counts," Fv (Extracted photons)  [ph/m^2/s] ","ep");
+      leg->Draw("same");
+
 
       cInt = new TCanvas("cInt","Interval",600,800);
 

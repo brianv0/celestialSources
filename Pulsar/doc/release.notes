@@ -64,5 +64,6 @@
 *   v2r3p3   16-apr-2007  THB   Another fix for FT2 problem
 *   v2r3p4   24-apr-2007  THB   Another fix for FT2 problem
 *   v2r3p5   6-jun-2007  THB   Fix infinite loop problem
+*   v2r3p6   12-jun-2007  THB   Changed inverse barycorr algorithm
 *@endverbatim
 */
