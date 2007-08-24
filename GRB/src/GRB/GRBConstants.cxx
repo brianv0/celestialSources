@@ -3,6 +3,8 @@
 #include <fstream>
 #include <cmath>
 
+#include "TMath.h"
+
 #include "GRBConstants.h"
 
 #define DEBUG  1
