@@ -16,6 +16,10 @@
 
 #include <cmath>
 
+#include "TDirectory.h"
+
+#include "TMath.h"
+
 #include "TRandom.h"
 
 #include "TF1.h"
