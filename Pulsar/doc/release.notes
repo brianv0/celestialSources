@@ -66,5 +66,6 @@
 *   v2r3p5   6-jun-2007  THB   Fix infinite loop problem
 *   v2r3p6   12-jun-2007  THB   Changed inverse barycorr algorithm
 *   v2r3p7   13-jun-2007  THB   Improved algorithm
+*   v2r3p8   23-aug-2007 HMK    Insert include for test from Berrie
 *@endverbatim
 */

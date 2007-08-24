@@ -4,6 +4,7 @@
 
   @verbatim
   $Id$
+  23-aug-07 v3r0p8     HMK   Insert includes from Berrie
   12-apr-07 v3r0p7     THB   Fix MAC line ends
   10-apr-07 v3r0p6     NO    Bug fixed (window compilation)
   04-apr-07 v3r0p5     NO    Add macros. Add the seed into XML
