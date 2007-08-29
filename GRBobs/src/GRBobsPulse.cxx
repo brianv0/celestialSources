@@ -68,15 +68,27 @@ double GRBobsPulse::PulseShape(double t, double e)
   double a  = m_LowEnergy;
   double b  = m_HighEnergy;
   
-  double Eb = m_Epeak;
-  double Ep = (2.+a)/(a-b)*Eb;
-  double C  = pow(Eb,a-b)*exp(b-a);
+  double Ep = m_Epeak;
+  double E0 = Ep/(2.+a); 
+  double Eb = (a-b)*E0;
+
+  //  double Eb = m_Epeak;
+  //  double Ep = (2.+a)/(a-b)*Eb;
+
+  double C  = pow(Eb/100.,a-b)*exp(b-a);
   
   double bandf;
   if(e < Eb) 
-    bandf = pow(e,a) * exp(-e*(2.+a)/Ep);
+    bandf = pow(e/100.,a) * exp(-e/E0);
   else
-    bandf= C * pow(e,b); // ph cm^(-2) s^(-1) keV^(-1)
+    bandf= C * pow(e/100.,b); // ph cm^(-2) s^(-1) keV^(-1)
+
+  if(DEBUG)
+    {
+      std::cout<<" Parameters used for the band functions:"<<std::endl;
+      std::cout<<" a = "<<a<<" b= "<<b<<" Ep= "<<Ep<<" E0= "<<E0<<" Eb= "<<Eb<<std::endl;
+    }
+
 
   return m_Intensity * bandf * pulse;
 }

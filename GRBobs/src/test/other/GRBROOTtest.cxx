@@ -76,11 +76,11 @@ double Band(double *var, double *par)
   double NT = pow(10.,par[3]);
 
   double E   = var[0];
-  double C   = pow((a-b)*E0,a-b)*exp(b-a);
+  double C   = pow((a-b)*E0/100.0,a-b)*exp(b-a);
   double H   = (a-b) * E0;
   if(E <= H) 
-    return E * NT * pow(E,a) * exp(-E/E0);
-  return E * C* NT * pow(E,b); // ph cm^(-2) s^(-1) keV^(-1)
+    return E * NT * pow(E/100.,a) * exp(-E/E0);
+  return E * C * NT * pow(E/100.,b); // ph cm^(-2) s^(-1) keV^(-1)
 }
 
 TH2D *Load(char name[100]="grb_65540.root")
@@ -349,16 +349,17 @@ void PlotGRB(double enph = 0,double z=0,char name[100]="grb_65540.root",TString 
       band.SetParNames("a","b","Log10(E0)","Log10(Const)");
       band.SetLineStyle(2);
       
-      band.SetParLimits(0,-2.0,1.0);
-      band.SetParLimits(1,-3.0,-1.0);
-      band.SetParLimits(2,1.0,3.0);
+      band.SetParLimits(0,-2.0,2.0);
+      band.SetParLimits(1,-4.0,-1.0);
+      band.SetParLimits(2,1.5,3.0);
       band.SetParLimits(3,0.0,10.0);
       
-      band.SetParameter(0,-1.0);
+      band.SetParameter(0,-0.0);
       band.SetParameter(1,-2.0);
       band.SetParameter(2,2.5);
       band.SetParameter(3,3.0);
       eNe->Fit("grb_f","QR+","lsame");
+      //Ne->Fit("grb_f","QR+","lsame");
       
       double a=band.GetParameter(0);
       double b=band.GetParameter(1);
@@ -375,17 +376,17 @@ void PlotGRB(double enph = 0,double z=0,char name[100]="grb_65540.root",TString 
       std::cout<<" b     = "<<b<<" +- "<<b_err<<std::endl;
       std::cout<<" E0    = "<<E0<<" + "<<E0_err_p<<" - "<<E0_err_m<<std::endl;
       std::cout<<" Ep    = "<<Ep<<std::endl;
-      std::cout<<" Const = "<<pow(10.,band.GetParameter(3))<<std::endl;
+      std::cout<<" Const = "<<pow(10.,band.GetParameter(3))*1e-4<<" ph/cm^2/s/kev"<<std::endl;
       std::cout<<"--------------------------------------------------"<<std::endl;
 
     }
   
   if(powerlawFit)
     {
-      TF1 pl("PL_f","10^([0])*(x/10000)^(-[1])",3.0e+3,1.0e+6);
+      TF1 pl("PL_f","10^([0])*(x)^(-[1])",3.0e+3,1.0e+6);
       
       pl.SetLineStyle(2);
-      pl.SetLineColor(2);
+      pl.SetLineColor(1);
       //band.Draw("lsame");
       pl.SetParameters(4.0,-2.5);
       pl.SetParLimits(0,-8,10);
@@ -393,10 +394,14 @@ void PlotGRB(double enph = 0,double z=0,char name[100]="grb_65540.root",TString 
       //////////////////////////////////////////////////
       Ne->Fit("PL_f","QR+","lsame");
       std::cout<<"---PL FUNTION Nv FIT------------------------------"<<std::endl;
-      std::cout<<" No    = "<<pow(10.,pl.GetParameter(0))<<std::endl;
+      std::cout<<" K       = "<<pow(10.,pl.GetParameter(0))*1e-4<<" ph/cm^2/kev/s, at 1keV"<<std::endl;
+      std::cout<<" F(  1 MeV) = "<<pl.Eval(1e3)<<" ph/m^2/kev/s"<<std::endl;
+      std::cout<<" F( 10 MeV) = "<<pl.Eval(1e4)<<" ph/m^2/kev/s"<<std::endl;
+      std::cout<<" F(100 MeV) = "<<pl.Eval(1e5)<<" ph/m^2/kev/s"<<std::endl;
+      std::cout<<" F(  1 GeV) = "<<pl.Eval(1e6)<<" ph/m^2/kev/s"<<std::endl;
       std::cout<<" Index = "<<pl.GetParameter(1)<<std::endl;
       std::cout<<"--------------------------------------------------"<<std::endl;
-      
+      /*
       eNe->Fit("PL_f","QR+","lsame");
       std::cout<<"---PL FUNTION eNe FIT------------------------------"<<std::endl;
       std::cout<<" No    = "<<pow(10.,pl.GetParameter(0))<<std::endl;
@@ -408,6 +413,7 @@ void PlotGRB(double enph = 0,double z=0,char name[100]="grb_65540.root",TString 
       std::cout<<" No    = "<<pow(10.,pl.GetParameter(0))<<std::endl;
       std::cout<<" Index = "<<pl.GetParameter(1)<<std::endl;
       std::cout<<"--------------------------------------------------"<<std::endl;
+      */
     }
   TLegend *leg = new TLegend(0.11,0.12,0.37,0.25);
   leg->SetFillStyle(0);

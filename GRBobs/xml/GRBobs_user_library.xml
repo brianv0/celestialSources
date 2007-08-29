@@ -4,7 +4,7 @@
 
 <source name=" GRB_00000 ">
 <spectrum escale="MeV">
- <SpectrumClass name="GRBobsmanager" params="tstart=1000, duration=0.5326, peakFlux=9.064, l=-116.1, b=-56.2, redshift=1.823, alpha=-1.479, beta=-2.322, Ep=190.9, emin=10, GBM=1 "/>
+ <SpectrumClass name="GRBobsmanager" params="tstart=1000, duration=1.0, peakFlux=1, theta=10, phi=0, redshift=1.823, alpha=-1.1, beta=-2.25, Ep=300.0, emin=10, GBM=0 "/>
 <use_spectrum frame="galaxy" />
 </spectrum> </source>
 
