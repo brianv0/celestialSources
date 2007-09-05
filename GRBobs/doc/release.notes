@@ -4,6 +4,8 @@
 
   @verbatim
   $Id$
+   5-sep-07 v3p1       NO    Change the libraries, improve the root test program.
+			     Change the range for computing the fluence in the normalization. 
   23-aug-07 v3r0p8     HMK   Insert includes from Berrie
   12-apr-07 v3r0p7     THB   Fix MAC line ends
   10-apr-07 v3r0p6     NO    Bug fixed (window compilation)
