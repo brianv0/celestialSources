@@ -1,0 +1,38 @@
+/** 
+  @file release.notes
+  @brief package celestialSources
+
+  @verbatim
+  $Id$
+   5-sep-07 v3p1       NO    Change the libraries, improve the root test program.
+			     Change the range for computing the fluence in the normalization. 
+  23-aug-07 v3r0p8     HMK   Insert includes from Berrie
+  12-apr-07 v3r0p7     THB   Fix MAC line ends
+  10-apr-07 v3r0p6     NO    Bug fixed (window compilation)
+  04-apr-07 v3r0p5     NO    Add macros. Add the seed into XML
+  22-mar-07 v3r0p4     NO    Chenge the initialization of the random seed
+  16-mar-07 v3r0p3     NO    Chenge the output format for GBM (bug fixed)
+  13-mar-07 v3r0p2     NO    There is a weird infinite loop. I put a check.
+  27-feb-07 v3r0p1     NO    included algorithm
+  26-feb-07 v3         NO    Variable bin size histogram. 
+			     Now producerd BGO and NaI separate files.
+                             Added names of the parameters in the xml library.
+			     Position of the GRB is stored in the xml file.
+			     Backeward compatibility should be ok, but it is not guaranteed.
+  03-dec-06 v2r2p2     THB   Change 3-vector class to Hep3Vector
+  1-nov-06 v2r2p1      NO    Change the requirements
+  30-oct-06 v2r2       NO    Add second spectral component (SSC) in the prompt phase
+  13-feb-06 v2r1p15    NO    Remove const from GRBobsSim::GetUniqueName
+  08-feb-06 v2r1p14    NO    Set gDirectory(0) for all the TH1 Objects
+  08-feb-06 v2r1p13    NO    Removed the ugly cicle in GRBengine with Joanne's suggestion
+  07-feb-06 v2r1p12    NO    Cleaned mem leaks
+  06-feb-06 v2r1p11    NO    TString removed.
+  31-jan-06 v2r1p10    NO    Earth occultation avoid GBM generation file
+  26-jan-06 v2r1p8     NO    GBM long burst's bug solved
+  21-dec-05 v2r1p7     THB   GBM generation on
+  13-dec-05 v2r1p6     THB   tag Johann's fixes
+  03-dec-05 v2r1p3     THB   fix bug in applying launch offset
+  15-Jun-05 v1r0p1     THB   GPS adjustment
+  05-Apr-05 v0r3p1     JCT    fix LATEST1.1419
+  @endverbatim
+*/
