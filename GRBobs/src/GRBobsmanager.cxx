@@ -383,14 +383,17 @@ void GRBobsmanager::GenerateGRB()
   os<<" "<<setw(8)<<m_LATphotons <<" "<< setw(8)<<m_EC_delay<<" "<<setw(8)<<m_EC_duration<<endl;
   os.close();  
 
-  cout<<"GRB"<<GRBname;
+  cout<<"GRB"<<GRBname<<" ("<<m_GRBnumber-65540<<")";
   if( m_z >0)  cout<<" redshift = "<<m_z;
-  cout<<setprecision(10)<<" t start "<<m_startTime<<", tend "<<m_endTime
-	   <<" l,b = "<<m_l<<", "<<m_b<<" elevation,phi(deg) = "<<m_theta<<", "<<m_phi;
+  cout<<setprecision(10)<<" t start "<<m_startTime<<", tend "<<m_endTime;
+  cout<<" l,b = "<<m_l<<", "<<m_b<<" elevation,phi(deg) = "<<m_theta<<", "<<m_phi;
+  cout<<" alpha=  "<<m_alpha<<" beta= "<<m_beta<<" Ep= "<<m_epeak;
+
   if(m_par->GetNormType()=='P')
     cout<<" Peak Flux = "<<m_fluence<<" 1/cm^2/s "<<endl;
   else 
     cout<<" Fluence = "<<m_fluence<<" erg/cm^2"<<endl;
+
   if(m_LATphotons>0) 
     {
       cout<<"Generate AFTERGLOW Emission ("<<setprecision(10)<<m_startTime_EC<<" "<<m_endTime_EC<<")"<<endl;
