@@ -20,9 +20,9 @@ long FirstBurstTime  =      1000; //1e4
 //double AverageInterval = 48516.9; //[s] 650 grbs / yr
 double AverageInterval = 47351.35135; //[s] 666 grbs / yr
 
-bool  GeneratePF         =   true; // If true: PF is used to normalize Bursts.
-                                   // If false Fluence (50-300 keV) is used to normalize Bursts.
-TString GenerateIC        =   "random";//"random"; //"yes", "no"
+bool  GeneratePF         =   false; // If true: PF is used to normalize Bursts.
+                                    // If false Fluence (50-300 keV) is used to normalize Bursts.
+TString GenerateIC        =   "no";//"random"; //"yes", "no"
 TString RepointFile       = "none"; //"l_b_coords.txt";
 
 double Fssc_Fsyn_const   =   10;
@@ -470,6 +470,9 @@ void GenerateXMLLibrary(int Nbursts=1000)
 
   PFlong->GetXaxis()->CenterTitle();
   PFshort->GetXaxis()->CenterTitle();
+
+  FLlong->GetXaxis()->CenterTitle();
+  FLshort->GetXaxis()->CenterTitle();
   
   betalong->GetXaxis()->CenterTitle();
   betashort->GetXaxis()->CenterTitle();
@@ -488,6 +491,9 @@ void GenerateXMLLibrary(int Nbursts=1000)
 
   PFlong->GetXaxis()->SetTitle("Peak Flux 50-300 keV [ph/cm^{2}/s]");
   PFshort->GetXaxis()->SetTitle("Peak Flux 50-300 keV [ph/cm^{2}/s]");
+  
+  FLlong->GetXaxis()->SetTitle("Log_{10} Fluence 50-300 keV [erg/cm^{2}]");
+  FLshort->GetXaxis()->SetTitle(Log_{10} "Fluence 50-300 keV [erg/cm^{2}]");
   
   betalong->GetXaxis()->SetTitle("High Energy Spectral Index (#beta)");
   betashort->GetXaxis()->SetTitle("High Energy Spectral Index (#beta)");
@@ -613,7 +619,7 @@ void GenerateXMLLibrary(int Nbursts=1000)
       double my_beta_min = beta_min;
       if (burst_positions[i]->is_ARR())
 	{
-	  my_beta_min= -2.0;
+	  my_beta_min= -2.1;
 	  
 	  if(GenerateIC=="random")
 	    {
