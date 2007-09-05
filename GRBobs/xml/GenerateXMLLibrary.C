@@ -21,7 +21,7 @@ long FirstBurstTime  =      1000; //1e4
 double AverageInterval = 47351.35135; //[s] 666 grbs / yr
 
 bool  GeneratePF         =   true; // If true: PF is used to normalize Bursts.
-                                   // If false Fluence is used to normalize Bursts.
+                                   // If false Fluence (50-300 keV) is used to normalize Bursts.
 TString GenerateIC        =   "random";//"random"; //"yes", "no"
 TString RepointFile       = "none"; //"l_b_coords.txt";
 

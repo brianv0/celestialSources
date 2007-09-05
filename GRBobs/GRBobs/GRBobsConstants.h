@@ -44,7 +44,7 @@ namespace ObsCst
 
   /// Number of  LAT energy bins.
 
-  const int   LAT_number_of_energy_bins=20;
+  const int   LAT_number_of_energy_bins=200;
 
   /// maximum energy (keV)
 
@@ -80,7 +80,7 @@ namespace ObsCst
 
   /// power law  index for the full width at half maximum - energy relation: \f$ W(e)=W0 (e/E0)^{-We} \f$
 
-  const double We           = 0.0;//33;//0.33; 
+  const double We           = 0.0;//0.33; 
 
   /// for the displacements between peaks
 

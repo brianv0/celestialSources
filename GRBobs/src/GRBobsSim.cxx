@@ -188,8 +188,8 @@ TH2D* GRBobsSim::MakeGRB()
       double BATSEfluence = m_params->GetFluence();
       if(DEBUG) std::cout<<" Scale at BATSE fluence!:" << BATSEfluence <<std::endl;
       
-      int ei1 = nph->GetYaxis()->FindBin(BATSE1);
-      int ei2 = nph->GetYaxis()->FindBin(BATSE5);
+      int ei1 = nph->GetYaxis()->FindBin(BATSE2);
+      int ei2 = nph->GetYaxis()->FindBin(BATSE4);
       double F=0.0;
       for (int ei = ei1; ei<=ei2; ei++)
 	{
