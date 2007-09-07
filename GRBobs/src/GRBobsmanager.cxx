@@ -153,7 +153,7 @@ GRBobsmanager::GRBobsmanager(const std::string& params)
       m_EC_duration    = parmap.value("EC_duration");
       m_CutOffEnergy   = parmap.value("EC_CutOff");
     }
-  
+
   if(DEBUG)
     {
       std::cout<<"-------Read the following parameters --------"<<std::endl;
@@ -338,6 +338,8 @@ void GRBobsmanager::GenerateGRB()
   h = m_GRB->MakeGRB();
   m_spectrum = new SpectObj(m_GRB->CutOff(h,m_CutOffEnergy) , 0, m_z);
   m_spectrum->SetAreaDetector(EventSource::totalArea());
+  double Fluence=m_spectrum->GetFluence(50.,300.);
+  double PeakFlux=m_spectrum->GetPeakFlux(50.,300.,0.256);
   //  m_endTime    = m_startTime  + m_GRB->Tmax();
   PromptEmission = new SpectralComponent(m_spectrum,m_startTime,m_endTime);
   //cout<<"Generate PROMPT emission ("<<m_startTime<<" "<<m_endTime<<")"<<endl;
@@ -359,28 +361,46 @@ void GRBobsmanager::GenerateGRB()
       {
       cout<<"This GRB is occulted by the Earth"<<endl;
       }
-  else 
+      else 
   */
-  if(m_GenerateGBMOutputs)
+  astro::GPS *gps(astro::GPS::instance());
+  gps->time(m_startTime);
+  astro::EarthCoordinate earthCoord(gps->lat(),gps->lon());  
+  int inSAA=earthCoord.insideSAA();
+  if(m_GenerateGBMOutputs && inSAA==0)
     {
       m_GRB->SaveGBMDefinition(GRBname,m_ra,m_dec,m_theta,m_phi,m_Rest);
       m_GRB->GetGBMFlux(GRBname);
     }
-  
+
   string name = "GRBOBS_";
   name+=GRBname; 
   name+="_PAR.txt";
   //..................................................//
   ofstream os(name.c_str(),ios::out);  
-  os<<"  GRBName      T_start         T_end        L        B       Ra      Dec    Theta      Phi        z     Flux    Alpha     Beta    Epeak     Essc     Fssc      Eco    N_ext  Del_ext  Dur_ext "<<endl;
-  os<<setw(9)<<GRBname<<setw(13)<<setprecision(10)<<m_startTime<<" "<<setw(13)<<m_GRBend;
-  os<<" "<<setprecision(4)<<setw(8)<<m_l<<" "<<setw(8)<<m_b;
-  os<<" "<<setw(8)<<m_ra<<" "<<setw(8)<<m_dec;
-  os<<" "<<setw(8)<<m_theta<<" "<<setw(8)<<m_phi;
-  os<<" "<<setw(8)<<m_z<<" "<<setw(8)<<m_fluence;
-  os<<" "<<setw(8)<<m_alpha<<" "<<setw(8)<<m_beta<<" "<<setw(8)<<m_epeak;
-  os<<" "<<setw(8)<<m_essc_esyn<<" "<<setw(8)<<m_fssc_fsyn<<" "<<setw(8)<<m_CutOffEnergy;
-  os<<" "<<setw(8)<<m_LATphotons <<" "<< setw(8)<<m_EC_delay<<" "<<setw(8)<<m_EC_duration<<endl;
+  os<<"  GRBName = "<<setw(9)<<GRBname<<endl;
+  os<<"  Seed = "<<m_GRBnumber-65540<<endl;
+  os<<" TStart = " <<setw(13)<<setprecision(10)<<m_startTime<<endl;
+  os<<" TEnd = " <<setw(13)<<m_GRBend<<endl;
+  os<<" L = "<<setprecision(4)<<setw(8)<<m_l<<endl;
+  os<<" B = "<<setw(8)<<m_b<<endl;
+  os<<" Ra = "<<setw(8)<<m_ra<<endl;
+  os<<" Dec = "<<setw(8)<<m_dec<<endl;
+  os<<" Theta = "<<setw(8)<<m_theta<<endl;
+  os<<" Phi = "<<setw(8)<<m_phi<<endl;
+  os<<" Redshift = "<<setw(8)<<m_z<<endl;
+  os<<" Fluence = "<<setw(8)<<Fluence<<endl;
+  os<<" PeakFlux = "<<setw(8)<<PeakFlux<<endl;
+  os<<" Alpha = "<<setw(8)<<m_alpha<<endl;
+  os<<" Beta = "<<setw(8)<<m_beta<<endl;
+  os<<" Epeak = "<<setw(8)<<m_epeak<<endl;
+  os<<" Essc = "<<setw(8)<<m_essc_esyn<<endl;
+  os<<" Fssc = "<<setw(8)<<m_fssc_fsyn<<endl;
+  os<<" Eco = "<<setw(8)<<m_CutOffEnergy<<endl;
+  os<<" NLAT = "<<setw(8)<<m_LATphotons <<endl;
+  os<<" Delay = "<<setw(8)<<m_EC_delay<<endl;
+  os<<" EC_duration = "<<setw(8)<<m_EC_duration<<endl;
+  os<<" inSAA ="<<setw(8)<<inSAA<<endl;
   os.close();  
 
   cout<<"GRB"<<GRBname<<" ("<<m_GRBnumber-65540<<")";
@@ -388,11 +408,10 @@ void GRBobsmanager::GenerateGRB()
   cout<<setprecision(10)<<" t start "<<m_startTime<<", tend "<<m_endTime;
   cout<<" l,b = "<<m_l<<", "<<m_b<<" elevation,phi(deg) = "<<m_theta<<", "<<m_phi;
   cout<<" alpha=  "<<m_alpha<<" beta= "<<m_beta<<" Ep= "<<m_epeak;
-
-  if(m_par->GetNormType()=='P')
-    cout<<" Peak Flux = "<<m_fluence<<" 1/cm^2/s "<<endl;
-  else 
-    cout<<" Fluence = "<<m_fluence<<" erg/cm^2"<<endl;
+  cout<<" Peak Flux = "<<PeakFlux<<" 1/cm^2/s, Fluence = "<<Fluence<<" erg/cm^2"<<endl;
+  
+  if(inSAA==1)
+    cout<<" -- inside the SAA -- "<<endl;
 
   if(m_LATphotons>0) 
     {
