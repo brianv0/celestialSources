@@ -4,6 +4,7 @@
 #include "flux/SpectrumFactoryTable.h"
 #include "flux/FluxMgr.h"
 #include "astro/GPS.h"
+#include "facilities/commonUtilities.h"
 
 #include <iostream>
 #include <fstream>
@@ -128,7 +129,7 @@ int main(int argn, char * argc[]) {
   
   //TESTING MULTIPLE XML INPUT
   std::vector<std::string> fileList;
-  fileList.push_back("$(GRBOBSROOT)/xml/GRBobs_user_library.xml");
+  fileList.push_back(facilities::commonUtilities::joinPath(facilities::commonUtilities::getXmlPath("GRBobs"), "GRBobs_user_library.xml"));
   //  fileList.push_back("$(GRBOBSROOT)/xml/SWIFT_bursts.xml");
   FluxMgr fm(fileList);
 

@@ -12,6 +12,8 @@
 #include "GRBobs/GRBobsSim.h"
 #include "GRBobs/GRBobsPulse.h"
 
+#include "facilities/commonUtilities.h"
+
 #include "TFile.h"
 #include "TCanvas.h"
 #define DEBUG 0
@@ -25,9 +27,8 @@ double *GRBobsSim::ComputeEnergyBins(int &Nbins)
   BGOEnergyGrid_Vector.erase(BGOEnergyGrid_Vector.begin(),BGOEnergyGrid_Vector.end());
 
   std::vector<double> EnergyGrid;
-  std::string path = ::getenv("GRBOBSROOT");
-  std::string NaIpath(path+"/GRBobs/NaI_energy_grid.dat");
-  std::string BGOpath(path+"/GRBobs/BGO_energy_grid.dat");
+  std::string NaIpath(facilities::commonUtilities::joinPath(facilities::commonUtilities::getDataPath("GRBobs"), "NaI_energy_grid.dat"));
+  std::string BGOpath(facilities::commonUtilities::joinPath(facilities::commonUtilities::getDataPath("GRBobs"), "BGO_energy_grid.dat"));
   //  std::cout<<NaIpath<<" "<<BGOpath<<std::endl;
   std::ifstream NaIEnergyGrid(NaIpath.c_str());
 
