@@ -13,6 +13,7 @@
 #include "TGaxis.h"
 #include "TTree.h"
 
+#include "facilities/commonUtilities.h"
 
 //#include "../../GRB/SpectObj.h"
 #include "SpectObj/SpectObj.h"
@@ -535,8 +536,7 @@ void PlotGRB(double enph = 0,char name[100]="grb_65540.root",TString name2="GRB_
 void ScanParameters(int Ngrb)
 {
   
-  std::string path = ::getenv("GRBROOT");
-  std::string paramFile = path+"/data/GRBParam.txt";  
+  std::string paramFile = facilities::commonUtilities::joinPath(facilities::commonUtilities::getDataPath("GRB"), "GRBParam.txt");
   Parameters *params = new Parameters();  
 
   //////////////////////////////////////////////////
@@ -685,8 +685,7 @@ void MakeGRB(int NGRB=1, double enph=0, bool gbm = false)
 {
   std::cout<<" ****** GRB and ROOT test ****** "<<std::endl;
   
-  std::string path = ::getenv("GRBROOT");
-  std::string paramFile = path+"/data/GRBParam.txt";
+  std::string paramFile = facilities::commonUtilities::joinPath(facilities::commonUtilities::getDataPath("GRB"), "GRBParam.txt");
   Parameters *params = new Parameters();  
   //////////////////////////////////////////////////
   params->ComputeParametersFromFile(paramFile,NGRB);

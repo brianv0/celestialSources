@@ -26,6 +26,7 @@
 #include "SpectObj/SpectObj.h"
 
 #include "facilities/Util.h"
+#include "facilities/commonUtilities.h"
 
 class GRBmanager : public Spectrum
 {
