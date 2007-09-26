@@ -7,6 +7,7 @@
 #include "Pulsar/PulsarConstants.h"
 #include "SpectObj/SpectObj.h"
 #include "flux/SpectrumFactory.h"
+#include "facilities/commonUtilities.h"
 #include <cmath>
 
 #define DEBUG 0
@@ -195,10 +196,9 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
   m_Sim_stopMET = astro::GPS::instance()->endTime();
 
   //Retrieve pulsar data from a list of DataList file.
-  std::string pulsar_root = ::getenv("PULSARROOT");
   
   // if this is in the GLEAM environment, allow for separate path specified by env var PULSARDATA
-  std::string pulsar_data(pulsar_root+"/data/"); // the default, perhaps overriden
+  std::string pulsar_data(facilities::commonUtilities::getDataPath("Pulsar")); // the default, perhaps overriden
 
   /*changed to old settings
   const char * gleam = ::getenv("PULSARDATA");
@@ -214,7 +214,7 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
     std::cout << "Warning !SKYMODEL_DIR not found!"  <<std::endl;
 
   //Scan PulsarDataList.txt
-  std::string ListFileName = pulsar_data + "PulsarDataList.txt";
+  std::string ListFileName = facilities::commonUtilities::joinPath(pulsar_data, "PulsarDataList.txt");
   
   std::ifstream ListFile;
   ListFile.open(ListFileName.c_str(), std::ios::in);
