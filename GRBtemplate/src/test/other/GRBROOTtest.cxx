@@ -655,9 +655,7 @@ void MakeGRBtemplate(std::string model_name = "pulse_002.dat", double enph=0, bo
 {
   std::cout<<" ****** GRB and ROOT test ****** "<<std::endl;
   
-  std::string path = ::getenv("GRBTEMPLATEROOT");
-  std::string paramFile = path+"/data/";
-  paramFile.append(model_name);
+  std::string paramFile = facilities::commonUtilities::joinPath(facilities::commonUtilities::getDataPath("GRBtemplate"), model_name);
   GRBtemplateSim* m_grb = new GRBtemplateSim(paramFile);
   std::cout<<" making GRB..."<<std::endl;
   TH2D *h = m_grb->MakeGRB();

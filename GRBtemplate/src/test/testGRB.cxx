@@ -128,7 +128,7 @@ int main(int argn, char * argc[]) {
   
   //TESTING MULTIPLE XML INPUT
   std::vector<std::string> fileList;
-  fileList.push_back("$(GRBTEMPLATEROOT)/xml/GRBtemplate_library.xml");
+  fileList.push_back(facilities::commonUtilities::joinPath(facilities::commonUtilities::getXmlpath("GRBtemplate"), "GRBtemplate_library.xml"));
   FluxMgr fm(fileList);
 
 
