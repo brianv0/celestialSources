@@ -14,6 +14,7 @@
 //#include "SpectObj.h"
 #include "SpectObj/SpectObj.h"
 #include "eblAtten/EblAtten.h"
+#include "facilities/commonUtilities.h"
 
 #include "CLHEP/Random/RandFlat.h"
 
@@ -64,8 +65,7 @@ SpectObj::SpectObj(const TH2D* In_Nv, int type, double z)
   m_TimeBinWidth   = Nv->GetXaxis()->GetBinWidth(0);
   m_z = z;
 
-  std::string path = ::getenv("SPECTOBJROOT");
-  std::string EBL_model_fileName(path+"/data/EBLmodel.dat");
+  std::string EBL_model_fileName(facilities::commonUtilities::joinPath(facilities::commonUtilities::getDataPath("SpectObj"), "EBLmodel.dat"));
   std::ifstream EBL_model_file(EBL_model_fileName.c_str(),std::ios_base::in);
   std::string EBl_model;
   if (!(EBL_model_file.is_open()))
