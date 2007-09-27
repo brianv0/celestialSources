@@ -489,7 +489,8 @@ std::ifstream &operator>>(std::ifstream &is, GRBurst &grb)
         grb.m_photonlist[i].setTime(t);
         grb.m_photonlist[i].setEnergy(e);
 
-		grb.m_photonlist[i].setDir(std::make_pair<float,float> (ra,dec));
+	std::pair<float,float> radec(ra,dec);
+	grb.m_photonlist[i].setDir(radec);
     }
     
 	std::cout << "Finished reading file...\n";
