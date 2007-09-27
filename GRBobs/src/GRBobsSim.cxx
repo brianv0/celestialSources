@@ -12,7 +12,7 @@
 #include "GRBobs/GRBobsSim.h"
 #include "GRBobs/GRBobsPulse.h"
 
-//#include "facilities/commonUtilities.h"
+#include "facilities/commonUtilities.h"
 
 #include "TFile.h"
 #include "TCanvas.h"
@@ -28,12 +28,12 @@ double *GRBobsSim::ComputeEnergyBins(int &Nbins)
 
   std::vector<double> EnergyGrid;
   //
-  std::string path = ::getenv("GRBOBSROOT");
-  std::string NaIpath(path+"/data/NaI_energy_grid.dat");
-  std::string BGOpath(path+"/data/BGO_energy_grid.dat");
-  // Sorry Navid...I'll go back after the tag...
-  //std::string NaIpath(facilities::commonUtilities::joinPath(facilities::commonUtilities::getDataPath("GRBobs"), "NaI_energy_grid.dat"));
-  //  std::string BGOpath(facilities::commonUtilities::joinPath(facilities::commonUtilities::getDataPath("GRBobs"), "BGO_energy_grid.dat"));
+  //std::string path = ::getenv("GRBOBSROOT");
+  //  std::string NaIpath(path+"/data/NaI_energy_grid.dat");
+  //  std::string BGOpath(path+"/data/BGO_energy_grid.dat");
+ // Sorry Navid...I'll go back after the tag...
+  std::string NaIpath(facilities::commonUtilities::joinPath(facilities::commonUtilities::getDataPath("GRBobs"), "NaI_energy_grid.dat"));
+  std::string BGOpath(facilities::commonUtilities::joinPath(facilities::commonUtilities::getDataPath("GRBobs"), "BGO_energy_grid.dat"));
 
   //  std::cout<<NaIpath<<" "<<BGOpath<<std::endl;
   std::ifstream NaIEnergyGrid(NaIpath.c_str());
