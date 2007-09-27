@@ -183,6 +183,7 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
   // Determine start and end time for FT2 or orbit file 
   try {
     const astro::PointingHistory & history = astro::GPS::instance()->history();
+    //    throw(NoHistoryError);
     m_FT2_startMET = history.startTime();
     m_FT2_stopMET = history.endTime();
     m_UseFT2 = 1;
