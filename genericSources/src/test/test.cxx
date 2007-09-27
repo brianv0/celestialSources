@@ -20,6 +20,8 @@
 #include "flux/CompositeSource.h"
 #include "flux/FluxMgr.h"
 
+#include "facilities/commonUtilities.h"
+
 #include "TestUtil.h"
 
 ISpectrumFactory & FitsTransientFactory();
