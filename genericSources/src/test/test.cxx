@@ -99,7 +99,7 @@ int main(int iargc, char * argv[]) {
 void TestApp::setXmlFiles() {
    std::vector<std::string> fileList;
 
-   std::string srcLibrary("$(GENERICSOURCESROOT)/xml/source_library.xml");
+   std::string srcLibrary(facilities::commonUtilities::joinPath(facilities::commonUtilities::getXmlPath("genericSources"), "source_library.xml"));
    fileList.push_back(srcLibrary);
 
    m_fluxMgr = new FluxMgr(fileList);
