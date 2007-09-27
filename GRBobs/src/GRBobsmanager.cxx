@@ -364,7 +364,8 @@ void GRBobsmanager::GenerateGRB()
       else 
   */
   astro::GPS *gps(astro::GPS::instance());
-  gps->time(m_startTime);
+  
+  //std::cout<<gps->time()<<std::endl;//m_startTime);
   astro::EarthCoordinate earthCoord(gps->lat(),gps->lon());  
   int inSAA=earthCoord.insideSAA();
   if(m_GenerateGBMOutputs && inSAA==0)

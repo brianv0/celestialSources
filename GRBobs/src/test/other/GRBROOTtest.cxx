@@ -14,7 +14,7 @@
 #include "SpectObj/SpectObj.h"
 #include "GRBobs/GRBobsSim.h"
 #include "GRBobs/GRBobsConstants.h"
-#include "facilities/commonUtilities.h"
+//#include "facilities/commonUtilities.h"
 
 using namespace ObsCst;
 double EMIN, EMAX, TMIN, TMAX, DT;
@@ -682,9 +682,13 @@ void MakeGRB(int NGRB=1, double enph=0, bool gbm=false)
 {
   std::cout<<" ****** GRB and ROOT test ****** "<<std::endl;
   
-  std::string path = facilities::commonUtilities::getPackagePath("GRBobs");
-  std::string paramFile = facilities::commonUtilities::joinPath(facilities::commonUtilities::joinPath(facilities::commonUtilities::joinPath(path,"src"),"test"),"GRBParam.txt");
-  
+  std::string path = ::getenv("GRBOBSROOT");
+  std::string paramFile = path+"/src/test/GRBParam.txt";
+  /*
+    std::string path = facilities::commonUtilities::getPackagePath("GRBobs");
+    std::string paramFile = facilities::commonUtilities::joinPath(facilities::commonUtilities::joinPath(facilities::commonUtilities::joinPath(path,"src"),"test"),"GRBParam.txt");
+  */
+
   GRBobsParameters *params = new GRBobsParameters();  
   //////////////////////////////////////////////////
   params->ReadParametersFromFile(paramFile,NGRB);
@@ -726,10 +730,12 @@ void MakeGRB(int NGRB=1, double enph=0, bool gbm=false)
 //////////////////////////////////////////////////
 void ScanParameters(int Ngrb)
 {
-  
-  std::string path = facilities::commonUtilities::getPackagePath("GRBobs");
-  std::string paramFile = facilities::commonUtilities::joinPath(facilities::commonUtilities::joinPath(facilities::commonUtilities::joinPath(path,"src"),"test"),"GRBParam.txt");
-
+  /*
+    std::string path = facilities::commonUtilities::getPackagePath("GRBobs");
+    std::string paramFile = facilities::commonUtilities::joinPath(facilities::commonUtilities::joinPath(facilities::commonUtilities::joinPath(path,"src"),"test"),"GRBParam.txt");
+  */
+  std::string path = ::getenv("GRBOBSROOT");
+  std::string paramFile = path+"/src/test/GRBParam.txt";  
   GRBobsParameters *params = new GRBobsParameters();
 
   //////////////////////////////////////////////////
