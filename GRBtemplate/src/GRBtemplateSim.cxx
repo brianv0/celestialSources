@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include <stdexcept>
+#include <cmath>
 #include "GRBtemplate/GRBtemplateSim.h"
 #include "facilities/commonUtilities.h"
 
