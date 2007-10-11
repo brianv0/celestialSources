@@ -107,8 +107,8 @@ void GRBtemplateSim::ComputeEnergyBins()
   NaIEnergyGrid_Vector.erase(NaIEnergyGrid_Vector.begin(),NaIEnergyGrid_Vector.end());
   BGOEnergyGrid_Vector.erase(BGOEnergyGrid_Vector.begin(),BGOEnergyGrid_Vector.end());
   
-  std::string NaIpath(facilities::commmonUtilities::joinPath(facilities::commonUtilities::getDataPath("GRBtemplate"),"NaI_energy_grid.dat"));
-  std::string BGOpath(facilities::commmonUtilities::joinPath(facilities::commonUtilities::getDataPath("GRBtemplate"),"BGO_energy_grid.dat"));
+  std::string NaIpath(facilities::commonUtilities::joinPath(facilities::commonUtilities::getDataPath("GRBtemplate"),"NaI_energy_grid.dat"));
+  std::string BGOpath(facilities::commonUtilities::joinPath(facilities::commonUtilities::getDataPath("GRBtemplate"),"BGO_energy_grid.dat"));
   std::cout<<NaIpath<<" *** "<<BGOpath<<std::endl;
   std::ifstream NaIEnergyGrid(NaIpath.c_str());
   

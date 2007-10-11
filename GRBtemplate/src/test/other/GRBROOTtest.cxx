@@ -18,6 +18,8 @@
 */
 #include "GRBtemplate/GRBtemplateSim.h"
 //#include "GRBobs/GRBobsConstants.h"
+
+#include "facilities/commonUtilities.h"
  
 using namespace TmpCst;
 double EMIN, EMAX, TMIN, TMAX, DT;
