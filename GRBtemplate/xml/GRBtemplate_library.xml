@@ -1,0 +1,43 @@
+<!-- $Header -->
+<!-- ************************************************************************** -->
+
+<source_library title="GRBtemplate_library">
+<source name=" GRBtemplate_1 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBtemplateManager" params="$(GRBTEMPLATEROOT)/data/test.dat, 3e6, 10.0 , 1, 10"/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRBtemplate_Thermal_LAT_A_025 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBtemplateManager" params="$(GRBTEMPLATEROOT)/data/Thermal_LAT_A_025.dat, 6e6, 10.0 , 1, 10"/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRBtemplate_Thermal_LAT_A_073 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBtemplateManager" params="$(GRBTEMPLATEROOT)/data/Thermal_LAT_A_073.dat, 9e6, 10.0 , 1, 10"/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRBtemplate_Thermal_LAT_A_617 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBtemplateManager" params="$(GRBTEMPLATEROOT)/data/Thermal_LAT_A_617.dat,  1.2e7, 10.0 , 1, 10"/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+
+<source name=" GRBtemplate_Thermal_LAT_C_014 ">
+<spectrum escale="MeV">
+ <SpectrumClass name="GRBtemplateManager" params="$(GRBTEMPLATEROOT)/data/Thermal_LAT_C_014.dat, 1.5e7, 10.0 , 1, 10"/>
+<use_spectrum frame="galaxy" />
+</spectrum> </source>
+                                                                                                                    
+<source name=" AllGRBtemplate" >
+     <nestedSource sourceRef=" GRBtemplate_Thermal_LAT_A_025 "/>
+     <nestedSource sourceRef=" GRBtemplate_Thermal_LAT_A_073 "/>
+     <nestedSource sourceRef=" GRBtemplate_Thermal_LAT_A_617 "/>
+     <nestedSource sourceRef=" GRBtemplate_Thermal_LAT_A_617 "/>
+     <nestedSource sourceRef=" GRBtemplate_Thermal_LAT_C_014 "/>
+</source>
+
+ </source_library>

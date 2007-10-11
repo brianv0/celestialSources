@@ -1,0 +1,9 @@
+# $Header$
+#
+# @file testTemplate.dat
+# @brief Used by SpectralTransient class
+# The columns are
+# tstart tstop  flux gamma1 gamma2 ebreak/MeV 
+  0.     0.3     50.   1.7   2.5    300.
+  0.5    0.8    100.   1.5   2.2    1000.
+  0.8    1.0     10.   2.1   2.1    1000.
