@@ -1,11 +1,12 @@
 package celestialSources/GRBtemplate
-version v0r1
+version v1r1p2
 author Nicola Omodei<nicola.omodei@pi.infn.it>
 
 use flux       v*
 use astro      v*
 use ROOT       v*  IExternal 
 use SpectObj   v* celestialSources
+use facilities v*
 
 macro_append ROOT_libs " -lHist -lGraf "\
                  WIN32 " libHist.lib libGraf.lib " 
@@ -21,8 +22,13 @@ private
 macro source "*.cxx" WIN32 "*.cxx *.h"
 
 library GRBtemplate -no_share \
-     -s=../src      $(source)
+     -s=../GRBtemplate  $(source)\
+     -s=../src          $(source)
 
-macro_append ROOT_libs " -lGpad " WIN32 " libGpad.lib " 
+application test_GRBtemplate      test/testGRB.cxx
 
-application test_GRBROOT  test/other/GRBROOTtest.cxx 
+macro_append ROOT_libs " -lGpad " \
+		WIN32 " libGpad.lib "\
+                Darwin " -lHist -lfreetype -lGraf "
+
+application test_GRBTEMPLATEROOT  test/other/GRBROOTtest.cxx 

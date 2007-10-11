@@ -1,7 +1,12 @@
 #include <fstream>
 #include <iostream>
-# include <string>
+#include <iomanip>
+#include <vector>
+#include <string>
+#include <stdexcept>
+#include <cmath>
 #include "GRBtemplate/GRBtemplateSim.h"
+#include "facilities/commonUtilities.h"
 
 #include "TFile.h"
 #include "TCanvas.h"
@@ -9,30 +14,167 @@
 
 using namespace TmpCst;
 
+TH1D *projectHistogram(TH1D *Nv, std::vector<double> energyBins)
+{
+  int N2 = energyBins.size();
+  gDirectory->Delete("GBM");
+  TH1D *GBM = new TH1D("GBM","GBM",energyBins.size()-1,&energyBins[0]);
+
+  int N1 = Nv->GetNbinsX();
+
+  for (int i=0;i<N2;i++)
+    {
+      double e1 = energyBins[i];
+      double e2 = energyBins[i+1];
+      double x   = (e2+e1)/2.;
+      
+      int    I0      = Nv->FindBin(e1);
+      int    I1      = Nv->FindBin(e2);
+
+      double X,X1,X2,Y1,Y2;
+      double y=0.0;      
+      if(N2>=N1)
+	{
+	  X     =  Nv->GetBinCenter(I0);
+	  if(x<X)
+	    {
+	      if(I0==1)
+		{
+		  X1     =  Nv->GetBinCenter(I0);
+		  X2     =  Nv->GetBinCenter(I0+1);
+		  Y1     =  Nv->GetBinContent(I0);
+		  Y2     =  Nv->GetBinContent(I0+1);
+		}
+	      else
+		{
+		  X1     =  Nv->GetBinCenter(I0-1);
+		  X2     =  Nv->GetBinCenter(I0);
+		  Y1     =  Nv->GetBinContent(I0-1);
+		  Y2     =  Nv->GetBinContent(I0);
+		}
+	    }
+	  else
+	    {
+	      if(I0==N1)
+		{
+		  X1     =  Nv->GetBinCenter(I0-1);
+		  X2     =  Nv->GetBinCenter(I0);
+		  Y1     =  Nv->GetBinContent(I0-1);
+		  Y2     =  Nv->GetBinContent(I0);
+		}
+	      else
+		{
+		  X1     =  Nv->GetBinCenter(I0);
+		  X2     =  Nv->GetBinCenter(I0+1);
+		  Y1     =  Nv->GetBinContent(I0);
+		  Y2     =  Nv->GetBinContent(I0+1);
+		}
+	    }
+	  y = Y1+(Y2-Y1)/(X2-X1)*(x-X1);
+	}
+      else
+	{
+	  int diff = I1-I0;
+	  y=0.0;
+	  if(diff==0)
+	    {
+	      double de12 = e2 - e1;
+	      y+= Nv->GetBinContent(I0)*de12;
+	    }
+	  else if(diff>0)
+	    {
+	      double de1 = Nv->GetBinLowEdge(I0)+ Nv->GetBinWidth(I0) - e1;
+	      y+= Nv->GetBinContent(I0)*de1;
+	      double de2 = e2 - Nv->GetBinLowEdge(I1);
+	      y+= Nv->GetBinContent(I1)*de2;
+	      if(diff>1)
+		for(int j=1;j<diff;j++)
+		  {
+		    y+=(Nv->GetBinContent(I0+j)*Nv->GetBinWidth(I0+j)); //ph/m^2/s 
+		  }
+	    }
+	}
+      y/=(e2-e1); //[ph/(cm² s keV)]
+      GBM->SetBinContent(i+1,y);
+    }
+  return GBM;
+}
+
+
+
+void GRBtemplateSim::ComputeEnergyBins()
+{
+  NaIEnergyGrid_Vector.erase(NaIEnergyGrid_Vector.begin(),NaIEnergyGrid_Vector.end());
+  BGOEnergyGrid_Vector.erase(BGOEnergyGrid_Vector.begin(),BGOEnergyGrid_Vector.end());
+  
+  std::string NaIpath(facilities::commonUtilities::joinPath(facilities::commonUtilities::getDataPath("GRBtemplate"),"NaI_energy_grid.dat"));
+  std::string BGOpath(facilities::commonUtilities::joinPath(facilities::commonUtilities::getDataPath("GRBtemplate"),"BGO_energy_grid.dat"));
+  std::cout<<NaIpath<<" *** "<<BGOpath<<std::endl;
+  std::ifstream NaIEnergyGrid(NaIpath.c_str());
+  
+  if(!NaIEnergyGrid.is_open())
+    {
+      std::cout<<"Unable to open "+NaIpath<<std::endl;
+      throw std::runtime_error("Unable to open "+NaIpath);
+    }
+  std::ifstream BGOEnergyGrid(BGOpath.c_str());
+  if(!BGOEnergyGrid.is_open())
+    {
+      std::cout<<"Unable to open "+NaIpath<<std::endl;
+      throw std::runtime_error("Unable to open "+BGOpath);
+    }
+  
+  int NaI_number_of_energy_bins;
+  int BGO_number_of_energy_bins;
+
+  double energy_low;
+  
+  NaIEnergyGrid>>NaI_number_of_energy_bins;
+
+  
+  for(int i = 0; i<NaI_number_of_energy_bins; i++)
+    {
+      NaIEnergyGrid >> energy_low;
+      NaIEnergyGrid_Vector.push_back(energy_low);
+    }
+  
+  
+  BGOEnergyGrid>>BGO_number_of_energy_bins;
+  
+  for(int i = 0; i<BGO_number_of_energy_bins; i++)
+    {
+      BGOEnergyGrid >> energy_low;
+      BGOEnergyGrid_Vector.push_back(energy_low);
+    }
+}
+
 //////////////////////////////////////////////////
 GRBtemplateSim::GRBtemplateSim(std::string InputFileName)
   : m_InputFileName(InputFileName)
 {
-  std::cout<<m_InputFileName<<std::endl;
+  
 }
 
-void GRBtemplateSim::GetUniqueName(const void *ptr, std::string & name)
+void GRBtemplateSim::GetUniqueName(void *ptr, std::string & name)
 {
   std::ostringstream my_name;
   my_name << reinterpret_cast<int> (ptr);
   name = my_name.str();
   gDirectory->Delete(name.c_str());
+  reinterpret_cast<TH1*> (ptr)->SetDirectory(0);
 }
 
 TH2D* GRBtemplateSim::MakeGRB()
 {
-  ifstream iFile(m_InputFileName);
+  ifstream iFile(m_InputFileName.c_str());
   char dummy[100];
   iFile>>dummy>>m_EnergyBins;
   iFile>>dummy>>m_emin;
   iFile>>dummy>>m_emax;
   iFile>>dummy>>m_TimeBins;
   iFile>>dummy>>m_TimeBinWidth;
+
+  std::cout<<"Template from: "<<m_InputFileName<<std::endl;
   std::cout<<"EnergyBins= "<<m_EnergyBins<<std::endl;
   std::cout<<"MinimumEnergy= "<<m_emin<<std::endl;
   std::cout<<"MaximumEnergy= "<<m_emax<<std::endl;
@@ -40,17 +182,19 @@ TH2D* GRBtemplateSim::MakeGRB()
   std::cout<<"TimeBinWidth= "<<m_TimeBinWidth<<std::endl;
 
   double de   = pow(m_emax/m_emin,1.0/m_EnergyBins);  
+
+
   double *e  = new double[m_EnergyBins +1];
 
   for(int i = 0; i<=m_EnergyBins; i++)
     {
      e[i] = m_emin*pow(de,1.0*i); //keV
     }
-  
   //////////////////////////////////////////////////  
   m_tfinal=m_TimeBinWidth * (m_TimeBins-1);
   //////////////////////////////////////////////////
   gDirectory->Delete("Nv");  
+
   m_Nv = new TH2D("Nv","Nv",m_TimeBins,0.,m_tfinal,m_EnergyBins, e);
   std::string name;
   GetUniqueName(m_Nv,name);
@@ -70,7 +214,7 @@ TH2D* GRBtemplateSim::MakeGRB()
     }
 
   TH2D *nph = Nph(m_Nv); //ph/m²
-  delete e;
+  delete[] e;
   delete nph;
   return m_Nv;
 }
@@ -125,12 +269,12 @@ void GRBtemplateSim::SaveNv()
 };
 
 //////////////////////////////////////////////////
-void GRBtemplateSim::SaveGBMDefinition(TString GRBname, double ra, double dec, double theta, double phi, double tstart)
+void GRBtemplateSim::SaveGBMDefinition(std::string GRBname, double ra, double dec, double theta, double phi, double tstart)
 {
-  TString name = "GRBTMP_";
+  std::string name = "GRBTMP_";
   name+=GRBname; 
-  name+="_DEF.txt";
-  std::ofstream os(name,std::ios::out);
+  name+=".DEF";
+  std::ofstream os(name.c_str(),std::ios::out);
   os<<"BURST DEFINITION FILE"<<std::endl;
   os<<"Burst Name"<<std::endl;
   os<<GRBname<<std::endl;
@@ -175,102 +319,74 @@ double LogFBTMP(double *var, double *par)
 }
 
 
-
-void GRBtemplateSim::GetGBMFlux(TString GRBname)
+void GRBtemplateSim::GetGBMFlux(std::string GRBname)
 {
-  //  double *e = new double[m_EnergyBins +1];
-  //  for(int i = 0; i<=m_EnergyBins; i++)
-  //    {
-  //      e[i] = m_emin*pow(de,1.0*i); //keV
-  //    }
+  ComputeEnergyBins();
+  //  m_Nv has to  be in [ph/(m² s keV)]
+  if(DEBUG) std::cout<<" NaI channels: "<<NaIEnergyGrid_Vector.size()<<" BGO channels: "<<BGOEnergyGrid_Vector.size()<<std::endl;
+  double tbin = m_Nv->GetXaxis()->GetNbins();
   
-  //////////////////////////////////////////////////
-  // GBM Spectrum:
-  TF1 band("grb_f",LogFBTMP,log10(m_emin), 4.0, 4); 
-  band.SetParNames("a","b","logE0","Log10(Const)");
- 
-  band.SetParLimits(0,-2.0 , 2.0); // a
-  band.SetParLimits(1,-3.0 , -0.001); // b-a; b < a -> b-a < 0 !
-  band.SetParLimits(2,log10(m_emin),4.0);
-  //  band.SetParLimits(3,-3.,3.);
+  std::string name_NaI = "NaI_GRBTMP_";
+  name_NaI += GRBname; 
+  name_NaI += ".lc";
+  
+  std::string name_BGO = "BGO_GRBTMP_";
+  name_BGO += GRBname; 
+  name_BGO += ".lc";
+  
+  std::ofstream file_NaI(name_NaI.c_str(),std::ios::out);
+  std::ofstream file_BGO(name_BGO.c_str(),std::ios::out);
 
-  double a,b,E0,Const;
-  TH1D GBM("GBM","GBM",m_EnergyBins,log10(m_emin),log10(m_emax));
-  GBM.SetMinimum(5);
-  GBM.SetMaximum(-5);
+  file_NaI<<"TimeBins= ";
+  file_BGO<<"TimeBins= ";
   
-  double t    = 0;
+  file_NaI<<tbin<<std::endl;
+  file_BGO<<tbin<<std::endl;
+  double *e  = new double[m_EnergyBins +1];
+  for (int ei = 0; ei<m_EnergyBins; ei++) 
+    e[ei]=m_Nv->GetYaxis()->GetBinLowEdge(ei+1);
+  e[m_EnergyBins]=m_Nv->GetYaxis()->GetBinLowEdge(m_EnergyBins)+m_Nv->GetYaxis()->GetBinWidth(m_EnergyBins);
   
-  TString name = "GRBTMP_";
-  name+=GRBname; 
-  name+="_GBM.txt";
-  std::ofstream os(name,std::ios::out);
-  os<<"Sample Spectrum File "<<std::endl;
-  os<<m_TimeBins<<" bins"<<std::endl;
-  os<<"Norm   alf   beta  E_p "<<std::endl;
+  TH1D *Nve =  new TH1D("Nve","Nve",m_EnergyBins, e);
 #ifndef WIN32 // THB: Avoid need to link TCanvas on windows 
   if(DEBUG)
     {
       TCanvas *GBMCanvas;
-      GBMCanvas = new TCanvas("GBMCanvas","GBMCanvas",500,400);
-      std::cout<<"Norm   alf   beta  E_p "<<std::endl;
-      GBM.Draw();
-      
+      GBMCanvas = new TCanvas("GBMCanvas","GBMCanvas",1000,800);
+      GBMCanvas->SetLogx();
+      GBMCanvas->SetLogy();
     }
-#endif 
-  a =  -1.00;
-  b =  -2.25;
+#endif
   
-  
-  for(int ti = 0; ti<m_TimeBins; ti++)
+  for(int ti=1; ti<=tbin; ti++)
     {
-      t = ti * m_TimeBinWidth;
-      for(int ei = 0; ei < m_EnergyBins; ei++)
-	{
-	  //	  double en = pow(10.0,GBM.GetBinCenter(ei+1));
-	  // Notice that Nv is in [ph/(m² s keV)]; nv is in [(ph)/(cm² s keV)]
-	  double nv = TMath::Max(1e-10,m_Nv->GetBinContent(ti+1,ei+1)); // [ph/( m² s keV)]
-	  nv = log10(nv)-4.0;                                           // [ph/(cm² s keV)]
-	  GBM.SetBinContent(ei+1 , nv);                                 // [ph/(cm² s keV)]
-	  GBM.SetBinError(ei+1 , nv/100.0);                             // arbitrary small error (1%)
-	}
+      for (int ei = 1; ei<=m_EnergyBins; ei++) Nve->SetBinContent(ei,m_Nv->GetBinContent(ti,ei));
+      TH1D *NaISpectrum = projectHistogram(Nve,NaIEnergyGrid_Vector);
+      NaISpectrum->SetNameTitle("NaI","NaI");
+      TH1D *BGOSpectrum = projectHistogram(Nve,BGOEnergyGrid_Vector);
+      NaISpectrum->SetNameTitle("BGO","BGO");
       
-      double LogC0  = GBM.GetBinContent(GBM.FindBin(2.0));
-      double LogEp0 = 2.0;
 
-      band.SetParameters(a,b-a,LogEp0,LogC0);
-      if(LogC0>-5) 
-	{
-	  if(DEBUG)
-	    GBM.Fit("grb_f","r");	  
-	  else 
-	    GBM.Fit("grb_f","nqr");	  
-	} 
-      else 
-	{
-	  band.SetParameters(-2.0,-3.0,LogEp0,-10.0);
-	}
-      
-      a  = band.GetParameter(0);
-      b  = a+band.GetParameter(1);
-      E0    = pow(10.,band.GetParameter(2));
-      Const = pow(10.,band.GetParameter(3));
-      double Ep=(2.0+a)*E0; 
-      os<<Const<<" "<<a<<" "<<b<<" "<<Ep<<" "<<std::endl;
-      
+      NaISpectrum->SetLineColor(2);
+      BGOSpectrum->SetLineColor(4);
+#ifndef WIN32 // THB: Avoid need to link TCanvas on windows 
       if(DEBUG)
 	{
-	  std::cout<<"t= "<<t<<" C= "<<Const<<" a= "<<a<<" b= "<<b<<" E0= "<<E0<<" Ep= "<<Ep<<std::endl;
-	  //gPad->SetLogx();
-	  //gPad->SetLogy();
+	  Nve->Draw();
+	  NaISpectrum->Draw("same");
+	  BGOSpectrum->Draw("same");
 	  gPad->Update();
-	  //	  TString gbmFlux= "GBMFlux";
-	  //	  gbmFlux+=ti;
-	  //	  gbmFlux+=".gif";
-	  //	  if(ti%10==0) gPad->Print(gbmFlux);
 	}
-    }   
-  os.close();
-  //////////////////////////////////////////////////
-  //  delete[] e;
+#endif
+      for(unsigned int ei = 1; ei<NaIEnergyGrid_Vector.size(); ei++) 
+	file_NaI << std::setprecision(5) << NaISpectrum->GetBinContent(ei)<<"\t";
+      file_NaI <<"\n";
+      for(unsigned int ei = 1; ei<BGOEnergyGrid_Vector.size(); ei++) 
+	file_BGO << std::setprecision(5) << BGOSpectrum->GetBinContent(ei)<<"\t";
+      file_BGO <<"\n";
+      gDirectory->Delete("NaI");
+      gDirectory->Delete("BGO");
+    }
+  file_NaI.close();
+  file_BGO.close();
 }

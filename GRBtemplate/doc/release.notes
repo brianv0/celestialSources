@@ -1,0 +1,17 @@
+/** 
+  @file release.notes
+  @brief package GRBtemplate
+
+  @verbatim
+  $Id$
+
+  11-oct-07 v1r1p2     HMK   include cmath
+  11-oct-07 v1r1p1     HMK   Patches for ROOT v5.16.00 and new facilities
+  05-apr-07 v1r1p0     NO    Accept energy grid for GBM. Save histograms.
+  02-dec-06 v1r0p4     THB   Changed to supported CLHEP vector class
+  01-nov-06 v1r0p3     NO    Fixed compilation under windows 
+  31-oct-06 v1r0p2     NO    Bug Fixed (caused a seg fault)
+  31-oct-06 v1r0p1     NO    Added 4 template files from Milan (Thermal model)
+  30-oct-06 v1r0       NO    This is the candidate for the first stable version
+  @endverbatim
+*/

@@ -14,14 +14,14 @@
 #include <map>
 #include <cmath>
 #include "TRandom.h"
-#include "flux/ISpectrum.h"
+#include "flux/Spectrum.h"
 #include "flux/EventSource.h"
 #include "GRBtemplateSim.h"
 #include "SpectObj/SpectObj.h"
 
 #include "facilities/Util.h"
 
-class GRBtemplateManager : public ISpectrum
+class GRBtemplateManager : public Spectrum
 {
   
  public:
@@ -57,7 +57,7 @@ class GRBtemplateManager : public ISpectrum
   //! direction, taken from GRBtemplateSim
   inline std::pair<double,double> dir(double) 
     {
-      (void)(energy);//energy is not used here
+      //      (void)(energy);//energy is not used here
       return m_GalDir;
     } 
   
@@ -66,7 +66,7 @@ class GRBtemplateManager : public ISpectrum
   std::string title() const {return "GRBtemplateManager";} 
   const char * particleName() const {return "gamma";}
   const char * nameOf() const {return "GRBtemplateManager";}
-  TString GetGRBname(double time);
+  std::string GetGRBname();
   void GenerateGRB();  
   void DeleteGRB();  
 
@@ -76,14 +76,14 @@ class GRBtemplateManager : public ISpectrum
     \param index if the position of the parameter in the input list. 
     \retval output is the value of the parameter as float number.
   */  
-  double parseParamList(std::string input, unsigned int index);  
+  std::string parseParamList(std::string input, unsigned int index);  
   
  private:
   double m_Rest;
   double m_Frac;
   double m_ra;
   double m_dec;
-  double m_theta;
+  double m_theta,m_theta_fow;
   double m_phi;
 
 
@@ -96,8 +96,9 @@ class GRBtemplateManager : public ISpectrum
   std::pair<double,double> m_GalDir;
   bool m_grbGenerated;
   bool m_grbdeleted;
+  bool m_grbocculted;
   bool m_GenerateGBMOutputs;
-
+  
   std::string m_InputFileName;
   double m_l;
   double m_b;

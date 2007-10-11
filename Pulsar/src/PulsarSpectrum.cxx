@@ -96,15 +96,13 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
 
   //Retrieve pulsar data from a list of DataList file.
   std::string pulsar_root = ::getenv("PULSARROOT");
+  std::string ListFileName = pulsar_root + "/data/PulsarDataList.txt";
   
-  // if this is in the GLEAM environment, allow for separate path specified by env var PULSARDATA
-  std::string pulsar_data(pulsar_root+"/data/"); // the default, perhaps overriden
-
+  // if this is in the GLEAM environment, allow for separate path
   const char * gleam = ::getenv("PULSARDATA");
   if( gleam!=0) {
-      pulsar_data =  std::string(gleam)+"/";
+     ListFileName = std::string(gleam)+"/PulsarDataList.txt";
   }
-  std::string ListFileName = pulsar_data + "PulsarDataList.txt";
   
   std::ifstream ListFile;
   ListFile.open(ListFileName.c_str(), std::ios::in);
@@ -127,7 +125,7 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
 	ListFile >> DataListFileName;
 	while (!ListFile.eof()) 
 	  {	
-	    CompletePathFileName = pulsar_data + std::string(DataListFileName);
+	    CompletePathFileName = pulsar_root + "/data/" + std::string(DataListFileName);
 	    Retrieved = getPulsarFromDataList(CompletePathFileName);
 	    
 	    if (Retrieved == 1)
@@ -175,7 +173,7 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
 
   //writes out an output log file
 
-  std::string logLabel = "PsrOutput/" + m_PSRname + "Log.txt";
+  std::string logLabel = m_PSRname + "Log.txt";
   ofstream PulsarLog(logLabel.c_str());
   
   PulsarLog << "\n********   PulsarSpectrum Log for pulsar" << m_PSRname << std::endl;
