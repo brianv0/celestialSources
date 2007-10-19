@@ -63,7 +63,6 @@ public:
 
 private:
 
-   double m_flux;
    double m_emin;
    double m_emax;
 

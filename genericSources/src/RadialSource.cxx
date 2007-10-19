@@ -29,11 +29,13 @@ ISpectrumFactory & RadialSourceFactory() {
 }
 
 RadialSource::RadialSource(const std::string & paramString) 
-   : m_flux(1.), m_emin(30.), m_emax(2e5), m_spectrum(0) {
+   : m_emin(30.), m_emax(2e5), m_spectrum(0) {
 
    genericSources::ConstParMap pars(paramString);
    
-   m_flux = pars.value("flux");
+// The following call requires the flux parameter to be set.  The actual
+// value is held internally by the m_spectrum data member.
+   pars.value("flux");
    try {
       m_emin = pars.value("emin");
    } catch (...) {
