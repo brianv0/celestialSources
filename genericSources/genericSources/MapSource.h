@@ -14,10 +14,6 @@
 
 #include "flux/Spectrum.h"
 
-namespace genericSources {
-   class FitsImage;
-}
-
 /**
  * @class MapSource
  *
@@ -93,14 +89,8 @@ protected:
    double m_mapIntegral;
 
    void samplePixel(unsigned int indx, double &lon, double &lat) const;
-   void readFitsFile(std::string fitsFile, bool createSubMap=false);
+   void readFitsFile(std::string fitsFile);
    void makeIntegralDistribution(const std::vector<double> & pixelValues);
-   void getSubMapAxes(const genericSources::FitsImage & fitsImage);
-
-   double m_lonMin;
-   double m_lonMax;
-   double m_latMin;
-   double m_latMax;
 
 private:
 

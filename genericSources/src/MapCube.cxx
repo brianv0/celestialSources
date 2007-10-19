@@ -30,61 +30,32 @@
 
 #include "genericSources/MapCube.h"
 
-#include "ConstParMap.h"
-
 ISpectrumFactory &MapCubeFactory() {
    static SpectrumFactory<MapCube> myFactory;
    return myFactory;
 }
 
-MapCube::MapCube(const std::string & paramString) : MapSource() {
+MapCube::MapCube(const std::string &paramString) : MapSource() {
 
    std::string fitsFile;
-   bool createSubMap(false);
-
    if (paramString.find("=") == std::string::npos) {
       std::vector<std::string> params;
       facilities::Util::stringTokenize(paramString, ", ", params);
       
       m_flux = std::atof(params[0].c_str());
       fitsFile = params[1];
-      if (params.size() > 2) {
-         try {
-            m_lonMin = std::atof(params.at(2).c_str());
-            m_lonMax = std::atof(params.at(3).c_str());
-            m_latMin = std::atof(params.at(4).c_str());
-            m_latMax = std::atof(params.at(5).c_str());
-            createSubMap = true;
-         } catch (...) {
-            throw std::runtime_error("Error reading sub-map bounds.\n"
-                                     "There must be precisely 4 parameters "
-                                     "to describe a sub-map.");
-         }
-      }
    } else {
-      genericSources::ConstParMap parmap(paramString);
+      std::map<std::string,std::string> params;
+      facilities::Util::keyValueTokenize(paramString, ", ", params);
       
-      m_flux = parmap.value("flux");
-      fitsFile = parmap["fitsFile"];
-      if (parmap.size() > 2) {
-         try {
-            m_lonMin = parmap.value("lonMin");
-            m_lonMax = parmap.value("lonMax");
-            m_latMin = parmap.value("latMin");
-            m_latMax = parmap.value("latMax");
-            createSubMap = true;
-         } catch (...) {
-            throw std::runtime_error("Error reading sub-map bounds.\n"
-                                     "They must be specified with names "
-                                     "lonMin, lonMax, latMin, latMax.");
-         }
-      }
-   }
+      m_flux = std::atof(params["flux"].c_str());
+      fitsFile = params["fitsFile"];
+    }
 
    facilities::Util::expandEnvVar(&fitsFile);
 
-   readFitsFile(fitsFile, createSubMap);
-   checkForNonPositivePixels(fitsFile);
+   readFitsFile(fitsFile);
+   checkForNonPositivePixels();
    readEnergyVector(fitsFile);
    makeCumulativeSpectra();
    std::vector<double> totalCounts(m_solidAngles.size());
@@ -97,15 +68,12 @@ MapCube::MapCube(const std::string & paramString) : MapSource() {
 //              << m_mapIntegral << std::endl;
 }
 
-void MapCube::checkForNonPositivePixels(const std::string & fitsFile) const {
+void MapCube::checkForNonPositivePixels() const {
    std::vector<double>::const_iterator pixel = m_image.begin();
    for ( ; pixel != m_image.end(); ++pixel) {
       if (*pixel <= 0) {
-         std::ostringstream message;
-         message << "MapCube: There are negative or zero-valued"
-                 << " pixels in the FITS image read from" 
-                 << fitsFile;
-         throw std::runtime_error(message.str());
+         throw std::runtime_error("MapCube: There are negative or zero-valued"
+                                  + std::string(" pixels in the FITS image."));
       }
    }
 }
@@ -130,7 +98,7 @@ float MapCube::operator()(float xi) const {
 
 double MapCube::energy(double time) {
    (void)(time);
-   double xi = CLHEP::RandFlat::shoot();
+   double xi = RandFlat::shoot();
    return (*this)(xi);
 }
 
@@ -199,7 +167,7 @@ double MapCube::powerLawIntegral(double x1, double x2,
 
 double MapCube::
 drawEnergy(const std::vector<std::pair<double, double> > & spectrum) const {
-   double xi = CLHEP::RandFlat::shoot()*spectrum.back().first;
+   double xi = RandFlat::shoot()*spectrum.back().first;
    std::vector<std::pair<double, double> >::const_iterator it 
       = std::upper_bound(spectrum.begin(), spectrum.end(),
                          std::make_pair(xi, 0), cmpPair);

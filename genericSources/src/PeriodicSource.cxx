@@ -57,12 +57,11 @@ float PeriodicSource::operator()(float xi) const {
 
 double PeriodicSource::energy(double time) {
    (void)(time);
-   double xi = CLHEP::RandFlat::shoot();
+   double xi = RandFlat::shoot();
    return (*this)(xi);
 }
 
 double PeriodicSource::interval(double time) {
-   time -= Spectrum::startTime();
    double phase = fmod(time, m_period);
    std::vector<double>::const_iterator it 
       = std::upper_bound(m_arrTimes.begin(), m_arrTimes.end(),
@@ -74,7 +73,7 @@ double PeriodicSource::interval(double time) {
                   m_integralDist.begin() + imin +  npts,
                   newDist.begin(), 
                   std::bind2nd(std::minus<double>(), m_integralDist[imin]));
-   double xi = -log(CLHEP::RandFlat::shoot());
+   double xi = -log(RandFlat::shoot());
    unsigned int turns = static_cast<unsigned int>(xi/newDist[npts-1]);
    double resid = fmod(xi, newDist[npts-1]);
    double my_interval = interpolate(newDist, m_arrTimes, resid) 
@@ -116,10 +115,9 @@ void PeriodicSource::computeIntegralDistribution() {
    m_integralDist.push_back(0);
    std::vector<double>::const_iterator it = m_arrTimes.begin();
    for ( ; it != m_arrTimes.end(); it++) {
-      m_integralDist.push_back(m_flux*EventSource::totalArea()
-                               *(*it + m_amplitude/angularFreq
-                                 *(cos(angularFreq*(*it) + m_phi0)
-                                   - cos(m_phi0))));
+      m_integralDist.push_back(m_flux*(*it + m_amplitude/angularFreq
+                                       *(cos(angularFreq*(*it) + m_phi0)
+                                         - cos(m_phi0))));
    }
 
 // Extend to cover two periods.

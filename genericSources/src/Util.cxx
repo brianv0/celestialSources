@@ -7,7 +7,6 @@
  */
 
 #include <cmath>
-#include <cassert>
 
 #include <algorithm>
 #include <fstream>
@@ -41,8 +40,8 @@ namespace genericSources {
    }
 
    void Util::readLines(std::string inputFile, 
-                        std::vector<std::string> & lines,
-                        const std::string & skip) {
+                        std::vector<std::string> &lines,
+                        const std::string &skip) {
       facilities::Util::expandEnvVar(&inputFile);
       std::ifstream file(inputFile.c_str());
       lines.clear();
@@ -105,7 +104,6 @@ namespace genericSources {
          yy = (xx - *it)/(*(it+1) - *it)*(y[indx+1] - y[indx]) + y[indx];
       } else {
          yy = (y[indx+1] + y[indx])/2.;
-         assert(false);
       }
       return yy;
    }
@@ -168,49 +166,13 @@ namespace genericSources {
    }
 
    double Util::drawFromPowerLaw(double emin, double emax, double gamma) {
-      double xi = CLHEP::RandFlat::shoot();
-      double energy;
-      if (gamma == 1) {
-         energy = emin*std::exp(xi*std::log(emax/emin));
-      } else {
-         double one_m_gamma = 1. - gamma;
-         double arg = xi*(std::pow(emax, one_m_gamma) - 
-                          std::pow(emin, one_m_gamma)) 
-            + std::pow(emin, one_m_gamma);
-         energy = std::pow(arg, 1./one_m_gamma);
-      }
+      double xi = RandFlat::shoot();
+      double one_m_gamma = 1. - gamma;
+      double arg = xi*(std::pow(emax, one_m_gamma) - 
+                       std::pow(emin, one_m_gamma)) 
+         + std::pow(emin, one_m_gamma);
+      double energy = std::pow(arg, 1./one_m_gamma);
       return energy;
-   }
-
-   double Util::logInterpolate(const std::vector<double> & x,
-                               const std::vector<double> & y,
-                               double xx) {
-      std::vector<double>::const_iterator it 
-         = std::upper_bound(x.begin(), x.end(), xx) - 1;
-      int indx(it - x.begin());
-      if (indx < 0) {
-         indx = 0;
-      }
-      if (static_cast<size_t>(indx) > x.size() - 2) {
-         indx = x.size() - 2;
-      }
-      double yy = 
-         y[indx]*std::exp(std::log(xx/x[indx])/std::log(x[indx+1]/x[indx])
-                          *std::log(y[indx+1]/y[indx]));
-      return yy;
-   }
-
-   double Util::powerLawIntegral(double x1, double x2, double y1, double y2) {
-      if (x1 <= 0 || x2 <= 0 || y1 <= 0 || y2 <= 0) {
-         throw std::range_error("Util::powerLawIntegral"
-                                "Negative or zero argument passed.");
-      }
-      double gamma(std::log(y2/y1)/std::log(x2/x1));
-      if (gamma == -1) {
-         return y1/x1*log(x2/x1);
-      }
-      return (y1/std::pow(x1, gamma)/(gamma + 1)
-              *(std::pow(x2, gamma+1) - std::pow(x1, gamma+1)));
    }
 
 } // namespace genericSources
