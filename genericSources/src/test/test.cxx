@@ -39,6 +39,7 @@ ISpectrumFactory & TF1SpectrumFactory();
 ISpectrumFactory & TF1MapFactory();
 ISpectrumFactory & FileSpectrumFactory();
 ISpectrumFactory & FileSpectrumMapFactory();
+ISpectrumFactory & RadialSourceFactory();
 //ISpectrumFactory & EventListFactory();
 
 class TestApp {
@@ -142,7 +143,8 @@ void TestApp::setSources() {
 			"tf1spectrum_test",
  			"tf1map_test",
                         "filespectrummap_test",
- 			"filespectrum_test"
+ 			"filespectrum_test",
+                        "radial_source"
    };
    size_t nsrcNames(sizeof(srcNames)/sizeof(char*));
    std::vector<std::string> sourceNames(srcNames, srcNames + nsrcNames);
@@ -206,6 +208,7 @@ void TestApp::load_sources() {
    TF1MapFactory();
    FileSpectrumFactory();
    FileSpectrumMapFactory();
+   RadialSourceFactory();
 //   EventListFactory();
 }
 

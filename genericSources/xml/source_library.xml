@@ -1,4 +1,13 @@
 <source_library>
+<!-- RadialSource -->
+<source name="radial_source">
+  <spectrum escale="MeV">
+    <SpectrumClass name="RadialSource"
+     params="profileFile=$(GENERICSOURCESROOT)/data/radial_dist.dat,specFile=$(GENERICSOURCESROOT)/data/energy_dist.dat, ra=86.4, dec=28.9, flux=1"/>
+     <use_spectrum frame="galaxy"/>
+  </spectrum>
+</source>
+
 <!-- MapCube source model -->
    <source name="DC2_GALPROP_diffuse">
       <spectrum escale="MeV">
