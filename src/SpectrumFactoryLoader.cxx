@@ -34,7 +34,6 @@ ISpectrumFactory & TF1SpectrumFactory();
 ISpectrumFactory & TF1MapFactory();
 ISpectrumFactory & FileSpectrumFactory();
 ISpectrumFactory & FileSpectrumMapFactory();
-ISpectrumFactory & EventListFactory();
 ISpectrumFactory & microQuasarFactory();
 ISpectrumFactory & RadialSourceFactory();
 
@@ -47,7 +46,6 @@ SpectrumFactoryLoader::SpectrumFactoryLoader() {
    load(GRBmanagerFactory());
    load(GRBobsmanagerFactory());
    load(GRBtemplateManagerFactory());
-   
    load(GRBobsFactory());
    load(GaussianSourceFactory());
    load(IsotropicFactory());
@@ -64,7 +62,6 @@ SpectrumFactoryLoader::SpectrumFactoryLoader() {
    load(TF1MapFactory());
    load(FileSpectrumFactory());
    load(FileSpectrumMapFactory());
-   load(EventListFactory());
    load(microQuasarFactory());
    load(RadialSourceFactory());
 }
