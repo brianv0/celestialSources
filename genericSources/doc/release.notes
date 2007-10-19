@@ -5,6 +5,8 @@
   @verbatim
   $Id$
 
+  19-Oct-07 v1r9    JC    add RadialSource for simulating extended sources 
+                          with azimuthal symmetry
   27-Sep-07 v1r8    JC    use facilities::commonUtilities::getDataPath in
                           in test program
   29-Mar-07 v1r7p5  JC    read in reference pixel as float in FitsImage.cxx
