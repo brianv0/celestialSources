@@ -5,6 +5,8 @@
   @verbatim
   $Id$
 
+  21-Oct-07 v1r9p2  JC    allow particle name for SpectralTransient to be
+                          set via params string
   19-Oct-07 v1r9p1  JC    add test data for RadialSource
   19-Oct-07 v1r9    JC    add RadialSource for simulating extended sources 
                           with azimuthal symmetry
