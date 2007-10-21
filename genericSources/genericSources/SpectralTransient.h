@@ -44,8 +44,10 @@ public:
       return m_currentEnergy;
    }
 
-   /// @return Particle type, "gamma".
-   virtual const char * particleName() const {return "gamma";}
+   /// @return Particle type, "gamma" is the default.
+   virtual const char * particleName() const {
+      return m_particle.c_str();
+   }
 
    /// @return Title describing the spectrum.
    virtual std::string title() const {return "SpectralTransient";}
@@ -70,6 +72,7 @@ private:
    float m_z;
    int m_logParabola;
    bool m_specFile;
+   std::string m_particle;
 
    IRB::EblAtten * m_tau;
 

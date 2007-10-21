@@ -40,7 +40,7 @@ ISpectrumFactory & SpectralTransientFactory() {
 
 SpectralTransient::SpectralTransient(const std::string & paramString) 
    : m_emin(20.), m_emax(2e5), m_lc(0), m_z(0), m_logParabola(0),
-     m_specFile(false), m_tau(0), m_tauScale(1) {
+     m_specFile(false), m_tau(0), m_tauScale(1), m_particle("gamma") {
    std::string templateFile;
    std::string spectrumFile("none");
    if (paramString.find("=") == std::string::npos) {
@@ -128,6 +128,10 @@ SpectralTransient::SpectralTransient(const std::string & paramString)
       }
       try {
          spectrumFile = parmap["spectrumFile"];
+      } catch (...) {
+      }
+      try {
+         m_particle = parmap["particle"];
       } catch (...) {
       }
    }
