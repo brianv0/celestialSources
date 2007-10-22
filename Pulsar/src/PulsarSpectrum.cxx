@@ -212,7 +212,10 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
   if( gleam!=0) {
        pulsar_data =  std::string(gleam)+"/pulsars/";
   } else
-    std::cout << "Warning !SKYMODEL_DIR not found!"  <<std::endl;
+    {
+      if (DEBUG)
+	std::cout << "Warning !SKYMODEL_DIR not found!"  <<std::endl;
+    }
 
   //Scan PulsarDataList.txt
   std::string ListFileName = facilities::commonUtilities::joinPath(pulsar_data, "PulsarDataList.txt");
@@ -263,7 +266,6 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
       }
 
   //  ListFile.getline(DataListFileName,200); 
-
 
   //Scan for Binary Pulsar if there are
 
@@ -1504,8 +1506,20 @@ double PulsarSpectrum::getBinaryDemodulationInverse( double CorrectedTime)
 int PulsarSpectrum::getPulsarFromDataList(std::string sourceFileName)
 {
 
-  double startTime = Spectrum::startTime();
-  double endTime = astro::GPS::instance()->endTime();
+  double startTime = 0.;//Spectrum::startTime();
+  double endTime = 0.;//astro::GPS::instance()->endTime();
+
+  if (m_UseFT2 == 1)
+    {
+      startTime =  m_FT2_startMET + (550/86400.);
+      endTime = m_FT2_stopMET - (550/86400.);
+    } else
+      {
+	startTime =  m_Sim_startMET + (550/86400.);
+	endTime = m_Sim_stopMET - (550/86400.);
+      }
+
+
 
   int Status = 0;
   std::ifstream PulsarDataTXT;
@@ -1552,7 +1566,7 @@ int PulsarSpectrum::getPulsarFromDataList(std::string sourceFileName)
 	  //Check if txbary or t0 are before start of the simulation
 	  double startMJD = StartMissionDateMJD+(startTime/86400.)+(550/86400.);
 	  // std::cout << "T0 " << t0 << " start " << startMJD << std::endl;
-	  if (t0 < startMJD)
+	  if ((t0 < startMJD) || (txbary < startMJD))
 	    {
 	      if (DEBUG)
 		{
@@ -1561,22 +1575,13 @@ int PulsarSpectrum::getPulsarFromDataList(std::string sourceFileName)
 			    << " s.: changing to MJD " << startMJD << std::endl;
 		}
 	      t0 = startMJD;
-	    }
-	  
-	  if (txbary < startMJD)
-	    {
-	      if (DEBUG)
-		{
-		  std::cout << "Warning! txbary out the simulation range (t0-tStart=" << (txbary-startMJD)
-			    << " s.: changing to MJD " << startMJD << std::endl;
-		}
 	      txbary = startMJD;
 	    }
-
+	  
 	  //Check if txbary or t0 are after start of the simulation
 	  double endMJD = StartMissionDateMJD+(endTime/86400.)-(550/86400.);
 	  // std::cout << "T0 " << t0 << " start " << startMJD << std::endl;
-	  if (t0 > endMJD)
+	  if ((t0 > endMJD) || (txbary > endMJD))
 	    {
 	      if (DEBUG)
 		{
@@ -1586,18 +1591,9 @@ int PulsarSpectrum::getPulsarFromDataList(std::string sourceFileName)
 		  std::cout << "***end at " << endTime << " corresp to " << endMJD << std::endl;
 		}
 	      t0 = endMJD;
+	      txbary = endMJD;
 	    }
 	  
-	  if (txbary > endMJD)
-	    {
-	      if (DEBUG)
-		{
-		  std::cout << "Warning! txbary out the simulation range (t0-tEnd=" << (txbary-endMJD)
-			    << " s.: changing to MJD " << endMJD << std::endl;
-		}
-		  txbary = endMJD;
-	    }
-
 	  m_t0InitVect.push_back(t0Init);
 	  m_t0Vect.push_back(t0);
 	  m_t0EndVect.push_back(t0End);
