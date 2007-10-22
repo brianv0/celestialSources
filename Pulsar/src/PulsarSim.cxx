@@ -111,8 +111,6 @@ TH2D* PulsarSim::PSRPhenom(double par0, double par1, double par2, double par3, d
   else
     logSimLabel = m_name + "Log.txt"; 
 
-  //TimeProfileFileName = std::string(gleam)+"/"+ m_name + "TimeProfile.txt";
-
   ofstream PulsarLogSim;
   PulsarLogSim.open(logSimLabel.c_str(),std::ios::app);
 
@@ -124,7 +122,7 @@ TH2D* PulsarSim::PSRPhenom(double par0, double par1, double par2, double par3, d
 	       << " | E0 = " << E0 << std::endl;
   PulsarLogSim << "**           G1 = " << G1 
 	       << " | b  = "  << b << std::endl;
-  //PulsarLogSim << "**  enphmin " << m_enphmin << " enphmax " << m_enphmax << std::endl; 
+  PulsarLogSim << "**  enphmin " << m_enphmin << " enphmax " << m_enphmax << std::endl; 
   PulsarLogSim << "**           Normalisation between " << cst::EnNormMin << " keV and " 
 	       << cst::EnNormMax << " keV " << std::endl;
   PulsarLogSim << "**           Photon extraction between " << m_enphmin << " keV and " 
@@ -153,7 +151,7 @@ TH2D* PulsarSim::PSRPhenom(double par0, double par1, double par2, double par3, d
     {
       dt = m_period/(m_Tbin-1);
 
-      double fwhm1,fwhm2,peak1,peak2,ampl1,ampl2,mindist;
+      double fwhm1,fwhm2,peak1,peak2,ampl1,ampl2,mindist=0.;;
       mindist = 0.5*m_period; //minimum distance in seconds (minPhase * m_period)
       
       //Set the Random engine.
@@ -207,7 +205,7 @@ TH2D* PulsarSim::PSRPhenom(double par0, double par1, double par2, double par3, d
 	    }
 	}
 
-      PulsarLogSim << std::setprecision(3) << "**\n**  Lightcurve parameters: (midist = " 
+      PulsarLogSim << std::setprecision(3) << "**\n**  Lightcurve parameters: (mindist = " 
 		   << mindist  << " s.)" << std::endl;
       
       if (ampl1 !=0)

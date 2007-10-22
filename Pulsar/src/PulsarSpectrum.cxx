@@ -11,9 +11,9 @@
 #include <cmath>
 
 #define DEBUG 0
-#define BARYCORRLOG 0
+#define BARYCORRLOG 1
 #define BINDEMODLOG 0
-#define TNOISELOG 0
+#define TNOISELOG 1
 
 using namespace cst;
 
@@ -238,7 +238,7 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
 	ListFile >> DataListFileName;
 	while (!ListFile.eof()) 
 	  {	
-	    CompletePathFileName = pulsar_data + std::string(DataListFileName);
+	    CompletePathFileName = pulsar_data + "/" + std::string(DataListFileName);
 	    Retrieved = getPulsarFromDataList(CompletePathFileName);
 	    
 	    if (Retrieved == 1)
@@ -1130,9 +1130,15 @@ double PulsarSpectrum::getBaryCorr( double ttInput, int LogCorrFlag)
 
   if ((LogCorrFlag == 1) && (ttInput-StartMissionDateMJD*SecsOneDay > 0.))
     {
+      double intPart=0.;
+      double PhaseOut = getTurns(ttInput);
+      PhaseOut = modf(PhaseOut,&intPart); // phase for linear evolution 
+
+
+
 	  std::ofstream BaryCorrLogFile((m_PSRname + "BaryCorr.log").c_str(),std::ios::app);
 	  BaryCorrLogFile << std::setprecision(20)
-			  << timeMET << "\t" <<  GLASTPosGeom << "\t"<< EarthPosGeom << "\t" 
+			  << timeMET << "\t" <<  PhaseOut << "\t" << GLASTPosGeom << "\t"<< EarthPosGeom << "\t" 
 			  << GeomCorr << "\t" << tdb_min_tt << "\t" << ShapiroCorr << std::endl;
 	  BaryCorrLogFile.close();
     }
