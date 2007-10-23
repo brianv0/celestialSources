@@ -98,11 +98,20 @@ class PulsarSpectrum : public ISpectrum
   //! Load Pulsar General data
   void LoadPulsarOrbitalData(std::string pulsar_data_dir);
 
+  //! Initialize timing noise parameters
+  void InitTimingNoise();
+
+  //! Initialize binray-related effects
+  void InitOrbitalEffects();
+
   //! Save an output txt file with pulsar ephemerides compatible with D4 file
   int saveDbTxtFile();
 
   //! Save an output txt file with pulsar orbital data compatible with D4 file
   int saveBinDbTxtFile();
+
+  //! Write Out Pulsar Log file
+  void WritePulsarLog(std::string pulsarOutDir);
 
   //! Check if a file exists using and throw an exception
   void CheckFileExistence(std::string NameFileToCheck);
