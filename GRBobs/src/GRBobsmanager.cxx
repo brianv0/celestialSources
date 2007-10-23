@@ -366,8 +366,13 @@ void GRBobsmanager::GenerateGRB()
   astro::GPS *gps(astro::GPS::instance());
   
   //std::cout<<gps->time()<<std::endl;//m_startTime);
+#if 0 // old version
   astro::EarthCoordinate earthCoord(gps->lat(),gps->lon());  
   int inSAA=earthCoord.insideSAA();
+#else // new version, after removal of that EarthCoordinate constructor
+  // check SAA status of current position
+  int inSAA=gps->earthpos().insideSAA();
+#endif
   if(m_GenerateGBMOutputs && inSAA==0)
     {
       m_GRB->SaveGBMDefinition(GRBname,m_ra,m_dec,m_theta,m_phi,m_Rest);

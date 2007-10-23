@@ -4,6 +4,7 @@
 
   @verbatim
   $Id$
+   27-sep-07 v3r1p4    THB   fix for SAA check, needed by interface change
    27-sep-07 v3r1p3    NO    Add facilities/commonUtil
    27-sep-07 v3r1p2    NO    Fix the problem with the GPS
    7-sep-07 v3r1p1     NO    Chech the SAA and add the flux and peak flux to the par file
