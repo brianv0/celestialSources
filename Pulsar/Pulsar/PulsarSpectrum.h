@@ -89,14 +89,23 @@ class PulsarSpectrum : public ISpectrum
   //! Get the pulsar ephemerides and data from the DataList
   int getPulsarFromDataList(std::string sourceFileName);
 
+  //! Load Pulsar General data
+  void LoadPulsarGeneralData(std::string pulsar_data_dir);
+
   //! Get the binary pulsar orbital data from the BinDataList
   int getOrbitalDataFromBinDataList(std::string sourceBinFileName);
+
+  //! Load Pulsar General data
+  void LoadPulsarOrbitalData(std::string pulsar_data_dir);
 
   //! Save an output txt file with pulsar ephemerides compatible with D4 file
   int saveDbTxtFile();
 
   //! Save an output txt file with pulsar orbital data compatible with D4 file
   int saveBinDbTxtFile();
+
+  //! Check if a file exists using and throw an exception
+  void CheckFileExistence(std::string NameFileToCheck);
 
   //! Get the eccentric anomaly at time t (only for binaries)
   double GetEccentricAnomaly(double mytime);

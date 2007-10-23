@@ -196,17 +196,8 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
   m_Sim_startMET = Spectrum::startTime();
   m_Sim_stopMET = astro::GPS::instance()->endTime();
 
-  //Retrieve pulsar data from a list of DataList file.
-  
   // if this is in the GLEAM environment, allow for separate path specified by env var PULSARDATA
   std::string pulsar_data(facilities::commonUtilities::getDataPath("Pulsar")); // the default, perhaps overriden
-
-  /*changed to old settings
-  const char * gleam = ::getenv("PULSARDATA");
-  if( gleam!=0) {
-       pulsar_data =  std::string(gleam)+"/";
-  }
-  */
 
   const char * gleam = ::getenv("SKYMODEL_DIR");
   if( gleam!=0) {
@@ -217,102 +208,15 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
 	std::cout << "Warning !SKYMODEL_DIR not found!"  <<std::endl;
     }
 
-  //Scan PulsarDataList.txt
-  std::string ListFileName = facilities::commonUtilities::joinPath(pulsar_data, "PulsarDataList.txt");
-  
-  std::ifstream ListFile;
-  ListFile.open(ListFileName.c_str(), std::ios::in);
-  char DataListFileName[200];
-  std::string CompletePathFileName = "";
-
-  ListFile.getline(DataListFileName,200); 
-
-  int Retrieved = 0;
-  int AllRetrieved = 0;
- 
-  if (! ListFile.is_open()) 
-    {
-      std::cout << "Error opening file containing DataList files" << ListFileName  
-		<< " (check whether $PULSARROOT is set" << std::endl; 
-      exit(1);
-    }  else 
-      {
-
-	ListFile >> DataListFileName;
-	while (!ListFile.eof()) 
-	  {	
-	    CompletePathFileName = pulsar_data + "/" + std::string(DataListFileName);
-	    Retrieved = getPulsarFromDataList(CompletePathFileName);
-	    
-	    if (Retrieved == 1)
-	      {
-		if (DEBUG)
-		  {
-		    std::cout << "Pulsar " << m_PSRname << " found in file " << CompletePathFileName << std::endl;
-		  }
-		AllRetrieved = 1;
-	      } 
-	    ListFile >> DataListFileName ;	  
-
-	  }
-
-	if (AllRetrieved == 0)
-	  {
-	    std::cout << "Pulsar " << m_PSRname 
-		      << " not found in any DataList file.Please Check if $PULSARDATA is correctly set " 
-		      << std::endl;
-	    exit(1);
-	  }
-      }
-
-  //  ListFile.getline(DataListFileName,200); 
+  //Load Pulsar General data from PulsarDataList.txt
+  LoadPulsarGeneralData(pulsar_data);
 
   //Scan for Binary Pulsar if there are
-
   if (m_BinaryFlag ==1)
     {
-      std::string BinListFileName = pulsar_data + "PulsarBinDataList.txt";
-      
-      //Look to BinDataList.txt for binary pulsar data
-      std::ifstream BinListFile;
-      BinListFile.open(BinListFileName.c_str(), std::ios::in);
-      char BinDataListFileName[200];
-      BinListFile.getline(BinDataListFileName,200); 
-
-      if (! BinListFile.is_open()) 
-	{
-	  std::cout << "Error opening file containing Binary DataList files" << BinListFileName  
-		    << " (check whether $PULSARDATA is set" << std::endl; 
-	  exit(1);
-	}  else 
-	  {
-
-	    BinListFile >> BinDataListFileName;
-	    while (!BinListFile.eof()) 
-	      {	
-		CompletePathFileName = pulsar_data + std::string(BinDataListFileName);
-		Retrieved = getOrbitalDataFromBinDataList(CompletePathFileName);
-		
-		if (Retrieved == 1)
-		  {
-		    if (DEBUG)
-		      {
-			std::cout << "Binary Pulsar " << m_PSRname << " found in file " << CompletePathFileName << std::endl;
-		      }
-		    AllRetrieved = 1;
-		  } 
-		BinListFile >> BinDataListFileName ;	  
-	      }
-
-	    if (AllRetrieved == 0)
-	      {
-		std::cout << "Binary Pulsar " << m_PSRname 
-			  << " not found in any BinDataList file.Please Check if PULSARDATA is correctly set " 
-			  << std::endl;
-		exit(1);
-	      }
-	  }
+      LoadPulsarOrbitalData(pulsar_data);
     }
+
 
   //Assign as starting ephemeris the first entry of the vectors... 
   m_t0Init = m_t0InitVect[0];
@@ -1533,10 +1437,11 @@ int PulsarSpectrum::getPulsarFromDataList(std::string sourceFileName)
   
   if (! PulsarDataTXT.is_open()) 
     {
-      std::cout << "Error opening Datalist file " << sourceFileName  
-		<< " (check whether $PULSARROOT is set" << std::endl; 
-      Status = 0;
-      exit(1);
+      throw "Error!Cannot open file";
+      //      std::cout << "Error opening Datalist file " << sourceFileName  
+      //	<< " (check whether $PULSARROOT is set" << std::endl; 
+      //Status = 0;
+      //exit(1);
     }
   
   char aLine[400];  
@@ -1648,6 +1553,78 @@ int PulsarSpectrum::getPulsarFromDataList(std::string sourceFileName)
 
 
 
+
+/////////////////////////////////////////////
+/*!
+ * \param pulsar_data_dir The Directory where PulsarDataList.txt resides
+ *
+ * <br>
+ * This method looks into PulsarDataList and load pulsar data
+ */
+void PulsarSpectrum::LoadPulsarGeneralData(std::string pulsar_data_dir)
+{
+
+  //Scan PulsarDataList.txt for Pulsar general data
+  std::string ListFileName = facilities::commonUtilities::joinPath(pulsar_data_dir, "PulsarDataList.txt");
+  std::string CompletePathFileName = "";
+  int Retrieved = 0;
+  int AllRetrieved = 0;
+
+  try
+    {
+      std::ifstream ListFile;
+      CheckFileExistence(ListFileName);
+      ListFile.open(ListFileName.c_str(), std::ios::in);
+      char DataListFileName[200];
+      ListFile.getline(DataListFileName,200); 
+      //    int Retrieved = 0;
+      //int AllRetrieved = 0;
+
+      ListFile >> DataListFileName;
+      while (!ListFile.eof()) 
+	{	
+
+	  CompletePathFileName = pulsar_data_dir + "/" + std::string(DataListFileName);
+
+	  try
+	    {
+	      Retrieved = getPulsarFromDataList(CompletePathFileName);
+	      if (Retrieved == 1)
+		{
+		  if (DEBUG)
+		    {
+		      std::cout << "Pulsar " << m_PSRname << " found in file " << CompletePathFileName << std::endl;
+		    }
+		  AllRetrieved = 1;
+		}
+	    }
+	  catch (char const *error)
+	    {
+	      std::cerr << error << CompletePathFileName << "..skipping to next DataList file" << std::endl;
+	    }
+
+
+	  ListFile >> DataListFileName ;	  	  
+	}
+      
+      if (AllRetrieved == 0)
+	{
+	  std::cout << "Pulsar " << m_PSRname 
+		    << " not found in any DataList file.Please Check if $PULSARDATA is correctly set " 
+		    << std::endl;
+	  exit(1);
+	}
+    }
+  catch (char const *error)
+    {
+      std::cerr << error << ListFileName << std::endl;
+      exit(1);
+    }
+
+}
+
+
+
 /////////////////////////////////////////////
 /*!
  * \param None
@@ -1684,10 +1661,11 @@ int PulsarSpectrum::getOrbitalDataFromBinDataList(std::string sourceBinFileName)
   
   if (! PulsarBinDataTXT.is_open()) 
     {
-      std::cout << "Error opening BinDatalist file " << sourceBinFileName  
-		<< " (check whether $PULSARDATA is set)" << std::endl; 
-      Status = 0;
-      exit(1);
+      throw "Error!Cannot open file";
+      //      std::cout << "Error opening BinDatalist file " << sourceBinFileName  
+      //	<< " (check whether $PULSARDATA is set)" << std::endl; 
+      //Status = 0;
+      //exit(1);
     }
   
   char aLine[400];  
@@ -1715,6 +1693,72 @@ int PulsarSpectrum::getOrbitalDataFromBinDataList(std::string sourceBinFileName)
 
   return Status;
 }
+
+/////////////////////////////////////////////
+/*!
+ * \param pulsar_data_dir The Directory where PulsarBinDataList.txt resides
+ *
+ * <br>
+ * This method looks into BinPulsarDataList and load pulsar data
+ */
+void PulsarSpectrum::LoadPulsarOrbitalData(std::string pulsar_data_dir)
+{
+
+  std::string CompletePathFileName = "";
+  int Retrieved = 0;
+  int AllRetrieved = 0;
+
+  std::string BinListFileName = pulsar_data_dir + "PulsarBinDataList.txt";
+  
+  try 
+    {
+      //Look to BinDataList.txt for binary pulsar data
+      std::ifstream BinListFile;
+      CheckFileExistence(BinListFileName);
+      BinListFile.open(BinListFileName.c_str(), std::ios::in);
+      char BinDataListFileName[200];
+      BinListFile.getline(BinDataListFileName,200); 
+      BinListFile >> BinDataListFileName;
+      while (!BinListFile.eof()) 
+	{	
+	  CompletePathFileName = pulsar_data_dir + std::string(BinDataListFileName);
+	  
+	  try
+	    {
+	      Retrieved = getOrbitalDataFromBinDataList(CompletePathFileName);
+	      if (Retrieved == 1)
+		{
+		  if (DEBUG)
+		    {
+		      std::cout << "Binary Pulsar " << m_PSRname << " found in file " << CompletePathFileName << std::endl;
+		    }
+		  AllRetrieved = 1;
+		} 
+	    }
+	  catch (char const *error)
+	    {
+	      std::cerr << error << CompletePathFileName << "..skipping to next BinDataList file" << std::endl;
+	    }
+	  
+	  BinListFile >> BinDataListFileName ;	  
+	}
+      
+      if (AllRetrieved == 0)
+	{
+	  std::cout << "Binary Pulsar " << m_PSRname 
+		    << " not found in any BinDataList file.Please Check if PULSARDATA is correctly set " 
+		    << std::endl;
+	  exit(1);
+	}
+    }
+  catch (char const *error)
+    {
+      std::cerr << error << BinListFileName << std::endl;
+      exit(1);
+    }
+}
+
+
 
 /////////////////////////////////////////////
 /*!
@@ -1802,6 +1846,29 @@ int PulsarSpectrum::saveDbTxtFile()
   return Flag;
 }
 
+/////////////////////////////////////////////
+/*!
+ * \param NameFileToCheck
+ *
+ * <br>
+ * This method simply check the file and return an exception
+ */
+//max1
+void PulsarSpectrum::CheckFileExistence(std::string NameFileToCheck)
+{
+
+  std::ifstream FileToCheck;
+
+  FileToCheck.open(NameFileToCheck.c_str(), std::ios::in);
+
+  if (!FileToCheck.is_open()) 
+    {
+      throw "Error!Cannot open file";
+    }
+
+  FileToCheck.close();
+
+}
 
 /////////////////////////////////////////////
 /*!
