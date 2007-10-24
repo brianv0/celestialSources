@@ -111,7 +111,7 @@ class PulsarSpectrum : public ISpectrum
   int saveBinDbTxtFile();
 
   //! Write Out Pulsar Log file
-  void WritePulsarLog(std::string pulsarOutDir);
+  void WritePulsarLog(std::string logLabel);
 
   //! Check if a file exists using and throw an exception
   void CheckFileExistence(std::string NameFileToCheck);

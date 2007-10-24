@@ -265,7 +265,12 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
   //Redirect output to a subdirectory
   const char * pulsarOutDir = ::getenv("PULSAROUTFILES");
 
-  WritePulsarLog(std::string(pulsarOutDir));
+  std::string LogFileName ="";
+  // override obssim if running in Gleam environment
+  if( pulsarOutDir!=0) 
+    LogFileName = std::string(pulsarOutDir) + "/" + m_PSRname + "Log.txt";
+  else
+    LogFileName = m_PSRname + "Log.txt";
 
   if (m_TimingNoiseModel != 0)
     { 
@@ -292,6 +297,8 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
 	std::cout << "ERROR!  Model choice not implemented " << std::endl;
 	exit(1);
       }
+
+  WritePulsarLog(LogFileName);
 
   //Save the output txt file..
   // int DbFlag = saveDbTxtFile();
@@ -1279,110 +1286,115 @@ int PulsarSpectrum::getPulsarFromDataList(std::string sourceFileName)
       //Status = 0;
       //exit(1);
     }
-  
-  char aLine[400];  
-  PulsarDataTXT.getline(aLine,400); 
+  else {
+     char aLine[400];  
+    PulsarDataTXT.getline(aLine,400); 
+    
+    char tempName[15] = "";
+    
+    double flux, ephem0, ephem1, ephem2, t0Init, t0, t0End, txbary, phi0, period, pdot, p2dot, f0, f1, f2, phas;
+    char ephemType[15] = "";
+    int tnmodel, binflag;
+    
+    while (PulsarDataTXT.eof() != 1)
+      {
 
-  char tempName[15] = "";
+	PulsarDataTXT >> tempName >> flux >> ephemType >> ephem0 >> ephem1 >> ephem2 
+		      >> t0Init >> t0 >> t0End  >> txbary >> tnmodel >> binflag;
 
-  double flux, ephem0, ephem1, ephem2, t0Init, t0, t0End, txbary, phi0, period, pdot, p2dot, f0, f1, f2, phas;
-  char ephemType[15] = "";
-  int tnmodel, binflag;
 
-  while (PulsarDataTXT.eof() != 1)
-    {
+	//	std::cout << tempName << flux << ephemType << ephem0 << ephem1 << ephem2 
+	//  << t0Init << t0 << t0End  << txbary << tnmodel << binflag <<std::endl;
 
-      PulsarDataTXT >> tempName >> flux >> ephemType >> ephem0 >> ephem1 >> ephem2 
-		    >> t0Init >> t0 >> t0End  >> txbary >> tnmodel >> binflag;
-      
-      if (std::string(tempName) == m_PSRname)
-	{
-
-	  Status = 1;
-	  m_flux = flux;
-	  m_TimingNoiseModel = tnmodel;
-	  m_ephemType = ephemType;
-	  m_BinaryFlag = binflag;
-
-	  //Check if txbary or t0 are before start of the simulation
-	  double startMJD = StartMissionDateMJD+(startTime/86400.)+(550/86400.);
-	  // std::cout << "T0 " << t0 << " start " << startMJD << std::endl;
-	  if ((t0 < startMJD) || (txbary < startMJD))
-	    {
-	      if (DEBUG)
-		{
-		  std::cout << std::setprecision(10) 
-			    << "Warning! Epoch t0 out the simulation range (t0-tStart=" << (t0-startMJD)
-			    << " s.: changing to MJD " << startMJD << std::endl;
-		}
-	      t0 = startMJD;
-	      txbary = startMJD;
-	    }
-	  
-	  //Check if txbary or t0 are after start of the simulation
-	  double endMJD = StartMissionDateMJD+(endTime/86400.)-(550/86400.);
-	  // std::cout << "T0 " << t0 << " start " << startMJD << std::endl;
-	  if ((t0 > endMJD) || (txbary > endMJD))
-	    {
-	      if (DEBUG)
-		{
-		  std::cout << std::setprecision(10) 
-			    << "Warning! Epoch t0 out the simulation range (t0-tEnd=" << (t0-endMJD)
-			    << " s.: changing to MJD " << endMJD << std::endl;
-		  std::cout << "***end at " << endTime << " corresp to " << endMJD << std::endl;
-		}
-	      t0 = endMJD;
-	      txbary = endMJD;
-	    }
-	  
-	  m_t0InitVect.push_back(t0Init);
-	  m_t0Vect.push_back(t0);
-	  m_t0EndVect.push_back(t0End);
-	  m_txbaryVect.push_back(txbary);
-
-	  //Period-type ephemerides
-	  if (std::string(ephemType) == "P")
-	    {
-
-	      period = ephem0;
-	      pdot = ephem1;
-	      p2dot = ephem2;
-	      f0 = 1.0/period;
-	      f1 = -pdot/(period*period);
-	      f2 = 2*pow((pdot/period),2.0)/period - p2dot/(period*period);
-
-	    } 
-	  else if (std::string(ephemType) == "F")
-	    {
-	      //Frequency-style ephemrides
-	      f0 = ephem0;
-	      f1 = ephem1;
-	      f2 = ephem2;
-	      period = 1.0/f0;
-	    }
-	  
-	  m_periodVect.push_back(period);
-	  m_pdotVect.push_back(pdot);
-	  m_p2dotVect.push_back(p2dot);
-	  m_f0Vect.push_back(f0);
-	  m_f1Vect.push_back(f1);
-	  m_f2Vect.push_back(f2);
-
-	  double dt = (txbary-t0)*SecsOneDay;
-
-	  phi0 = -1.0*(f0*dt
-		       + (f1/2.0)*dt*dt
-		       + (f2/6.0)*dt*dt*dt); 
-	
-	  phi0 = modf(phi0,&phas);
-
-	  if (phi0 < 0. ) 
-	    phi0++;
-
-	  m_phi0Vect.push_back(phi0);
-	  
-	}
-    }
+	if (std::string(tempName) == m_PSRname)
+	  {
+	    
+	    Status = 1;
+	    m_flux = flux;
+	    m_TimingNoiseModel = tnmodel;
+	    m_ephemType = ephemType;
+	    m_BinaryFlag = binflag;
+	    
+	    //Check if txbary or t0 are before start of the simulation
+	    double startMJD = StartMissionDateMJD+(startTime/86400.)+(550/86400.);
+	    // std::cout << "T0 " << t0 << " start " << startMJD << std::endl;
+	    if ((t0 < startMJD) || (txbary < startMJD))
+	      {
+		if (DEBUG)
+		  {
+		    std::cout << std::setprecision(10) 
+			      << "Warning! Epoch t0 out the simulation range (t0-tStart=" << (t0-startMJD)
+			      << " s.: changing to MJD " << startMJD << std::endl;
+		  }
+		t0 = startMJD;
+		txbary = startMJD;
+	      }
+	    
+	    //Check if txbary or t0 are after start of the simulation
+	    double endMJD = StartMissionDateMJD+(endTime/86400.)-(550/86400.);
+	    // std::cout << "T0 " << t0 << " start " << startMJD << std::endl;
+	    if ((t0 > endMJD) || (txbary > endMJD))
+	      {
+		if (DEBUG)
+		  {
+		    std::cout << std::setprecision(10) 
+			      << "Warning! Epoch t0 out the simulation range (t0-tEnd=" << (t0-endMJD)
+			      << " s.: changing to MJD " << endMJD << std::endl;
+		    std::cout << "***end at " << endTime << " corresp to " << endMJD << std::endl;
+		  }
+		t0 = endMJD;
+		txbary = endMJD;
+	      }
+	    
+	    m_t0InitVect.push_back(t0Init);
+	    m_t0Vect.push_back(t0);
+	    m_t0EndVect.push_back(t0End);
+	    m_txbaryVect.push_back(txbary);
+	    
+	    //Period-type ephemerides
+	    if (std::string(ephemType) == "P")
+	      {
+		
+		period = ephem0;
+		pdot = ephem1;
+		p2dot = ephem2;
+		f0 = 1.0/period;
+		f1 = -pdot/(period*period);
+		f2 = 2*pow((pdot/period),2.0)/period - p2dot/(period*period);
+		
+	      } 
+	    else if (std::string(ephemType) == "F")
+	      {
+		//Frequency-style ephemrides
+		f0 = ephem0;
+		f1 = ephem1;
+		f2 = ephem2;
+		period = 1.0/f0;
+	      }
+	    
+	    m_periodVect.push_back(period);
+	    m_pdotVect.push_back(pdot);
+	    m_p2dotVect.push_back(p2dot);
+	    m_f0Vect.push_back(f0);
+	    m_f1Vect.push_back(f1);
+	    m_f2Vect.push_back(f2);
+	    
+	    double dt = (txbary-t0)*SecsOneDay;
+	    
+	    phi0 = -1.0*(f0*dt
+			 + (f1/2.0)*dt*dt
+			 + (f2/6.0)*dt*dt*dt); 
+	    
+	    phi0 = modf(phi0,&phas);
+	    
+	    if (phi0 < 0. ) 
+	      phi0++;
+	    
+	    m_phi0Vect.push_back(phi0);
+	    
+	  }
+      }
+  }
 
   return Status;
 }
@@ -1439,8 +1451,7 @@ void PulsarSpectrum::LoadPulsarGeneralData(std::string pulsar_data_dir)
 	      std::cerr << error << CompletePathFileName << "..skipping to next DataList file" << std::endl;
 	    }
 
-
-	  ListFile >> DataListFileName ;	  	  
+	  ListFile >> DataListFileName ;
 	}
       
       if (AllRetrieved == 0)
@@ -1865,15 +1876,19 @@ int PulsarSpectrum::saveBinDbTxtFile()
  * <br>
  * This method saves the relevant information about pulsar in a log file
  */
-void PulsarSpectrum::WritePulsarLog(std::string pulsarOutDir)
+void PulsarSpectrum::WritePulsarLog(std::string logLabel)
 {
 
-  std::string logLabel;
+  //  std::string logLabel;
   // override obssim if running in Gleam environment
+
+  /*
   if( pulsarOutDir!=0) 
     logLabel = std::string(pulsarOutDir) + "/" + m_PSRname + "Log.txt";
   else
     logLabel = m_PSRname + "Log.txt";
+  */
+
 
   ofstream PulsarLog(logLabel.c_str());
 
@@ -1948,7 +1963,7 @@ void PulsarSpectrum::WritePulsarLog(std::string pulsarOutDir)
 		  << " --> Using External 2-D Pulsar Shape" << std::endl;  
       }
 
-  PulsarLog << "**   Effective Area set to : " << m_spectrum->GetAreaDetector() << " m2 " << std::endl; 
+  PulsarLog << "**   Effective Area set to : " << m_spectrum->GetAreaDetector() << " m^2 " << std::endl; 
   PulsarLog << "**************************************************" << std::endl;
 
   //Timing noise
