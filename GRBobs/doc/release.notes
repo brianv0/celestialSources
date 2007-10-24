@@ -3,8 +3,11 @@
   @brief package celestialSources
 
   @verbatim
-  $Id$
-   27-sep-07 v3r1p4    THB   fix for SAA check, needed by interface change
+  $Id$ 
+   24-oct-07 v3r2      THB   Add also a falg to manually disable the SAA check.
+			     Add flag to remove the spectral evolution.
+			     Find a bug in the GRBobsPulse
+   24-oct-07 v3r1p4    THB   fix for SAA check, needed by interface change
    27-sep-07 v3r1p3    NO    Add facilities/commonUtil
    27-sep-07 v3r1p2    NO    Fix the problem with the GPS
    7-sep-07 v3r1p1     NO    Chech the SAA and add the flux and peak flux to the par file

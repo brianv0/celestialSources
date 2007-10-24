@@ -145,9 +145,10 @@ std::vector<point*> GetBurstPositions(int N=1000)
     }
   for (unsigned i=0;i<S;i++)
     {
-      long time = (pointings[i])->get_time();
-      int ti = GetClosestPointing(bursts_positions,time);
-      bursts_positions[ti]->set_time(pointings[i]->get_time());
+      long sim_time = (pointings[i])->get_time();
+      
+      int ti = GetClosestPointing(bursts_positions,sim_time);
+      bursts_positions[ti]->set_time(sim_time);
       bursts_positions[ti]->set_l(pointings[i]->get_l());
       bursts_positions[ti]->set_b(pointings[i]->get_b());
       bursts_positions[ti]->set_ARR(true);
@@ -493,7 +494,7 @@ void GenerateXMLLibrary(int Nbursts=1000)
   PFshort->GetXaxis()->SetTitle("Peak Flux 50-300 keV [ph/cm^{2}/s]");
   
   FLlong->GetXaxis()->SetTitle("Log_{10} Fluence 50-300 keV [erg/cm^{2}]");
-  FLshort->GetXaxis()->SetTitle(Log_{10} "Fluence 50-300 keV [erg/cm^{2}]");
+  FLshort->GetXaxis()->SetTitle("Log_{10} Fluence 50-300 keV [erg/cm^{2}]");
   
   betalong->GetXaxis()->SetTitle("High Energy Spectral Index (#beta)");
   betashort->GetXaxis()->SetTitle("High Energy Spectral Index (#beta)");

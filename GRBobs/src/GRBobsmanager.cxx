@@ -356,24 +356,18 @@ void GRBobsmanager::GenerateGRB()
   
   //////////////////////////////////////////////////
   string GRBname = GetGRBname();
-  
-  /*  if(m_grbocculted)
-      {
-      cout<<"This GRB is occulted by the Earth"<<endl;
-      }
-      else 
-  */
-  astro::GPS *gps(astro::GPS::instance());
-  
-  //std::cout<<gps->time()<<std::endl;//m_startTime);
-#if 0 // old version
-  astro::EarthCoordinate earthCoord(gps->lat(),gps->lon());  
-  int inSAA=earthCoord.insideSAA();
-#else // new version, after removal of that EarthCoordinate constructor
-  // check SAA status of current position
-  int inSAA=gps->earthpos().insideSAA();
-#endif
-  if(m_GenerateGBMOutputs && inSAA==0)
+  bool inSAA;
+  if (::getenv("DISABLE_SAA"))
+    {
+      inSAA=false;
+    }
+  else
+    {
+      astro::GPS *gps(astro::GPS::instance());
+      inSAA=gps->earthpos().insideSAA();
+    }
+
+  if(m_GenerateGBMOutputs && !inSAA)
     {
       m_GRB->SaveGBMDefinition(GRBname,m_ra,m_dec,m_theta,m_phi,m_Rest);
       m_GRB->GetGBMFlux(GRBname);
@@ -416,7 +410,7 @@ void GRBobsmanager::GenerateGRB()
   cout<<" alpha=  "<<m_alpha<<" beta= "<<m_beta<<" Ep= "<<m_epeak;
   cout<<" Peak Flux = "<<PeakFlux<<" 1/cm^2/s, Fluence = "<<Fluence<<" erg/cm^2"<<endl;
   
-  if(inSAA==1)
+  if(inSAA)
     cout<<" -- inside the SAA -- "<<endl;
 
   if(m_LATphotons>0) 
