@@ -151,9 +151,7 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
 
   m_UseFT2 = 0;
 
-
-
-   //Read from XML file
+  //Read from XML file
   m_PSRname    = parseParamList(params,0).c_str();            // Pulsar name
   m_RA = std::atof(parseParamList(params,1).c_str());         // Pulsar Right Ascension
   m_dec = std::atof(parseParamList(params,2).c_str());         // Pulsar Declination
@@ -181,25 +179,6 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
 	m_PSRShapeName = parseParamList(params,8).c_str();        // model parameters
       }
 
-  /*
-  // Determine start and end time for FT2 or orbit file 
-  try {
-    const astro::PointingHistory & history = astro::GPS::instance()->history();
-    //    throw(NoHistoryError);
-    m_FT2_startMET = history.startTime();
-    m_FT2_stopMET = history.endTime();
-    m_UseFT2 = 1;
-  } catch (astro::GPS::NoHistoryError & eObj)
-    {
-      m_FT2_startMET = Spectrum::startTime();
-      m_FT2_stopMET = astro::GPS::instance()->endTime();
-    }
-
-  m_Sim_startMET = Spectrum::startTime();
-  m_Sim_stopMET = astro::GPS::instance()->endTime();
-  */
-
-
   // if this is in the GLEAM environment, allow for separate path specified by env var PULSARDATA
   std::string pulsar_data(facilities::commonUtilities::getDataPath("Pulsar")); // the default, perhaps overriden
 
@@ -212,17 +191,6 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
 	std::cout << "Warning !SKYMODEL_DIR not found!"  <<std::endl;
     }
 
-  /* via di qui
-  //Load Pulsar General data from PulsarDataList.txt
-  LoadPulsarGeneralData(pulsar_data);
-
-  //Scan for Binary Pulsar if there are
-  if (m_BinaryFlag ==1)
-    {
-      LoadPulsarOrbitalData(pulsar_data);
-    }
-  */
-
   // Determine start and end time for FT2 or orbit file 
   try {
     const astro::PointingHistory & history = astro::GPS::instance()->history();
@@ -239,7 +207,6 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
   m_Sim_startMET = Spectrum::startTime();
   m_Sim_stopMET = astro::GPS::instance()->endTime();
 
-
   //Init SolarSystem stuffs useful for barycentric decorrections
   astro::JulianDate JDStart(StartMissionDateMJD+JDminusMJD);
   m_earthOrbit = new astro::EarthOrbit(JDStart);   
@@ -248,7 +215,6 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
   m_GalDir = std::make_pair(m_PulsarDir.l(),m_PulsarDir.b());
   m_l = m_GalDir.first;
   m_b = m_GalDir.second;
-
 
   //Load Pulsar General data from PulsarDataList.txt
   LoadPulsarGeneralData(pulsar_data);
@@ -261,20 +227,6 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
       LoadPulsarOrbitalData(pulsar_data);
       int BinDbFlag = saveBinDbTxtFile();
     }
-
-
-  /*
-  //Redirect output to a subdirectory
-  const char * pulsarOutDir = ::getenv("PULSAROUTFILES");
-
-  std::string LogFileName ="";
-  // override obssim if running in Gleam environment
-  if( pulsarOutDir!=0) 
-    LogFileName = std::string(pulsarOutDir) + "/" + m_PSRname + "Log.txt";
-  else
-    LogFileName = m_PSRname + "Log.txt";
-  */
-
 
   if (m_TimingNoiseModel != 0)
     { 
@@ -313,15 +265,6 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
     LogFileName = m_PSRname + "Log.txt";
 
   WritePulsarLog(LogFileName);
-
-  //Save the output txt file..
-  // int DbFlag = saveDbTxtFile();
-
-  //Save the binary data output txt file..
-  //  if (m_BinaryFlag ==1)
-  //{
-  //  int BinDbFlag = saveBinDbTxtFile();
-  //}
 
 }
 
@@ -388,6 +331,7 @@ double PulsarSpectrum::interval(double time)
     }
   else
     {
+     
       if (BINDEMODLOG)
 	{
 	  timeTildeDemodulated = getIterativeDemodulatedTime(timeTilde,1);      
@@ -401,141 +345,13 @@ double PulsarSpectrum::interval(double time)
   //Phase assignment
 
   double intPart=0.; //Integer part
-  double PhaseNoNoise,PhaseWithNoise=0.;
+  //  double PhaseNoNoise,PhaseWithNoise=0.;
 
   //Apply timing noise
   if (m_TimingNoiseModel !=0)
     {
-      //Check for a next Timing noise event
-      if ((timeTildeDemodulated-(StartMissionDateMJD)*SecsOneDay) > m_TimingNoiseTimeNextEvent)
-	{
-	  //interval according to Poisson statistics
-	  m_TimingNoiseTimeNextEvent+= -log(1.-m_PSpectrumRandom->Uniform(1.0))/m_TimingNoiseMeanRate;
- 
-	  if (DEBUG)
-	    {
-	      std::cout << std::setprecision(30)<<"Timing Noise Event!Next Event at t=" 
-			<< m_TimingNoiseTimeNextEvent << " |dt=" 
-			<< m_TimingNoiseTimeNextEvent
-		-(timeTildeDemodulated-(StartMissionDateMJD)*SecsOneDay) <<std::endl;
-	    }
-
-
-	  //Timing noise managing...
-
-	  double S0=0.;
-	  double S1=0.;
-	  double S2=0.;
-
-	  if (m_TimingNoiseModel ==1) // Timing Noise #1
-	    {
-	      m_f2 = 0;
-	      PhaseNoNoise = getTurns(timeTildeDemodulated);
-	      PhaseNoNoise = modf(PhaseNoNoise,&intPart); // phase for linear evolution 
-	      if ( PhaseNoNoise <0.)
-		PhaseNoNoise+=1.;
-	      m_TimingNoiseActivity = 6.6 + 0.6*log10(m_pdot) + m_PSpectrumRandom->Gaus(0,0.5);
-	      
-	      //estimate an f2
-	      double Sign = m_PSpectrumRandom->Uniform();
-	      if (Sign > 0.5)
-		m_f2 = ((m_f0*6.*std::pow(10.,m_TimingNoiseActivity))*1e-24);
-	      else
-		m_f2 = -1.0*((m_f0*6.*std::pow(10.,m_TimingNoiseActivity))*1e-24);
-	    }
-	  else if ((m_TimingNoiseModel >1) && (m_TimingNoiseModel < 5)) // Timing Noise RW -Cordes-Downs
-	    {
-
-	      m_f2 = 0.;
-	      double tempPhi0 = m_phi0; 
-	      m_phi0 = 0.;
-	      double tempF0 = m_f0;
-	      m_f0 = m_f0NoNoise;	      
-	      double tempF1 = m_f1;
-	      m_f1 = m_f1NoNoise;	      
-
-	      PhaseNoNoise = getTurns(timeTildeDemodulated);
-	      PhaseNoNoise = modf(PhaseNoNoise,&intPart); // phase for linear evolution 
-	      if ( PhaseNoNoise <0.)
-		PhaseNoNoise+=1.;
-
-	      //Determine Crab RMS
-	      double dt_days = (timeTildeDemodulated-(StartMissionDateMJD)*SecsOneDay)/SecsOneDay;
-	      double s_rms_crab = 0.012*pow((dt_days/1628),1.5);
-
-	      //Activity parameter
-	      m_TimingNoiseActivity = -1.37+0.71*log10(m_pdot*1E15);
-	      double s_rms = pow(10.0,m_TimingNoiseActivity)*s_rms_crab;
-
-
-	      if (m_TimingNoiseModel ==2) //Case 1 :PN
-		{
-		  S0 = (3.7*3.7*s_rms*s_rms)*(2/(SecsOneDay*dt_days));
-		  m_TimingNoiseRMS = std::sqrt((S0/m_TimingNoiseMeanRate));
-		  m_phi0 = tempPhi0+m_PSpectrumRandom->Gaus(0,m_TimingNoiseRMS);
-		  // std::cout << std::setprecision(30) << "A="<<m_TimingNoiseActivity<<" dt"<<dt_days << " s_rms" << s_rms << 
-		  //" S0 " << S0 << " RMS " << m_TimingNoiseRMS << " phi0 " << m_phi0 << std::endl;
-		}
-	      else if (m_TimingNoiseModel ==3) //Case 2 :PN
-		{
-		  S1 =(15.5*15.5*s_rms*s_rms)*(12./pow((SecsOneDay*dt_days),3));
-		  m_TimingNoiseRMS = std::sqrt((S1/m_TimingNoiseMeanRate));
-		  m_f0 = tempF0+m_PSpectrumRandom->Gaus(0,m_TimingNoiseRMS);
-		  //std::cout << std::setprecision(30) << "A="<<m_TimingNoiseActivity<<" dt"<<dt_days << " s_rms" << s_rms << 
-		  //" S1 " << S1 << " RMS " << m_TimingNoiseRMS << " f0 " << m_f0 << std::endl;
-		}
-	      else if (m_TimingNoiseModel ==4) //Case 3 :SN
-		{
-		  S2 =(23.7*23.7*s_rms*s_rms)*(120./pow((SecsOneDay*dt_days),5));
-		  m_TimingNoiseRMS = std::sqrt((S2/m_TimingNoiseMeanRate));
-		  m_f1 = tempF1+m_PSpectrumRandom->Gaus(0,m_TimingNoiseRMS);
-		  //std::cout << std::setprecision(30) << "A="<<m_TimingNoiseActivity<<" dt"<<dt_days << " s_rms" << s_rms << 
-		  //  " S2 " << S2 << " RMS " << m_TimingNoiseRMS << " f1 " << m_f1 << std::endl;
-		}
-
-
-
-	    }
-
-	  
-	  PhaseWithNoise = getTurns(timeTildeDemodulated);
-	  PhaseWithNoise = modf(PhaseWithNoise,&intPart); // phase for linear evolution 
-	  if ( PhaseWithNoise <0.)
-	    PhaseWithNoise+=1.;
-
-	  if (TNOISELOG)
-	    {
-	      
-	      std::ofstream TimingNoiseLogFile((m_PSRname + "TimingNoise.log").c_str(),std::ios::app);
-	      m_f2NoNoise = 0.;
-	      double ft_l = GetFt(timeTildeDemodulated,m_f0NoNoise,m_f1NoNoise,m_f2NoNoise);
-	      double ft_n = GetFt(timeTildeDemodulated,m_f0,m_f1,m_f2);
-	      double ft1_l = GetF1t(timeTildeDemodulated,m_f1NoNoise,m_f2NoNoise);
-	      double ft1_n = GetF1t(timeTildeDemodulated,m_f1,m_f2);
-	      double ft2_l = m_f2NoNoise;//
-	      double ft2_n = m_f2;//
-	      
-	      TimingNoiseLogFile << std::setprecision(30) << timeTildeDemodulated-(StartMissionDateMJD)*SecsOneDay
-				 << "\t" << m_TimingNoiseActivity
-				 << "\t" << S0 
-				 << "\t" << S1
-				 << "\t" << S2 
-				 << "\t" <<ft_l << "\t" << ft_n 
-				 << "\t" <<ft1_l << "\t" << ft1_n 
-				 << "\t" <<ft2_l << "\t" << ft2_n 			 
-				 << "\t" << PhaseNoNoise << "\t" << PhaseWithNoise << std::endl;
-	    }
-	  
-
-	  if (DEBUG)
-	    {
-	      std::cout << std::setprecision(30) << " Activity=" << m_TimingNoiseActivity 
-			<< "f2=" << m_f2 << " PN=" << PhaseWithNoise 
-			<< " dPhi=" << PhaseWithNoise-PhaseNoNoise <<std::endl;
-	    }
-	}
+      ApplyTimingNoise(timeTildeDemodulated);
     }
-
 
   double initTurns = getTurns(timeTildeDemodulated); //Turns made at this time
   double tStart = modf(initTurns,&intPart)*m_period; // Start time for interval
@@ -549,73 +365,7 @@ double PulsarSpectrum::interval(double time)
 		<<  " phase is " << tStart/m_period << " phi0 is " << m_phi0 << std::endl;
     }
 
-  //Checks whether ephemerides (period,pdot, etc..) are within validity ranges
-  if (((timeTildeDemodulated/SecsOneDay) < m_t0Init) || ((timeTildeDemodulated/SecsOneDay) > m_t0End)) 
-    {
-#if DEBUG
-      std::cout << "Warning!Time is out of range of validity for pulsar " << m_PSRname 
-		<< ": Switching to new ephemerides set..." << std::endl;
-#endif
-	for (unsigned int e=0; e < m_t0Vect.size();e++)
-	  if (((timeTildeDemodulated/SecsOneDay) > m_t0InitVect[e]) && ((timeTildeDemodulated/SecsOneDay) < m_t0EndVect[e])) 
-	    {
-	
-	      m_t0Init = m_t0InitVect[e];
-	      m_t0 = m_t0Vect[e];
- 	      m_t0End = m_t0EndVect[e];
-	      m_f0 = m_f0Vect[e];
-	      m_f1 = m_f1Vect[e];
-	      m_f2 = m_f2Vect[e];
-	      m_f0NoNoise = m_f0Vect[e];
-	      m_f1NoNoise = m_f1Vect[e];
-	      m_f2NoNoise = m_f2Vect[e];
-	      m_period = m_periodVect[e];
-	      m_pdot = m_pdotVect[e];
-	      m_p2dot = m_p2dotVect[e];
-	      m_phi0 = m_phi0Vect[e];
-
-	      if (DEBUG)
-		{
-		  std::cout << "Valid Ephemerides set found:" << std::endl;
-		  std::cout << "MJD("<<m_t0Init<<"-"<<m_t0End<<") --> Epoch t0 = MJD " << m_t0 << std::endl; 
-		  std::cout << "f0 " << m_f0 << " f1 " << m_f1 << " f2 " << m_f2 << std::endl;
-		  std::cout << "Period " << m_period << " pdot " << m_pdot << " p2dot " << m_p2dot << std::endl;
-		}
-
-
-	      //Re-instantiate PulsarSim and SpectObj
-	      delete m_Pulsar;
-
-	      m_Pulsar = new PulsarSim(m_PSRname, m_seed, m_flux, m_enphmin, m_enphmax, m_period);
-
-	      if (m_model == 1)
-		{
-
-		  delete m_spectrum;
-		  m_spectrum = new SpectObj(m_Pulsar->PSRPhenom(double(m_ppar0), m_ppar1,m_ppar2,m_ppar3,m_ppar4),1);
-		  m_spectrum->SetAreaDetector(EventSource::totalArea());
-	      
-		}
-
-	      m_N0 = m_N0 + initTurns - getTurns(timeTildeDemodulated); //Number of turns at next t0
-	      double intN0;
-	      double N0frac = modf(m_N0,&intN0); // Start time for interval
-	      m_N0 = m_N0 - N0frac;
-	      std::cout << std::setprecision(20) << " Turns now are " << initTurns  
-			<< " ; at t0 " << m_N0 << std::endl;	           
-	       
-	      //m_phi0 = m_phi0 - N0frac;
-	       
-	      if (DEBUG)
-		{
-		  std::cout << std::setprecision(20) << " At Next t0 Number of Turns will be: " << m_N0 << std::endl;
-		}
-	    }
-	 else
-	   {
-	     std::cout << "Warning! Valid ephemerides not found!Proceeding with the old ones" << std::endl; 
-	   }
-    }
+  CheckEphemeridesValidity(timeTildeDemodulated,initTurns);;
 
   if (DEBUG)
     {
@@ -651,15 +401,6 @@ double PulsarSpectrum::interval(double time)
   if (m_BinaryFlag == 0)
     {
       nextTimeTilde = nextTimeTildeDemodulated;
-
-      /* need Bug fix
-      if (((nextTimeTilde-(StartMissionDateMJD)*SecsOneDay)+510)>m_FT2_stopMET)
-	{
-	  std::cout << "aiutoooo!!! " << std::endl;
-	  return 3e10;
-	}
-	End code that need bug fix */
-
       nextTimeTildeDecorr = getDecorrectedTime(nextTimeTilde); //Barycentric decorrections
     }
   else 
@@ -1680,6 +1421,233 @@ void PulsarSpectrum::InitTimingNoise()
   //Determine next Timing noise event according to the rate R m_TimingNoiseRate      
   m_TimingNoiseTimeNextEvent = startTime -log(1.-m_PSpectrumRandom->Uniform(1.0))/m_TimingNoiseMeanRate; 
   
+}
+
+
+/////////////////////////////////////////////
+/*!
+ * \param None
+ *
+ * <br>
+ * TnoiseInputTime input time where to apply noise
+ *
+ * Do the timing noise calculation on ephemerides
+ */
+void PulsarSpectrum::ApplyTimingNoise(double TnoiseInputTime)
+{
+
+  double intPart=0.; //Integer part
+  double PhaseNoNoise,PhaseWithNoise=0.;
+
+  //Check for a next Timing noise event
+      if ((TnoiseInputTime-(StartMissionDateMJD)*SecsOneDay) > m_TimingNoiseTimeNextEvent)
+	{
+	  //interval according to Poisson statistics
+	  m_TimingNoiseTimeNextEvent+= -log(1.-m_PSpectrumRandom->Uniform(1.0))/m_TimingNoiseMeanRate;
+ 
+	  if (DEBUG)
+	    {
+	      std::cout << std::setprecision(30)<<"Timing Noise Event!Next Event at t=" 
+			<< m_TimingNoiseTimeNextEvent << " |dt=" 
+			<< m_TimingNoiseTimeNextEvent
+		-(TnoiseInputTime-(StartMissionDateMJD)*SecsOneDay) <<std::endl;
+	    }
+
+
+	  //Timing noise managing...
+
+	  double S0=0.;
+	  double S1=0.;
+	  double S2=0.;
+
+	  if (m_TimingNoiseModel ==1) // Timing Noise #1
+	    {
+	      m_f2 = 0;
+	      PhaseNoNoise = getTurns(TnoiseInputTime);
+	      PhaseNoNoise = modf(PhaseNoNoise,&intPart); // phase for linear evolution 
+	      if ( PhaseNoNoise <0.)
+		PhaseNoNoise+=1.;
+	      m_TimingNoiseActivity = 6.6 + 0.6*log10(m_pdot) + m_PSpectrumRandom->Gaus(0,0.5);
+	      
+	      //estimate an f2
+	      double Sign = m_PSpectrumRandom->Uniform();
+	      if (Sign > 0.5)
+		m_f2 = ((m_f0*6.*std::pow(10.,m_TimingNoiseActivity))*1e-24);
+	      else
+		m_f2 = -1.0*((m_f0*6.*std::pow(10.,m_TimingNoiseActivity))*1e-24);
+	    }
+	  else if ((m_TimingNoiseModel >1) && (m_TimingNoiseModel < 5)) // Timing Noise RW -Cordes-Downs
+	    {
+
+	      m_f2 = 0.;
+	      double tempPhi0 = m_phi0; 
+	      m_phi0 = 0.;
+	      double tempF0 = m_f0;
+	      m_f0 = m_f0NoNoise;	      
+	      double tempF1 = m_f1;
+	      m_f1 = m_f1NoNoise;	      
+
+	      PhaseNoNoise = getTurns(TnoiseInputTime);
+	      PhaseNoNoise = modf(PhaseNoNoise,&intPart); // phase for linear evolution 
+	      if ( PhaseNoNoise <0.)
+		PhaseNoNoise+=1.;
+
+	      //Determine Crab RMS
+	      double dt_days = (TnoiseInputTime-(StartMissionDateMJD)*SecsOneDay)/SecsOneDay;
+	      double s_rms_crab = 0.012*pow((dt_days/1628),1.5);
+
+	      //Activity parameter
+	      m_TimingNoiseActivity = -1.37+0.71*log10(m_pdot*1E15);
+	      double s_rms = pow(10.0,m_TimingNoiseActivity)*s_rms_crab;
+
+
+	      if (m_TimingNoiseModel ==2) //Case 1 :PN
+		{
+		  S0 = (3.7*3.7*s_rms*s_rms)*(2/(SecsOneDay*dt_days));
+		  m_TimingNoiseRMS = std::sqrt((S0/m_TimingNoiseMeanRate));
+		  m_phi0 = tempPhi0+m_PSpectrumRandom->Gaus(0,m_TimingNoiseRMS);
+		  // std::cout << std::setprecision(30) << "A="<<m_TimingNoiseActivity<<" dt"<<dt_days << " s_rms" << s_rms << 
+		  //" S0 " << S0 << " RMS " << m_TimingNoiseRMS << " phi0 " << m_phi0 << std::endl;
+		}
+	      else if (m_TimingNoiseModel ==3) //Case 2 :PN
+		{
+		  S1 =(15.5*15.5*s_rms*s_rms)*(12./pow((SecsOneDay*dt_days),3));
+		  m_TimingNoiseRMS = std::sqrt((S1/m_TimingNoiseMeanRate));
+		  m_f0 = tempF0+m_PSpectrumRandom->Gaus(0,m_TimingNoiseRMS);
+		  //std::cout << std::setprecision(30) << "A="<<m_TimingNoiseActivity<<" dt"<<dt_days << " s_rms" << s_rms << 
+		  //" S1 " << S1 << " RMS " << m_TimingNoiseRMS << " f0 " << m_f0 << std::endl;
+		}
+	      else if (m_TimingNoiseModel ==4) //Case 3 :SN
+		{
+		  S2 =(23.7*23.7*s_rms*s_rms)*(120./pow((SecsOneDay*dt_days),5));
+		  m_TimingNoiseRMS = std::sqrt((S2/m_TimingNoiseMeanRate));
+		  m_f1 = tempF1+m_PSpectrumRandom->Gaus(0,m_TimingNoiseRMS);
+		  //std::cout << std::setprecision(30) << "A="<<m_TimingNoiseActivity<<" dt"<<dt_days << " s_rms" << s_rms << 
+		  //  " S2 " << S2 << " RMS " << m_TimingNoiseRMS << " f1 " << m_f1 << std::endl;
+		}
+
+
+
+	    }
+
+	  if ((DEBUG) || (TNOISELOG))
+	    {
+	      PhaseWithNoise = getTurns(TnoiseInputTime);
+	      PhaseWithNoise = modf(PhaseWithNoise,&intPart); // phase for linear evolution 
+	      if ( PhaseWithNoise <0.)
+		PhaseWithNoise+=1.;
+	    }
+
+	  if (TNOISELOG)
+	    {
+
+	      std::ofstream TimingNoiseLogFile((m_PSRname + "TimingNoise.log").c_str(),std::ios::app);
+	      m_f2NoNoise = 0.;
+	      double ft_l = GetFt(TnoiseInputTime,m_f0NoNoise,m_f1NoNoise,m_f2NoNoise);
+	      double ft_n = GetFt(TnoiseInputTime,m_f0,m_f1,m_f2);
+	      double ft1_l = GetF1t(TnoiseInputTime,m_f1NoNoise,m_f2NoNoise);
+	      double ft1_n = GetF1t(TnoiseInputTime,m_f1,m_f2);
+	      double ft2_l = m_f2NoNoise;//
+	      double ft2_n = m_f2;//
+	      
+	      TimingNoiseLogFile << std::setprecision(30) << TnoiseInputTime-(StartMissionDateMJD)*SecsOneDay
+				 << "\t" << m_TimingNoiseActivity
+				 << "\t" << S0 
+				 << "\t" << S1
+				 << "\t" << S2 
+				 << "\t" <<ft_l << "\t" << ft_n 
+				 << "\t" <<ft1_l << "\t" << ft1_n 
+				 << "\t" <<ft2_l << "\t" << ft2_n 			 
+				 << "\t" << PhaseNoNoise << "\t" << PhaseWithNoise << std::endl;
+	    }
+	  
+
+	  if (DEBUG)
+	    {
+
+	      std::cout << std::setprecision(30) << " Activity=" << m_TimingNoiseActivity 
+			<< "f2=" << m_f2 << " PN=" << PhaseWithNoise 
+			<< " dPhi=" << PhaseWithNoise-PhaseNoNoise <<std::endl;
+	    }
+	}
+}
+
+/////////////////////////////////////////////
+/*!
+ * \param None
+ *
+ * <br>
+ * This method check if the current time is within valid ephemerides
+ */
+void PulsarSpectrum::CheckEphemeridesValidity(double EphCheckTime, double initTurns)
+{
+  //Checks whether ephemerides (period,pdot, etc..) are within validity ranges
+  if (((EphCheckTime/SecsOneDay) < m_t0Init) || ((EphCheckTime/SecsOneDay) > m_t0End)) 
+    {
+#if DEBUG
+      std::cout << "Warning!Time is out of range of validity for pulsar " << m_PSRname 
+		<< ": Switching to new ephemerides set..." << std::endl;
+#endif
+	for (unsigned int e=0; e < m_t0Vect.size();e++)
+	  if (((EphCheckTime/SecsOneDay) > m_t0InitVect[e]) && ((EphCheckTime/SecsOneDay) < m_t0EndVect[e])) 
+	    {
+	
+	      m_t0Init = m_t0InitVect[e];
+	      m_t0 = m_t0Vect[e];
+ 	      m_t0End = m_t0EndVect[e];
+	      m_f0 = m_f0Vect[e];
+	      m_f1 = m_f1Vect[e];
+	      m_f2 = m_f2Vect[e];
+	      m_f0NoNoise = m_f0Vect[e];
+	      m_f1NoNoise = m_f1Vect[e];
+	      m_f2NoNoise = m_f2Vect[e];
+	      m_period = m_periodVect[e];
+	      m_pdot = m_pdotVect[e];
+	      m_p2dot = m_p2dotVect[e];
+	      m_phi0 = m_phi0Vect[e];
+
+	      //    if (DEBUG)
+	      //{
+		  std::cout << "Valid Ephemerides set found:" << std::endl;
+		  std::cout << "MJD("<<m_t0Init<<"-"<<m_t0End<<") --> Epoch t0 = MJD " << m_t0 << std::endl; 
+		  std::cout << "f0 " << m_f0 << " f1 " << m_f1 << " f2 " << m_f2 << std::endl;
+		  std::cout << "Period " << m_period << " pdot " << m_pdot << " p2dot " << m_p2dot << std::endl;
+		  //}
+
+
+	      //Re-instantiate PulsarSim and SpectObj
+	      delete m_Pulsar;
+
+	      m_Pulsar = new PulsarSim(m_PSRname, m_seed, m_flux, m_enphmin, m_enphmax, m_period);
+
+	      if (m_model == 1)
+		{
+
+		  delete m_spectrum;
+		  m_spectrum = new SpectObj(m_Pulsar->PSRPhenom(double(m_ppar0), m_ppar1,m_ppar2,m_ppar3,m_ppar4),1);
+		  m_spectrum->SetAreaDetector(EventSource::totalArea());
+	      
+		}
+
+	      m_N0 = m_N0 + initTurns - getTurns(EphCheckTime); //Number of turns at next t0
+	      double intN0;
+	      double N0frac = modf(m_N0,&intN0); // Start time for interval
+	      m_N0 = m_N0 - N0frac;
+	      std::cout << std::setprecision(20) << " Turns now are " << initTurns  
+			<< " ; at t0 " << m_N0 << std::endl;	           
+	       
+	      //m_phi0 = m_phi0 - N0frac;
+	       
+	      if (DEBUG)
+		{
+		  std::cout << std::setprecision(20) << " At Next t0 Number of Turns will be: " << m_N0 << std::endl;
+		}
+	    }
+	 else
+	   {
+	     std::cout << "Warning! Valid ephemerides not found!Proceeding with the old ones" << std::endl; 
+	   }
+    }
 }
 
 /////////////////////////////////////////////

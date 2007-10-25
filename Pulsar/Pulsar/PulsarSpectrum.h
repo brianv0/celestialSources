@@ -101,6 +101,12 @@ class PulsarSpectrum : public ISpectrum
   //! Initialize timing noise parameters
   void InitTimingNoise();
 
+  //! Apply timing noise algorithms
+  void ApplyTimingNoise(double TnoiseInputTime);
+
+  //! Check the validity of the ephemrides and change it accordingly
+  void CheckEphemeridesValidity(double EphCheckTime, double initTurns);
+
   //! Initialize binray-related effects
   void InitOrbitalEffects();
 
