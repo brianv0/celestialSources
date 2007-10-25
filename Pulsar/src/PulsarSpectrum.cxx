@@ -494,6 +494,7 @@ double PulsarSpectrum::retrieveNextTimeTilde( double tTilde, double totalTurns, 
 
 
   int u = 0;
+  int nIterations = 0;
   while ((NTdown*NTup)>0)
     {
       u++;
@@ -507,8 +508,8 @@ double PulsarSpectrum::retrieveNextTimeTilde( double tTilde, double totalTurns, 
   
   while(fabs(NTmid) > err )
     { 
-  
-      if (fabs(NTmid) < err) break;
+      nIterations++;
+      if ((fabs(NTmid) < err) || (nIterations > 200)) break;
       NTmid = totalTurns - getTurns(tTildeMid);
       NTdown = totalTurns - getTurns(tTildeDown); 
       if ((NTmid*NTdown)>0)
