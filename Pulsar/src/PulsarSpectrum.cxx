@@ -262,6 +262,8 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
       int BinDbFlag = saveBinDbTxtFile();
     }
 
+
+  /*
   //Redirect output to a subdirectory
   const char * pulsarOutDir = ::getenv("PULSAROUTFILES");
 
@@ -271,6 +273,8 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
     LogFileName = std::string(pulsarOutDir) + "/" + m_PSRname + "Log.txt";
   else
     LogFileName = m_PSRname + "Log.txt";
+  */
+
 
   if (m_TimingNoiseModel != 0)
     { 
@@ -297,6 +301,16 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
 	std::cout << "ERROR!  Model choice not implemented " << std::endl;
 	exit(1);
       }
+
+  //Redirect output to a subdirectory
+  const char * pulsarOutDir = ::getenv("PULSAROUTFILES");
+
+  std::string LogFileName ="";
+  // override obssim if running in Gleam environment
+  if( pulsarOutDir!=0) 
+    LogFileName = std::string(pulsarOutDir) + "/" + m_PSRname + "Log.txt";
+  else
+    LogFileName = m_PSRname + "Log.txt";
 
   WritePulsarLog(LogFileName);
 
@@ -882,6 +896,8 @@ double PulsarSpectrum::getBaryCorr( double ttInput, int LogCorrFlag)
       double intPart=0.;
       double PhaseOut = getTurns(ttInput);
       PhaseOut = modf(PhaseOut,&intPart); // phase for linear evolution 
+      if (PhaseOut < 0)
+	PhaseOut++;
 
 
 
@@ -1543,6 +1559,7 @@ int PulsarSpectrum::getOrbitalDataFromBinDataList(std::string sourceBinFileName)
       
       if (std::string(tempName) == m_PSRname)
 	{
+	  Status = 1;
 	  m_Porb = porb;
 	  m_asini = asini;
 	  m_ecc = ecc;
