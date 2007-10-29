@@ -1,6 +1,6 @@
 package GRB
-version v4r3p3
-author Nicola Omodei<nicola.omodei@pi.infn.it> Johann Cohen-Tanugi <johann.cohen@pi.infn.it> Sandhia Bansal <sandhiab@lheapop.gsfc.nasa.gov>
+version v4r4
+author Nicola Omodei<nicola.omodei@pi.infn.it>
 
 # $Id$
 
@@ -25,8 +25,7 @@ macro source "*.cxx" WIN32 "*.cxx *.h"
 
 library GRB -no_share \
      -s=../src      $(source) \
-     -s=GRB         $(source) \     
-     -s=GRBmaker    $(source) 
+     -s=GRB         $(source)
 
 
 
