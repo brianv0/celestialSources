@@ -1,3 +1,0 @@
-#DataList txt files, Datalist for normal pulsars
-BasicDataList111.txt
-BasicDataList.txt
