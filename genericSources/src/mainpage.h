@@ -87,7 +87,7 @@
    <source name="map_cube_source">
       <spectrum escale="MeV">
          <SpectrumClass name="MapCube"
-          params="1., $(GENERICSOURCESROOT)/data/test_image.fits"/>
+          params="1., $(GENERICSOURCESDATAPATH)/test_image.fits"/>
          <use_spectrum frame="galaxy"/>
       </spectrum>
    </source>
@@ -153,7 +153,7 @@
    <source name="Crab_Pulsar">
       <spectrum escale="MeV">
          <SpectrumClass name="Pulsar"
-         params="1e-3,2.,0.033,0,0,$(OBSERVATIONSIMROOT)/data/CrabTemplate.dat"/>
+         params="1e-3,2.,0.033,0,0,$(OBSERVATIONSIMDATAPATH)/CrabTemplate.dat"/>
          <celestial_dir ra="83.57" dec="22.01"/>
       </spectrum>
    </source>
@@ -196,7 +196,7 @@
    <source name="spectral_transient">
       <spectrum escale="MeV">
           <SpectrumClass name="SpectralTransient"
-          params="flux=1e-1, tstart=0., tstop=1e4, templateFile=$(GENERICSOURCESROOT)/data/testTemplate.dat, emin=20, emax=2e5, lc=0, z=0, useLogParabola=0"/>
+          params="flux=1e-1, tstart=0., tstop=1e4, templateFile=$(GENERICSOURCESDATAPATH)/testTemplate.dat, emin=20, emax=2e5, lc=0, z=0, useLogParabola=0"/>
           <celestial_dir ra="193.4" dec="-5.82"/>
       </spectrum>
    </source>
@@ -221,7 +221,7 @@
    <source name="transient_template">
       <spectrum escale="MeV">
          <SpectrumClass name="TransientTemplate"
-          params="100.,2,1e3,1.1e3,$(OBSERVATIONSIMROOT)/data/CrabTemplate.dat"/>
+          params="100.,2,1e3,1.1e3,$(OBSERVATIONSIMDATAPATH)/CrabTemplate.dat"/>
          <celestial_dir ra="80" dec="20"/>
       </spectrum>
    </source>
