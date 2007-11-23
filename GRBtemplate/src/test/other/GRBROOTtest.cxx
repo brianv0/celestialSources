@@ -672,7 +672,7 @@ void MakeGRBtemplate(std::string model_name = "pulse_002.dat", double enph=0, bo
 
 int main(int argc, char** argv)
 {
-  
+  facilities::commonUtilities::setupEnvironment();
   std::string arg_name("");
   int current_arg = 1;
   double enph=0.0;

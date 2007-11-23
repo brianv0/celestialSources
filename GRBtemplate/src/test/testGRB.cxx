@@ -123,6 +123,7 @@ void galacticTest(FluxMgr* fm, std::string sourceName)
 int main(int argn, char * argc[]) {
   using std::cout;
   using std::endl;
+  facilities::commonUtilities::setupEnvironment();
   flux_load();
   
   int count = default_count;
