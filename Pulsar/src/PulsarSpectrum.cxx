@@ -88,23 +88,12 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
   m_enphmax    = std::atof(parseParamList(params,4).c_str()); // minimum energy of extracted photons
   m_model      = std::atoi(parseParamList(params,5).c_str()); // choosen model
   m_seed       = std::atoi(parseParamList(params,6).c_str()); //Model Parameters: Random seed
-  
+  m_numpeaks   = std::atoi(parseParamList(params,7).c_str()); //Model Parameters: Number of peaks
 
-  if (m_model == 1) //Phenomenological model
-    {
-      m_ppar0   = std::atoi(parseParamList(params,7).c_str()); //Model Parameters: Number of peaks  
-      m_ppar1 = std::atof(parseParamList(params,8).c_str());   // model parameters
-      m_ppar2 = std::atof(parseParamList(params,9).c_str());
-      m_ppar3 = std::atof(parseParamList(params,10).c_str());
-      m_ppar4 = std::atof(parseParamList(params,11).c_str());
-    }
-  else 
-    if (m_model == 2) //PulsarShape model
-      {
-	m_ppar0   = std::atoi(parseParamList(params,7).c_str());  //Model Parameters: Use normalization?
-	m_PSRShapeName = parseParamList(params,8).c_str();        // model parameters
-      }
-
+ m_ppar1 = std::atof(parseParamList(params,8).c_str()); // model parameters
+ m_ppar2 = std::atof(parseParamList(params,9).c_str());
+ m_ppar3 = std::atof(parseParamList(params,10).c_str());
+ m_ppar4 = std::atof(parseParamList(params,11).c_str());
 
   //Retrieve pulsar data from a list of DataList file.
   std::string pulsar_root = ::getenv("PULSARROOT");
@@ -200,6 +189,12 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
 
   //  std::string nameProfile = "PsrOutput/" + m_name + "TimeProfile.txt";
 
+
+
+
+
+
+
   ofstream PulsarLog(logLabel.c_str());
   
   PulsarLog << "\n********   PulsarSpectrum Log for pulsar" << m_PSRname << std::endl;
@@ -247,7 +242,7 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
   if (m_model == 1)
     {
       PulsarLog << "**   Model chosen : " << m_model << " --> Using Phenomenological Pulsar Model " << std::endl;  
-      m_spectrum = new SpectObj(m_Pulsar->PSRPhenom(double(m_ppar0), m_ppar1,m_ppar2,m_ppar3,m_ppar4),1);
+      m_spectrum = new SpectObj(m_Pulsar->PSRPhenom(double(m_numpeaks), m_ppar1,m_ppar2,m_ppar3,m_ppar4),1);
       m_spectrum->SetAreaDetector(EventSource::totalArea());
 
       PulsarLog << "**   Effective Area set to : " << m_spectrum->GetAreaDetector() << " m2 " << std::endl; 
@@ -259,25 +254,10 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
  	}  
     }
   else 
-    if (m_model == 2)
-      {
-	PulsarLog << "**   Model chosen : " << m_model << " --> Using External 2-D Pulsar Shape" << std::endl;  
-	m_spectrum = new SpectObj(m_Pulsar->PSRShape(m_PSRShapeName,m_ppar0),1);
-	m_spectrum->SetAreaDetector(EventSource::totalArea());
-	
-	PulsarLog << "**   Effective Area set to : " << m_spectrum->GetAreaDetector() << " m2 " << std::endl; 
-	
-	if (DEBUG)
-	  {
-	    std::cout << "**   Model chosen : " << m_model << " --> Using External 2-D Pulsar Shape" << std::endl;  
-	    std::cout << "**  Effective Area set to : " << m_spectrum->GetAreaDetector() << " m2 " << std::endl; 
-	  }  
-      }
-    else
-      {
-	std::cout << "ERROR!  Model choice not implemented " << std::endl;
-	exit(1);
-      }
+    {
+      std::cout << "ERROR!  Model choice not implemented " << std::endl;
+      exit(1);
+    }
 
 
   PulsarLog.close();
@@ -385,7 +365,7 @@ double PulsarSpectrum::interval(double time)
 	      if (m_model == 1)
 		{
 		  delete m_spectrum;
-		  m_spectrum = new SpectObj(m_Pulsar->PSRPhenom(double(m_ppar0), m_ppar1,m_ppar2,m_ppar3,m_ppar4),1);
+		  m_spectrum = new SpectObj(m_Pulsar->PSRPhenom(double(m_numpeaks), m_ppar1,m_ppar2,m_ppar3,m_ppar4),1);
 		  m_spectrum->SetAreaDetector(EventSource::totalArea());
 		}
 

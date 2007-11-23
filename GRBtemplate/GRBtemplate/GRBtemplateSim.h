@@ -69,7 +69,7 @@ class GRBtemplateSim
       if(!m_Nv) delete m_Nv;
     }
   /// This method ensures that a unique name is given to the ROOT objects. It is set equal to the pointer address.
-  void GetUniqueName(const void *ptr, std::string & name);
+  void GetUniqueName(void *ptr, std::string & name);
     
   /*!
    * \brief Starts the GRBtemplate simulation
@@ -125,7 +125,7 @@ class GRBtemplateSim
     \param tstart is the GRB starting time (in second, since the starting time of the simulation).
   */
   void SaveGBMDefinition(std::string GRBname, double ra, double dec, double theta, double phi, double tstart);
-  
+  void ComputeEnergyBins();
  private:
   
   /// Gathers all relevant constants for the simulation 
@@ -139,6 +139,8 @@ class GRBtemplateSim
   int    m_TimeBins;
 
   TH2D *m_Nv;
+  std::vector<double> NaIEnergyGrid_Vector;
+  std::vector<double> BGOEnergyGrid_Vector;
 };
 
 #endif

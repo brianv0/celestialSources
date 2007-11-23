@@ -20,7 +20,6 @@
 #include "flux/CompositeSource.h"
 #include "flux/FluxMgr.h"
 
-ISpectrumFactory & FitsTransientFactory();
 ISpectrumFactory & GaussianSourceFactory();
 ISpectrumFactory & GRBmanagerFactory();
 ISpectrumFactory & IsotropicFactory();
@@ -29,12 +28,7 @@ ISpectrumFactory & MapSourceFactory();
 ISpectrumFactory & PeriodicSourceFactory();
 ISpectrumFactory & PulsarFactory();
 ISpectrumFactory & SimpleTransientFactory();
-ISpectrumFactory & SourcePopulationFactory();
 ISpectrumFactory & TransientTemplateFactory();
-ISpectrumFactory & TF1SpectrumFactory();
-ISpectrumFactory & TF1MapFactory();
-ISpectrumFactory & FileSpectrumFactory();
-ISpectrumFactory & FileSpectrumMapFactory();
 
 class TestApp {
 
@@ -112,9 +106,7 @@ void TestApp::parseCommandLine(int iargc, char * argv[]) {
 }
 
 void TestApp::setSources() {
-   char * srcNames[] = {
-                        "Galactic_diffuse",
-                        "Galactic_diffuse_0",
+   char * srcNames[] = {"Galactic_diffuse",
                         "simple_transient",
                         "transient_template",
                         "_3C279_June1991_flare",
@@ -124,15 +116,8 @@ void TestApp::setSources() {
                         "Geminga_Pulsar",
                         "gaussian_source",
                         "Extragalactic_diffuse",
-                        "map_cube_source",
-                        "map_cube_source_0",
-                        "fits_spectrum",
-                        "source_population",
-			"tf1spectrum_test",
- 			"tf1map_test",
- 			"filespectrum_test",
- 			"filespectrummap_test"};
-   std::vector<std::string> sourceNames(srcNames, srcNames+19);
+                        "map_cube_source"};
+   std::vector<std::string> sourceNames(srcNames, srcNames+11);
 
    m_compositeSource = new CompositeSource();
    unsigned long nsrcs(0);
@@ -168,9 +153,7 @@ void TestApp::createEvents(const std::string & filename) {
       HepRotation rotMatrix = instrumentToCelestial(currentTime);
       astro::SkyDir srcDir(rotMatrix(-launchDir), astro::SkyDir::EQUATORIAL);
       
-      outputFile << m_compositeSource->findSource().c_str()<<"  "
-		 << newEvent->particleName()<<"  "
-		 << newEvent->time() << "  "
+      outputFile << newEvent->time() << "  "
                  << newEvent->energy() << "  "
                  << srcDir.ra() << "  "
                  << srcDir.dec() << "\n";
@@ -179,7 +162,6 @@ void TestApp::createEvents(const std::string & filename) {
 }
 
 void TestApp::load_sources() {
-   FitsTransientFactory();
    GaussianSourceFactory();
    IsotropicFactory();
    MapCubeFactory();
@@ -187,16 +169,12 @@ void TestApp::load_sources() {
    PeriodicSourceFactory();
    PulsarFactory();
    SimpleTransientFactory();
-   SourcePopulationFactory();
    TransientTemplateFactory();
-   TF1SpectrumFactory();
-   TF1MapFactory();
-   FileSpectrumFactory();
-   FileSpectrumMapFactory();
 }
 
 HepRotation TestApp::instrumentToCelestial(double time) {
-   astro::GPS *gps = astro::GPS::instance();
+//   astro::GPS *gps = astro::GPS::instance();
+   GPS *gps = GPS::instance();
    gps->getPointingCharacteristics(time);
    astro::SkyDir xAxis(gps->RAX(), gps->DECX());
    astro::SkyDir zAxis(gps->RAZ(), gps->DECZ());

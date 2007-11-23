@@ -1,31 +1,4 @@
 <source_library>
-<!-- MapCube source model -->
-   <source name="DC2_GALPROP_diffuse">
-      <spectrum escale="MeV">
-<!-- Total photon flux from the map (#/m^2/s) = 18.58 from 10 MeV-655 GeV
-     Fits file (plate-carree only) = GP_gamma.fits
--->
-         <SpectrumClass name="MapCube"
-          params="18.58, $(EXTFILESSYS)/galdiffuse/GP_gamma.fits"/>
-         <use_spectrum frame="galaxy"/>
-      </spectrum>
-   </source>
-
-<!-- MapSource version of the Galactic Diffuse model -->
-   <source name="Galactic_diffuse_0">
-      <spectrum escale="MeV">
-<!-- Total photon flux from the map (#/m^2/s) = 17.
-     Photon spectral index = 2.1
-     Fits file (plate-carree only) = $(FLUXROOT)/sources/gas_gal.fits
-     Minimum photon energy (MeV) = 30.
-     Maximum photon energy (MeV) = 2e5
--->
-         <SpectrumClass name="MapSource"
-          params="flux=17.,gamma=2.1,fitsFile=$(FLUXROOT)/sources/gas_gal.fits,emin=30.,emax=2e5"/>
-         <use_spectrum frame="galaxy"/>
-      </spectrum>
-   </source>
-
 <!-- MapSource version of the Galactic Diffuse model -->
    <source name="Galactic_diffuse">
       <spectrum escale="MeV">
@@ -42,17 +15,6 @@
    </source>
 
 <!-- Map with spectral variation -->
-   <source name="map_cube_source_0">
-      <spectrum escale="MeV">
-<!-- Total photon flux from the map (#/m^2/s) = 1.
-     Fits file (plate-carree only) = test_image.fits
--->
-         <SpectrumClass name="MapCube"
-          params="flux=1.,fitsFile=$(GENERICSOURCESROOT)/data/test_image.fits"/>
-         <use_spectrum frame="galaxy"/>
-      </spectrum>
-   </source>
-
    <source name="map_cube_source">
       <spectrum escale="MeV">
 <!-- Total photon flux from the map (#/m^2/s) = 1.
@@ -203,78 +165,9 @@
 
    <source name="spectral_transient">
       <spectrum escale="MeV">
-<!-- 
-     mean flux = 0.1 (#/m^2/s) 
-     start time = 0 (MET s)
-     stop time = 1e4 (MET s)
-     template file name = $(GENERICSOURCESROOT)/data/testTemplate.dat
-     emin = 20 (MeV, this is the default)
-     emax = 2e5 (MeV, default)
-     lc # (in FITS file) = 0 (default)
-     z (redshift) = 0 (default)
-     useLogParabola = 0 (default)
--->
           <SpectrumClass name="SpectralTransient"
-          params="flux=1e-1, tstart=0., tstop=1e4, templateFile=$(GENERICSOURCESROOT)/data/testTemplate.dat, emin=20, emax=2e5, lc=0, z=0, useLogParabola=0"/>
+          params="1e-1, 0., 1e4, $(GENERICSOURCESROOT)/data/testTemplate.dat"/>
           <celestial_dir ra="193.4" dec="-5.82"/>
       </spectrum>
    </source>
-
-   <source name="fits_spectrum">
-      <spectrum escale="MeV">
-         <SpectrumClass name="FitsTransient"
-          params = "flux=1, tstart=0., tstop=1e4, fitsFile=$(GENERICSOURCESROOT)/data/fitsSpectrum.fits"/>
-         <celestial_dir ra="193.98" dec="-5.82"/>
-      </spectrum>
-   </source>
-
-   <source name="source_population">
-      <spectrum escale="MeV">
-         <SpectrumClass name="SourcePopulation"
-          params="$(GENERICSOURCESROOT)/data/sourcePop.dat, 1"/>
-         <use_spectrum frame="galaxy"/>
-      </spectrum>
-   </source>
-
-
-   <source name="tf1spectrum_test">
-      <spectrum escale="MeV" particle_name="gamma">
-         <SpectrumClass name="TF1Spectrum"
-          params="flux=17.,tf1name=TF1Spectrum_TEST,formula=-0.0001*(100.-x)*(1100.-x),emin=100.,emax=1100"/>
-         <celestial_dir ra="266.04" dec="-28.9"/>
-      </spectrum>
-   </source>
-
-   <source name="tf1map_test">
-      <spectrum escale="MeV" particle_name="gamma">
-         <SpectrumClass name="TF1Map"
-          params="flux=17.,tf1name=FT1Map_TEST,formula=-0.0001*(100.-x)*(1100.-x),fitsFile=$(FLUXROOT)/sources/gas_gal.fits,emin=100.,emax=1100,tf1precision=100,gamma=2,lonMin=-180,lonMax=180,latMin=-90,latMax=90"/>
-         <use_spectrum frame="galaxy"/>
-      </spectrum>
-   </source>
-
-   <source name="filespectrum_test">
-      <spectrum escale="GeV" flux="1." particle_name="gamma">
-         <SpectrumClass name="FileSpectrum"
-          params="flux=0.,specFile=$(GENERICSOURCESROOT)/data/dm120gev.dat"/>
-      <celestial_dir ra="266.04" dec="-28.9"/>
-      </spectrum>
-   </source>
-
-   <source name="filespectrummap_test">
-      <spectrum escale="GeV" flux="1." particle_name="gamma">
-         <SpectrumClass name="FileSpectrumMap"
-          params="flux=17.,fitsFile=$(FLUXROOT)/sources/gas_gal.fits,specFile=$(GENERICSOURCESROOT)/data/dm120gev.dat,emin=100.,emax=1000,lonMin=-180,lonMax=180,latMin=-90,latMax=90"/>
-         <use_spectrum frame="galaxy"/>
-      </spectrum>
-   </source>
-
-   <source name="eventlist_test">
-     <spectrum escale="MeV">
-       <SpectrumClass name="EventList"
-        params="file=$(GENERICSOURCESROOT)/data/LAT-GRB-inc_25.lis,start=0"/>
-       <use_spectrum frame="galaxy"/>
-     </spectrum>
-   </source>
-
 </source_library>

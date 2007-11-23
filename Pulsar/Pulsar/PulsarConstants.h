@@ -60,7 +60,7 @@ namespace cst
   const double EGRET3=3.0e7;                  
 
   //! Start Mission Date, expressed in MJD (corresponding to TT January 1st, 2007, at 00:00:00)
-  const double StartMissionDateMJD = 51910.0 + 64.184/86400.; ;//54101.0; 
+  const double StartMissionDateMJD = 51910.0;//54101.0; 
   
   //! Tolerance for the ephemerides decorrection (in us.)
   const double ephemCorrTol = 1e-6;//1e-6

@@ -110,16 +110,3 @@
     </source>
 
 </source_library>
-
-
-<source_library title="PulsarShape">
-
- <!-- Pulsar shapes models -->
-
-    <source name=" PSRVelaShapePCH " >
-       <spectrum escale="MeV"> <SpectrumClass name="PulsarSpectrum" params="PSRVELA, 128.83, -45.18, 1.0e5, 3.0e8, 2, 61243, 1,PsrPCHShape, 0., 0., 0."/>
-        <use_spectrum frame="galaxy"/> 
-       </spectrum> 
-    </source>
-
-</source_library>

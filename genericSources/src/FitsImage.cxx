@@ -9,78 +9,27 @@
 
 #include <cmath>
 
-#include <algorithm>
 #include <iostream>
 #include <memory>
 #include <sstream>
 #include <stdexcept>
 
-#include "Util.h"
 #include "FitsImage.h"
 
-namespace {
-   bool withinBounds(double value, std::vector<double> array) {
-      return ((array.front() < value && value < array.back()) || 
-              (array.back() < value && value < array.front()));
-   }
-}
 namespace genericSources {
 
 #include "fitsio.h"
 
 std::string FitsImage::s_fitsRoutine("");
 
-FitsImage::FitsImage(const std::string & filename) {
-   m_filename = filename;
+FitsImage::FitsImage(const std::string &fitsfile) {
+   m_filename = fitsfile;
    read_fits_image(m_filename, m_axes, m_image);
-   if (m_axes[0].axisType.find("GLON") != std::string::npos) {
-      m_coordSys = astro::SkyDir::GALACTIC;
-   } else if (m_axes[0].axisType.find("RA") != std::string::npos) {
-      m_coordSys = astro::SkyDir::EQUATORIAL;
-   } else {
-      throw std::runtime_error("Unknown coordinate system in FitsImage");
-   }
-
    for (unsigned int i = 0; i < m_axes.size(); i++) {
       std::vector<double> axisVector;
       m_axes[i].computeAxisVector(axisVector);
       m_axisVectors.push_back(axisVector);
    }
-}
-
-double FitsImage::operator()(const astro::SkyDir & dir, size_t iz) const {
-   double lon, lat;
-   if (m_coordSys == astro::SkyDir::GALACTIC) {
-      lon = dir.l();
-      lat = dir.b();
-   } else if (m_coordSys == astro::SkyDir::EQUATORIAL) {
-      lon = dir.ra();
-      lat = dir.dec();
-   } else {
-      throw std::runtime_error("Unknown coordinate system in FitsImage");
-   }
-// Kluge to account for maps spanning either (-180, 180) or (0, 360).
-   if (withinBounds(lon - 360., m_axisVectors.at(0))) {
-      lon -= 360.;
-   } else if (withinBounds(lon + 360., m_axisVectors.at(0))) {
-      lon += 360.;
-   }
-   size_t ix = std::upper_bound(m_axisVectors.at(0).begin(),
-                                m_axisVectors.at(0).end(), lon) - 
-      m_axisVectors.at(0).begin();
-   size_t iy = std::upper_bound(m_axisVectors.at(1).begin(),
-                                m_axisVectors.at(1).end(), lat) - 
-      m_axisVectors.at(1).begin();
-   try {
-      size_t offset(0);
-      if (m_axes.size() == 3) {
-         offset = iz*m_axes.at(0).size*m_axes.at(1).size;
-      }
-      return m_image.at(offset + iy*m_axes.at(0).size + ix);
-   } catch (...) {
-      return 0;
-   }
-   return 0;
 }
 
 void FitsImage::getAxisDims(std::vector<int> &axisDims) {
@@ -98,7 +47,7 @@ void FitsImage::getAxisNames(std::vector<std::string> &axisNames) {
 }
 
 void FitsImage::getAxisVector(unsigned int naxis,
-                              std::vector<double> &axisVector) const {
+                              std::vector<double> &axisVector) {
    if (naxis >= m_axes.size()) {
       std::ostringstream message;
       message << "FitsImage::getAxisVector: Invalid axis number " << naxis;
@@ -121,7 +70,7 @@ void FitsImage::getCelestialArrays(std::vector<double> &lonArray,
    }
 }
          
-void FitsImage::getSolidAngles(std::vector<double> &solidAngles) const {
+void FitsImage::getSolidAngles(std::vector<double> &solidAngles){
 // This solid angle calculation *assumes* that m_axes[0] is a
 // longitudinal coordinate and that m_axes[1] is a latitudinal one.
 // Furthermore, the axis units are assumed to be degrees, while the
@@ -150,26 +99,14 @@ AxisParams::computeAxisVector(std::vector<double> &axisVector) {
    axisVector.reserve(size);
    for (int i = 0; i < size; i++) {
       double value = step*(i - refPixel + 1) + refVal;
-      if (logScale) {
-         value = exp(value);
-      }
+      if (logScale) value = exp(value);
       axisVector.push_back(value);
    }
 }
 
-double FitsImage::mapIntegral() const {
-   std::vector<double> solidAngles;
-   getSolidAngles(solidAngles);
-   double map_integral(0);
-   for (unsigned int i = 1; i < solidAngles.size(); i++) {
-      map_integral += solidAngles.at(i)*m_image.at(i);
-   }
-   return map_integral;
-}
-
-void FitsImage::read_fits_image(std::string & filename,
-                                std::vector<AxisParams> & axes,
-                                std::vector<double> & image) {
+void FitsImage::read_fits_image(std::string &filename, 
+                                std::vector<AxisParams> &axes,
+                                std::vector<double> &image) {
    s_fitsRoutine = "read_fits_image";
    fitsfile * fptr = 0;
    char *file = const_cast<char *>(filename.c_str());
@@ -273,9 +210,8 @@ void FitsImage::read_fits_image(std::string & filename,
 
    image.resize(npixels);
 
-   for (int i = 0; i < npixels; i++) {
+   for (int i = 0; i < npixels; i++)
       image[i] = tmpImage[i];
-   }
 
    delete [] tmpImage;
 
@@ -283,14 +219,14 @@ void FitsImage::read_fits_image(std::string & filename,
    fitsReportError(status);
 }
 
-int FitsImage::findHdu(const std::string & filename, 
+int FitsImage::findHdu(const std::string & fitsFile, 
                        const std::string & extension) {
    s_fitsRoutine = "findHdu";
    
    int status(0);
    fitsfile * fptr = 0;
 
-   fits_open_file(&fptr, filename.c_str(), READONLY, &status);
+   fits_open_file(&fptr, fitsFile.c_str(), READONLY, &status);
    fitsReportError(status);
    
    int nhdus;
@@ -323,7 +259,7 @@ int FitsImage::findHdu(const std::string & filename,
 
    std::ostringstream message;
    message << "FitsImage::findHdu: HDU number not found for file "
-           << filename << " and extension " << extension;
+           << fitsFile << " and extension " << extension;
    throw std::runtime_error(message.str());
    return -1;
 }

@@ -74,7 +74,7 @@ void TransientTemplate::createEventTimes(std::string templateFile) {
    }
 
    double npred = m_flux*EventSource::totalArea()*duration;
-   long nevts = CLHEP::RandPoisson::shoot(npred);
+   long nevts = RandPoisson::shoot(npred);
 //    std::cerr << "TemplateTransient: number of events = "
 //              << nevts << std::endl;
    m_eventTimes.reserve(nevts);
@@ -86,7 +86,7 @@ void TransientTemplate::createEventTimes(std::string templateFile) {
 
 double TransientTemplate::drawTime(const std::vector<double> & tt,
                                    const std::vector<double> & integralDist) {
-   double xi = CLHEP::RandFlat::shoot();
+   double xi = RandFlat::shoot();
    std::vector<double>::const_iterator it = 
       std::upper_bound(integralDist.begin(), integralDist.end(), xi);
    int indx = it - integralDist.begin() - 1;
