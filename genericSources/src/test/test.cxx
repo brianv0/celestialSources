@@ -80,6 +80,7 @@ int main(int iargc, char * argv[]) {
    feenableexcept (FE_INVALID|FE_DIVBYZERO|FE_OVERFLOW);
 #endif
 
+   facilities::commonUtilities::setupEnvironment();
    try {
       TestApp testApp;
       
