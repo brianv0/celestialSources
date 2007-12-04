@@ -1,17 +1,32 @@
 package celestialSources
-
-version v0r3p6
+version v1r2
+author James Chiang <jchiang@slac.stanford.edu>
 
 # $Header$
 #
 # Container package for astrophysical sources to be used by Gleam and
 # observationSim
 
-use flux v*
+use genericSources v* celestialSources
+use SpectObj v* celestialSources
+use GRB v* celestialSources
+use GRBobs v* celestialSources
+use GRBtemplate v* celestialSources
+use Pulsar v* celestialSources
+use eblAtten v* celestialSources
+use microQuasar v* celestialSources
 
-use genericSources v1r2 celestialSources
-use SpectObj v0r1p0 celestialSources
-use GRB v4r1p2 celestialSources
-use GRBobs v0r1p1 celestialSources
-use Pulsar v1r0p3 celestialSources
-#use DarkMatter JCT celestialSources
+apply_pattern package_include
+apply_pattern package_linkopts
+apply_pattern package_stamps
+
+macro source *.cxx WIN32 "*.h *.cxx"
+
+library celestialSources -no_share -s=../celestialSources \
+        $(source) -s=../src $(source)
+
+application test_celestialSources test/*.cxx
+
+macro celestialSources_cppflags "" \
+      Linux "-I ../src " \
+      WIN32 '/I..\src /wd4290'
