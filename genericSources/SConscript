@@ -1,4 +1,8 @@
-import glob,os,platform
+# -*- python -*-
+#
+# $Header$
+
+import glob, os, platform
 
 Import('baseEnv')
 Import('listFiles')
@@ -6,11 +10,17 @@ progEnv = baseEnv.Clone()
 libEnv = baseEnv.Clone()
 
 if platform.system() == 'Linux':
-        progEnv.Append(CPPDEFINES = 'TRAP_FPE')
+    progEnv.Append(CPPDEFINES = 'TRAP_FPE')
 
-genericSourcesLib = libEnv.StaticLibrary('genericSources', listFiles(['src/*.cxx', 'src/*.c']))
+genericSourcesLib = libEnv.StaticLibrary('genericSources',
+                                         listFiles(['src/*.cxx', 'src/*.c']))
 
 progEnv.Tool('genericSourcesLib')
-test_genericSourcesBin = progEnv.Program('test_genericSources', 'src/test/test.cxx')
 
-progEnv.Tool('registerObjects', package = 'genericSources', libraries = [genericSourcesLib], includes = listFiles(['genericSources/*.h']), testApps = [test_genericSourcesBin])
+test_genericSourcesBin = progEnv.Program('test_genericSources',
+                                         'src/test/test.cxx')
+
+progEnv.Tool('registerObjects', package='genericSources', 
+             libraries=[genericSourcesLib],
+             includes=listFiles(['genericSources/*.h']),
+             testApps=[test_genericSourcesBin])
