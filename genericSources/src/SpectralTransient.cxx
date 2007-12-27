@@ -160,7 +160,12 @@ double SpectralTransient::interval(double time) {
       std::pair<double, double> thisEvent = m_eventCache.back();
       m_eventCache.pop_back();
       m_currentEnergy = thisEvent.second;
-      return thisEvent.first - time;
+      double my_interval(thisEvent.first - time);
+      if (my_interval == 0) {
+         throw std::runtime_error("SpectralTransient::interval:"
+                                  "zero interval computed");
+      }
+      return my_interval;
    }
    return 3.15e8;
 }

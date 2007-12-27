@@ -137,7 +137,13 @@ double SourcePopulation::energy(double time) {
 
 double SourcePopulation::interval(double time) {
    (void)(time);
-   return -std::log(1. - CLHEP::RandFlat::shoot())/m_flux/EventSource::totalArea();
+   double my_interval = 
+      -std::log(1. - CLHEP::RandFlat::shoot())/m_flux/EventSource::totalArea();
+   if (my_interval == 0) {
+      throw std::runtime_error("SourcePopulation::interval:\n"
+                               "zero length interval generated.");
+   }
+   return my_interval;
 }
 
 SourcePopulation::PointSource * SourcePopulation::PointSource::Self::s_self(0);
