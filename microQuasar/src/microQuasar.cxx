@@ -94,7 +94,7 @@ microQuasar::microQuasar(const std::string &paramString)
 	} 
 
 	// default to same spectral index in both regions
-	if(specOrbital2=-1) {
+	if(specOrbital2 == -1) {
 		m_orbitalRegion.setSpectralIndex(specOrbital1,specOrbital1);
 		m_orbitalRegion.setOrbitalPhase(0.5,1.0);
 	}
