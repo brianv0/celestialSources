@@ -10,9 +10,12 @@
  */
 
 #include <algorithm>
+#include <vector>
+
+#include "Primack05.h"
 
 namespace {
-   size_t findIndex(float target, std::vector<float> & values) {
+   size_t findIndex(float target, const std::vector<float> & values) {
       if (target >= values.back()) {
          return values.size() - 2;
       } else if (target <= values.front()) {
@@ -57,9 +60,9 @@ float Primack05::value(float energy, float redshift) const {
       return 0;
    }
 
-   size_t eindex(findIndex(energy, m_evalues));
+   size_t eindex(findIndex(energy, m_evalue));
 
-   size_t zindex(findIndex(redshift, m_zvalues));
+   size_t zindex(findIndex(redshift, m_zvalue));
 
 // Replicate the calculation from the earlier version of
 // IRB::calcPrimack05, This is not optimal, but need to do so to
@@ -79,7 +82,7 @@ float Primack05::value(float energy, float redshift) const {
       tau1 = m_tauTables.at(zindex).back();
    }
 
-   if (zindex < m_zvalues.size() - 1) {
+   if (zindex < m_zvalue.size() - 1) {
       if (eindex < m_tauTables.at(zindex+1).size() - 1) {
          tau2 = ( (energy - m_evalue.at(eindex))
                   /(m_evalue.at(eindex+1) - m_evalue.at(eindex))

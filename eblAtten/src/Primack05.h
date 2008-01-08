@@ -8,6 +8,8 @@
  * $Header$
  */
 
+#include <vector>
+
 namespace IRB {
 
 /**
@@ -34,6 +36,8 @@ private:
    std::vector<float> m_zvalue;
    std::vector<float> m_evalue;
    std::vector< std::vector<float> > m_tauTables;
+
+   void fillTauTables();
 
 };
 
