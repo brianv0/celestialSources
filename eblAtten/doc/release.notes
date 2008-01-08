@@ -5,6 +5,10 @@
   @verbatim
   $Id$
 
+  08-Jan-08 v0r5    JC    fix memory leak in calcPrimack05: add Singleton
+                          Primack05 class to handle static data. (More 
+                          refactoring still needs to be done.)
+  20-Jul-07 v0r4    LR    extend energy ranges and update Stecker model
   13-Dec-05 v0r3p1  THB   suppress warning messages
   08-Nov-05 v0r3    LR    Include new Stecker's model for EBL
   21-Sep-05 v0r2p3  JC    Fix line in req file so that compiler warnings are
