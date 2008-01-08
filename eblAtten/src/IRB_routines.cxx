@@ -21,8 +21,9 @@
 
 //-------------------------------------------------------------------
 
-#include <fstream>
 #include <cmath>
+
+#include <fstream>
 #include <iostream>
 
 #include "Primack05.h"
