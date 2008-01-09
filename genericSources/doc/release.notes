@@ -5,6 +5,8 @@
   @verbatim
   $Id$
 
+  08-Jan-08 v1r9p5  JC    draw random deviates using finer precision via a
+                          second call to RandFlat::shoot in SpectralTransient
   26-Dec-07 v1r9p4  JC    add checks for zero length intervals in 
                           SpectralTransient and SourcePopulation
   27-Nov-07 v1r9p3  JC    env var changes in xml by Navid; changes in test.cxx
