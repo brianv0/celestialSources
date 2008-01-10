@@ -12,7 +12,7 @@
 
 #define DEBUG 0
 #define BARYCORRLOG 0
-#define BINDEMODLOG 0
+#define BINDEMODLOG 1
 #define TNOISELOG 0
 
 using namespace cst;
@@ -182,6 +182,8 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
   // if this is in the GLEAM environment, allow for separate path specified by env var PULSARDATA
   std::string pulsar_data(facilities::commonUtilities::getDataPath("Pulsar")); // the default, perhaps overriden
 
+  pulsar_data=pulsar_data+"/";
+
   const char * gleam = ::getenv("SKYMODEL_DIR");
   if( gleam!=0) {
        pulsar_data =  std::string(gleam)+"/pulsars/";
@@ -340,6 +342,9 @@ double PulsarSpectrum::interval(double time)
 	{
 	  timeTildeDemodulated = getIterativeDemodulatedTime(timeTilde,0);      
 	}
+
+      //      std::cout <<"\n****Test inverso:"<< timeTildeDemodulated-(StartMissionDateMJD)*SecsOneDay << " con correzioni" << getBinaryDemodulationInverse(timeTildeDemodulated)-(StartMissionDateMJD)*SecsOneDay << std::endl;
+      //    std::cout << " indietro -->" << getIterativeDemodulatedTime(getBinaryDemodulationInverse(timeTildeDemodulated),0)-(StartMissionDateMJD)*SecsOneDay << std::endl;
     }
 
   //Phase assignment
@@ -430,12 +435,14 @@ double PulsarSpectrum::interval(double time)
 		<< nextTimeTildeDecorr + getBaryCorr(nextTimeTildeDecorr,0) - (StartMissionDateMJD)*SecsOneDay << std::endl;
       std::cout << std::setprecision(15) <<"  -->Interval is " <<  nextTimeTildeDecorr - timeTildeDecorr << std::endl;
     }
-    //  double interv = nextTimeTildeDecorr - timeTildeDecorr;
+
+  //  double interv = nextTimeTildeDecorr - timeTildeDecorr;
 
   double interv = nextTimeTildeDecorr-(time + (StartMissionDateMJD)*SecsOneDay);
-  if (interv < 0.)
-    interv = m_periodVect[0]/100.;
 
+  if (interv <= 0.)
+    interv = m_periodVect[0]/100.;
+  
   return interv;
   
 }
@@ -674,10 +681,10 @@ double PulsarSpectrum::getIterativeDemodulatedTime(double tInput, int LogFlag)
   int i=0;
   while ((fabs(timeDemodulated-delay-TargetTime) > DemodTol) && ( i < 50))
     {
-
       i++;
       timeDemodulated = TargetTime+delay;
       delay = getBinaryDemodulation(timeDemodulated,0);
+      // std::cout << "Step " << i << " t= " << timeDemodulated-(StartMissionDateMJD)*SecsOneDay<<std::endl;
     }
   
   if (LogFlag == 1)
@@ -789,8 +796,6 @@ double PulsarSpectrum::getDecorrectedTime(double CorrectedTime)
   //  double CorrectedTime = 54.2342.;
   double deltaT = 510.;
 
-  //  int DEBUG = 1;
-
   double tcurr = CorrectedTime-deltaT;
   double fcurr = tcurr + getBaryCorr(tcurr,0); // fx(tcurr);
   double fcurr_ct = CorrectedTime;
@@ -851,71 +856,22 @@ double PulsarSpectrum::getDecorrectedTime(double CorrectedTime)
 	  //    << " and starting again1 from " << tcurr << std::endl;
 	  //std::cout << std::setprecision(30) << CorrectedTime << 
 	  //" <--" << fcurr << " df=" << CorrectedTime-fcurr << std::endl;
-	  if ((s > 8) || (deltaStep < 1e-7))
+	  if ((s > 10) || (deltaStep < 1e-7))
 	    {
 	      //std::cout << "Skipping ! " << std::endl;
 	      break;
 	    }
 	}
 
-      //      std::cout << std::setprecision(30) <<  s << " -> " << CorrectedTime 
-      //	<< " <--" << fcurr 
-      //	<< " df=" << CorrectedTime-fcurr << std::endl;
-  
+      if (DEBUG)
+	{
+	  std::cout << std::setprecision(30) <<  s << " -> " << CorrectedTime 
+		    << " <--" << fcurr 
+		    << " df=" << CorrectedTime-fcurr << std::endl;
+	}
+
+
       return tcurr;
-
-
-  // Begin old algorithm..
-  /*
-  //Use the bisection method to find the inverse of the de-corrected time, i.e. the time (in TT)
-  //that after correction is equal to Time in TDB
-
-  if (DEBUG)
-    {
-      std::cout << "Get decorrected time from time t=" << CorrectedTime << std::endl;
-    }
-  double deltaMax = 510.0; //max deltat (s)
-  double ttDown = CorrectedTime - deltaMax;
-  double ttUp = CorrectedTime + deltaMax;
-
-  double ttMid = (ttUp + ttDown)/2;
-
-  int i = 0;
-  double hMid = 1e30; //for the 1st iteration
-
-  while (fabs(hMid)>baryCorrTol )
-    {
-      double hDown = (CorrectedTime - (ttDown + getBaryCorr(ttDown,0)));
-      hMid = (CorrectedTime - (ttMid + getBaryCorr(ttMid,0)));
-      //std::cout << std::setprecision(30) 
-      //	<< "\n" << i << "**ttUp " << ttUp << " ttDown " << ttDown << " mid " << ttMid << std::endl;
-             
-       if (fabs(hMid) < baryCorrTol) break;
-      if ((hDown*hMid)>0)
-	{
-	  ttDown = ttMid;
-	  ttMid = (ttUp+ttDown)/2;
-	}
-      else 
-	{
-	  ttUp = ttMid;
-	  ttMid = (ttUp+ttDown)/2;
-	}
-       i++;
-
-       if (i>50)
-	 {
-	   break;
-	 }
-
-    }
-   
-   return ttMid;
-  */
-  // End old algorithm..
-
-
-
 }
 
 /////////////////////////////////////////////
@@ -929,9 +885,89 @@ double PulsarSpectrum::getDecorrectedTime(double CorrectedTime)
 double PulsarSpectrum::getBinaryDemodulationInverse( double CorrectedTime)
 {
 
+  double deltaMin = (m_asini*(1+m_ecc)-m_asini*std::sqrt(1-m_ecc*m_ecc));
+
+  double tcurr = CorrectedTime-deltaMin;
+  double fcurr = getIterativeDemodulatedTime(tcurr,0);
+  double fcurr_ct = CorrectedTime;
+
+  if (DEBUG)
+    {
+      std::cout << "Get inverse demodulated time for t=" << CorrectedTime << std::endl;
+    }
+
+  //double deltaStep = 10.;
+  int s = 0;
+  int SignDirection = 0;
+  double deltaStep =  pow(10.,(2.-s));
+
+  if (CorrectedTime <= fcurr) // function increasing
+    {
+      //      std::cout << "Case 1: de-crescent function" << std::endl;
+      SignDirection = 1;
+    }
+  else
+    {
+      //std::cout << "Case 2: crescent function" << std::endl;
+      SignDirection = 2;
+    }
+
+  /*
+  std::cout << "\n\n***\ntstart= " << tcurr << " -->fcurr= " << fcurr 
+	    << " -->fcurr_CT= " << fcurr_ct << " inital delta=" 
+	    << deltaStep << " sign" << SignDirection << std::endl;
+  */
+
+  double tModMid=0.;
+
+      while ( fabs(CorrectedTime-fcurr) > InverseDemodTol)
+	{
+
+	  if (SignDirection == 1)
+	    {
+	      while (fcurr > CorrectedTime)
+		{ 
+		  tcurr = tcurr+deltaStep;
+		  fcurr = getIterativeDemodulatedTime(tcurr,0);
+		  //      std::cout << std::setprecision(30) << " tcurr=>" << tcurr << " fcurr " << fcurr 
+		  //	<< "df=" << CorrectedTime-fcurr << std::endl; 
+		}
+	    }
+	  else
+	    while (fcurr < CorrectedTime)
+	      { 
+		tcurr = tcurr+deltaStep;
+		fcurr = getIterativeDemodulatedTime(tcurr,0);
+		//std::cout << std::setprecision(30) << " tcurr=>" << tcurr << " fcurr " << fcurr 
+		//  << "df=" << CorrectedTime-fcurr << std::endl; 
+	      }
+	    
+	  
+	  tcurr = tcurr-deltaStep;
+	  fcurr = getIterativeDemodulatedTime(tcurr,0);
+	  s++;
+	  deltaStep =  pow(10.,(2.-s));
+	  //std::cout << "\n" << m_PSRname << "  Target superated, decreasing to " << deltaStep 
+	  //    << " and starting again1 from " << tcurr << std::endl;
+	  //std::cout << std::setprecision(30) << CorrectedTime << 
+	  //" <--" << fcurr << " df=" << CorrectedTime-fcurr << std::endl;
+	  if ((s > 8) || (deltaStep < 1e-7))
+	    {
+	      //std::cout << "Skipping ! " << std::endl;
+	      break;
+	    }
+	}
+
+      //      std::cout << std::setprecision(30) <<  s << " -> " << CorrectedTime 
+      //	<< " <--" << fcurr 
+      //	<< " df=" << CorrectedTime-fcurr << std::endl;
+
+  //pippo
+
+  /* Old code...tryng replace with new system...
   //Set initial conditions
-  double deltaMax = m_asini*(1-m_ecc)+m_asini*std::sqrt(1-m_ecc*m_ecc); //max deltat (s)
-  double deltaMin = m_asini*(1+m_ecc)-m_asini*std::sqrt(1-m_ecc*m_ecc);
+  double deltaMax = 2*(m_asini*(1-m_ecc)+m_asini*std::sqrt(1-m_ecc*m_ecc)); //max deltat (s)
+  double deltaMin = 2*(m_asini*(1+m_ecc)-m_asini*std::sqrt(1-m_ecc*m_ecc));
 
   double tModUp = CorrectedTime + deltaMax;
   double tModDown = CorrectedTime - deltaMin;
@@ -946,9 +982,9 @@ double PulsarSpectrum::getBinaryDemodulationInverse( double CorrectedTime)
     {
       i++;
       tModMid = tModUp*0.5 + tModDown*0.5;
-      
+       
       if (tModMid == tModDown)
-	{
+	 {
 	  tModDown = tModDown-1e-5*m_PSpectrumRandom->Uniform();
 	  if (DEBUG) std::cout << "\n**Correcting down to tDown:" << tModDown << std::endl;
 	  tModMid = tModUp*0.5 + tModDown*0.5;
@@ -961,20 +997,20 @@ double PulsarSpectrum::getBinaryDemodulationInverse( double CorrectedTime)
 	  tModMid = tModUp*0.5 + tModDown*0.5;
 	}
 
-      hModMid = CorrectedTime - (getIterativeDemodulatedTime(tModMid,0));
+       hModMid = CorrectedTime - (getIterativeDemodulatedTime(tModMid,0));
 
-      /*
-       std::cout << std::setprecision(30) << "\n****Rand" << RandFrac << " delta " << (tModUp - tModDown)*RandFrac << std::endl;
-       std::cout << std::setprecision(30) << " tUp-tmid " << tModUp - tModMid << std::endl;
-       std::cout << std::setprecision(30) << " tDown-tmid " << tModDown - tModMid << std::endl;
-       std::cout << std::setprecision(30) << "   tdown=" << tModDown << " tup=" << tModUp << " tMid=" << tModMid << std::endl;
-       std::cout << std::setprecision(30) << "   hdown=" << hModDown << " hup=" << hModUp << " hMid=" << hModMid << std::endl;
-      */
+
+//        std::cout << std::setprecision(30) << "\n****Rand" << RandFrac << " delta " << (tModUp - tModDown)*RandFrac << std::endl;
+//        std::cout << std::setprecision(30) << " tUp-tmid " << tModUp - tModMid << std::endl;
+//        std::cout << std::setprecision(30) << " tDown-tmid " << tModDown - tModMid << std::endl;
+//        std::cout << std::setprecision(30) << "   tdown=" << tModDown << " tup=" << tModUp << " tMid=" << tModMid << std::endl;
+//        std::cout << std::setprecision(30) << "   hdown=" << hModDown << " hup=" << hModUp << " hMid=" << hModMid << std::endl;
+
       
       if ((hModDown*hModMid)<0)
 	{
-	  tModUp = tModMid;
-	  //std::cout << " tMid--->tTup ::: tUp=" << tModUp<<std::endl; 
+	   tModUp = tModMid;
+	   //std::cout << " tMid--->tTup ::: tUp=" << tModUp<<std::endl; 
 	}
       else
 	{
@@ -985,7 +1021,10 @@ double PulsarSpectrum::getBinaryDemodulationInverse( double CorrectedTime)
       hModUp = CorrectedTime - (getIterativeDemodulatedTime(tModUp,0));
       hModDown = CorrectedTime - (getIterativeDemodulatedTime(tModDown,0));
 
-      if (i==50) 
+      std::cout << "step " << i << " --> " <<tModMid-(StartMissionDateMJD)*SecsOneDay << " " 
+		<< hModMid << std::endl;
+
+      if (i==200) 
 	{
 	  if (DEBUG)
 	    {
@@ -993,10 +1032,13 @@ double PulsarSpectrum::getBinaryDemodulationInverse( double CorrectedTime)
 	    }
 	  break;
     	}
-    }
-   
-  return tModMid;
+     }
 
+     return tModMid;
+  */
+
+
+      return tcurr;
 }
 
 /////////////////////////////////////////////
@@ -1755,7 +1797,6 @@ int PulsarSpectrum::saveDbTxtFile()
  * <br>
  * This method simply check the file and return an exception
  */
-//max1
 void PulsarSpectrum::CheckFileExistence(std::string NameFileToCheck)
 {
 
