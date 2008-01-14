@@ -12,7 +12,7 @@
 
 #define DEBUG 0
 #define BARYCORRLOG 0
-#define BINDEMODLOG 1
+#define BINDEMODLOG 0
 #define TNOISELOG 0
 
 using namespace cst;
@@ -222,12 +222,18 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
   LoadPulsarGeneralData(pulsar_data);
   //Save the output txt file..
   int DbFlag = saveDbTxtFile();
+  if ((DbFlag !=1) && (DEBUG))
+    std::cout << "Warning! Problem in saving SimPulsars_spin.txt" << std::endl;
+
+
 
   //Binary Pulsar Data
   if (m_BinaryFlag ==1)
     {
       LoadPulsarOrbitalData(pulsar_data);
       int BinDbFlag = saveBinDbTxtFile();
+      if ((BinDbFlag !=1) && (DEBUG))
+	std::cout << "Warning! Problem in saving SimPulsars_bin.txt" << std::endl;
     }
 
   if (m_TimingNoiseModel != 0)
@@ -798,7 +804,7 @@ double PulsarSpectrum::getDecorrectedTime(double CorrectedTime)
 
   double tcurr = CorrectedTime-deltaT;
   double fcurr = tcurr + getBaryCorr(tcurr,0); // fx(tcurr);
-  double fcurr_ct = CorrectedTime;
+  //  double fcurr_ct = CorrectedTime;
 
   if (DEBUG)
     {
@@ -889,7 +895,7 @@ double PulsarSpectrum::getBinaryDemodulationInverse( double CorrectedTime)
 
   double tcurr = CorrectedTime-deltaMin;
   double fcurr = getIterativeDemodulatedTime(tcurr,0);
-  double fcurr_ct = CorrectedTime;
+  //  double fcurr_ct = CorrectedTime;
 
   if (DEBUG)
     {
@@ -918,7 +924,7 @@ double PulsarSpectrum::getBinaryDemodulationInverse( double CorrectedTime)
 	    << deltaStep << " sign" << SignDirection << std::endl;
   */
 
-  double tModMid=0.;
+  //double tModMid=0.;
 
       while ( fabs(CorrectedTime-fcurr) > InverseDemodTol)
 	{

@@ -394,8 +394,8 @@ TH2D* PulsarSim::PSRShape(std::string ModelShapeName, int NormalizeFlux)
   TFile *ModelShapeInputFile = new TFile(ModelShapeInputFileName.c_str());
   TH2D *m_Nv = (TH2D*) ModelShapeInputFile->Get("Nv"); //ph m^(-2) s^(-1) keV^(-1)
     
-  double shapePhmin = m_Nv->GetXaxis()->GetXmin();
-  double shapePhmax = m_Nv->GetXaxis()->GetXmax();
+  //  double shapePhmin = m_Nv->GetXaxis()->GetXmin();
+  //double shapePhmax = m_Nv->GetXaxis()->GetXmax();
   double shapeEmin = m_Nv->GetYaxis()->GetXmin();
   double shapeEmax = m_Nv->GetYaxis()->GetXmax();
  
