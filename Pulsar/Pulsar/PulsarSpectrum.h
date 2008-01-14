@@ -38,7 +38,7 @@
 * \author Nicola Omodei        nicola.omodei@pi.infn.it 
 * \author Massimiliano Razzano massimiliano.razzano@pi.infn.it
 *
-* PulsarSpectrum, derived from ISpectrum, takes the model parameters from the XML file, where are also located the pulsar name, his position in the sky, 
+* PulsarSpectrum, derived from Spectrum, takes the model parameters from the XML file, where are also located the pulsar name, his position in the sky, 
 * and the energy range of the extracted photons. Then it looks in the PulsarDataList.txt file ( in the <i>/data</i> directory)
 * for the name of the pulsar and then extracts the specific parameters of the pulsar (period, flux, ephemerides, etc.) related 
 * to that pulsar. 
@@ -48,7 +48,7 @@
 *  - Timing Noise;
 *  - Binary demodulation
 */
-class PulsarSpectrum : public ISpectrum
+class PulsarSpectrum : public Spectrum
 {
   
  public:

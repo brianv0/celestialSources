@@ -200,7 +200,7 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
     m_FT2_startMET = history.startTime();
     m_FT2_stopMET = history.endTime();
     m_UseFT2 = 1;
-  } catch (astro::GPS::NoHistoryError & eObj)
+  } catch (astro::GPS::NoHistoryError & )
     {
       m_FT2_startMET = Spectrum::startTime();
       m_FT2_stopMET = astro::GPS::instance()->endTime();
@@ -598,7 +598,7 @@ double PulsarSpectrum::getBaryCorr( double ttInput, int LogCorrFlag)
     //    std::cout<<astro::GPS::time()<<std::endl;
     astro::GPS::instance()->time(timeMET);
     scPos = astro::GPS::instance()->position(timeMET);
-  } catch (astro::PointingHistory::TimeRangeError & eObj)
+  } catch (astro::PointingHistory::TimeRangeError & )
     {
       if (DEBUG)
 	{
@@ -623,7 +623,7 @@ double PulsarSpectrum::getBaryCorr( double ttInput, int LogCorrFlag)
     EarthPosGeom = GeomVect.dot(m_PulsarVectDir);
     GeomVect = (scPos/clight) - m_solSys.getBarycenter(ttJD);
     GeomCorr = GeomVect.dot(m_PulsarVectDir);
-  } catch (astro::SolarSystem::BadDate & eObj)
+  } catch (astro::SolarSystem::BadDate & )
     {
       std::cout << "Time Error JD! " << ttJD << std::endl;
       GeomCorr = 0.;  

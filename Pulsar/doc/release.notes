@@ -73,5 +73,6 @@
 *   v2r4p1     25-oct-2007 MR   python added
 *   v2r4p2     10-Jan-2008 MR   Binary pulsars fixed also with low eccentricity
 *   v2r4p3     14-Jan-2008 MR   Removed extra warnings
+*   v2r4p4   14-jan-2008  THB   Inherit from Spectrum, not ISpectrum
 *@endverbatim
 */
