@@ -5,6 +5,9 @@
   @verbatim
   $Id$
 
+  15-Jan-08 v1r10   JC    set identifier in SourcePopulation for new
+                          Spectrum::identifier member function so that unique
+                          MC_SRC_IDs can be assigned.
   08-Jan-08 v1r9p5  JC    draw random deviates using finer precision via a
                           second call to RandFlat::shoot in SpectralTransient
   26-Dec-07 v1r9p4  JC    add checks for zero length intervals in 
