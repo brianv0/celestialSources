@@ -126,6 +126,7 @@ float SourcePopulation::operator()(float xi) {
    m_currentEnergy = m_sources.at(indx).energy();
    m_l = m_sources.at(indx).dir().l();
    m_b = m_sources.at(indx).dir().b();
+   setIdentifier(indx);
    return m_currentEnergy;
 }
 
