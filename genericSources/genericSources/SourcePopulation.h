@@ -78,6 +78,7 @@ private:
 
    IRB::EblAtten * m_tau;
 
+   int m_idOffset;
    double m_l;
    double m_b;
    double m_currentEnergy;
@@ -156,7 +157,7 @@ private:
 
    void setEblAtten(const std::string & ebl_par);
 
-   void readSourceFile(const std::string & input_file);
+   void readSourceFile(std::string input_file);
 
 };
 

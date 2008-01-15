@@ -29,6 +29,7 @@
 
 #include "genericSources/SourcePopulation.h"
 
+#include "ConstParMap.h"
 #include "Util.h"
 #include "dgaus8.h"
 
@@ -72,15 +73,29 @@ ISpectrumFactory & SourcePopulationFactory() {
 }
 
 SourcePopulation::SourcePopulation(const std::string & params) 
-   : m_tau(0), m_l(0), m_b(0) {
-   std::vector<std::string> pars;
-   facilities::Util::stringTokenize(params, ",", pars);
-   std::string inputFile(pars.at(0));
-   facilities::Util::expandEnvVar(&inputFile);
-   if (pars.size() > 1) {
-      setEblAtten(pars.at(1));
+   : m_tau(0), m_idOffset(100000), m_l(0), m_b(0) {
+   if (params.find("=") == std::string::npos) {
+      std::vector<std::string> pars;
+      facilities::Util::stringTokenize(params, ",", pars);
+      readSourceFile(pars.at(0));
+      if (pars.size() > 1) {
+         setEblAtten(pars.at(1));
+      }
+      if (pars.size() > 2) {
+         m_idOffset = std::atoi(pars.at(2).c_str());
+      } 
+   } else {
+      genericSources::ConstParMap pars(params);
+      readSourceFile(pars["sourceFile"]);
+      try {
+         setEblAtten(pars["eblModel"]);
+      } catch(std::runtime_error & eObj) {
+      }
+      try {
+         m_idOffset = static_cast<int>(pars.value("idOffset"));
+      } catch(std::runtime_error & eObj) {
+      }
    }
-   readSourceFile(inputFile);
    m_flux = m_cumulativeFlux.back();
 }
 
@@ -95,7 +110,8 @@ void SourcePopulation::setEblAtten(const std::string & ebl_par) {
    PointSource::setEblAtten(m_tau);
 }
 
-void SourcePopulation::readSourceFile(const std::string & input_file) {
+void SourcePopulation::readSourceFile(std::string input_file) {
+   facilities::Util::expandEnvVar(&input_file);
    genericSources::Util::file_ok(input_file);
    std::vector<std::string> lines;
    ::readLines(input_file, lines, "#", true);
@@ -126,7 +142,7 @@ float SourcePopulation::operator()(float xi) {
    m_currentEnergy = m_sources.at(indx).energy();
    m_l = m_sources.at(indx).dir().l();
    m_b = m_sources.at(indx).dir().b();
-   setIdentifier(indx);
+   setIdentifier(indx + m_idOffset);
    return m_currentEnergy;
 }
 
