@@ -73,7 +73,7 @@ ISpectrumFactory & SourcePopulationFactory() {
 }
 
 SourcePopulation::SourcePopulation(const std::string & params) 
-   : m_tau(0), m_idOffset(100000), m_l(0), m_b(0) {
+   : m_tau(0), m_idOffset(100000), m_l(0), m_b(0) , m_name(""){
    if (params.find("=") == std::string::npos) {
       std::vector<std::string> pars;
       facilities::Util::stringTokenize(params, ",", pars);
@@ -89,11 +89,11 @@ SourcePopulation::SourcePopulation(const std::string & params)
       readSourceFile(pars["sourceFile"]);
       try {
          setEblAtten(pars["eblModel"]);
-      } catch(std::runtime_error & eObj) {
+      } catch(std::runtime_error & ) {
       }
       try {
          m_idOffset = static_cast<int>(pars.value("idOffset"));
-      } catch(std::runtime_error & eObj) {
+      } catch(std::runtime_error & ) {
       }
    }
    m_flux = m_cumulativeFlux.back();
@@ -143,6 +143,7 @@ float SourcePopulation::operator()(float xi) {
    m_l = m_sources.at(indx).dir().l();
    m_b = m_sources.at(indx).dir().b();
    setIdentifier(indx + m_idOffset);
+   m_name = m_sources.at(indx).name();
    return m_currentEnergy;
 }
 
@@ -162,6 +163,10 @@ double SourcePopulation::interval(double time) {
    }
    return my_interval;
 }
+std::string SourcePopulation::name()const {
+    return m_name;
+}
+
 
 SourcePopulation::PointSource * SourcePopulation::PointSource::Self::s_self(0);
 
@@ -178,6 +183,7 @@ SourcePopulation::
 PointSource::PointSource(const std::string & line) : m_z(0) {
    std::vector<std::string> tokens;
    facilities::Util::stringTokenize(line, ", \n", tokens);
+   m_name = tokens.at(0);
    double ra = std::atof(tokens.at(1).c_str());
    double dec = std::atof(tokens.at(2).c_str());
    m_dir = astro::SkyDir(ra, dec);
@@ -255,3 +261,4 @@ PointSource::attenuation(double energy) const {
    }
    return atten;
 }
+

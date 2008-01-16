@@ -74,6 +74,8 @@ public:
       return std::make_pair(m_l, m_b);
    }
 
+   virtual std::string name()const;
+
 private:
 
    IRB::EblAtten * m_tau;
@@ -82,6 +84,7 @@ private:
    double m_l;
    double m_b;
    double m_currentEnergy;
+   std::string m_name; ///< name of current source
 
    std::vector<double> m_cumulativeFlux;
 
@@ -114,6 +117,10 @@ private:
 
       double integral(double emin, double emax);
 
+      std::string name()const{
+          return m_name;
+      }
+
    private:
 
       astro::SkyDir m_dir;
@@ -130,6 +137,7 @@ private:
       double m_part1;
       double m_part2;
       double m_frac;
+      std::string m_name; ///< name of the source
 
       void setPowerLaw();
 
