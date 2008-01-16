@@ -5,6 +5,9 @@
   @verbatim
   $Id$
 
+  16-Jan-08 v1r10p1 JC    Toby's modifications to SourcePopulation to
+                          use the component name as the source name when
+                          assigning MC_SRC_ID
   15-Jan-08 v1r10   JC    set identifier in SourcePopulation for new
                           Spectrum::identifier member function so that unique
                           MC_SRC_IDs can be assigned.
