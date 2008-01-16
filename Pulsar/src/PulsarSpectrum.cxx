@@ -891,7 +891,7 @@ double PulsarSpectrum::getDecorrectedTime(double CorrectedTime)
 double PulsarSpectrum::getBinaryDemodulationInverse( double CorrectedTime)
 {
 
-  double deltaMin = (m_asini*(1+m_ecc)-m_asini*std::sqrt(1-m_ecc*m_ecc));
+  double deltaMin = m_asini*(1.+m_ecc);//-m_asini*std::sqrt(1.-m_ecc*m_ecc);
 
   double tcurr = CorrectedTime-deltaMin;
   double fcurr = getIterativeDemodulatedTime(tcurr,0);
@@ -905,8 +905,9 @@ double PulsarSpectrum::getBinaryDemodulationInverse( double CorrectedTime)
   //double deltaStep = 10.;
   int s = 0;
   int SignDirection = 0;
-  double deltaStep =  pow(10.,(2.-s));
-
+  double StartStep = 1.0*int(log10(fabs(deltaMin/10.)));
+  double deltaStep =  pow(10.,(StartStep-s));
+  //std::cout << "START " << StartStep << " dmin " << deltaMin << std::endl;
   if (CorrectedTime <= fcurr) // function increasing
     {
       //      std::cout << "Case 1: de-crescent function" << std::endl;
@@ -919,42 +920,70 @@ double PulsarSpectrum::getBinaryDemodulationInverse( double CorrectedTime)
     }
 
   /*
-  std::cout << "\n\n***\ntstart= " << tcurr << " -->fcurr= " << fcurr 
-	    << " -->fcurr_CT= " << fcurr_ct << " inital delta=" 
+  std::cout << "\n\n***\n"<<m_PSRname<<"tstart= " << tcurr << " -->fcurr= " << fcurr 
+	    << " -->fcurr_CT= " << CorrectedTime << " inital delta=" 
 	    << deltaStep << " sign" << SignDirection << std::endl;
   */
 
   //double tModMid=0.;
-
+  int nMaxStepIterations=0;	
       while ( fabs(CorrectedTime-fcurr) > InverseDemodTol)
 	{
 
+
+/*
+  if (CorrectedTime <= fcurr) // function increasing
+    {
+      //      std::cout << "Case 1: de-crescent function" << std::endl;
+      SignDirection = 1;
+    }
+  else
+    {
+      //std::cout << "Case 2: crescent function" << std::endl;
+      SignDirection = 2;
+    }
+*/
+          nMaxStepIterations=0;
 	  if (SignDirection == 1)
 	    {
-	      while (fcurr > CorrectedTime)
+	      while ((fcurr > CorrectedTime) && (nMaxStepIterations <1000))
 		{ 
 		  tcurr = tcurr+deltaStep;
 		  fcurr = getIterativeDemodulatedTime(tcurr,0);
-		  //      std::cout << std::setprecision(30) << " tcurr=>" << tcurr << " fcurr " << fcurr 
+	          nMaxStepIterations++;	 
+                  if (fcurr < CorrectedTime)
+                   {
+                  // std::cout << " EXITTTTTT" <<std::endl;
+                   break;
+                   }
+                  //std::cout << std::setprecision(30) << nMaxStepIterations <<" tcurr=>" << tcurr << " fcurr " << fcurr 
 		  //	<< "df=" << CorrectedTime-fcurr << std::endl; 
 		}
 	    }
 	  else
-	    while (fcurr < CorrectedTime)
+	    while ((fcurr < CorrectedTime) && (nMaxStepIterations <1000))
 	      { 
 		tcurr = tcurr+deltaStep;
 		fcurr = getIterativeDemodulatedTime(tcurr,0);
-		//std::cout << std::setprecision(30) << " tcurr=>" << tcurr << " fcurr " << fcurr 
-		//  << "df=" << CorrectedTime-fcurr << std::endl; 
-	      }
+                nMaxStepIterations++;
+		//std::cout << std::setprecision(30) << nMaxStepIterations << " tcurr=>" << tcurr << " fcurr " << fcurr 
+		  //<< "df=" << CorrectedTime-fcurr << std::endl; 
+             if (fcurr > CorrectedTime)
+                   {
+                   //std::cout << " EXITTTTTT" <<std::endl;
+                   break;
+                   }
+	      
+
+}
 	    
 	  
 	  tcurr = tcurr-deltaStep;
 	  fcurr = getIterativeDemodulatedTime(tcurr,0);
 	  s++;
-	  deltaStep =  pow(10.,(2.-s));
+	  deltaStep =  pow(10.,(StartStep-s));
 	  //std::cout << "\n" << m_PSRname << "  Target superated, decreasing to " << deltaStep 
-	  //    << " and starting again1 from " << tcurr << std::endl;
+	    //  << " and starting again1 from " << tcurr << std::endl;
 	  //std::cout << std::setprecision(30) << CorrectedTime << 
 	  //" <--" << fcurr << " df=" << CorrectedTime-fcurr << std::endl;
 	  if ((s > 8) || (deltaStep < 1e-7))
