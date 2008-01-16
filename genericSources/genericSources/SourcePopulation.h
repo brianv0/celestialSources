@@ -74,7 +74,7 @@ public:
       return std::make_pair(m_l, m_b);
    }
 
-   virtual std::string name()const;
+   virtual std::string name() const;
 
 private:
 
@@ -84,7 +84,7 @@ private:
    double m_l;
    double m_b;
    double m_currentEnergy;
-   std::string m_name; ///< name of current source
+   std::string m_name; /// name of current source
 
    std::vector<double> m_cumulativeFlux;
 
@@ -137,7 +137,7 @@ private:
       double m_part1;
       double m_part2;
       double m_frac;
-      std::string m_name; ///< name of the source
+      std::string m_name; /// name of the source
 
       void setPowerLaw();
 

@@ -73,7 +73,7 @@ ISpectrumFactory & SourcePopulationFactory() {
 }
 
 SourcePopulation::SourcePopulation(const std::string & params) 
-   : m_tau(0), m_idOffset(100000), m_l(0), m_b(0) , m_name(""){
+   : m_tau(0), m_idOffset(100000), m_l(0), m_b(0), m_name("") {
    if (params.find("=") == std::string::npos) {
       std::vector<std::string> pars;
       facilities::Util::stringTokenize(params, ",", pars);
@@ -163,10 +163,10 @@ double SourcePopulation::interval(double time) {
    }
    return my_interval;
 }
-std::string SourcePopulation::name()const {
-    return m_name;
-}
 
+std::string SourcePopulation::name() const {
+   return m_name;
+}
 
 SourcePopulation::PointSource * SourcePopulation::PointSource::Self::s_self(0);
 
