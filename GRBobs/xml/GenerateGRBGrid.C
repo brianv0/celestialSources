@@ -2,11 +2,11 @@
 //////////////////////////////////////////////////
 // OPTIONS FOR GENERATING THE XML LIBRARY:
 double MinExtractedPhotonEnergy = 10.0; //MeV
-long FirstBurstTime    =      1000; //1e4
-double AverageInterval =      1000;
-TString GenerateIC       =   "no";//"random"; //"yes", "no"
-bool  GenerateGBM        =   true;//false;
-bool  GeneratePF        =   false;
+long FirstBurstTime           =      100; //1e4
+double SeparationBetweenBursts=      1000;
+TString GenerateIC            =   "no";//"random"; //"yes", "no"
+bool  GenerateGBM             =   false;
+bool  GeneratePF              =   false;
 
 //////////////////////////////////////////////////
 
@@ -17,27 +17,27 @@ double z=0;
 
 //////////////////////////////////////////////////
 
-double t90_min   = 1.0;
+double t90_min   = 0.1;
 double t90_max   = 100.0;
-int    NlogT90   = 3;
+int    NlogT90   = 10;
 
 
-double beta_min  = -3.2;
-double beta_max  = -1.2;
+double beta_min  = -3.0;
+double beta_max  = -2.0;
 int    NBeta     = 5;
 double deltaBeta = (beta_max-beta_min)/(NBeta-1);
 
 double PF_min    =  0.1;
 double PF_max    = 30.0;
-int    NlogPF       = 5;
+int    NlogPF    = 5;
 
 double FL_min    =  1e-8;
 double FL_max    =  1e-4;
-int    NlogFL    =  8;
+int    NlogFL    =  5;
 
 double theta_min  = 0.0;
-double theta_max  = 90.0;
-int    Ntheta     = 5;
+double theta_max  = 80.0;
+int    Ntheta     = 8;
 double Dtheta     = (theta_max - theta_min)/(Ntheta-1);
 //////////////////////////////////////////////////
 long seed = 1;
@@ -116,7 +116,7 @@ void GenerateGRBGrid()
 		      osTest<<setw(8)<<z<<" "<<setw(8)<<alpha<<" "<<setw(8)<<beta<<" "<<setw(8)<<Epeak<<" ";
 		      osTest<<setw(8)<<Essc_Esyn<<setw(8)<<Fssc_Fsyn<<setw(8)<<co_energy<<std::endl;
 		      //////////////////////////////////////////////////
-		      BurstTime+=(int) (AverageInterval);		    
+		      BurstTime+=(int) (SeparationBetweenBursts);		    
 		      NGRBs++;		  
 		    }
 		}
@@ -145,7 +145,7 @@ void GenerateGRBGrid()
 		      osTest<<setw(8)<<Essc_Esyn<<setw(8)<<Fssc_Fsyn<<setw(8)<<co_energy<<std::endl;
 		      
 		      //////////////////////////////////////////////////
-		      BurstTime+=(int) (AverageInterval);		    
+		      BurstTime+=(int) (SeparationBetweenBursts);		    
 		      NGRBs++;
 		    }
 		}
