@@ -37,14 +37,14 @@ namespace {
       return my_value;
    }
 
-   double pl_draw(double e1, double e2, double f1, double f2, double xi) {
-//      double xi(CLHEP::RandFlat::shoot());
-
+   double pl_draw(double e1, double e2, double f1, double f2) {
+      double xi(CLHEP::RandFlat::shoot());
+      
       double gamma(std::log(f2/f1)/std::log(e2/e1));
       double e1gam(std::pow(e1, 1. + gamma));
       double e2gam(std::pow(e2, 1. + gamma));
 
-      double ee(std::pow(xi*(e1gam - e2gam) + e2gam, 1./(1. + gamma)));
+      double ee(std::pow(xi*(e2gam - e1gam) + e1gam, 1./(1. + gamma)));
       return ee;
    }
 }
@@ -96,19 +96,21 @@ double FileSpectrum::flux(double time) const {
    return m_flux;
 }
 
-float FileSpectrum::operator() (float xi) {
+float FileSpectrum::operator()(float xi) {
    size_t k(std::upper_bound(m_integralSpectrum.begin(),
                              m_integralSpectrum.end(), xi) 
             - m_integralSpectrum.begin());
-   if (m_integralSpectrum.at(k-1) == 0 ||
-       m_integralSpectrum.at(k) == 0) {
-      double my_energy = (xi - m_integralSpectrum.at(k-1))
-         /(m_integralSpectrum.at(k) - m_integralSpectrum.at(k-1))
-         *(m_energies.at(k) - m_energies.at(k-1)) + m_energies.at(k-1);
-      return std::max(my_energy, 0.);
-   }
+//    if ((m_integralSpectrum.at(k-1) == 0 ||
+//         m_integralSpectrum.at(k) == 0)) {
+//       std::cout << k << "  " << m_integralSpectrum.at(k-1) << "  "
+//                 << m_integralSpectrum.at(k) << std::endl;
+//       double my_energy = (xi - m_integralSpectrum.at(k-1))
+//          /(m_integralSpectrum.at(k) - m_integralSpectrum.at(k-1))
+//          *(m_energies.at(k) - m_energies.at(k-1)) + m_energies.at(k-1);
+//       return std::max(my_energy, 0.);
+//    }
    return ::pl_draw(m_energies.at(k-1), m_energies.at(k),
-                    m_dnde.at(k-1), m_dnde.at(k), xi);
+                    m_dnde.at(k-1), m_dnde.at(k));
 }
 
 std::string FileSpectrum::title() const {
@@ -134,6 +136,13 @@ double FileSpectrum::read_file(const std::string & infile) {
       if (tokens.size() < 2) {
          std::ostringstream message;
          message << "FileSpectrum: poorly formatted column in input file: "
+                 << infile;
+         throw std::runtime_error(message.str());
+      }
+      if (std::atof(tokens.at(1).c_str()) == 0) {
+         std::ostringstream message;
+         message << "Cannot have zero valued dN/dE entries in "
+                 << "FileSpectrum input file "
                  << infile;
          throw std::runtime_error(message.str());
       }
@@ -192,6 +201,5 @@ double FileSpectrum::compute_integral_dist() {
    for (size_t k = 0; k < m_integralSpectrum.size(); k++) {
       m_integralSpectrum.at(k) /= total_flux;
    }
-
    return total_flux;
 }
