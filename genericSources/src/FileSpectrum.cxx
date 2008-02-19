@@ -100,15 +100,6 @@ float FileSpectrum::operator()(float xi) {
    size_t k(std::upper_bound(m_integralSpectrum.begin(),
                              m_integralSpectrum.end(), xi) 
             - m_integralSpectrum.begin());
-//    if ((m_integralSpectrum.at(k-1) == 0 ||
-//         m_integralSpectrum.at(k) == 0)) {
-//       std::cout << k << "  " << m_integralSpectrum.at(k-1) << "  "
-//                 << m_integralSpectrum.at(k) << std::endl;
-//       double my_energy = (xi - m_integralSpectrum.at(k-1))
-//          /(m_integralSpectrum.at(k) - m_integralSpectrum.at(k-1))
-//          *(m_energies.at(k) - m_energies.at(k-1)) + m_energies.at(k-1);
-//       return std::max(my_energy, 0.);
-//    }
    return ::pl_draw(m_energies.at(k-1), m_energies.at(k),
                     m_dnde.at(k-1), m_dnde.at(k));
 }
