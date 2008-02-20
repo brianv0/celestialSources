@@ -1,3 +1,4 @@
+#$Id$
 def generate(env, **kw):
     env.Tool('addLibrary', library = ['GRB'], package = 'celestialSources/GRB')
     env.Tool('fluxLib')
