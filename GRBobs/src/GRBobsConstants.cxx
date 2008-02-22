@@ -118,6 +118,7 @@ void GRBobsParameters::GenerateParameters()
     m_RD = rnd->Gaus(0.4,0.1);
   
   m_Peakedness        = Peakedness;
+
   while (Peakedness==0) 
     m_Peakedness = pow(10.0,rnd->Gaus(0.16,0.3));
   
@@ -132,7 +133,34 @@ void GRBobsParameters::GenerateParameters()
   
   m_decayTime         = 1.00/(1.0+m_RD) / pow(log10(2.0),1./m_Peakedness) * m_FWHM;
   m_riseTime          = m_RD/(1.0+m_RD) / pow(log10(2.0),1./m_Peakedness) * m_FWHM;
+
+  m_peaktime          = pow(log(100.0),1./m_Peakedness) * m_riseTime; //this sets the tstart =0
+
   m_pulseHeight       = rnd->Uniform();
+  if(m_Epeak == 0 )
+    {  
+      m_Epeak             =  pow(10.,rnd->Gaus(log10(235.0),log10(1.75))); //Short
+      if(m_Type==2 && m_NormType=='P') m_Epeak/=m_Stretch; //Long
+    }
+}
+
+void GRBobsParameters::GenerateSinglePulse()
+{
+  m_Peakedness        = Peakedness;  
+  
+  while (Peakedness==0) 
+    m_Peakedness = pow(10.0,rnd->Gaus(0.16,0.3));
+  
+  double scaledDuration=m_duration/(pow(log(100),1.0/m_Peakedness));
+  
+  m_decayTime         = 2./3.*scaledDuration;
+  m_riseTime          = 1./3.*scaledDuration;
+  m_peaktime          = 1./3.*m_duration;
+    
+
+  m_pulseSeparation = 0.0;
+  m_FWHM =  0.0;
+  m_pulseHeight       = 1.0;
   if(m_Epeak == 0 )
     {  
       m_Epeak             =  pow(10.,rnd->Gaus(log10(235.0),log10(1.75))); //Short

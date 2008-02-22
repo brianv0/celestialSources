@@ -712,6 +712,8 @@ void MakeGRB(int NGRB=1, double enph=0, bool gbm=false)
     }
   char GRBname[100];
   sprintf(GRBname,"%d",(int) params->GetGRBNumber());
+  
+
   if (gbm)  m_grb->GetGBMFlux(GRBname);
 
   delete m_grb;

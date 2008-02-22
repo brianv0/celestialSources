@@ -6,6 +6,7 @@
 #include "TCanvas.h"
 #include "TPad.h"
 #include "TStyle.h"
+#include "TMath.h"
 #include <iostream>
 #include <iomanip>
 #include <vector>
@@ -143,7 +144,7 @@ std::vector<point*> GetBurstPositions(int N=1000)
       
       bursts_positions.push_back(a_position);
     }
-  for (unsigned i=0;i<S;i++)
+  for (unsigned int i=0;i<S;i++)
     {
       long sim_time = (pointings[i])->get_time();
       
@@ -155,10 +156,10 @@ std::vector<point*> GetBurstPositions(int N=1000)
       //std::cout<<bursts_positions[ti]->get_time()<<", l= "<<bursts_positions[ti]->get_l()<<",b= "<<bursts_positions[ti]->get_b()<<std::endl;
     }
   delete rnd_2;
-  for (unsigned i=0;i<S;i++) delete pointings[i];
+  for (unsigned int i=0;i<S;i++) delete pointings[i];
   std::cout<<" -------------------------------------------------- "<<std::endl;
   std::cout<<"                 Final positions:                   "<<std::endl;
-  for(unsigned i=0;i<bursts_positions.size();i++) 
+  for(unsigned int i=0;i<bursts_positions.size();i++) 
     {
       std::cout<<i<<" "<<bursts_positions[i]->get_time()<<", l= "<<bursts_positions[i]->get_l()<<",b= "<<bursts_positions[i]->get_b();
       if(bursts_positions[i]->is_ARR())std::cout<< "<-- this is a repoint!";
@@ -326,10 +327,10 @@ void GenerateXMLLibrary(int Nbursts=1000)
   double theta = 45.0;
   double phi   = 0.0;
   
-  double alpha0 = 10.0;  //  -3<= a < 1.0 
-  double beta0  = 10.0;   //   b < a && b < -1 
-  double alpha_min = -2.5;  //  -3<= a < 1.0 
-  double alpha_max = 0.5;   //   -3<= a < 1.0 
+  double alpha0 = 10.0;  //  -2< a < 1.0 
+  double beta0  = 10.0;   //   b < a && b < -1.2 
+  double alpha_min = -2.0;  //  -2< a < 0.5 
+  double alpha_max = 0.5;   //   -2< a < 0.5 
   double beta_max = -1.2;   //   b < a && b < -2 
   double beta_min = -7.2;// -4.0;   //   b < a && b < -2 
   
@@ -643,13 +644,13 @@ void GenerateXMLLibrary(int Nbursts=1000)
       
       if(JayDistributions)
 	{
-	  while (alpha < alpha_min || alpha > alpha_max) alpha = AlphaHisto->GetRandom();
-	  while(beta >= alpha || beta >= beta_max || beta < my_beta_min) beta = BetaHisto->GetRandom();
+	  while (alpha <= alpha_min || alpha >= alpha_max) alpha = AlphaHisto->GetRandom();
+	  while(beta >= alpha || beta >= beta_max || beta <= my_beta_min) beta = BetaHisto->GetRandom();
 	}
       else
 	{
-	  while (alpha < alpha_min || alpha > alpha_max) alpha = rnd->Gaus(-1.0,0.4);
-	  while(beta >= alpha || beta >= beta_max || beta < my_beta_min) beta = rnd->Gaus(-2.25,0.4);
+	  while (alpha <= alpha_min || alpha >= alpha_max) alpha = rnd->Gaus(-1.0,0.4);
+	  while(beta >= alpha || beta >= beta_max || beta <= my_beta_min) beta = rnd->Gaus(-2.25,0.4);
 	  
 	}
       

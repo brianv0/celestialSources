@@ -27,13 +27,35 @@ double GRBobsengine::generatePulses(std::vector<GRBobsPulse*> &thePulses, double
   GRBobsPulse *aPulse;
   int npulses=0;
   
+  //////////////////////////////////////////////////
+  // Single pulse
+  if(::getenv("GRBOBS_SINGLEPULSE"))
+    {
+      m_params->GenerateSinglePulse();
+      pt  = m_params->GetPeakTime();
+      aPulse = new GRBobsPulse(pt,m_params);
+      if(DEBUG) {
+	m_params->PrintParameters();
+	aPulse->Print();
+      }
+      
+      thePulses.push_back(aPulse);
+      BurstEndTime = aPulse->GetEndTime();
+      if(DEBUG) 
+	{
+	  std::cout<<"================================================== "<<std::endl;
+	  std::cout<<BurstEndTime<<" "<<duration<<std::endl;
+	  std::cout<<"================================================== "<<std::endl;
+	}
+      return BurstEndTime;
+    }
   while(endTime<duration || npulses==0)
     {
       m_params->GenerateParameters();
       tau = m_params->GetPulseSeparation();
-
+      
       if (npulses==0) 
-	pt  = pow(log(100.0),1./m_params->GetPeakedness()) * m_params->GetRiseTime(); //this sets the tstart =0
+	pt  = m_params->GetPeakTime(); //this sets the tstart =0
       else 
 	pt=pt1+tau; 
       
@@ -44,7 +66,7 @@ double GRBobsengine::generatePulses(std::vector<GRBobsPulse*> &thePulses, double
 	  m_params->PrintParameters();
 	  aPulse->Print();
 	}
-
+      
       endTime = aPulse->GetEndTime();
       
       if(endTime <= duration) 

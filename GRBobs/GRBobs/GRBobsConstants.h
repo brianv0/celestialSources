@@ -206,6 +206,8 @@ class GRBobsParameters
 
   inline  double GetDecayTime()      {return m_decayTime;}
 
+  inline  double GetPeakTime()       {return m_peaktime;}
+
   inline  double GetPulseHeight()    {return m_pulseHeight;}
 
   inline  double GetPulseSeparation(){return m_pulseSeparation;}
@@ -392,6 +394,11 @@ class GRBobsParameters
 
   void GenerateParameters();
 
+  /*!
+    When it is called, It generate 1 single pulse.
+  */
+  
+  void GenerateSinglePulse();
   
 
   /// Read parameters from the parameter file. Each line correspond to a GRB parameters set. 
@@ -446,7 +453,7 @@ class GRBobsParameters
 
   double m_duration;
 
-  double m_RD,m_riseTime,m_decayTime;
+  double m_RD,m_riseTime,m_decayTime,m_peaktime;
 
   double m_pulseHeight;
 

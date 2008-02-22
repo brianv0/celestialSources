@@ -107,6 +107,7 @@ class GRBobsmanager : public Spectrum
   //  bool m_grbocculted;
   //  bool m_inSAA;
   bool m_GenerateGBMOutputs;
+  bool m_GenerateOUTPUT;
 
   double m_l;
   double m_b;

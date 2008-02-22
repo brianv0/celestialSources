@@ -55,7 +55,7 @@ void flux_load()
   GRBobsmanagerFactory();
 }
 
-void galacticTest(FluxMgr* fm, std::string sourceName)
+void galacticTest(FluxMgr* fm, std::string sourceName, double tstart=0, double tend=1e8)
 {
   TTree tree("Events","Events");
   double energy;
@@ -73,14 +73,16 @@ void galacticTest(FluxMgr* fm, std::string sourceName)
   using astro::GPS;
   EventSource* e = fm->source(sourceName);
   time=fm->time();
+  std::cout<<time<<std::endl;
+  time=tstart;
   EventSource* f;
   double lavg=0,bavg=0;
   int i=0;
   double interval=0.0;
   while (time<1e8)
     {
-      f = e->event(time);
-      interval=e->interval(time);
+      f        = e->event(time);
+      interval = e->interval(time);
       //here we increment the "elapsed" time and the "orbital" time,
       //just as is done in flux.  NOTE: this is important for the operation 
       //of fluxsource, and is expected.
@@ -125,6 +127,7 @@ int main(int argn, char * argc[]) {
   flux_load();
   
   int count = default_count;
+  double tstart=0.0;
   std::string source_name(default_source);
   
   //TESTING MULTIPLE XML INPUT
@@ -143,12 +146,17 @@ int main(int argn, char * argc[]) {
   //    fm.addFactory("seantest", sean );
   //End Test
   
+  
+
   if ( argn >1 ) source_name = argc[1];
   if( source_name =="help") { help(); return 0; }
   if( source_name =="list") { 
     listSources(fm.sourceList());
     listSpectra(); return 0; }
-  if ( argn >2 ) count = ::atoi(argc[2]);
+  if ( argn >2 ) 
+    count = ::atoi(argc[2]);
+  if ( argn >3 ) 
+    tstart = ::atof(argc[3]);
   
   cout << "------------------------------------------------------" << endl;
   cout << " Flux test program: type 'help' for help" << endl;
@@ -175,7 +183,7 @@ int main(int argn, char * argc[]) {
   std::list<std::string>::iterator abc;
   if(argn != 1){
     //    fm.test(std::cout, source_name, count);
-    galacticTest(&fm,source_name);
+    galacticTest(&fm,source_name,tstart);
     return 0;
   }
   std::string testfilename("test_GRB.out");

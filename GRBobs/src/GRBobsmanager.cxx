@@ -75,8 +75,9 @@ GRBobsmanager::GRBobsmanager(const std::string& params)
   //  Field Of View for generating bursts degrees above the XY plane.
   const double FOV = -100;
   if(FOV>-90) std::cout<<"WARNING!! GRBobs: FOV = "<<FOV<<std::endl;
-
+  
   m_GenerateGBMOutputs = false;
+  m_GenerateOUTPUT=true;
   //  facilities::Util::expandEnvVar(&paramFile);  
   m_l     = -200.0;
   m_b     = -200.0;
@@ -146,7 +147,8 @@ GRBobsmanager::GRBobsmanager(const std::string& params)
       m_essc_esyn       = parmap.value("essc_esyn");
       m_fssc_fsyn       = parmap.value("Fssc_Fsyn");
       
-      if(parmap.value("GBM")!=0) m_GenerateGBMOutputs = true;
+      if(parmap.value("GBM")!=0) 
+	m_GenerateGBMOutputs = true;
 
       m_LATphotons     = parmap.value("EC_NLAT");
       m_EC_delay       = parmap.value("EC_delay");
@@ -367,43 +369,57 @@ void GRBobsmanager::GenerateGRB()
       inSAA=gps->earthpos().insideSAA();
     }
 
-  if(m_GenerateGBMOutputs && !inSAA)
+  if(m_GenerateGBMOutputs && !inSAA && m_GenerateOUTPUT)
     {
       m_GRB->SaveGBMDefinition(GRBname,m_ra,m_dec,m_theta,m_phi,m_Rest);
       m_GRB->GetGBMFlux(GRBname);
     }
+  if(m_GenerateOUTPUT)
+    {
+      string name = "GRBOBS_";
+      name+=GRBname; 
+      name+="_PAR.txt";
+      //..................................................//
+      ofstream os(name.c_str(),ios::out);  
+      os<<"  GRBName = "<<setw(9)<<GRBname<<endl;
+      os<<"  Seed = "<<m_GRBnumber-65540<<endl;
+      os<<" TStart = " <<setw(13)<<setprecision(10)<<m_startTime<<endl;
+      os<<" TEnd = " <<setw(13)<<m_GRBend<<endl;
+      os<<" L = "<<setprecision(4)<<setw(8)<<m_l<<endl;
+      os<<" B = "<<setw(8)<<m_b<<endl;
+      os<<" Ra = "<<setw(8)<<m_ra<<endl;
+      os<<" Dec = "<<setw(8)<<m_dec<<endl;
+      os<<" Theta = "<<setw(8)<<m_theta<<endl;
+      os<<" Phi = "<<setw(8)<<m_phi<<endl;
+      os<<" Redshift = "<<setw(8)<<m_z<<endl;
+      os<<" Fluence = "<<setw(8)<<Fluence<<endl;
+      os<<" PeakFlux = "<<setw(8)<<PeakFlux<<endl;
+      os<<" Alpha = "<<setw(8)<<m_alpha<<endl;
+      os<<" Beta = "<<setw(8)<<m_beta<<endl;
+      os<<" Epeak = "<<setw(8)<<m_epeak<<endl;
+      os<<" Essc = "<<setw(8)<<m_essc_esyn<<endl;
+      os<<" Fssc = "<<setw(8)<<m_fssc_fsyn<<endl;
+      os<<" Eco = "<<setw(8)<<m_CutOffEnergy<<endl;
+      os<<" NLAT = "<<setw(8)<<m_LATphotons <<endl;
+      os<<" Delay = "<<setw(8)<<m_EC_delay<<endl;
+      os<<" EC_duration = "<<setw(8)<<m_EC_duration<<endl;
+      os<<" inSAA ="<<setw(8)<<inSAA<<endl;
+      if(::getenv("GRBOBS_SINGLEPULSE"))
+	os<<" SinglePulse = 1"<<std::endl;
+      else
+	os<<" SinglePulse = 0"<<std::endl;
+      
+      if(::getenv("GRBOBS_DISABLE_SPECEVOL"))
+	os<<" DISABLE_SPECEVOL = 1"<<std::endl;
+      else
+	os<<" DISABLE_SPECEVOL = 0"<<std::endl;
+      
+      os.close();  
+      cout<<"GRB"<<GRBname<<" ("<<m_GRBnumber-65540<<")";
+    }
+  else 
+    cout<<"GRB"<<GRBname<<" ("<<m_GRBnumber-65540<<") output already generated in previous runs.";
 
-  string name = "GRBOBS_";
-  name+=GRBname; 
-  name+="_PAR.txt";
-  //..................................................//
-  ofstream os(name.c_str(),ios::out);  
-  os<<"  GRBName = "<<setw(9)<<GRBname<<endl;
-  os<<"  Seed = "<<m_GRBnumber-65540<<endl;
-  os<<" TStart = " <<setw(13)<<setprecision(10)<<m_startTime<<endl;
-  os<<" TEnd = " <<setw(13)<<m_GRBend<<endl;
-  os<<" L = "<<setprecision(4)<<setw(8)<<m_l<<endl;
-  os<<" B = "<<setw(8)<<m_b<<endl;
-  os<<" Ra = "<<setw(8)<<m_ra<<endl;
-  os<<" Dec = "<<setw(8)<<m_dec<<endl;
-  os<<" Theta = "<<setw(8)<<m_theta<<endl;
-  os<<" Phi = "<<setw(8)<<m_phi<<endl;
-  os<<" Redshift = "<<setw(8)<<m_z<<endl;
-  os<<" Fluence = "<<setw(8)<<Fluence<<endl;
-  os<<" PeakFlux = "<<setw(8)<<PeakFlux<<endl;
-  os<<" Alpha = "<<setw(8)<<m_alpha<<endl;
-  os<<" Beta = "<<setw(8)<<m_beta<<endl;
-  os<<" Epeak = "<<setw(8)<<m_epeak<<endl;
-  os<<" Essc = "<<setw(8)<<m_essc_esyn<<endl;
-  os<<" Fssc = "<<setw(8)<<m_fssc_fsyn<<endl;
-  os<<" Eco = "<<setw(8)<<m_CutOffEnergy<<endl;
-  os<<" NLAT = "<<setw(8)<<m_LATphotons <<endl;
-  os<<" Delay = "<<setw(8)<<m_EC_delay<<endl;
-  os<<" EC_duration = "<<setw(8)<<m_EC_duration<<endl;
-  os<<" inSAA ="<<setw(8)<<inSAA<<endl;
-  os.close();  
-
-  cout<<"GRB"<<GRBname<<" ("<<m_GRBnumber-65540<<")";
   if( m_z >0)  cout<<" redshift = "<<m_z;
   cout<<setprecision(10)<<" t start "<<m_startTime<<", tend "<<m_endTime;
   cout<<" l,b = "<<m_l<<", "<<m_b<<" elevation,phi(deg) = "<<m_theta<<", "<<m_phi;
@@ -452,6 +468,9 @@ double GRBobsmanager::flux(double time) const
     }
   else 
     {
+      if(time > m_startTime+1.0) 
+	const_cast<GRBobsmanager*>(this)->m_GenerateOUTPUT=false;
+      
       if(!m_grbGenerated) const_cast<GRBobsmanager*>(this)->GenerateGRB();
       flux   = PromptEmission->flux(time,m_MinPhotonEnergy);
       if(m_LATphotons>0) flux  += AfterGlowEmission->flux(time,m_MinPhotonEnergy);
@@ -476,6 +495,9 @@ double GRBobsmanager::interval(double time)
     }
   else if(time<m_GRBend) //During the prompt emission
     {
+      if(time>m_startTime+1.0) 
+	m_GenerateOUTPUT = false;
+
       if(!m_grbGenerated) GenerateGRB();
       inte_prompt = PromptEmission->interval(time,m_MinPhotonEnergy);
       
