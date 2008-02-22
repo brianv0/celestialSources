@@ -151,7 +151,7 @@ void GRBobsParameters::GenerateSinglePulse()
   while (Peakedness==0) 
     m_Peakedness = pow(10.0,rnd->Gaus(0.16,0.3));
   
-  double scaledDuration=m_duration/(pow(log(100),1.0/m_Peakedness));
+  double scaledDuration=m_duration/(pow(log(100.0),1.0/m_Peakedness));
   
   m_decayTime         = 2./3.*scaledDuration;
   m_riseTime          = 1./3.*scaledDuration;
