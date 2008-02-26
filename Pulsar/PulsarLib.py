@@ -1,5 +1,6 @@
 def generate(env, **kw):
-    env.Tool('addLibrary', library = ['Pulsar'], package = 'celestialSources/Pulsar')
+    if not kw.get('depsOnly',0):
+        env.Tool('addLibrary', library = ['Pulsar'])
     env.Tool('fluxLib')
     env.Tool('SpectObjLib')
     env.Tool('astroLib')

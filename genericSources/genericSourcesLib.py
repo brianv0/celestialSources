@@ -1,5 +1,6 @@
 def generate(env, **kw):
-    env.Tool('addLibrary', library = ['genericSources', 'g2c'], package = 'celestialSources/genericSources')
+    if not kw.get('depsOnly',0):
+        env.Tool('addLibrary', library = ['genericSources'])
     env.Tool('facilitiesLib')
     env.Tool('astroLib')
     env.Tool('fluxLib')
@@ -7,6 +8,7 @@ def generate(env, **kw):
     env.Tool('addLibrary', library = env['cfitsioLibs'])
     env.Tool('addLibrary', library = env['clhepLibs'])
     env.Tool('addLibrary', library = env['rootGuiLibs'])
+    env.Tool('addLibrary', library = env['f2cLibs'])
 
 def exists(env):
     return 1

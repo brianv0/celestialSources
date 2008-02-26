@@ -1,5 +1,7 @@
+#$Id$
 def generate(env, **kw):
-    env.Tool('addLibrary', library = ['microQuasar'], packages = 'celestialSources/microQuasar')
+    if not kw.get('depsOnly',0):
+        env.Tool('addLibrary', library = ['microQuasar'])
     env.Tool('fluxLib')
     env.Tool('SpectObjLib')
     env.Tool('astroLib')

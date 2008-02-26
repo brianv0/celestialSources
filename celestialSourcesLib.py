@@ -1,5 +1,6 @@
 def generate(env, **kw):
-    env.Tool('addLibrary', library = ['celestialSources'], package = 'celestialSources')
+    if not kw.get('depsOnly',0):
+        env.Tool('addLibrary', library = ['celestialSources'], package = 'celestialSources')
     env.Tool('genericSourcesLib')
     env.Tool('SpectObjLib')
     env.Tool('GRBLib')

@@ -1,5 +1,6 @@
 def generate(env, **kw):
-    env.Tool('addLibrary', library = ['SpectObj'], package = 'celestialSources/SpectObj')
+    if not kw.get('depsOnly',0):
+        env.Tool('addLibrary', library = ['SpectObj'])
     env.Tool('eblAttenLib')
     env.Tool('addLibrary', library = env['rootLibs'])
     env.Tool('addLibrary', library = env['rootGuiLibs'])

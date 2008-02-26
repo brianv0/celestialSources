@@ -1,5 +1,6 @@
 def generate(env, **kw):
-    env.Tool('addLibrary', library = ['GRBtemplate'], package = 'celestialSources/GRBtemplate')
+    if not kw.get('depsOnly',0):
+        env.Tool('addLibrary', library = ['GRBtemplate'], package = 'celestialSources/GRBtemplate')
     env.Tool('fluxLib')
     env.Tool('astroLib')
     env.Tool('SpectObjLib')
