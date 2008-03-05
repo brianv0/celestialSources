@@ -21,6 +21,8 @@
 
 #include "microQuasar/microQuasar.h"
 
+#include "genericSources/FileSpectrum.h"
+
 #include "astro/GPS.h"
 #include "astro/PointingHistory.h"
 #include "CLHEP/Random/RandFlat.h"
@@ -35,6 +37,7 @@ microQuasar::microQuasar(const std::string &paramString)
 , m_nTurns(0)
 , m_currentSpectralIndex(2)
 , m_randPhase(0)
+, m_spectrum(0)
 {
 	float daySecs = 86400.;
 
@@ -90,6 +93,9 @@ microQuasar::microQuasar(const std::string &paramString)
 			m_jetProperties.setJetOnDurationFluct(std::atof(token[1].c_str()));
 		if(token[0]=="BURSTRANDOMSEED")
 			m_burstSeed = std::atof(token[1].c_str());
+                if(token[0]=="SPECFILE"){
+                    m_spectrum = new FileSpectrum(std::string("specFile="+token[1]));
+                }
 		curToken++;
 	} 
 
@@ -163,11 +169,16 @@ std::vector<std::string> microQuasar::tokenize(std::string params, char token){
 }
 
 float microQuasar::operator()(float xi) const {
-	double one_m_gamma = 1. - m_currentSpectralIndex;
-	double arg = xi*(pow(m_eMax, one_m_gamma) - pow(m_eMin, one_m_gamma)) 
-		+ pow(m_eMin, one_m_gamma);
-	float energy = pow(arg, 1./one_m_gamma);
-	return energy;
+    float energy(0);
+    if( m_spectrum==0){
+        double one_m_gamma = 1. - m_currentSpectralIndex;
+        double arg = xi*(pow(m_eMax, one_m_gamma) - pow(m_eMin, one_m_gamma)) 
+            + pow(m_eMin, one_m_gamma);
+        energy = pow(arg, 1./one_m_gamma);
+    }else{
+        energy = (*m_spectrum)(xi);
+    }
+    return energy;
 }
 
 double microQuasar::energy(double time) {

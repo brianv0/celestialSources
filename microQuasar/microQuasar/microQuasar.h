@@ -140,6 +140,7 @@ public:
 		float m_jetOnDurationFluctuation;
 		/// current spectral index
 
+
 	};
 protected:
 
@@ -247,6 +248,8 @@ private:
 	JetProperties m_jetProperties;
 	/// allow max two orbital regions for now
 	OrbitalRegion m_orbitalRegion;
+
+        Spectrum* m_spectrum; ///< pointer to spectrum object for the spectral function
 
 };
 
