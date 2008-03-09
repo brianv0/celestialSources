@@ -237,6 +237,7 @@ private:
 	double m_jetEnd;
 	double m_nJet;
 	double m_cycleStart;
+	int m_region;
 	// random see for burst generation
 	double m_burstSeed;
 	CLHEP::HepRandom m_randGenBurst;
@@ -249,7 +250,7 @@ private:
 	/// allow max two orbital regions for now
 	OrbitalRegion m_orbitalRegion;
 
-        Spectrum* m_spectrum; ///< pointer to spectrum object for the spectral function
+    Spectrum* m_spectrum[2]; ///< pointer to spectrum object for the spectral function - orb phase 1
 
 };
 
