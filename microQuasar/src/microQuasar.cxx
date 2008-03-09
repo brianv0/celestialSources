@@ -37,7 +37,6 @@ microQuasar::microQuasar(const std::string &paramString)
 , m_nTurns(0)
 , m_currentSpectralIndex(2)
 , m_randPhase(0)
-, m_spectrum(0)
 {
 	float daySecs = 86400.;
 
@@ -45,6 +44,9 @@ microQuasar::microQuasar(const std::string &paramString)
 
 	float specOrbital1,specOrbital2=-1;
 	float phaseOrbital1,phaseOrbital2=-1;
+
+	m_spectrum[0] = 0;
+	m_spectrum[1] = 0;
 
 	// allow bursts to be off by default
 
@@ -93,9 +95,14 @@ microQuasar::microQuasar(const std::string &paramString)
 			m_jetProperties.setJetOnDurationFluct(std::atof(token[1].c_str()));
 		if(token[0]=="BURSTRANDOMSEED")
 			m_burstSeed = std::atof(token[1].c_str());
-                if(token[0]=="SPECFILE"){
-                    m_spectrum = new FileSpectrum(std::string("specFile="+token[1]));
-                }
+		if(token[0]=="SPECFILE1") {
+			std::string sp1File = std::string("specFile="+token[1]);
+            m_spectrum[0] = new FileSpectrum(sp1File);
+		}
+		if(token[0]=="SPECFILE2") {
+			std::string sp2File = std::string("specFile="+token[1]);
+            m_spectrum[1] = new FileSpectrum(sp2File);
+		}        
 		curToken++;
 	} 
 
@@ -169,22 +176,25 @@ std::vector<std::string> microQuasar::tokenize(std::string params, char token){
 }
 
 float microQuasar::operator()(float xi) const {
-    float energy(0);
-    if( m_spectrum==0){
-        double one_m_gamma = 1. - m_currentSpectralIndex;
-        double arg = xi*(pow(m_eMax, one_m_gamma) - pow(m_eMin, one_m_gamma)) 
-            + pow(m_eMin, one_m_gamma);
-        energy = pow(arg, 1./one_m_gamma);
-    }else{
-        energy = (*m_spectrum)(xi);
-    }
-    return energy;
+	float energy(0);
+	if( m_spectrum[m_region]==0){
+		if ( m_currentSpectralIndex != -999.) {
+			double one_m_gamma = 1. - m_currentSpectralIndex;
+			double arg = xi*(pow(m_eMax, one_m_gamma) - pow(m_eMin, one_m_gamma)) 
+				+ pow(m_eMin, one_m_gamma);
+			energy = pow(arg, 1./one_m_gamma);
+		}
+	}
+	else{
+		energy = (*m_spectrum[m_region])(xi);
+	}
+	return energy;
 }
 
 double microQuasar::energy(double time) {
 
-	int region = m_orbitalRegion.findRegion(time,m_orbitalPeriod);
-	m_currentSpectralIndex = m_orbitalRegion.getSpectralIndex(region);
+	m_region = m_orbitalRegion.findRegion(time,m_orbitalPeriod);
+	m_currentSpectralIndex = m_orbitalRegion.getSpectralIndex(m_region);
 	double xi = CLHEP::RandFlat::shoot();
 	return (*this)(xi);
 }
