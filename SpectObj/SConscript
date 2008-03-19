@@ -7,4 +7,4 @@ libEnv = baseEnv.Clone()
 libEnv.Tool('SpectObjLib', depsOnly = 1)
 SpectObjLib = libEnv.StaticLibrary('SpectObj', listFiles(['src/*.cxx']))
 
-progEnv.Tool('registerObjects', package = 'SpectObj', libraries = [SpectObjLib], includes = listFiles(['SpectObj/*.h']))
+progEnv.Tool('registerObjects', package = 'SpectObj', libraries = [SpectObjLib], includes = listFiles(['SpectObj/*.h']), data = listFiles(['data/*'], recursive = True))

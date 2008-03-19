@@ -21,4 +21,5 @@ test_genericSourcesBin = progEnv.Program('test_genericSources',
 progEnv.Tool('registerObjects', package='genericSources', 
              libraries=[genericSourcesLib],
              includes=listFiles(['genericSources/*.h']),
-             testApps=[test_genericSourcesBin])
+             testApps=[test_genericSourcesBin],
+             data = listFiles(['data/*'], recursive = True))

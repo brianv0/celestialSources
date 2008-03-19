@@ -10,4 +10,4 @@ GRBLib = libEnv.StaticLibrary('GRB', listFiles(['src/GRB/*.cxx', 'src/*.cxx']))
 progEnv.Tool('GRBLib')
 test_GRBROOTBin = progEnv.Program('test_GRBROOT', listFiles(['src/test/other/GRBROOTtest.cxx']))
 
-progEnv.Tool('registerObjects', package = 'GRB', libraries = [GRBLib], testApps = [test_GRBROOTBin])
+progEnv.Tool('registerObjects', package = 'GRB', libraries = [GRBLib], testApps = [test_GRBROOTBin], data = listFiles(['data/*'], recursive = True))
