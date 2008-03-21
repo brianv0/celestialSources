@@ -12,4 +12,4 @@ test_GRBobsBin = progEnv.Program('test_GRBobs', 'src/test/testGRB.cxx')
 test_GRBobsROOTBin = progEnv.Program('test_GRBobsROOT', 'src/test/other/GRBROOTtest.cxx')
 
 progEnv.Tool('registerObjects', package = 'GRBobs', libraries = [GRBobsLib], testApps = [test_GRBobsBin, test_GRBobsROOTBin], includes = listFiles(['GRBobs/*.h']),
-             data = listFiles(['data/*'], recursive = True))
+             data = listFiles(['data/*'], recursive = True), xml = listFiles(['xml/*'], recursive = True))

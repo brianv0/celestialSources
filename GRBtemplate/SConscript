@@ -12,4 +12,4 @@ test_GRBtemplateBin = progEnv.Program('test_GRBtemplate', 'src/test/testGRB.cxx'
 test_GRBTEMPLATEROOTBin = progEnv.Program('test_GRBTEMPLATEROOT', 'src/test/other/GRBROOTtest.cxx')
 
 progEnv.Tool('registerObjects', package = 'GRBtemplate', libraries = [GRBtemplateLib], testApps = [test_GRBtemplateBin, test_GRBTEMPLATEROOTBin],
-             includes = listFiles(['GRBtemplate/*.h']), data = listFiles(['data/*'], recursive = True))
+             includes = listFiles(['GRBtemplate/*.h']), data = listFiles(['data/*'], recursive = True), xml = listFiles(['xml/*'], recursive = True))

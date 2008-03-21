@@ -22,4 +22,5 @@ progEnv.Tool('registerObjects', package='genericSources',
              libraries=[genericSourcesLib],
              includes=listFiles(['genericSources/*.h']),
              testApps=[test_genericSourcesBin],
-             data = listFiles(['data/*'], recursive = True))
+             data = listFiles(['data/*'], recursive = True),
+             xml = listFiles(['xml/*'], recursive = True))
