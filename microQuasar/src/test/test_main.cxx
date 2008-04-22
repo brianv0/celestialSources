@@ -56,7 +56,7 @@ int main(int argn, char * argc[]) {
 
         // set up the flux manager, adding in our xml description
         std::vector<std::string> fileList;
-        fileList.push_back("$(FLUX_XML)/source_library.xml");
+        fileList.push_back(facilities::commonUtilities::joinPath(facilities::commonUtilities::getXmlPath("flux"),"source_library.xml"));
         fileList.push_back(xml_spec);
         FluxMgr fm(fileList);
 
