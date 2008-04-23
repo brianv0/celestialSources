@@ -4,6 +4,7 @@
 
   @verbatim
   $Id$ 
+   23-apr-08 v3r3p2    JCT   compliant with 64bits machines
    22-feb-08 v3r3p1    NO    Compatibility with windoz fixed
    22-feb-08 v3r3      NO    Add also a falg to generate single pulse GRBs
 			     Disable the generation of the output if already generated (1sec)

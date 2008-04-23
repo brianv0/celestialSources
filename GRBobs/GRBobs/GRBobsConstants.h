@@ -242,7 +242,7 @@ class GRBobsParameters
 
       std::ostringstream my_name;
 
-      my_name << reinterpret_cast<int> (ptr);
+      my_name << reinterpret_cast<long> (ptr);
 
       name = my_name.str();
 
