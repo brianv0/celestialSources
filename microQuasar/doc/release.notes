@@ -6,6 +6,7 @@
  * Coordinators: R.Dubois
     EOH
 
+   v1r4p1 23-Apr-2008 Navid   Use commonUtilties functions instead of $FLUX_XML
    v1r4   9-Mar-2008  richard include FileSpectrum to apply fitted spectra
    v1r3p1   31-Dec-2007  richard fix setting of spectral index vs orbital phase
    v1r0p9   1-Jun-2007  richard don't access pointing history if no bursts
