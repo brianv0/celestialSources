@@ -12,7 +12,8 @@
 
 #include <vector>
 
-#include "flux/Spectrum.h"
+//#include "flux/Spectrum.h"
+#include "genericSources/FileSpectrum.h"
 #include "CLHEP/Random/Random.h"
 
 /**
@@ -250,7 +251,7 @@ private:
 	/// allow max two orbital regions for now
 	OrbitalRegion m_orbitalRegion;
 
-    Spectrum* m_spectrum[2]; ///< pointer to spectrum object for the spectral function - orb phase 1
+	FileSpectrum* m_spectrum[2]; ///< pointer to spectrum object for the spectral function - orb phase 1
 
 };
 
