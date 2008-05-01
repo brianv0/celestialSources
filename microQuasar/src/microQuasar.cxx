@@ -150,7 +150,7 @@ microQuasar::microQuasar(const std::string &paramString)
 
 	m_jetStart = 0.;
 
-	std::cerr << "microQuasar created. Total flux = " 
+	std::cerr << "MicroQuasar created. Total flux = " 
 		<< m_ftot << " m^-2 s^-1 " << " between " 
 		<< m_eMin << " MeV and "
 		<< m_eMax << " MeV." << std::endl;
@@ -176,9 +176,10 @@ std::vector<std::string> microQuasar::tokenize(std::string params, char token){
 }
 
 float microQuasar::operator()(float xi) const {
-	float energy(0);
+	float energy(1.);
 	if( m_spectrum[m_region]==0){
 		if ( m_currentSpectralIndex != -999.) {
+
 			double one_m_gamma = 1. - m_currentSpectralIndex;
 			double arg = xi*(pow(m_eMax, one_m_gamma) - pow(m_eMin, one_m_gamma)) 
 				+ pow(m_eMin, one_m_gamma);
@@ -195,7 +196,7 @@ double microQuasar::energy(double time) {
 
 	m_region = m_orbitalRegion.findRegion(time,m_orbitalPeriod);
 	m_currentSpectralIndex = m_orbitalRegion.getSpectralIndex(m_region);
-	double xi = CLHEP::RandFlat::shoot();
+	float xi = CLHEP::RandFlat::shoot();
 	return (*this)(xi);
 }
 
