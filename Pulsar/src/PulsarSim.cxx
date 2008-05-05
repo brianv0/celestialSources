@@ -10,7 +10,6 @@
 
 #define DEBUG 0
 #define SAVETIMEPROFILE 0
-#define SAVENV 0
 
 using namespace cst;
 
@@ -41,8 +40,8 @@ PulsarSim::PulsarSim(std::string name, int seed, double flux, double enphmin, do
  * \param par0 Number of peaks(1) : 1 - Only one peak;
  *                                  2 - Two peaks;
  *                                  3 - LightCurve from an user-defined Time Profile txt file (1)
- * \param par1 Parameter E0 expressed in GeV;
- * \param par2 Parameter En expressed in GeV;
+ * \param par1 Parameter En expressed in GeV;
+ * \param par2 Parameter E0 expressed in GeV;
  * \param par3 Parameter g ;
  * \param par4 Parameter b ;
  *
@@ -326,7 +325,7 @@ TH2D* PulsarSim::PSRPhenom(double par0, double par1, double par2, double par3, d
   delete nph;
   delete[] e;
   
-  if (SAVENV)
+  if (::getenv("PULSAR_OUT_NV"))
     {
       SaveNv(m_Nv); // ph/m2/s/keV
     }
@@ -435,7 +434,7 @@ TH2D* PulsarSim::PSRShape(std::string ModelShapeName, int NormalizeFlux)
   PulsarLogSim.close();
 
   //Save output if flags are enabled
-  if (SAVENV)
+  if (::getenv("PULSAR_OUT_NV"))
     {
       SaveNv(m_Nv); // ph/m2/s/keV
     }
