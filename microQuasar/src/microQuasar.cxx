@@ -40,7 +40,7 @@ microQuasar::microQuasar(const std::string &paramString)
 {
 	float daySecs = 86400.;
 
-	m_burstSeed = 124556789.;  // default see for burst generation
+//	m_burstSeed = 124556789.;  // default see for burst generation
 
 	float specOrbital1,specOrbital2=-1;
 	float phaseOrbital1,phaseOrbital2=-1;
@@ -93,8 +93,8 @@ microQuasar::microQuasar(const std::string &paramString)
 			m_jetProperties.setJetOnDuration(std::atof(token[1].c_str()));
 		if(token[0]=="JETONDURATIONFLUCTUATION")
 			m_jetProperties.setJetOnDurationFluct(std::atof(token[1].c_str()));
-		if(token[0]=="BURSTRANDOMSEED")
-			m_burstSeed = std::atof(token[1].c_str());
+//		if(token[0]=="BURSTRANDOMSEED")
+//			m_burstSeed = std::atof(token[1].c_str());
 		if(token[0]=="SPECFILE1") {
 			std::string sp1File = std::string("specFile="+token[1]);
             m_spectrum[0] = new FileSpectrum(sp1File);
@@ -116,7 +116,7 @@ microQuasar::microQuasar(const std::string &paramString)
 		m_orbitalRegion.setOrbitalPhase(phaseOrbital1, phaseOrbital2);
 	}
 
-	m_randGenBurst.setTheSeed(m_burstSeed);
+//	m_randGenBurst.setTheSeed(m_burstSeed);  // uh-oh - sets the seed for everyone!
 
 	double time = 0.;
 	burstPairs burstTimes;
@@ -271,6 +271,11 @@ double microQuasar::interval(double current_time) {
 
 	double dT = m_currentTime - fTime + deltaT;
 	//	std::cout << "input t (d) " << fTime/daySecs << " interval (sec) " << dT << std::endl;
+
+	if (dT <= 0.) {
+		std::cout << "Zero or negative interval generated! " << dT << std::endl;
+	}
+
 	return dT;
 }
 
