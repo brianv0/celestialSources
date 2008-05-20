@@ -240,7 +240,7 @@ private:
 	double m_cycleStart;
 	int m_region;
 	// random see for burst generation
-	double m_burstSeed;
+//	double m_burstSeed;  // bad idea!
 	CLHEP::HepRandom m_randGenBurst;
 	std::vector<burstPairs > m_bursts;
 
