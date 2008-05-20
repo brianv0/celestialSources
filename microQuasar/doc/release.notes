@@ -6,6 +6,7 @@
  * Coordinators: R.Dubois
     EOH
 
+   v1r4p2   20-May-2008  richard remove setting random seed; flag interval <=0
    v1r4p1 23-Apr-2008 Navid   Use commonUtilties functions instead of $FLUX_XML
    v1r4   9-Mar-2008  richard include FileSpectrum to apply fitted spectra
    v1r3p1   31-Dec-2007  richard fix setting of spectral index vs orbital phase
