@@ -5,6 +5,7 @@
   @verbatim
   $Id$
 
+  22-May-08 v1r11p2 JC    bug fix for short time intervals in FitsTransient
   19-Feb-08 v1r11p1 JC    remove zero-valued dN/dE entries in data/dm120gev.dat
   19-Feb-08 v1r11   JC    FileSpectrum bug-fix for random deviate
                           reuse in operator()(float) and ::pl_draw(...)
