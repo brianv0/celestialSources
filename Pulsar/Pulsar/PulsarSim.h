@@ -90,6 +90,9 @@ class PulsarSim
   //!Random seed
   int m_seed;
 
+  //! PULSARDATA directory
+  std::string m_pulsardata_dir;
+
   //!Outpur 2D ROOT histogram
   TH2D *m_Nv;
 };

@@ -168,6 +168,9 @@ class PulsarSpectrum : public Spectrum
 
   //! Name of file containing shape spectrum for model PSRShape
   std::string m_PSRShapeName;
+
+  //! PULSARDATA directory
+  std::string m_pulsardata_dir;
   
   bool m_ff;
 

@@ -33,6 +33,30 @@ PulsarSim::PulsarSim(std::string name, int seed, double flux, double enphmin, do
   m_period  = period;    //s
   m_Tbin = Tbin;         //If a template is specified, m_Tbin depends upon the the bins contained in it.
 
+  //look for pulsar data directory, following, in the order $PULSARDATA, $SKYMODEL_DIR/pulsars or $PULSARROOT/data
+  //  std::string m_pulsardata_dir;
+  
+  if (::getenv("PULSARDATA"))
+    {
+      const char * psrdata = ::getenv("PULSARDATA");
+      m_pulsardata_dir = std::string(psrdata);
+    }
+  else if (::getenv("SKYMODEL_DIR"))
+    {
+      const char * psrdata = ::getenv("SKYMODEL_DIR");
+      m_pulsardata_dir =  std::string(psrdata)+"/pulsars";
+    }
+  else
+    {
+      const char * psrdata = ::getenv("PULSARROOT");
+      m_pulsardata_dir =  std::string(psrdata)+"/data";
+    }
+
+  if (DEBUG)
+    {
+      std::cout << "PULSARDATA used is: "<< m_pulsardata_dir << std::endl;
+    }
+
 }
 
 //////////////////////////////////////////////////
@@ -229,11 +253,11 @@ TH2D* PulsarSim::PSRPhenom(double par0, double par1, double par2, double par3, d
     {
 
       //Look for NAMETimeProfile.txt in the data directory...
-      std::string TimeProfileFileName = facilities::commonUtilities::joinPath(facilities::commonUtilities::getDataPath("Pulsar"), m_name+"TimeProfile.txt");
-      const char * gleam = ::getenv("PULSARDATA");
+
+      std::string TimeProfileFileName = facilities::commonUtilities::joinPath(m_pulsardata_dir, m_name+"TimeProfile.txt");
 
       // override obssim if running in Gleam environment
-      if( gleam!=0) TimeProfileFileName = facilities::commonUtilities::joinPath(std::string(gleam), m_name + "TimeProfile.txt");
+      //     if( gleam!=0) TimeProfileFileName = facilities::commonUtilities::joinPath(std::string(gleam), m_name + "TimeProfile.txt");
 
       if (DEBUG)
 	{
@@ -380,11 +404,7 @@ TH2D* PulsarSim::PSRShape(std::string ModelShapeName, int NormalizeFlux)
  
 
   //Look for ModelShapeName.root in the data directory...
-  std::string ModelShapeInputFileName = facilities::commonUtilities::joinPath(facilities::commonUtilities::getDataPath("Pulsar"), ModelShapeName + ".root");
-  const char * gleam = ::getenv("PULSARDATA");
-  
-  // override obssim if running in Gleam environment
-  if( gleam!=0) ModelShapeInputFileName = facilities::commonUtilities::joinPath(std::string(gleam), ModelShapeName + ".root");
+  std::string ModelShapeInputFileName = facilities::commonUtilities::joinPath(m_pulsardata_dir, ModelShapeName + ".root");
 
   PulsarLogSim << "** Using Shape " << ModelShapeName << " located at: " << ModelShapeInputFileName << std::endl;
 

@@ -8,6 +8,7 @@
 #include "SpectObj/SpectObj.h"
 #include "flux/SpectrumFactory.h"
 #include "facilities/commonUtilities.h"
+#include "facilities/Util.h"
 #include <cmath>
 
 #define DEBUG 0
@@ -160,6 +161,7 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
   //Setting random seed
   m_PSpectrumRandom = new TRandom;
   m_PSpectrumRandom->SetSeed(m_seed);
+
  
   if (m_model == 1) //Phenomenological model
     {
@@ -176,18 +178,28 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
 	m_PSRShapeName = parseParamList(params,8).c_str();        // model parameters
       }
 
-  // if this is in the GLEAM environment, allow for separate path specified by env var PULSARDATA
-  std::string pulsar_data(facilities::commonUtilities::getDataPath("Pulsar")); // the default, perhaps overriden
-
-  pulsar_data=pulsar_data+"/";
-
-  const char * gleam = ::getenv("SKYMODEL_DIR");
-  if( gleam!=0) {
-       pulsar_data =  std::string(gleam)+"/pulsars/";
-  } else
+  //look for pulsar data directory, following, in the order $PULSARDATA, $SKYMODEL_DIR/pulsars or $PULSARROOT/data
+  //  std::string m_pulsardata_dir;
+  
+  if (::getenv("PULSARDATA"))
     {
-      if (DEBUG)
-	std::cout << "Warning !SKYMODEL_DIR not found!"  <<std::endl;
+      const char * psrdata = ::getenv("PULSARDATA");
+      m_pulsardata_dir = std::string(psrdata);
+    }
+  else if (::getenv("SKYMODEL_DIR"))
+    {
+      const char * psrdata = ::getenv("SKYMODEL_DIR");
+      m_pulsardata_dir =  std::string(psrdata)+"/pulsars";
+    }
+  else
+    {
+      const char * psrdata = ::getenv("PULSARROOT");
+      m_pulsardata_dir =  std::string(psrdata)+"/data";
+    }
+
+  if (DEBUG)
+    {
+      std::cout << "PULSARDATA used is: "<< m_pulsardata_dir << std::endl;
     }
 
   // Determine start and end time for FT2 or orbit file 
@@ -216,7 +228,7 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
   m_b = m_GalDir.second;
 
   //Load Pulsar General data from PulsarDataList.txt
-  LoadPulsarGeneralData(pulsar_data);
+  LoadPulsarGeneralData(m_pulsardata_dir);
 
   if (::getenv("PULSAR_NO_DB"))
     {
@@ -234,7 +246,7 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
   //Binary Pulsar Data
   if (m_BinaryFlag ==1)
     {
-      LoadPulsarOrbitalData(pulsar_data);
+      LoadPulsarOrbitalData(m_pulsardata_dir);
 
       if (::getenv("PULSAR_NO_DB"))
 	{
@@ -1127,7 +1139,7 @@ int PulsarSpectrum::getPulsarFromDataList(std::string sourceFileName)
   
   if (! PulsarDataTXT.is_open()) 
     {
-      throw "Error!Cannot open file";
+      throw "Error! Cannot open file";
       //      std::cout << "Error opening Datalist file " << sourceFileName  
       //	<< " (check whether $PULSARROOT is set" << std::endl; 
       //Status = 0;
@@ -1279,7 +1291,7 @@ void PulsarSpectrum::LoadPulsarGeneralData(std::string pulsar_data_dir)
       while (!ListFile.eof()) 
 	{	
 
-	  CompletePathFileName = pulsar_data_dir + "/" + std::string(DataListFileName);
+	  CompletePathFileName = facilities::commonUtilities::joinPath(pulsar_data_dir,std::string(DataListFileName));
 
 	  try
 	    {
@@ -1418,7 +1430,7 @@ void PulsarSpectrum::LoadPulsarOrbitalData(std::string pulsar_data_dir)
   int Retrieved = 0;
   int AllRetrieved = 0;
 
-  std::string BinListFileName = pulsar_data_dir + "PulsarBinDataList.txt";
+  std::string BinListFileName = facilities::commonUtilities::joinPath(m_pulsardata_dir,"PulsarBinDataList.txt");
   
   try 
     {
@@ -1431,7 +1443,7 @@ void PulsarSpectrum::LoadPulsarOrbitalData(std::string pulsar_data_dir)
       BinListFile >> BinDataListFileName;
       while (!BinListFile.eof()) 
 	{	
-	  CompletePathFileName = pulsar_data_dir + std::string(BinDataListFileName);
+	  CompletePathFileName = facilities::commonUtilities::joinPath(m_pulsardata_dir,std::string(BinDataListFileName));
 	  
 	  try
 	    {
@@ -1812,13 +1824,25 @@ int PulsarSpectrum::saveDbTxtFile()
 	BinFlag = "F";
       else if (m_BinaryFlag==1)
 	BinFlag = "T";
-	    
 
-	  DbOutputFile << std::setprecision(14) 
-		       << m_f0Vect[ep] << " " << m_f1Vect[ep] << " " << m_f2Vect[ep] << " " 
-		       << m_TimingNoiseRMS*1e3 << " "  
-		       << m_t0InitVect[ep] << " " << m_t0EndVect[ep] << " "
-		       << BinFlag << " \"JPL DE200\" P" << std::endl;
+
+      std::string SolarEph;
+    
+      if (::getenv("PULSAR_EPH"))
+	{
+	  const char * soleph = ::getenv("PULSAR_EPH");
+	  SolarEph = " \" " + std::string(soleph)  + " \" ";
+	}
+      else
+	{
+	  SolarEph = " \"JPL DE405\" ";
+	}
+
+      DbOutputFile << std::setprecision(14) 
+		   << m_f0Vect[ep] << " " << m_f1Vect[ep] << " " << m_f2Vect[ep] << " " 
+		   << m_TimingNoiseRMS*1e3 << " "  
+		   << m_t0InitVect[ep] << " " << m_t0EndVect[ep] << " "
+		   << BinFlag << SolarEph << " P" << std::endl;
 
     }
   
