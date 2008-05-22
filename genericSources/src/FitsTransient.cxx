@@ -46,7 +46,7 @@ ISpectrumFactory & FitsTransientFactory() {
 }
 
 FitsTransient::FitsTransient(const std::string & paramString) 
-   : m_z(0), m_tau(0) {
+   : m_z(0), m_tau(0), m_haveFirstEvent(false) {
    if (paramString.find("=") == std::string::npos) {
       std::vector<std::string> params;
       facilities::Util::stringTokenize(paramString, ", ", params);
@@ -106,13 +106,19 @@ FitsTransient::~FitsTransient() {
 
 double FitsTransient::interval(double time) {
    time -= Spectrum::startTime();
-   std::vector<std::pair<double, double> >::const_iterator event =
-      std::upper_bound(m_events.begin(), m_events.end(), 
-                       std::make_pair(time, 0), compareEventTime);
-   if (event != m_events.end()) {
-      m_currentEnergy = event->second;
-      return event->first - time;
-   } 
+   if (!m_haveFirstEvent) {
+      std::vector<std::pair<double, double> >::const_iterator event =
+         std::upper_bound(m_events.begin(), m_events.end(), 
+                          std::make_pair(time, 0), compareEventTime);
+      m_nextEvent = event;
+      m_haveFirstEvent = true;
+   }
+   if (m_nextEvent != m_events.end()) {
+      double dt(m_nextEvent->first - time);
+      m_currentEnergy = m_nextEvent->second;
+      ++m_nextEvent;
+      return dt;
+   }
 // There should be a better way to turn off a source than this:
    return 3.155e8;
 }
@@ -137,6 +143,11 @@ void FitsTransient::createEvents() {
    computeIntegralDist(times, energies, spectra, integralDist, lightCurve);
    drawEvents(times, energies, integralDist, lightCurve);
    std::stable_sort(m_events.begin(), m_events.end(), compareEventTime);
+//    std::cout << "nevents = " << m_events.size() << std::endl;
+//    for (size_t i(0); i < m_events.size(); i++) {
+//       std::cout << m_events.at(i).first << "  "
+//                 << m_events.at(i).second << std::endl;
+//    }
 }
 
 void FitsTransient::

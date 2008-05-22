@@ -77,6 +77,9 @@ private:
    double m_currentEnergy;
    std::vector<std::pair<double, double> > m_events;
 
+   bool m_haveFirstEvent;
+   std::vector<std::pair<double, double> >::const_iterator m_nextEvent;
+
    void createEvents();
 
    void readTable(const std::string & extname,
