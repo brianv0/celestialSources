@@ -10,6 +10,7 @@
 #include "facilities/commonUtilities.h"
 #include "facilities/Util.h"
 #include <cmath>
+#include <vector>
 
 #define DEBUG 0
 
@@ -228,8 +229,8 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
   m_b = m_GalDir.second;
 
   //Load Pulsar General data from PulsarDataList.txt
-  LoadPulsarGeneralData(m_pulsardata_dir);
-
+  LoadPulsarData(m_pulsardata_dir,0);
+  
   if (::getenv("PULSAR_NO_DB"))
     {
       int DbFlag=0;
@@ -246,8 +247,8 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
   //Binary Pulsar Data
   if (m_BinaryFlag ==1)
     {
-      LoadPulsarOrbitalData(m_pulsardata_dir);
-
+      LoadPulsarData(m_pulsardata_dir,1); //loading orbital data from PulsarBinDataList.txt
+	
       if (::getenv("PULSAR_NO_DB"))
 	{
 	  int BinDbFlag=0;
@@ -1139,11 +1140,7 @@ int PulsarSpectrum::getPulsarFromDataList(std::string sourceFileName)
   
   if (! PulsarDataTXT.is_open()) 
     {
-      throw "Error! Cannot open file";
-      //      std::cout << "Error opening Datalist file " << sourceFileName  
-      //	<< " (check whether $PULSARROOT is set" << std::endl; 
-      //Status = 0;
-      //exit(1);
+      throw "Error! Cannot open file ";
     }
   else {
      char aLine[400];  
@@ -1259,92 +1256,152 @@ int PulsarSpectrum::getPulsarFromDataList(std::string sourceFileName)
 }
 
 
-
-
 /////////////////////////////////////////////
 /*!
- * \param pulsar_data_dir The Directory where PulsarDataList.txt resides
+ * \param pulsar_data_dir: $PULSARDATA directory;
+ * \param DataType: Type of data to be loaded (0=General data; 1=Orbital Data);
  *
  * <br>
- * This method looks into PulsarDataList and load pulsar data
+ * This method load pulsar general data (flux, spin parameters, etc..) of
+ * orbital data (kepler parameters, etc..) according to DataType parameter
+ * Datafiles containing parameters must be specified in $PULSARDATA/PulsarDataList.txt 
+ * for general data or $PULSARDATA/PulsarBinDataList.txt for orbital data
+ *
  */
-void PulsarSpectrum::LoadPulsarGeneralData(std::string pulsar_data_dir)
+void PulsarSpectrum::LoadPulsarData(std::string pulsar_data_dir, int DataType = 0)
 {
 
   //Scan PulsarDataList.txt for Pulsar general data
-  std::string ListFileName = facilities::commonUtilities::joinPath(pulsar_data_dir, "PulsarDataList.txt");
-  std::string CompletePathFileName = "";
+
+  std::string ListFileName;
+
+  if (DataType == 0)
+    {
+      ListFileName = facilities::commonUtilities::joinPath(pulsar_data_dir, "PulsarDataList.txt");
+      if (DEBUG)
+	{
+	  std::cout << "Reading General Data" << std::endl;
+	}
+    }
+  else if (DataType == 1)
+    {
+      ListFileName = facilities::commonUtilities::joinPath(pulsar_data_dir, "PulsarBinDataList.txt");
+      if (DEBUG)
+	{      
+	  std::cout << "Reading Orbital Data" << std::endl;
+	}
+    }
+
   int Retrieved = 0;
   int AllRetrieved = 0;
 
-  try
-    {
-      std::ifstream ListFile;
-      CheckFileExistence(ListFileName);
-      ListFile.open(ListFileName.c_str(), std::ios::in);
-      char DataListFileName[200];
-      ListFile.getline(DataListFileName,200); 
-      //    int Retrieved = 0;
-      //int AllRetrieved = 0;
+  //new block for reading lines
 
-      ListFile >> DataListFileName;
-      while (!ListFile.eof()) 
-	{	
+  //max
+ try
+   {
+     CheckFileExistence(ListFileName);
+     
+     std::ifstream ListFile(ListFileName.c_str());
+     std::string dataline;
+     std::vector<std::string> datalines;
+     while (std::getline(ListFile, dataline, '\n'))
+       {
+	 if (dataline != "" && dataline != " "
+	     && dataline.find_first_of('#') != 0)
+	   {
+	     datalines.push_back(dataline);
+	   }
+       }
 
-	  CompletePathFileName = facilities::commonUtilities::joinPath(pulsar_data_dir,std::string(DataListFileName));
+     // After lines are parsed, each DataList is processed...
+     int PulsarFound=0;
+     int l=0;
 
-	  try
+     while ((l<datalines.size()) && (PulsarFound!=1))
+       {
+	std::string CompletePathFileName = facilities::commonUtilities::joinPath(pulsar_data_dir,datalines[l]);
+	try
 	    {
-	      Retrieved = getPulsarFromDataList(CompletePathFileName);
-	      if (Retrieved == 1)
+
+	      if (DataType == 0)
 		{
-		  if (DEBUG)
-		    {
-		      std::cout << "Pulsar " << m_PSRname << " found in file " << CompletePathFileName << std::endl;
-		    }
-		  AllRetrieved = 1;
+		  PulsarFound = getPulsarFromDataList(CompletePathFileName);
 		}
-	    }
-	  catch (char const *error)
-	    {
-	      std::cerr << error << CompletePathFileName << "..skipping to next DataList file" << std::endl;
-	    }
+	      else if (DataType == 1)
+		{
+		  PulsarFound = getOrbitalDataFromBinDataList(CompletePathFileName);
+		}
 
-	  ListFile >> DataListFileName ;
-	}
-      
-      if (AllRetrieved == 0)
+	    }
+	 catch (char const *error) //DataList does not exists....
+	   {
+	     if (DEBUG)
+	       {
+		 std::cout << error << CompletePathFileName 
+			   << "... skip to next ASCII Data list file" <<std::endl;
+	       }
+	   }
+	
+	 l++;
+       }
+
+     if (PulsarFound == 0)//if no Datalist contains pulsars...
+       {
+	 std::cout << "ERROR! Unable to find pulsar " << m_PSRname 
+		   << " in any DataList. Check $PULSARDATA" << std::endl;
+	 exit(1);
+       }
+
+
+     //if requested, initialize log output for barycentric corrections
+     if (::getenv("PULSAR_OUT_BARY"))
+       {
+	 std::ofstream BaryCorrLogFile((m_PSRname + "BaryCorr.log").c_str());
+	 BaryCorrLogFile << "\nPulsar" << m_PSRname 
+			 << " : Barycentric corrections log generated by PulsarSpectrum" 
+			 << std::endl;
+	 BaryCorrLogFile << "tMET\tTDB-TT\tGeomDelay\tShapiroDelay" << std::endl;
+	 BaryCorrLogFile.close();
+       }
+
+
+     //if requested, initialize log output for barycentric corrections
+      if ((m_BinaryFlag ==1) && (::getenv("PULSAR_OUT_BIN")))
 	{
-	  std::cout << "Pulsar " << m_PSRname 
-		    << " not found in any DataList file.Please Check if $PULSARDATA is correctly set " 
-		    << std::endl;
-	  exit(1);
+	  std::ofstream BinDemodLogFile((m_PSRname + "BinDemod.log").c_str());
+	  BinDemodLogFile << "tMET\tdt\tE\tAt\tOmega\tecc\tasini\tdt_Roemer\tdt_einstein\tdt_shapiro" 
+			  << std::endl;
+	  BinDemodLogFile.close();
 	}
-    }
-  catch (char const *error)
+     
+   }
+ catch (char const *error) //DataList.txt of BinDataList.txt does not exists...
     {
       std::cerr << error << ListFileName << std::endl;
       exit(1);
     }
 
-  //Assign as starting ephemeris the first entry of the vectors... 
-  m_t0Init = m_t0InitVect[0];
-  m_t0 = m_t0Vect[0];
-  m_t0End = m_t0EndVect[0];
-  m_period = m_periodVect[0];
-  m_pdot = m_pdotVect[0];
-  m_p2dot = m_p2dotVect[0];
-  m_f0 = m_f0Vect[0];
-  m_f1 = m_f1Vect[0];
-  m_f2 = m_f2Vect[0];
-  m_f0NoNoise = m_f0Vect[0];
-  m_f1NoNoise = m_f1Vect[0];
-  m_f2NoNoise = m_f2Vect[0];
-  m_phi0 = m_phi0Vect[0];
+ if (DataType == 0)
+   {
+     //Assign as starting ephemeris the first entry of the vectors... 
+     m_t0Init = m_t0InitVect[0];
+     m_t0 = m_t0Vect[0];
+     m_t0End = m_t0EndVect[0];
+     m_period = m_periodVect[0];
+     m_pdot = m_pdotVect[0];
+     m_p2dot = m_p2dotVect[0];
+     m_f0 = m_f0Vect[0];
+     m_f1 = m_f1Vect[0];
+     m_f2 = m_f2Vect[0];
+     m_f0NoNoise = m_f0Vect[0];
+     m_f1NoNoise = m_f1Vect[0];
+     m_f2NoNoise = m_f2Vect[0];
+     m_phi0 = m_phi0Vect[0];
+   }
+
 
 }
-
-
 
 /////////////////////////////////////////////
 /*!
@@ -1416,87 +1473,6 @@ int PulsarSpectrum::getOrbitalDataFromBinDataList(std::string sourceBinFileName)
   return Status;
 }
 
-/////////////////////////////////////////////
-/*!
- * \param pulsar_data_dir The Directory where PulsarBinDataList.txt resides
- *
- * <br>
- * This method looks into BinPulsarDataList and load pulsar data
- */
-void PulsarSpectrum::LoadPulsarOrbitalData(std::string pulsar_data_dir)
-{
-
-  std::string CompletePathFileName = "";
-  int Retrieved = 0;
-  int AllRetrieved = 0;
-
-  std::string BinListFileName = facilities::commonUtilities::joinPath(m_pulsardata_dir,"PulsarBinDataList.txt");
-  
-  try 
-    {
-      //Look to BinDataList.txt for binary pulsar data
-      std::ifstream BinListFile;
-      CheckFileExistence(BinListFileName);
-      BinListFile.open(BinListFileName.c_str(), std::ios::in);
-      char BinDataListFileName[200];
-      BinListFile.getline(BinDataListFileName,200); 
-      BinListFile >> BinDataListFileName;
-      while (!BinListFile.eof()) 
-	{	
-	  CompletePathFileName = facilities::commonUtilities::joinPath(m_pulsardata_dir,std::string(BinDataListFileName));
-	  
-	  try
-	    {
-	      Retrieved = getOrbitalDataFromBinDataList(CompletePathFileName);
-	      if (Retrieved == 1)
-		{
-		  if (DEBUG)
-		    {
-		      std::cout << "Binary Pulsar " << m_PSRname << " found in file " << CompletePathFileName << std::endl;
-		    }
-		  AllRetrieved = 1;
-		} 
-	    }
-	  catch (char const *error)
-	    {
-	      std::cerr << error << CompletePathFileName << "..skipping to next BinDataList file" << std::endl;
-	    }
-	  
-	  BinListFile >> BinDataListFileName ;	  
-	}
-      
-      if (AllRetrieved == 0)
-	{
-	  std::cout << "Binary Pulsar " << m_PSRname 
-		    << " not found in any BinDataList file.Please Check if PULSARDATA is correctly set " 
-		    << std::endl;
-	  exit(1);
-	}
-
-
-      if ((m_BinaryFlag ==1) && (::getenv("PULSAR_OUT_BIN")))
-	{
-	  std::ofstream BinDemodLogFile((m_PSRname + "BinDemod.log").c_str());
-	  BinDemodLogFile << "tMET\tdt\tE\tAt\tOmega\tecc\tasini\tdt_Roemer\tdt_einstein\tdt_shapiro" << std::endl;
-	  BinDemodLogFile.close();
-	}
-      
-      if (::getenv("PULSAR_OUT_BARY"))
-	{
-	  std::ofstream BaryCorrLogFile((m_PSRname + "BaryCorr.log").c_str());
-	  BaryCorrLogFile << "\nPulsar" << m_PSRname << " : Barycentric corrections log generated by PulsarSpectrum" << std::endl;
-	  BaryCorrLogFile << "tMET\tTDB-TT\tGeomDelay\tShapiroDelay" << std::endl;
-	  BaryCorrLogFile.close();
-	}
-
-    }
-  catch (char const *error)
-    {
-      std::cerr << error << BinListFileName << std::endl;
-      exit(1);
-    }
-
-}
 
 /////////////////////////////////////////////
 /*!

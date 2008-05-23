@@ -66,7 +66,7 @@ namespace cst
 
   //! Number of energy bins used in the TH2D histogram
 
-  const    int Ebin =  50 ; 
+  const    int Ebin =  100 ; 
 
 
 

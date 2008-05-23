@@ -11,8 +11,8 @@
 
 #include <iostream>
 #include <iomanip>
-#include <vector>
 #include <string>
+#include <sstream>
 #include <fstream>
 #include <map>
 #include <cmath>
@@ -89,14 +89,11 @@ class PulsarSpectrum : public Spectrum
   //! Get the pulsar ephemerides and data from the DataList
   int getPulsarFromDataList(std::string sourceFileName);
 
-  //! Load Pulsar General data
-  void LoadPulsarGeneralData(std::string pulsar_data_dir);
+  //! Load Pulsar data
+  void LoadPulsarData(std::string pulsar_data_dir, int DataType);
 
   //! Get the binary pulsar orbital data from the BinDataList
   int getOrbitalDataFromBinDataList(std::string sourceBinFileName);
-
-  //! Load Pulsar General data
-  void LoadPulsarOrbitalData(std::string pulsar_data_dir);
 
   //! Initialize timing noise parameters
   void InitTimingNoise();
