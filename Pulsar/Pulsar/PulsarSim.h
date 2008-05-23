@@ -47,6 +47,7 @@ class PulsarSim
   ~PulsarSim()
     {
       delete m_Nv;
+      m_PulsarLog.close();
     }
   
   //! Method that creates the TH2D histogram according to the phenomenological model.
@@ -67,6 +68,12 @@ class PulsarSim
   //! Save a TXT file with the Pulsar time profile
   void SaveTimeProfile(TH2D *Nv);
   
+  //!Flag for Output level
+  int m_OutputLevel;
+
+  //! output stream
+  std::ofstream m_PulsarLog;
+
  private:
 
   //! Pulsar name

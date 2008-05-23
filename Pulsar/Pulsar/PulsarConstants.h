@@ -75,7 +75,6 @@ namespace cst
   const int Tbin =  200; 
 
 
-
   //! Conversion erg-->MeV
 
   const double erg2meV   = 624151.0;

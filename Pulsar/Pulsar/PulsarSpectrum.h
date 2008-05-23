@@ -114,7 +114,7 @@ class PulsarSpectrum : public Spectrum
   int saveBinDbTxtFile();
 
   //! Write Out Pulsar Log file
-  void WritePulsarLog(std::string logLabel);
+  void WritePulsarLog();
 
   //! Check if a file exists using and throw an exception
   void CheckFileExistence(std::string NameFileToCheck);
@@ -197,8 +197,14 @@ class PulsarSpectrum : public Spectrum
   double m_phi0,m_N0;
   std::vector<double> m_phi0Vect,m_txbaryVect;
 
+  //!Log output file
+  std::ofstream m_PulsarLog;
+
   //!Type of model
   int m_model;
+
+  //!Output level 0 - no output; 1- only pulsar data 2 - also warning messages
+  int m_OutputLevel;
 
   //!Pulsar flux
   double m_flux;

@@ -57,6 +57,39 @@ PulsarSim::PulsarSim(std::string name, int seed, double flux, double enphmin, do
       std::cout << "PULSARDATA used is: "<< m_pulsardata_dir << std::endl;
     }
 
+
+  if (::getenv("PULSAR_OUTPUT_LEVEL"))
+    {
+      const char * outlevel = ::getenv("PULSAR_OUTPUT_LEVEL");
+      m_OutputLevel = atoi(outlevel);
+      if ((m_OutputLevel<0) || (m_OutputLevel>2))
+	m_OutputLevel=1;
+    }
+  else
+    {
+      m_OutputLevel=1;
+    }
+
+
+  if (m_OutputLevel > 0)
+    {
+      //Redirect output to a subdirectory
+      const char * pulsarOutDir = ::getenv("PULSAROUTFILES");
+      std::string LogFileName ="";
+      // override obssim if running in Gleam environment
+      if( pulsarOutDir!=0) 
+	LogFileName = std::string(pulsarOutDir) + "/" + m_name + "Log.txt";
+      else
+	LogFileName = m_name + "Log.txt";
+
+      m_PulsarLog.open(LogFileName.c_str(),std::ios::app);
+  
+      m_PulsarLog << "**  Output Level set to: " << m_OutputLevel << std::endl;      
+    }
+
+
+
+
 }
 
 //////////////////////////////////////////////////
@@ -124,33 +157,35 @@ TH2D* PulsarSim::PSRPhenom(double par0, double par1, double par2, double par3, d
 
   //Writes out an output log file for the pulsar
  
+
   //Redirect output to a subdirectory
-  const char * pulsarOutDir = ::getenv("PULSAROUTFILES");
-
-  std::string logSimLabel;
-  // override obssim if running in Gleam environment
-  if( pulsarOutDir!=0) 
-    logSimLabel = facilities::commonUtilities::joinPath(std::string(pulsarOutDir), m_name + "Log.txt");
-  else
-    logSimLabel = m_name + "Log.txt"; 
-
-  ofstream PulsarLogSim;
-  PulsarLogSim.open(logSimLabel.c_str(),std::ios::app);
+  /*  
+      const char * pulsarOutDir = ::getenv("PULSAROUTFILES");
+      std::string logSimLabel;
+      // override obssim if running in Gleam environment
+      if( pulsarOutDir!=0) 
+      logSimLabel = facilities::commonUtilities::joinPath(std::string(pulsarOutDir), m_name + "Log.txt");
+      else
+      logSimLabel = m_name + "Log.txt"; 
+      
+      ofstream PulsarLogSim;
+      PulsarLogSim.open(logSimLabel.c_str(),std::ios::app);
+  */
 
   //Writes out informations about the model parameters on the file
-  PulsarLogSim << "******** Pulsar Phenomenological Model ********" << std::endl;
-  PulsarLogSim << "**  Random seed for the model : " << m_seed << std::endl;
-  PulsarLogSim << "**  Spectrum parameters: " << std::endl;
-  PulsarLogSim << "**           En = " << En  
+  m_PulsarLog << "******** Pulsar Phenomenological Model ********" << std::endl;
+  m_PulsarLog << "**  Random seed for the model : " << m_seed << std::endl;
+  m_PulsarLog << "**  Spectrum parameters: " << std::endl;
+  m_PulsarLog << "**           En = " << En  
 	       << " | E0 = " << E0 << std::endl;
-  PulsarLogSim << "**           G1 = " << G1 
+  m_PulsarLog << "**           G1 = " << G1 
 	       << " | b  = "  << b << std::endl;
-  PulsarLogSim << "**  enphmin " << m_enphmin << " enphmax " << m_enphmax << std::endl; 
-  PulsarLogSim << "**           Normalisation between " << cst::EnNormMin << " keV and " 
+  m_PulsarLog << "**  enphmin " << m_enphmin << " enphmax " << m_enphmax << std::endl; 
+  m_PulsarLog << "**           Normalisation between " << cst::EnNormMin << " keV and " 
 	       << cst::EnNormMax << " keV " << std::endl;
-  PulsarLogSim << "**           Photon extraction between " << m_enphmin << " keV and " 
+  m_PulsarLog << "**           Photon extraction between " << m_enphmin << " keV and " 
 	       << m_enphmax << " keV " << std::endl;
-  PulsarLogSim << "**  Spectrum calculated between " << LowEnBound << " keV and " 
+  m_PulsarLog << "**  Spectrum calculated between " << LowEnBound << " keV and " 
 	        << HighEnBound << " keV " << std::endl; 
 
   //Create the spectrum profile
@@ -228,24 +263,24 @@ TH2D* PulsarSim::PSRPhenom(double par0, double par1, double par2, double par3, d
 	    }
 	}
 
-      PulsarLogSim << std::setprecision(3) << "**\n**  Lightcurve parameters: (mindist = " 
+      m_PulsarLog << std::setprecision(3) << "**\n**  Lightcurve parameters: (mindist = " 
 		   << mindist  << " s.)" << std::endl;
       
       if (ampl1 !=0)
 	{
-	  PulsarLogSim << std::setprecision(3) << "**           Peak 1 t = " << peak1 
+	  m_PulsarLog << std::setprecision(3) << "**           Peak 1 t = " << peak1 
 		       << "(Ph.= " << peak1/m_period << " ) " 
 		       << " , FWHM " << fwhm1 << " ampl1 " << ampl1 << std::endl; 
 	}
       if (ampl2 !=0)
 	{
-	  PulsarLogSim << std::setprecision(3) << "**           Peak 2 t = " << peak2 
+	  m_PulsarLog << std::setprecision(3) << "**           Peak 2 t = " << peak2 
 		       << "(Ph.= " << peak2/m_period << " ) " 
 		       << " , FWHM " << fwhm2 << " ampl2 " << ampl2 << std::endl; 
-	  PulsarLogSim << "***********************************************" << std::endl;
+	  m_PulsarLog << "***********************************************" << std::endl;
 	}
       
-      PulsarLogSim.close();
+
       PulsarTimeCurve.SetParameters(peak1,fwhm1,ampl1,peak2,fwhm2,ampl2);  
   
     }
@@ -259,9 +294,9 @@ TH2D* PulsarSim::PSRPhenom(double par0, double par1, double par2, double par3, d
       // override obssim if running in Gleam environment
       //     if( gleam!=0) TimeProfileFileName = facilities::commonUtilities::joinPath(std::string(gleam), m_name + "TimeProfile.txt");
 
-      if (DEBUG)
+      if (m_OutputLevel>1)
 	{
-	  std::cout << "Building lightcurve from file " << TimeProfileFileName << std::endl;
+	  m_PulsarLog << "Building lightcurve from file " << TimeProfileFileName << std::endl;
 	}
       
       ifstream TimeProfileFile;
