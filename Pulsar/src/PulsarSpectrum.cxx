@@ -212,7 +212,7 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
 
   if (m_OutputLevel>1)
     {
-      m_PulsarLog << "PULSARDATA used is: "<< m_pulsardata_dir << std::endl;
+      WriteToLog("PULSARDATA used is: "+std::string(m_pulsardata_dir));
     }
 
   // Determine start and end time for FT2 or orbit file 
@@ -248,7 +248,7 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
       //Save the output txt file..
       int DbFlag = saveDbTxtFile();
       if ((DbFlag !=1) && (m_OutputLevel>1))
-	m_PulsarLog << "WARNING! Problem in saving SimPulsars_spin.txt" << std::endl;
+	WriteToLog("WARNING! Problem in saving SimPulsars_spin.txt");
     }
 
 
@@ -261,7 +261,7 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
 	{
 	  int BinDbFlag = saveBinDbTxtFile();
 	  if ((BinDbFlag !=1) && (m_OutputLevel>1))
-	    m_PulsarLog << "WARNING! Problem in saving SimPulsars_bin.txt" << std::endl;
+	    WriteToLog("WARNING! Problem in saving SimPulsars_bin.txt");
 	}
     }
 
@@ -311,17 +311,20 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
       
       //Redirect output to a subdirectory
       const char * pulsarOutDir = ::getenv("PULSAROUTFILES");
-      std::string LogFileName ="";
+      
       // override obssim if running in Gleam environment
       if( pulsarOutDir!=0) 
-	LogFileName = std::string(pulsarOutDir) + "/" + m_PSRname + "Log.txt";
+	m_LogFileName = std::string(pulsarOutDir) + "/" + m_PSRname + "Log.txt";
       else
-	LogFileName = m_PSRname + "Log.txt";
+	m_LogFileName = m_PSRname + "Log.txt";
 
-      m_PulsarLog.open(LogFileName.c_str(),std::ios::app);
-  
-      m_PulsarLog << "**  Output Level set to: " << m_OutputLevel << std::endl;      
+      char temp[200];
+      sprintf(temp,"**  Output Level set to: %d",m_OutputLevel);
+      WriteToLog(std::string(temp));
+
       WritePulsarLog();
+
+
     }
 
 
@@ -335,8 +338,6 @@ PulsarSpectrum::~PulsarSpectrum()
   delete m_spectrum;
   delete m_earthOrbit;
   delete m_PSpectrumRandom;
-
-  m_PulsarLog.close();
 }
 
 /////////////////////////////////////////////////
@@ -624,7 +625,9 @@ double PulsarSpectrum::getBaryCorr( double ttInput, int LogCorrFlag)
     {
       if (m_OutputLevel>1)
 	{
-	  m_PulsarLog << "WARNING!!!Arrival time after FT2 end. No barycentric correction! " << ttInput << std::endl;
+	  char temp[200];
+	  sprintf(temp,"WARNING!!!Arrival time after FT2 end. No barycentric correction! at t=%.f",ttInput);
+	  WriteToLog(std::string(temp));
 	}
       return 0.;
     }
@@ -1116,10 +1119,9 @@ int PulsarSpectrum::getPulsarFromDataList(std::string sourceFileName)
 	      {
 		if (m_OutputLevel>1)
 		  {
-		    m_PulsarLog << std::setprecision(10) 
-				<< "Warning! Epoch t0 out the simulation range (t0-tStart=" 
-				<< (t0-startMJD)
-				<< " s.: changing to MJD " << startMJD << std::endl;
+		    char temp[200];
+		    sprintf(temp,"Warning! Epoch t0 out the simulation range (t0-tStart=%.10f) s.: changing to MJD=%d",(t0-startMJD),startMJD);
+		    WriteToLog(std::string(temp));
 		  }
 		t0 = startMJD;
 		txbary = startMJD;
@@ -1132,10 +1134,13 @@ int PulsarSpectrum::getPulsarFromDataList(std::string sourceFileName)
 	      {
 		if (m_OutputLevel>1)
 		  {
-		    m_PulsarLog << std::setprecision(10) 
-				<< "Warning! Epoch t0 out the simulation range (t0-tEnd=" << (t0-endMJD)
-				<< " s.: changing to MJD " << endMJD << std::endl;
-		    m_PulsarLog << "***end at " << endTime << " corresp to " << endMJD << std::endl;
+
+		    char temp[200];
+		    sprintf(temp,"Warning! Epoch t0 out the simulation range (t0-tEnd=%.10f) s.: changing to MJD=%d",
+			    (t0-endMJD),endMJD);
+		    WriteToLog(std::string(temp));
+		    sprintf(temp,"**  Tnd at %d corresp. to MJD %d",endTime,endMJD);
+		    WriteToLog(std::string(temp));
 		  }
 		t0 = endMJD;
 		txbary = endMJD;
@@ -1274,8 +1279,8 @@ void PulsarSpectrum::LoadPulsarData(std::string pulsar_data_dir, int DataType = 
 	   {
 	     if (m_OutputLevel>1)
 	       {
-		 m_PulsarLog << "WARNING!" << error << CompletePathFileName 
-			     << "... skip to next ASCII Data list file" <<std::endl;
+		 WriteToLog("WARNING!"+std::string(error)+std::string(CompletePathFileName)
+			    +"... skip to next ASCII Data list file");
 	       }
 	   }
 	
@@ -1602,8 +1607,8 @@ void PulsarSpectrum::CheckEphemeridesValidity(double EphCheckTime, double initTu
 
       if (m_OutputLevel>1)
 	{
-	  m_PulsarLog << "WARNING! Time is out of range of validity for pulsar " << m_PSRname 
-		      << ": Switching to new ephemerides set..." << std::endl;
+	  WriteToLog("WARNING! Time is out of range of validity for pulsar "+std::string(m_PSRname) 
+		     +": Switching to new ephemerides set...");
 	}
 
 
@@ -1627,10 +1632,14 @@ void PulsarSpectrum::CheckEphemeridesValidity(double EphCheckTime, double initTu
 
 	      if (m_OutputLevel>1)
 		{
-		  m_PulsarLog << "Valid Ephemerides set found:" << std::endl;
-		  m_PulsarLog << "MJD("<<m_t0Init<<"-"<<m_t0End<<") --> Epoch t0 = MJD " << m_t0 << std::endl; 
-		  m_PulsarLog << "f0 " << m_f0 << " f1 " << m_f1 << " f2 " << m_f2 << std::endl;
-		  m_PulsarLog << "Period " << m_period << " pdot " << m_pdot << " p2dot " << m_p2dot << std::endl;
+		  WriteToLog("Valid Ephemerides set found:");
+		  char temp[200];
+		  sprintf(temp,"MJD(%d-%d) --> Epoch t0 = MJD %d",m_t0Init,m_t0End,m_t0);
+		  WriteToLog(std::string(temp));
+		  sprintf(temp,"f0: %.f Hz | f1: %.e Hz/s | f2 %.e Hz/s2 ",m_f0,m_f1,m_f2);
+		  WriteToLog(std::string(temp));
+		  sprintf(temp,"P0: %.f s | P1: %.e s/s | P2 %.e s/s2 ",m_period,m_pdot,m_p2dot);
+		  WriteToLog(std::string(temp));
 		}
 
 
@@ -1668,7 +1677,7 @@ void PulsarSpectrum::CheckEphemeridesValidity(double EphCheckTime, double initTu
 	   {
 	     if (m_OutputLevel>1)
 	       {
-		 m_PulsarLog << "WARNING! Valid ephemerides not found!Proceeding with the old ones" << std::endl; 
+		 WriteToLog("WARNING! Valid ephemerides not found!Proceeding with the old ones");
 	       }
 	   }
     }
@@ -1900,123 +1909,127 @@ void PulsarSpectrum::WritePulsarLog()
 {
 
   //Write infos to Log file  
+  
+  std::ofstream PulsarLog(m_LogFileName.c_str(),std::ios::app);
 
-  m_PulsarLog << "\n********   PulsarSpectrum Log for pulsar" << m_PSRname << std::endl;
-  m_PulsarLog << "**   Name : " << m_PSRname << std::endl;
-  m_PulsarLog << "**\n**   Position : (RA,Dec)=(" << m_RA << "," << m_dec 
+  PulsarLog << "** PulsarSpectrum: " << "********   PulsarSpectrum Log for pulsar" << m_PSRname << std::endl;
+  PulsarLog << "** PulsarSpectrum: "<< "**   Name : " << m_PSRname << std::endl;
+  PulsarLog << "** PulsarSpectrum: "<< "**   Position : (RA,Dec)=(" << m_RA << "," << m_dec 
 	    << ") ; (l,b)=(" << m_l << "," << m_b << ")" << std::endl; 
-  m_PulsarLog << "**\n**   Flux above 100 MeV : " << m_flux << " ph/cm2/s " << std::endl;
-  m_PulsarLog << "**   Enphmin: " << m_enphmin << " keV | Enphmax: " << m_enphmax << " keV" << std::endl;
-  m_PulsarLog << "**************************************************" << std::endl;
+  PulsarLog << "** PulsarSpectrum: "<< "**   Flux above 100 MeV : " << m_flux << " ph/cm2/s " << std::endl;
+  PulsarLog << "** PulsarSpectrum: "<< "**   Enphmin: " << m_enphmin << " keV | Enphmax: " << m_enphmax << " keV" << std::endl;
+  PulsarLog << "** PulsarSpectrum: "<< "**************************************************" << std::endl;
+  
 
   //Write info about FT2 
   if (m_UseFT2 == 0)
     {
-      m_PulsarLog << "** No FT2 file used " << std::endl;
+      PulsarLog << "** PulsarSpectrum: "<< "** No FT2 file used " << std::endl;
     }
   else
-    m_PulsarLog << "** FT2 file used " << std::endl;
+    PulsarLog << "** PulsarSpectrum: "<< "** FT2 file used " << std::endl;
   
-  m_PulsarLog << "** Start time:" << std::setprecision(30) << m_FT2_startMET << " s. MET |  End time:" 
+  PulsarLog << "** PulsarSpectrum: "<< "** Start time:" << std::setprecision(30) << m_FT2_startMET << " s. MET |  End time:" 
 	    << m_FT2_stopMET << " s. MET" << std::endl;
-  m_PulsarLog << "**************************************************" << std::endl;
-  m_PulsarLog << "** Simulation start at " << m_Sim_startMET << " s. MET and ends at :" 
+  PulsarLog << "** PulsarSpectrum: "<< "**************************************************" << std::endl;
+  PulsarLog << "** PulsarSpectrum: "<< "** Simulation start at " << m_Sim_startMET << " s. MET and ends at :" 
 	    << m_Sim_stopMET << std::endl;
-  m_PulsarLog << "**************************************************" << std::endl;
+  PulsarLog << "** PulsarSpectrum: "<< "**************************************************" << std::endl;
 
   //Writes down on Log all the ephemerides
   for (unsigned int n=0; n < m_t0Vect.size(); n++)
     {
-      m_PulsarLog << "**   Ephemerides valid from " << m_t0InitVect[n] 
+      PulsarLog << "** PulsarSpectrum: "<< "**   Ephemerides valid from " << m_t0InitVect[n] 
 		<< " to " << m_t0EndVect[n] << " (MJD): " << std::endl;
-      m_PulsarLog << "**     Epoch (MJD) :  " << m_t0Vect[n] << std::endl;
-      m_PulsarLog << std::setprecision(8) << "**     TxBary (MJD) where fiducial point (phi=0) is reached : " 
+      PulsarLog << "** PulsarSpectrum: "<< "**     Epoch (MJD) :  " << m_t0Vect[n] << std::endl;
+      PulsarLog << "** PulsarSpectrum: "<< std::setprecision(8) << "**     TxBary (MJD) where fiducial point (phi=0) is reached : " 
 		<< m_txbaryVect[n] << std::endl;
-      m_PulsarLog << "**     Phi0 (at Epoch t0) : " << m_phi0Vect[n] << std::endl;
+      PulsarLog << "** PulsarSpectrum: "<< "**     Phi0 (at Epoch t0) : " << m_phi0Vect[n] << std::endl;
       
       if (m_ephemType == "P")
 	{
-	  m_PulsarLog << "**     Ephemerides type: PERIOD" << std::endl;
-	  m_PulsarLog << std::setprecision(14) << "**     Period : " 
+	  PulsarLog << "** PulsarSpectrum: "<< "**     Ephemerides type: PERIOD" << std::endl;
+	  PulsarLog << "** PulsarSpectrum: "<< std::setprecision(14) << "**     Period : " 
 		    << m_periodVect[n] << " s. | f0: " << m_f0Vect[n] << std::endl;
-	  m_PulsarLog << std::setprecision(14) << "**     Pdot : " 
+	  PulsarLog << "** PulsarSpectrum: "<< std::setprecision(14) << "**     Pdot : " 
 		    <<  m_pdotVect[n]  << " | f1: " << m_f1Vect[n] << std::endl; 
-	  m_PulsarLog << std::setprecision(14) << "**     P2dot : " 
+	  PulsarLog << "** PulsarSpectrum: "<< std::setprecision(14) << "**     P2dot : " 
 		    <<  m_p2dotVect[n]  << " | f2: " << m_f2Vect[n] << std::endl; 
 	} 
       else if (m_ephemType == "F")
 	{
-	  m_PulsarLog << "**Ephemerides type: FREQUENCY" << std::endl;
-	  m_PulsarLog << std::setprecision(14) << "**     Period : " 
+	  PulsarLog << "** PulsarSpectrum: "<< "**Ephemerides type: FREQUENCY" << std::endl;
+	  PulsarLog << "** PulsarSpectrum: "<< std::setprecision(14) << "**     Period : " 
 		    << m_periodVect[n] << " s. | f0: " << m_f0Vect[n] << std::endl;
-	  m_PulsarLog << std::setprecision(14) << "**     f1: " << m_f1Vect[n] << std::endl; 
-	  m_PulsarLog << std::setprecision(14) << "**     f2: " << m_f2Vect[n] << std::endl; 
+	  PulsarLog << "** PulsarSpectrum: "<< std::setprecision(14) << "**     f1: " << m_f1Vect[n] << std::endl; 
+	  PulsarLog << "** PulsarSpectrum: "<< std::setprecision(14) << "**     f2: " << m_f2Vect[n] << std::endl; 
 	}
     }
 
   //MJDRef
-  m_PulsarLog << "**\n**   Mission Reference time: MJD " << StartMissionDateMJD << " (" 
+  PulsarLog << "** PulsarSpectrum: "<< "**   Mission Reference time: MJD " << StartMissionDateMJD << " (" 
 	    << std::setprecision(12) << (StartMissionDateMJD+JDminusMJD)*SecsOneDay 
 	    << " sec.)" << std::endl;
 
   //SimulationModel
   if (m_model ==1)
     {
-      m_PulsarLog << "**   Model chosen : " << m_model 
+      PulsarLog << "** PulsarSpectrum: "<< "**   Model chosen : " << m_model 
 		<< " --> Using Phenomenological Pulsar Model " << std::endl;  
     } else if (m_model == 2)
       {
-	m_PulsarLog << "**   Model chosen : " << m_model 
+	PulsarLog << "** PulsarSpectrum: "<< "**   Model chosen : " << m_model 
 		  << " --> Using External 2-D Pulsar Shape" << std::endl;  
       }
 
-  m_PulsarLog << "**   Effective Area set to : " << m_spectrum->GetAreaDetector() << " m^2 " << std::endl; 
-  m_PulsarLog << "**************************************************" << std::endl;
+  PulsarLog << "** PulsarSpectrum: "<< "**   Effective Area set to : " << m_spectrum->GetAreaDetector() << " m^2 " << std::endl; 
+  PulsarLog << "** PulsarSpectrum: "<< "**************************************************" << std::endl;
 
   //Timing noise
   if (m_TimingNoiseModel == 1) // Timing model #1 - Delta8 parameter (Arzoumanian94)
     {
-      m_PulsarLog << "**\n**   Timing Noise Model : " << m_TimingNoiseModel 
+      PulsarLog << "** PulsarSpectrum: "<< "**   Timing Noise Model : " << m_TimingNoiseModel 
 		<< " (Stability parameter, Arzoumanian 1994)" << std::endl;
-      m_PulsarLog << "**      Timing Noise Events Mean Rate : " << m_TimingNoiseMeanRate << std::endl;
+      PulsarLog << "** PulsarSpectrum: "<< "**      Timing Noise Events Mean Rate : " << m_TimingNoiseMeanRate << std::endl;
     }
   else if (m_TimingNoiseModel == 2) //Timing model #2 - PN Random Walk (Cordes-Downs 1985) 
     {
-      m_PulsarLog << "**\n**   Timing Noise Model : " << m_TimingNoiseModel 
+      PulsarLog << "** PulsarSpectrum: "<< "**   Timing Noise Model : " << m_TimingNoiseModel 
 		<< " (PN Random Walk; Cordes-Downs 1985)" << std::endl;
-      m_PulsarLog << "**      Timing Noise Events Mean Rate : " << m_TimingNoiseMeanRate << std::endl;
+      PulsarLog << "** PulsarSpectrum: "<< "**      Timing Noise Events Mean Rate : " << m_TimingNoiseMeanRate << std::endl;
     }
   else if (m_TimingNoiseModel == 3) //Timing model #3 - FN Random Walk (Cordes-Downs 1985) 
     {
-      m_PulsarLog << "**\n**   Timing Noise Model : " << m_TimingNoiseModel 
+      PulsarLog << "** PulsarSpectrum: "<< "**   Timing Noise Model : " << m_TimingNoiseModel 
 		<< " (FN Random Walk; Cordes-Downs 1985)" << std::endl;
-      m_PulsarLog << "**      Timing Noise Events Mean Rate : " << m_TimingNoiseMeanRate << std::endl;
+      PulsarLog << "** PulsarSpectrum: "<< "**      Timing Noise Events Mean Rate : " << m_TimingNoiseMeanRate << std::endl;
     }
   else if (m_TimingNoiseModel == 4) //Timing model #4 - SN Random Walk (Cordes-Downs 1985) 
     {
-      m_PulsarLog << "**\n**   Timing Noise Model : " << m_TimingNoiseModel 
+      PulsarLog << "** PulsarSpectrum: "<< "**   Timing Noise Model : " << m_TimingNoiseModel 
 		<< " (SN Random Walk; Cordes-Downs 1985)" << std::endl;
-      m_PulsarLog << "**      Timing Noise Events Mean Rate : " << m_TimingNoiseMeanRate << std::endl;
+      PulsarLog << "** PulsarSpectrum: "<< "**      Timing Noise Events Mean Rate : " << m_TimingNoiseMeanRate << std::endl;
     }
   
 
   //Orbital info
   if (m_BinaryFlag == 1)
     {
-      m_PulsarLog << "**************************************************" << std::endl;
-      m_PulsarLog << "**   Pulsar in a Binary System! Orbital Data:" << std::endl;
-      m_PulsarLog << "**     Orbital period: " << m_Porb << " s." << std::endl;
-      m_PulsarLog << "**     Projected major semiaxis (a * sini): " << m_asini << " lightsec." <<std::endl; 
-      m_PulsarLog << "**     Eccentricity: " << m_ecc << std::endl;
-      m_PulsarLog << "**     Longitude of periastron: " <<  m_omega << " deg." << std::endl;
-      m_PulsarLog << "**     Epoch of Periastron (MJD): " << m_t0PeriastrMJD << std::endl;
-      m_PulsarLog << "**     Epoch of Ascending Node (MJD): " << m_t0AscNodeMJD << std::endl;
+      PulsarLog << "** PulsarSpectrum: "<< "**************************************************" << std::endl;
+      PulsarLog << "** PulsarSpectrum: "<< "**   Pulsar in a Binary System! Orbital Data:" << std::endl;
+      PulsarLog << "** PulsarSpectrum: "<< "**     Orbital period: " << m_Porb << " s." << std::endl;
+      PulsarLog << "** PulsarSpectrum: "<< "**     Projected major semiaxis (a * sini): " << m_asini << " lightsec." <<std::endl; 
+      PulsarLog << "** PulsarSpectrum: "<< "**     Eccentricity: " << m_ecc << std::endl;
+      PulsarLog << "** PulsarSpectrum: "<< "**     Longitude of periastron: " <<  m_omega << " deg." << std::endl;
+      PulsarLog << "** PulsarSpectrum: "<< "**     Epoch of Periastron (MJD): " << m_t0PeriastrMJD << std::endl;
+      PulsarLog << "** PulsarSpectrum: "<< "**     Epoch of Ascending Node (MJD): " << m_t0AscNodeMJD << std::endl;
       if (m_PPN ==0)
-	m_PulsarLog << "**   No Post Newtonian Parameterization " << std::endl; 
+	PulsarLog << "** PulsarSpectrum: "<< "**   No Post Newtonian Parameterization " << std::endl; 
 
-      m_PulsarLog << "**************************************************" << std::endl;
+      PulsarLog << "** PulsarSpectrum: "<< "**************************************************" << std::endl;
     }
 
+  PulsarLog.close();
 }
 
 //////////////////////////////////////////////////////////
@@ -2121,4 +2134,16 @@ std::string PulsarSpectrum::parseParamList(std::string input, unsigned int index
   return output[index];
 };
 
+//////////////////////////////////////////////////
+/*!
+ * \param Line line to be written in the output log file
+ *
+ * This method writes a line into a log file
+*/
+void PulsarSpectrum::WriteToLog(std::string Line)
+{
+  std::ofstream PulsarLog(m_LogFileName.c_str(),std::ios::app);
+  PulsarLog << "** PulsarSpectrum: " << Line << std::endl;
+  PulsarLog.close();
+}
 

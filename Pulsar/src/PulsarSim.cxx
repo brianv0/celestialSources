@@ -75,16 +75,16 @@ PulsarSim::PulsarSim(std::string name, int seed, double flux, double enphmin, do
     {
       //Redirect output to a subdirectory
       const char * pulsarOutDir = ::getenv("PULSAROUTFILES");
-      std::string LogFileName ="";
+      
       // override obssim if running in Gleam environment
       if( pulsarOutDir!=0) 
-	LogFileName = std::string(pulsarOutDir) + "/" + m_name + "Log.txt";
+	m_LogFileName = std::string(pulsarOutDir) + "/" + m_name + "Log.txt";
       else
-	LogFileName = m_name + "Log.txt";
-
-      m_PulsarLog.open(LogFileName.c_str(),std::ios::app);
-  
-      m_PulsarLog << "**  Output Level set to: " << m_OutputLevel << std::endl;      
+	m_LogFileName = m_name + "Log.txt";
+      
+      char temp[200];
+      sprintf(temp,"**  Output Level set to: %d",m_OutputLevel);
+      WriteToLog(std::string(temp));
     }
 
 
@@ -155,38 +155,25 @@ TH2D* PulsarSim::PSRPhenom(double par0, double par1, double par2, double par3, d
     m_enphmax = cst::EnNormMax;
   double HighEnBound = TMath::Max(cst::EnNormMax,m_enphmax); 
 
-  //Writes out an output log file for the pulsar
- 
+  //Writes out informations about the model parameters on the log file
+  WriteToLog("******** Pulsar Phenomenological Model ********");
 
-  //Redirect output to a subdirectory
-  /*  
-      const char * pulsarOutDir = ::getenv("PULSAROUTFILES");
-      std::string logSimLabel;
-      // override obssim if running in Gleam environment
-      if( pulsarOutDir!=0) 
-      logSimLabel = facilities::commonUtilities::joinPath(std::string(pulsarOutDir), m_name + "Log.txt");
-      else
-      logSimLabel = m_name + "Log.txt"; 
-      
-      ofstream PulsarLogSim;
-      PulsarLogSim.open(logSimLabel.c_str(),std::ios::app);
-  */
-
-  //Writes out informations about the model parameters on the file
-  m_PulsarLog << "******** Pulsar Phenomenological Model ********" << std::endl;
-  m_PulsarLog << "**  Random seed for the model : " << m_seed << std::endl;
-  m_PulsarLog << "**  Spectrum parameters: " << std::endl;
-  m_PulsarLog << "**           En = " << En  
-	       << " | E0 = " << E0 << std::endl;
-  m_PulsarLog << "**           G1 = " << G1 
-	       << " | b  = "  << b << std::endl;
-  m_PulsarLog << "**  enphmin " << m_enphmin << " enphmax " << m_enphmax << std::endl; 
-  m_PulsarLog << "**           Normalisation between " << cst::EnNormMin << " keV and " 
-	       << cst::EnNormMax << " keV " << std::endl;
-  m_PulsarLog << "**           Photon extraction between " << m_enphmin << " keV and " 
-	       << m_enphmax << " keV " << std::endl;
-  m_PulsarLog << "**  Spectrum calculated between " << LowEnBound << " keV and " 
-	        << HighEnBound << " keV " << std::endl; 
+  char temp[300];
+  sprintf(temp,"**  Random seed for the model : %d",m_seed);
+  WriteToLog(std::string(temp));
+  WriteToLog("**  Spectrum parameters: ");
+  sprintf(temp,"**           En: %.2e | E0: %.2E",En,E0);
+  WriteToLog(std::string(temp));
+  sprintf(temp,"**           G1: %.2f | b: %.2f",G1,b);  
+  WriteToLog(std::string(temp));
+  sprintf(temp,"**  enphmin: %.2e keV | enphmax: %.2e keV",m_enphmin,m_enphmax);
+  WriteToLog(std::string(temp));
+  sprintf(temp,"**           Normalisation between %.2e keV and %.2e keV ",cst::EnNormMin,cst::EnNormMax);
+  WriteToLog(std::string(temp));
+  sprintf(temp,"**           Photon extraction between %.2e keV and %.2e keV ",m_enphmin,m_enphmax);
+  WriteToLog(std::string(temp));
+  sprintf(temp,"**  Spectrum calculated between %.2e keV and %.2e keV",LowEnBound,HighEnBound);
+  WriteToLog(std::string(temp));
 
   //Create the spectrum profile
   double de = pow(HighEnBound/LowEnBound,1.0/Ebin);
@@ -263,25 +250,27 @@ TH2D* PulsarSim::PSRPhenom(double par0, double par1, double par2, double par3, d
 	    }
 	}
 
-      m_PulsarLog << std::setprecision(3) << "**\n**  Lightcurve parameters: (mindist = " 
-		   << mindist  << " s.)" << std::endl;
+      char temp[200];
+      printf(temp,"**\n**  Lightcurve parameters: (mindist = %.2f s.)",mindist);
+      WriteToLog(std::string(temp));
       
       if (ampl1 !=0)
 	{
-	  m_PulsarLog << std::setprecision(3) << "**           Peak 1 t = " << peak1 
-		       << "(Ph.= " << peak1/m_period << " ) " 
-		       << " , FWHM " << fwhm1 << " ampl1 " << ampl1 << std::endl; 
+	  sprintf(temp,"**           Peak 1 t = %.3f (ph= %.3f), FWHM: %.3f, ampl: %.3f",
+		  peak1,peak1/m_period,fwhm1,ampl1);
+	  WriteToLog(std::string(temp));
+	  WriteToLog("***********************************************");
 	}
       if (ampl2 !=0)
 	{
-	  m_PulsarLog << std::setprecision(3) << "**           Peak 2 t = " << peak2 
-		       << "(Ph.= " << peak2/m_period << " ) " 
-		       << " , FWHM " << fwhm2 << " ampl2 " << ampl2 << std::endl; 
-	  m_PulsarLog << "***********************************************" << std::endl;
+	  sprintf(temp,"**           Peak 1 t = %.3f (ph= %.3f), FWHM: %.3f, ampl: %.3f",
+		  peak2,peak2/m_period,fwhm2,ampl2);
+	  WriteToLog(std::string(temp));
+	  WriteToLog("***********************************************");
 	}
       
 
-      PulsarTimeCurve.SetParameters(peak1,fwhm1,ampl1,peak2,fwhm2,ampl2);  
+      //    PulsarTimeCurve.SetParameters(peak1,fwhm1,ampl1,peak2,fwhm2,ampl2);  
   
     }
   else if (m_numpeaks == 3)
@@ -296,7 +285,7 @@ TH2D* PulsarSim::PSRPhenom(double par0, double par1, double par2, double par3, d
 
       if (m_OutputLevel>1)
 	{
-	  m_PulsarLog << "Building lightcurve from file " << TimeProfileFileName << std::endl;
+	  WriteToLog("Building lightcurve from file "+ TimeProfileFileName);
 	}
       
       ifstream TimeProfileFile;
@@ -427,21 +416,20 @@ TH2D* PulsarSim::PSRShape(std::string ModelShapeName, int NormalizeFlux)
 
   //TimeProfileFileName = std::string(gleam)+"/"+ m_name + "TimeProfile.txt";
 
-
-  ofstream PulsarLogSim;
-  PulsarLogSim.open(logSimLabel.c_str(),std::ios::app);
-
   //Writes out informations about the model parameters on the file
-  PulsarLogSim << "******** Pulsar Shape Model ********" << std::endl;
-  PulsarLogSim << "** Using and arbitrary 2-d shape as spectrum" << std::endl;
-  PulsarLogSim << "** Pulsar Shape used:" << ModelShapeName << std::endl;
-  PulsarLogSim << "** Use normalization? : " << NormalizeFlux << std::endl;
+  WriteToLog("******** Pulsar Shape Model ********");
+  WriteToLog("** Using and arbitrary 2-d shape as spectrum");
+  WriteToLog("** Pulsar Shape used: "+ std::string(ModelShapeName));
+  if (NormalizeFlux ==1)
+    WriteToLog("** Use normalization :");
+  else
+    WriteToLog("** No normalization used:");
  
 
   //Look for ModelShapeName.root in the data directory...
   std::string ModelShapeInputFileName = facilities::commonUtilities::joinPath(m_pulsardata_dir, ModelShapeName + ".root");
 
-  PulsarLogSim << "** Using Shape " << ModelShapeName << " located at: " << ModelShapeInputFileName << std::endl;
+  WriteToLog("** Using Shape "+std::string(ModelShapeName)+ " located at: "+std::string(ModelShapeInputFileName));
 
   //Load 2HD Histogram
 
@@ -467,12 +455,14 @@ TH2D* PulsarSim::PSRShape(std::string ModelShapeName, int NormalizeFlux)
   int ei2 = nph->GetYaxis()->FindBin(cst::EnNormMin);
   int ei3 = nph->GetYaxis()->FindBin(cst::EnNormMax);
 
+  char temp[200];
+  sprintf(temp,"Pulsar shape defined between %.2e  keV and %.2e keV", shapeEmin,shapeEmax);
+  WriteToLog(std::string(temp));
+  sprintf(temp,"Phase bins: %d ; energy bins: %d",phbin,ebin);
+  WriteToLog(std::string(temp));
+  sprintf(temp,"Normalization between %.2e keV (%d) and %.2e keV (%d)",cst::EnNormMin,ei2,cst::EnNormMax,ei3);
+  WriteToLog(std::string(temp));
 
-  PulsarLogSim << "Pulsar shape defined between " << shapeEmin << " keV and " << shapeEmax << std::endl;
-  PulsarLogSim << "Phase bins " << phbin << " ; energy bins : " << ebin << std::endl;
-  PulsarLogSim << "Normalization between " << cst::EnNormMin << " keV ("<< ei2 
-	    << ") and " << cst::EnNormMax << " keV (" << ei3 << ")" << std::endl;
- 
   //Normalisation factor according to band between EGRET1 and EGRET2 energies
   //Integration is on a averaged flux over period
 
@@ -486,7 +476,6 @@ TH2D* PulsarSim::PSRShape(std::string ModelShapeName, int NormalizeFlux)
 
   delete nph;
 
-  PulsarLogSim.close();
 
   //Save output if flags are enabled
   if (::getenv("PULSAR_OUT_NV"))
@@ -614,4 +603,17 @@ void PulsarSim::SaveTimeProfile(TH2D *Nv)
  
 };
 
+
+//////////////////////////////////////////////////
+/*!
+ * \param Line line to be written in the output log file
+ *
+ * This method writes a line into a log file
+*/
+void PulsarSim::WriteToLog(std::string Line)
+{
+  std::ofstream PulsarLog(m_LogFileName.c_str(),std::ios::app);
+  PulsarLog << "** PulsarSim: " << Line << std::endl;
+  PulsarLog.close();
+}
 

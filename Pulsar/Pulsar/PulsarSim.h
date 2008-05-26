@@ -47,7 +47,6 @@ class PulsarSim
   ~PulsarSim()
     {
       delete m_Nv;
-      m_PulsarLog.close();
     }
   
   //! Method that creates the TH2D histogram according to the phenomenological model.
@@ -67,12 +66,12 @@ class PulsarSim
 
   //! Save a TXT file with the Pulsar time profile
   void SaveTimeProfile(TH2D *Nv);
+
+  //! Write to an output log file
+  void WriteToLog(std::string Line);
   
   //!Flag for Output level
   int m_OutputLevel;
-
-  //! output stream
-  std::ofstream m_PulsarLog;
 
  private:
 
@@ -102,6 +101,10 @@ class PulsarSim
 
   //!Outpur 2D ROOT histogram
   TH2D *m_Nv;
+
+  //! output log filename
+  std::string m_LogFileName;
+
 };
 
 #endif

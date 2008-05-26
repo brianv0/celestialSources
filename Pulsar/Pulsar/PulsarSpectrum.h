@@ -113,9 +113,6 @@ class PulsarSpectrum : public Spectrum
   //! Save an output txt file with pulsar orbital data compatible with D4 file
   int saveBinDbTxtFile();
 
-  //! Write Out Pulsar Log file
-  void WritePulsarLog();
-
   //! Check if a file exists using and throw an exception
   void CheckFileExistence(std::string NameFileToCheck);
 
@@ -145,6 +142,12 @@ class PulsarSpectrum : public Spectrum
 
   //! Parse parameters from XML file
   std::string parseParamList(std::string input, unsigned int index);  
+
+  //! Write to an output log file
+  void WriteToLog(std::string Line);
+
+  //! Write pulsar info
+  void WritePulsarLog();
       
  private:
   
@@ -197,9 +200,6 @@ class PulsarSpectrum : public Spectrum
   double m_phi0,m_N0;
   std::vector<double> m_phi0Vect,m_txbaryVect;
 
-  //!Log output file
-  std::ofstream m_PulsarLog;
-
   //!Type of model
   int m_model;
 
@@ -243,6 +243,9 @@ class PulsarSpectrum : public Spectrum
   //! Binary parameters - relative to PPN
   double m_Porb_dot,m_xdot,m_ecc_dot,m_omega_dot,m_gamma;
   double m_shapiro_r, m_shapiro_s;
+
+  //! output log filename
+  std::string m_LogFileName;
 
 };
 #endif
