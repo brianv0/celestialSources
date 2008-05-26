@@ -291,20 +291,6 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
 	exit(1);
       }
 
-  /*
-  //Redirect output to a subdirectory
-  const char * pulsarOutDir = ::getenv("PULSAROUTFILES");
-  std::string LogFileName ="";
-  // override obssim if running in Gleam environment
-  if( pulsarOutDir!=0) 
-    LogFileName = std::string(pulsarOutDir) + "/" + m_PSRname + "Log.txt";
-  else
-     LogFileName = m_PSRname + "Log.txt";
-  */
-
-  //qui
-
-
 
   if (m_OutputLevel > 0)
     {
