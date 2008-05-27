@@ -76,5 +76,6 @@
 *   v2r4p4   14-jan-2008  THB   Inherit from Spectrum, not ISpectrum
 *   v2r4p5   15-Jan-2008 MR Changed inverse binary demodulation algorithm. Bug fixed
 *   v2r4p6   05-May-2008 MR Added env variables to control output
+*   v2r5     21-May-2008 MR Updated the input methods and log options
 *@endverbatim
 */
