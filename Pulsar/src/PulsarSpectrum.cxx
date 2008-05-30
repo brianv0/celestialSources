@@ -243,7 +243,7 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
   //Load Pulsar General data from PulsarDataList.txt
   LoadPulsarData(m_pulsardata_dir,0);
   
-  if (::getenv("PULSAR_NO_DB")!=0)
+  if (!(::getenv("PULSAR_NO_DB")))
     {
       //Save the output txt file..
       int DbFlag = saveDbTxtFile();
@@ -257,7 +257,7 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
     {
       LoadPulsarData(m_pulsardata_dir,1); //loading orbital data from PulsarBinDataList.txt
 	
-      if (::getenv("PULSAR_NO_DB")!=0)
+      if (!(::getenv("PULSAR_NO_DB"))
 	{
 	  int BinDbFlag = saveBinDbTxtFile();
 	  if ((BinDbFlag !=1) && (m_OutputLevel>1))
