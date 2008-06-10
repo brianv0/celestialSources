@@ -247,6 +247,13 @@ void MapSource::getSubMapAxes(const genericSources::FitsImage & fitsImage) {
 
    double img_lonMin = axis.at(0)-0.5*dx;
    double img_lonMax = axis.at(axis.size()-1)+0.5*dx;
+   //The longitude can go in decreasing steps 
+   //(ascending from 0 to 180 to the left, -180 to 0 to the right)
+   if(img_lonMin>img_lonMax){
+     double temp=img_lonMax;
+     img_lonMax=img_lonMin;
+     img_lonMin=temp;
+   }
 
    //standard case : the subRange is included inside the map boundaries
    if(m_lonMin>=img_lonMin && m_lonMax<=img_lonMax)
