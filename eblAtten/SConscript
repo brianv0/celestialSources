@@ -1,4 +1,8 @@
-#$Id$
+# -*- python -*-
+# $Id$
+# Authors: James Chiang <jchiang@slac.stanford.edu>, Luis Reyes <lreyes@milkyway.gsfc.nasa.gov>
+# Version: eblAtten-00-05-00
+
 Import('baseEnv')
 Import('listFiles')
 progEnv = baseEnv.Clone()

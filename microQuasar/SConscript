@@ -1,4 +1,7 @@
-#$Id$
+# -*- python -*-
+# $Id$
+# Authors: Richard Dubois<richard@slac.stanford.edu>
+# Version: microQuasar-01-04-02
 Import('baseEnv')
 Import('listFiles')
 progEnv = baseEnv.Clone()
