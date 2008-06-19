@@ -1,0 +1,43 @@
+//##############################################################
+//
+// Job options file for Gleam job to run detault source for 10K events
+
+//$Header$
+
+// start with the basic program defined in Gleam
+#include "$GLEAMROOT/src/basicOptions.txt"
+
+// following, if uncommented, will run the GUI
+//#include "$GLEAMROOT/src/guiOptions.txt"
+//#include "$GLEAMROOT/src/fredOptions.txt"
+
+FluxSvc.source_lib = {"E:\GLAST\MQmodel\mq.xml"};
+FluxAlg.source_name="Galactic_LSI61_303";
+// DC2 start
+FluxSvc.StartDate = "2005-05-01 12:00:00";
+
+// set root output from merit with following
+MeritAlg.EventTreeName="MeritTuple";
+
+RootTupleSvc.filename="merit.root";
+
+// Set output level threshold (2=DEBUG, 3=INFO, 4=WARNING, 5=ERROR, 6=FATAL )
+CalClustersAlg.OutputLevel=4; // too much info
+
+// Number of events to process
+MeritAlg.generated = 1000; // for estimation of Aeff
+ApplicationMgr.EvtMax = 5000;
+
+TriggerAlg.mask=0;
+RootTupleSvc.RejectIfBad        =false;             // warning your own risk!
+
+
+Output.Members={};
+
+MessageSvc.OutputLevel      =3;
+
+//==============================================================
+//
+// End of job options file
+//
+//##############################################################
