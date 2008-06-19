@@ -1,4 +1,7 @@
-#$Id$
+# -*- python -*-
+# $Id$
+# Authors: Nicola Omodei<nicola.omodei@pi.infn.it>, Massimiliano Razzano <massimiliano.razzano@pi.infn.it>
+# Version: Pulsar-02-05-00
 Import('baseEnv')
 Import('listFiles')
 progEnv = baseEnv.Clone()
