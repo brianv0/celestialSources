@@ -1,6 +1,9 @@
 # -*- python -*-
 #
 # $Header$
+# Authors: James Chiang <jchiang@slac.stanford.edu>
+# Version: genericSources-01-11-03
+
 Import('baseEnv')
 Import('listFiles')
 progEnv = baseEnv.Clone()
