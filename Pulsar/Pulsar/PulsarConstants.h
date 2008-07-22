@@ -131,7 +131,7 @@ namespace cst
 
   //! Start Mission Date, expressed in MJD (corresponding to TT January 1st, 2007, at 00:00:00)
 
-  const double StartMissionDateMJD = 51910.0 + 64.184/86400.; ;//54101.0; 
+  const double StartMissionDateMJD = 51910.0 + 64.184/86400.;//54101.0; 
 
   
 
@@ -177,7 +177,7 @@ namespace cst
 
 
 
-};
+}
 
 
 

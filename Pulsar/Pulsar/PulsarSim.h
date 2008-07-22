@@ -56,7 +56,7 @@ class PulsarSim
   TH2D* PSRShape(std::string ModelShapeName="PulsarShape", int NormalizeFlux=0);
 
   // Returns a TH2D ROOT matrix that contains in every bin Nv*dE*dT*Aeff
-  TH2D *PulsarSim::Nph(const TH2D *Nv);
+  TH2D *Nph(const TH2D *Nv);
 
   //! Returns the period of the pulsar 
   inline double Period(){return m_period;}

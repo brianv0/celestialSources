@@ -2118,7 +2118,7 @@ std::string PulsarSpectrum::parseParamList(std::string input, unsigned int index
 
   if(index>=output.size()) return "";
   return output[index];
-};
+}
 
 //////////////////////////////////////////////////
 /*!

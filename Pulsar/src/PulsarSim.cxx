@@ -601,7 +601,7 @@ void PulsarSim::SaveTimeProfile(TH2D *Nv)
 
   OutTimeProf.close();
  
-};
+}
 
 
 //////////////////////////////////////////////////
