@@ -64,7 +64,7 @@ namespace cst
   const double LAT1=30.0e3;                   
   /// Top edge of the of GLAST/LAT energy band 300 GeV
   const double LAT2=3.0e8;                    
-};
+}
 /*!
  * \class Parameters
  * \brief This class reads the parameters from the file, compute the parameters of the physical model 
