@@ -35,8 +35,10 @@ ISpectrumFactory & PulsarFactory();
 ISpectrumFactory & SimpleTransientFactory();
 ISpectrumFactory & SourcePopulationFactory();
 ISpectrumFactory & TransientTemplateFactory();
+#ifndef BUILD_WITHOUT_ROOT
 ISpectrumFactory & TF1SpectrumFactory();
 ISpectrumFactory & TF1MapFactory();
+#endif
 ISpectrumFactory & FileSpectrumFactory();
 ISpectrumFactory & FileSpectrumMapFactory();
 ISpectrumFactory & RadialSourceFactory();
@@ -205,8 +207,10 @@ void TestApp::load_sources() {
    SimpleTransientFactory();
    SourcePopulationFactory();
    TransientTemplateFactory();
+#ifndef BUILD_WITHOUT_ROOT
    TF1SpectrumFactory();
    TF1MapFactory();
+#endif
    FileSpectrumFactory();
    FileSpectrumMapFactory();
    RadialSourceFactory();
