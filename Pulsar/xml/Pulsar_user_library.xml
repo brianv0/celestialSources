@@ -1,7 +1,7 @@
 <!-- $Header$
    This is a library of sources that can be included by a source with an empty element:
    that is, <source name="chime"/> picks up the entry named "chime"
-   Also, if the second command line option matches one of these names, it will be used as a source
+   Also,  if the second command line option matches one of these names, it will be used as a source
    (overriding any specified in the xml).
    Finally, it is used to generate a drop-down menu of sources to add.
 -->
