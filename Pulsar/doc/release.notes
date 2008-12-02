@@ -78,6 +78,6 @@
 *   v2r4p6   05-May-2008 MR Added env variables to control output
 *   v2r5     21-May-2008 MR Updated the input methods and log options
 *   v2r5p1     30-May-2008 MR bug PULSAR_NO_DB corrected
-*   v2r5p2     04-Nov-2008 MR log replaced with log10 in timing noise
+*   v2r5p2     04-Nov-2008 MR log replaced with log10 in timing noise, added EGRET B1706 and B1055
 *@endverbatim
 */
