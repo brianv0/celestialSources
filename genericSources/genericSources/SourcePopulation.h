@@ -145,20 +145,17 @@ private:
 
       double attenuation(double energy) const;
 
-      /// @class Self
-      /// @brief Static functions to provide a function pointer for 
-      /// integration of the photon spectrum, dnde, using dgaus8.
-      class Self {
+      class DndeIntegrand {
       public:
-         static void setPointSource(PointSource * self) {
-            s_self = self;
-         }
-         static double dndeIntegrand(double * energy) {
-            return s_self->dnde(*energy);
+         DndeIntegrand(const PointSource & pointSource) 
+            : m_pointSource(pointSource) {}
+         double operator()(double energy) const {
+            return m_pointSource.dnde(energy);
          }
       private:
-         static PointSource * s_self;
+         const PointSource & m_pointSource;
       };
+
    };
 
    std::vector<PointSource> m_sources;

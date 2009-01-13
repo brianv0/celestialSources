@@ -9,9 +9,11 @@
 #include <fenv.h>
 #endif
 
+#include <cmath>
 #include <cstdlib>
 
 #include <fstream>
+#include <sstream>
 
 #include "astro/GPS.h"
 #include "astro/PointingTransform.h"
@@ -21,6 +23,10 @@
 #include "flux/FluxMgr.h"
 
 #include "facilities/commonUtilities.h"
+
+#include "genericSources/SourcePopulation.h"
+
+#include "GaussianQuadrature.h"
 
 #include "TestUtil.h"
 
@@ -66,6 +72,8 @@ public:
    void setSources();
    void createEvents(const std::string & filename);
 
+   void test_dgaus8() const;
+
    static void load_sources();
    static HepRotation instrumentToCelestial(double time);
 
@@ -86,6 +94,8 @@ int main(int iargc, char * argv[]) {
    try {
       TestApp testApp;
       
+      testApp.test_dgaus8();
+
       testApp.parseCommandLine(iargc, argv);
       testApp.load_sources();
       testApp.setXmlFiles();
@@ -223,4 +233,39 @@ HepRotation TestApp::instrumentToCelestial(double time) {
 
    astro::PointingTransform transform(gps->zAxisDir(), gps->xAxisDir());
    return transform.localToCelestial();
+}
+
+class MyFunction {
+public:
+   MyFunction(double norm, double index1, double index2, double ebreak)
+      : m_norm(norm), m_index1(index1), m_index2(index2), m_ebreak(ebreak) {}
+   double operator()(double energy) const {
+      if (energy < m_ebreak) {
+         return m_norm*std::pow(energy, m_index1);
+      }
+      return m_norm*std::pow(energy, m_index2);
+   }
+private:
+   double m_norm;
+   double m_index1;
+   double m_index2;
+   double m_ebreak;
+};
+
+void TestApp::test_dgaus8() const {
+   MyFunction foo(1, -1.7, -2.3, 1e3);
+   double expected_value(4.56e-2);
+//   double expected_value(4.56e-3);
+   double err(1e-5);
+   int ier;
+   double result = 
+      genericSources::GaussianQuadrature::dgaus8(foo, 100., 1e5, err, ier);
+   double rel_diff((result - expected_value)/expected_value);
+   if (fabs(rel_diff) > 1e-3) {
+      std::ostringstream message;
+      message << "test_dgaus8 failed:\n"
+              << "result = " << result << "  "
+              << "expected value = " << expected_value;
+      throw std::runtime_error(message.str());
+   }
 }

@@ -31,7 +31,7 @@
 
 #include "ConstParMap.h"
 #include "Util.h"
-#include "dgaus8.h"
+#include "GaussianQuadrature.h"
 
 namespace {
    void cleanLine(std::string & line) {
@@ -168,7 +168,7 @@ std::string SourcePopulation::name() const {
    return m_name;
 }
 
-SourcePopulation::PointSource * SourcePopulation::PointSource::Self::s_self(0);
+//SourcePopulation::PointSource * SourcePopulation::PointSource::Self::s_self(0);
 
 SourcePopulation::
 PointSource::PointSource(const astro::SkyDir & dir, double flux,
@@ -233,9 +233,10 @@ double SourcePopulation::
 PointSource::integral(double emin, double emax) {
    double err(1e-5);
    double result(0);
-   long ierr;
-   Self::setPointSource(this);
-   dgaus8_(&Self::dndeIntegrand, &emin, &emax, &err, &result, &ierr);
+   int ierr;
+   DndeIntegrand dnde(*this);
+   result = genericSources::GaussianQuadrature::dgaus8(dnde, emin, emax, 
+                                                       err, ierr);
    return result;
 }
 

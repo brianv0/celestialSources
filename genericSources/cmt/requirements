@@ -6,7 +6,6 @@ author James Chiang <jchiang@slac.stanford.edu>
 # $Id$
 
 use GlastPolicy *
-use f2c *
 use cfitsio v* IExternal
 use CLHEP v* IExternal
 use facilities v*
