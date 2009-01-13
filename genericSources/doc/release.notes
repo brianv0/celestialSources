@@ -5,8 +5,11 @@
   @verbatim
   $Id$
 
+  13-Jan-09 v1r12   JC    remove dgaus8.c and f2c dependence; replace with
+                          C++ reimplementation of dgaus8
   29-Oct-08 v1r11p4 JV    Added code from peachey to allow root free build
-  10-Jun-08 v1r11p3 JCT   bug fix in submapping for reversed longitudes in MapSource
+  10-Jun-08 v1r11p3 JCT   bug fix in submapping for reversed longitudes 
+                          in MapSource
   22-May-08 v1r11p2 JC    bug fix for short time intervals in FitsTransient
   19-Feb-08 v1r11p1 JC    remove zero-valued dN/dE entries in data/dm120gev.dat
   19-Feb-08 v1r11   JC    FileSpectrum bug-fix for random deviate
