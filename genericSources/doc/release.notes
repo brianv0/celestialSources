@@ -5,6 +5,7 @@
   @verbatim
   $Id$
 
+  13-Jan-09 v1r12p1 JC    add GaussianQuadrature.h
   13-Jan-09 v1r12   JC    remove dgaus8.c and f2c dependence; replace with
                           C++ reimplementation of dgaus8
   29-Oct-08 v1r11p4 JV    Added code from peachey to allow root free build
