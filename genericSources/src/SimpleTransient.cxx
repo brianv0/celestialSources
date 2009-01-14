@@ -54,31 +54,30 @@ float SimpleTransient::operator()(float xi) const {
 }
 
 double SimpleTransient::interval(double time) {
-   time -= Spectrum::startTime();
    std::vector<double>::const_iterator eventTime =
       std::upper_bound(m_eventTimes.begin(), m_eventTimes.end(), time);
    if (eventTime != m_eventTimes.end()) {
       return *eventTime - time;
    } 
 // There should be a better way to turn off a source than this:
-   return 3.15e8;
+   return 8.64e5;
 }
 
 double SimpleTransient::energy(double time) {
    (void)(time);
-   double xi = CLHEP::RandFlat::shoot();
+   double xi = RandFlat::shoot();
    return (*this)(xi);
 }
 
 void SimpleTransient::createEventTimes() {
    double duration = m_tstop - m_tstart;
    double npred = m_flux*EventSource::totalArea()*duration;
-   long nevts = CLHEP::RandPoisson::shoot(npred);
+   long nevts = RandPoisson::shoot(npred);
 //    std::cerr << "SimpleTransient: number of events = " 
 //              << nevts << std::endl;
    m_eventTimes.reserve(nevts);
    for (long i = 0; i < nevts; i++) {
-      double xi = CLHEP::RandFlat::shoot();
+      double xi = RandFlat::shoot();
       m_eventTimes.push_back(duration*xi + m_tstart);
    }
    std::stable_sort(m_eventTimes.begin(), m_eventTimes.end());

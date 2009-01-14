@@ -85,12 +85,6 @@ public:
 
    static double drawFromPowerLaw(double emin, double emax, double gamma);
 
-   static double logInterpolate(const std::vector<double> & x, 
-                                const std::vector<double> & y, 
-                                double xx);
-
-   static double powerLawIntegral(double x1, double x2, double y1, double y2);
-
 };
 
 } // namespace genericSources

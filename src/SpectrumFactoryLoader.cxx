@@ -19,6 +19,7 @@ ISpectrumFactory & GaussianSourceFactory();
 ISpectrumFactory & GRBmanagerFactory();
 ISpectrumFactory & GRBobsmanagerFactory();
 ISpectrumFactory & GRBtemplateManagerFactory();
+ISpectrumFactory & GRBobsFactory();
 ISpectrumFactory & IsotropicFactory();
 ISpectrumFactory & MapSourceFactory();
 ISpectrumFactory & MapCubeFactory();
@@ -45,6 +46,7 @@ SpectrumFactoryLoader::SpectrumFactoryLoader() {
    load(GRBmanagerFactory());
    load(GRBobsmanagerFactory());
    load(GRBtemplateManagerFactory());
+   load(GRBobsFactory());
    load(GaussianSourceFactory());
    load(IsotropicFactory());
    load(MapSourceFactory());

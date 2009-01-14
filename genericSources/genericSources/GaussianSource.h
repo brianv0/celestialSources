@@ -66,8 +66,8 @@ private:
    double m_emin;
    double m_emax;
 
-   CLHEP::HepRotation m_rot;
-   CLHEP::Hep3Vector m_rotatedSrcVec;
+   HepRotation m_rot;
+   Hep3Vector m_rotatedSrcVec;
 
 };
 

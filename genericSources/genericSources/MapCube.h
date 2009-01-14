@@ -87,7 +87,7 @@ private:
    static bool cmpPair(const std::pair<double, double> & x, 
                        const std::pair<double, double> & y);
 
-   void checkForNonPositivePixels(const std::string &) const;
+   void checkForNonPositivePixels() const;
 
 };
 

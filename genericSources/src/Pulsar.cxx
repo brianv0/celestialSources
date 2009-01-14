@@ -51,7 +51,6 @@ Pulsar::Pulsar(const std::string &paramString)
 }
 
 double Pulsar::interval(double current_time) {
-   current_time -= Spectrum::startTime();
    double time = drawTime();
    double resid = residualTime(time + current_time);
    double my_period = period(time + current_time);
@@ -119,7 +118,7 @@ double Pulsar::period(double time) const {
 }
 
 double Pulsar::drawTime() const {
-   double xi = CLHEP::RandFlat::shoot();
+   double xi = RandFlat::shoot();
    double time = -std::log(xi)/m_meanFlux/EventSource::totalArea();
    return time;
 }
