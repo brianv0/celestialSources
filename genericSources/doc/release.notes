@@ -5,6 +5,8 @@
   @verbatim
   $Id$
 
+  15-May-09 v1r13   JC    allow for sky cone to be specified for Isotropic
+                          source
   13-Jan-09 v1r12p1 JC    add GaussianQuadrature.h
   13-Jan-09 v1r12   JC    remove dgaus8.c and f2c dependence; replace with
                           C++ reimplementation of dgaus8
