@@ -63,6 +63,9 @@ private:
    double m_gamma;
    double m_emin;
    double m_emax;
+   double m_ra;
+   double m_dec;
+   double m_cos_thetamax;
 
 };
 

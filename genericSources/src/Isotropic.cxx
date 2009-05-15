@@ -13,13 +13,18 @@
 #include "CLHEP/Random/JamesRandom.h"
 #include "CLHEP/Random/RandFlat.h"
 #include "CLHEP/Random/RandGauss.h"
+#include "CLHEP/Vector/ThreeVector.h"
 
 #include "facilities/Util.h"
+
+#include "astro/SkyDir.h"
 
 #include "flux/SpectrumFactory.h"
 #include "flux/EventSource.h"
 
 #include "genericSources/Isotropic.h"
+
+#include "ConstParMap.h"
 
 ISpectrumFactory &IsotropicFactory() {
    static SpectrumFactory<Isotropic> myFactory;
@@ -27,14 +32,36 @@ ISpectrumFactory &IsotropicFactory() {
 }
 
 Isotropic::Isotropic(const std::string & paramString) 
-   : m_flux(1.), m_gamma(2), m_emin(30.), m_emax(1e5) {
-   std::vector<std::string> params;
-   facilities::Util::stringTokenize(paramString, ", ", params);
+   : m_flux(1.), m_gamma(2), m_emin(20.), m_emax(5e5), m_ra(0), m_dec(0),
+     m_cos_thetamax(-1) {
 
-   m_flux = std::atof(params[0].c_str());
-   m_gamma = std::atof(params[1].c_str());
-   if (params.size() > 2) m_emin = std::atof(params[2].c_str());
-   if (params.size() > 3) m_emax = std::atof(params[3].c_str());
+   if (paramString.find("=") == std::string::npos) {
+      std::vector<std::string> params;
+      facilities::Util::stringTokenize(paramString, ", ", params);
+      
+      m_flux = std::atof(params[0].c_str());
+      m_gamma = std::atof(params[1].c_str());
+      m_emin = std::atof(params[2].c_str());
+      m_emax = std::atof(params[3].c_str());
+      if (params.size() > 4) {
+         m_ra = std::atof(params[4].c_str());
+         m_dec = std::atof(params[5].c_str());
+         m_cos_thetamax = std::cos(std::atof(params[6].c_str())*M_PI/180.);
+      }
+   } else {
+      genericSources::ConstParMap parmap(paramString);
+      
+      m_flux = parmap.value("flux");
+      m_gamma = parmap.value("gamma");
+      m_emin = parmap.value("emin");
+      m_emax = parmap.value("emax");
+      try {
+         m_ra = parmap.value("ra");
+         m_dec = parmap.value("dec");
+         m_cos_thetamax = std::cos(parmap.value("radius")*M_PI/180.);
+      } catch (...) {
+      }
+   }
 }
 
 float Isotropic::operator()(float xi) const {
@@ -70,21 +97,17 @@ std::pair<double, double> Isotropic::dir(double energy) {
    (void)(energy);
 
    double xi = CLHEP::RandFlat::shoot();
-   double lon = 360.*xi - 180.;
+   double phi = 2.*M_PI*xi;
 
    xi = CLHEP::RandFlat::shoot();
-   double mu = 2.*xi - 1.;
-   double theta;
-   if (fabs(mu) <= 1.) {
-      theta = acos(mu);
-   } else {
-      if (mu > 0) {
-         theta = 0;
-      } else {
-         theta = M_PI;
-      }
-   }
-   double lat = (M_PI/2. - theta)*180./M_PI;
+   double costh = 1. - xi*(1. - m_cos_thetamax);
+   double sinth = std::sqrt(1. - costh*costh);
 
-   return std::make_pair(lon, lat);
+   CLHEP::Hep3Vector direction(std::cos(phi)*sinth, 
+                               std::sin(phi)*sinth, 
+                               costh);
+                               
+   astro::SkyDir dir(direction.rotateY((90 - m_dec)*M_PI/180.).rotateZ(m_ra*M_PI/180));
+
+   return std::make_pair(dir.l(), dir.b());
 }
