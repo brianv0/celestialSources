@@ -25,7 +25,7 @@ namespace IRB {
  * $Header$
  */
 
-enum EblModel {Kneiske, Primack05, Kneiske_HighUV, Stecker05};
+enum EblModel {Kneiske, Primack05, Kneiske_HighUV, Stecker05, Franceschini, Razzaque};
 
 class EblAtten {
 

@@ -16,7 +16,7 @@
 int main() {
 
    IRB::EblAtten tau0(IRB::Kneiske), tau1(IRB::Primack05),
-      tau2(IRB::Kneiske_HighUV), tau3(IRB::Stecker05);
+      tau2(IRB::Kneiske_HighUV), tau3(IRB::Stecker05), tau4(IRB::Razzaque), tau5(IRB::Franceschini);
 
    double emin(1e4), emax(5e5);
    int npts(50);
@@ -33,6 +33,8 @@ int main() {
                 << tau0(energy, z[j]) << "  "
                 << tau1(energy, z[j]) << "  "
                 << tau2(energy, z[j]) << "  "
-		<< tau3(energy, z[j]) << std::endl;
+                << tau3(energy, z[j]) << "  "
+                << tau4(energy, z[j]) << "  "
+		<< tau5(energy, z[j]) << std::endl;
    }
 }
