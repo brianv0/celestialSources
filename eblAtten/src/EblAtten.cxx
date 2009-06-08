@@ -21,7 +21,8 @@ float calcPrimack05(float energy, float redshift);
 float calcKneiske_HighUV(float energy, float redshift);
 float calcStecker05(float energy, float redshift);
 float calcFranceschini(float energy, float redshift);
-float calcRazzaque(float energy, float redshift);
+float calcFinke(float energy, float redshift);
+float calcGilmore(float energy, float redshift);
 
 EblAtten::EblAtten(EblModel model) : m_model(model) {
    if (s_model_Ids.size() == 0) {
@@ -29,8 +30,9 @@ EblAtten::EblAtten(EblModel model) : m_model(model) {
       s_model_Ids[Primack05] = "Primack et al (2005)";
       s_model_Ids[Kneiske_HighUV] = "Kneiske et al - High UV (2004)";
       s_model_Ids[Stecker05] = "Stecker et al (2005)";
-	  s_model_Ids[Franceschini] = "Franceschini (2008)";
-	  s_model_Ids[Razzaque] = "Razzaque, Dermer and Finke (2008)";
+      s_model_Ids[Franceschini] = "Franceschini (2008)";
+      s_model_Ids[Finke] = "Finke et al. (2009)";
+      s_model_Ids[Gilmore] = "Gilmore et al. (2008)";	  
       }
    if (s_model_Ids.find(model) == s_model_Ids.end()) {
       std::ostringstream message;
@@ -58,8 +60,10 @@ float EblAtten::operator()(float energy, float redshift) const {
       return calcStecker05(energy, redshift);
    case Franceschini:
       return calcFranceschini(energy, redshift);
-   case Razzaque:
-      return calcRazzaque(energy, redshift);
+   case Finke:
+      return calcFinke(energy, redshift);
+   case Gilmore:
+      return calcGilmore(energy, redshift);
    }
    return 0;
 }
