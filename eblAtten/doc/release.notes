@@ -5,6 +5,10 @@
   @verbatim
   $Id$
 
+  19-Jun-09 v0r7p1  JC    add EblAtten::model()
+  08-Jun-09 v0r7    LR    Gilmore model, updating Finke et al. 
+                          (previously Razzaque et al.)
+  02-Jun-09 v0r6    LR    Franceschini et al. and Razzaque et al. EBL models
   08-Jan-08 v0r5    JC    fix memory leak in calcPrimack05: add Singleton
                           Primack05 class to handle static data. (More 
                           refactoring still needs to be done.)
