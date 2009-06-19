@@ -38,6 +38,10 @@ public:
    /// @param Source redshift
    float operator()(float energy, float redshift) const;
 
+   EblModel model() const {
+      return m_model;
+   }
+
 private:
 
    EblModel m_model;
