@@ -1,7 +1,7 @@
 # -*- python -*-
 # $Id$
 # Authors: James Chiang <jchiang@slac.stanford.edu>, Luis Reyes <lreyes@milkyway.gsfc.nasa.gov>
-# Version: eblAtten-00-07-00
+# Version: eblAtten-00-07-01
 
 Import('baseEnv')
 Import('listFiles')
