@@ -4,6 +4,7 @@
 
   @verbatim
   $Id$
+  * EOH *
 
   29-Oct-07 v1r3p2   JC    Remove GrbobsFactory (was deleted from GRB package)
   19-Oct-07 v1r3p1   JC    Remove EventListFactory from SpectrumFactoryLoader

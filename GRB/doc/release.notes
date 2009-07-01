@@ -4,6 +4,8 @@
 *
 *   $Header$
 *@verbatim
+ * EOH *
+
 *   v4r4p3   23-apr-2008  JCT compliant with 64bits machines
 *   v4r4p2   22-feb-2008  NO update SCons
 *   v4r4p1   25-jan-2008  NO include SCons
