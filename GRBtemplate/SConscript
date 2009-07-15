@@ -1,7 +1,7 @@
 # -*- python -*-
 # $Id$
 # Authors: Nicola Omodei<nicola.omodei@pi.infn.it>
-# Version: GRBtemplate-01-03-01
+# Version: GRBtemplate-01-03-02
 Import('baseEnv')
 Import('listFiles')
 progEnv = baseEnv.Clone()
