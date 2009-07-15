@@ -1,0 +1,21 @@
+# -*- python -*-
+# $Id$
+# Authors: Richard Dubois<richard@slac.stanford.edu>
+# Version: microQuasar-01-04-03
+Import('baseEnv')
+Import('listFiles')
+progEnv = baseEnv.Clone()
+libEnv = baseEnv.Clone()
+
+libEnv.Tool('microQuasarLib', depsOnly = 1)
+microQuasarLib = libEnv.StaticLibrary('microQuasar', listFiles(['src/*.cxx']))
+
+progEnv.Tool('microQuasarLib')
+test_microQuasar = progEnv.Program('test_microQuasar',
+                                   listFiles(['src/test/*.cxx']))
+
+progEnv.Tool('registerTargets', package = 'microQuasar',
+             staticLibraryCxts = [[microQuasarLib, libEnv]],
+             includes = listFiles(['microQuasar/*.h']),
+             testAppCxts = [[test_microQuasar, progEnv]],
+             xml = listFiles(['xml/*'], recursive = True))
