@@ -6,6 +6,7 @@
   $Id$
   * EOH *
 
+  15-Jul-09 v1r3p2     jrb   Update to SConscript
   23-apr-08 v1r2p3     JCT   compliant with 64bits machines
   04-dec-07 v1r2p1     NO    new facilities
   23-nov-07 v1r2       NO    new facilities
