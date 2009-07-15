@@ -6,6 +6,7 @@
   $Id$
   * EOH *
 
+  15-Jul-09 v1r3p6   jrb  Update SConscript
   23-Apr-08 v1r3p5  JCT   fix compilation on 64bit machines
   27-Sept-07 v1r3p3  NG   add facilities to the requirements file
   27-Sept-07 v1r3p2  NO   add Facilities/commonUtils
