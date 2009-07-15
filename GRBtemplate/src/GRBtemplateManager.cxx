@@ -263,7 +263,7 @@ double GRBtemplateManager::energy(double time)
 std::string GRBtemplateManager::parseParamList(std::string input, unsigned int index)
 {
   std::vector<std::string> output;
-  unsigned int i=0;
+  unsigned long i=0;
   for(;!input.empty() && i!=std::string::npos;){
     
     i=input.find_first_of(",");
