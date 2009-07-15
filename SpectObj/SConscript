@@ -1,7 +1,7 @@
 # -*- python -*-
 # $Id$
 # Authors: Nicola Omodei<nicola.omodei@pi.infn.it>
-# Version: SpectObj-01-03-05
+# Version: SpectObj-01-03-06
 Import('baseEnv')
 Import('listFiles')
 libEnv = baseEnv.Clone()
