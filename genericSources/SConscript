@@ -18,9 +18,9 @@ progEnv.Tool('genericSourcesLib')
 test_genericSourcesBin = progEnv.Program('test_genericSources',
                                          'src/test/test.cxx')
 
-progEnv.Tool('registerObjects', package='genericSources', 
-             libraries=[genericSourcesLib],
+progEnv.Tool('registerTargets', package='genericSources', 
+             staticLibraryCxts=[[genericSourcesLib, libEnv]],
              includes=listFiles(['genericSources/*.h']),
-             testApps=[test_genericSourcesBin],
+             testAppCxts=[[test_genericSourcesBin, progEnv]],
              data = listFiles(['data/*'], recursive = True),
              xml = listFiles(['xml/*'], recursive = True))

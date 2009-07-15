@@ -16,9 +16,9 @@ progEnv.Tool('celestialSourcesLib')
 test_celestialSourcesBin = progEnv.Program('test_celestialSources',
                                            listFiles(['src/test/*.cxx']))
 
-progEnv.Tool('registerObjects', package='celestialSources',
-             libraries=[celestialSourcesLib], 
-             testApps=[test_celestialSourcesBin],
+progEnv.Tool('registerTargets', package='celestialSources',
+             staticLibraryCxts=[[celestialSourcesLib, libEnv]], 
+             testAppCxts=[[test_celestialSourcesBin, progEnv]],
              includes=listFiles(['celestialSources/*.h']))
 
 

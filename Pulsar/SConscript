@@ -11,7 +11,12 @@ libEnv.Tool('PulsarLib', depsOnly = 1)
 PulsarLib = libEnv.StaticLibrary('Pulsar', listFiles(['src/*.cxx', 'src/Pulsar/*.cxx']))
 
 progEnv.Tool('PulsarLib')
-test_PulsarROOTBin = progEnv.Program('test_PulsarROOT', 'src/test/other/PulsarROOTtest.cxx')
+test_PulsarROOTBin = progEnv.Program('test_PulsarROOT',
+                                     'src/test/other/PulsarROOTtest.cxx')
 
-progEnv.Tool('registerObjects', package = 'Pulsar', libraries = [PulsarLib], includes = listFiles(['Pulsar/*.h']), testApps = [test_PulsarROOTBin],
-             data = listFiles(['data/*'], recursive = True), xml = listFiles(['xml/*'], recursive = True))
+progEnv.Tool('registerTargets', package = 'Pulsar',
+             staticLibraryCxts = [[PulsarLib, libEnv]],
+             includes = listFiles(['Pulsar/*.h']),
+             testAppCxts = [[test_PulsarROOTBin, progEnv]],
+             data = listFiles(['data/*'], recursive = True),
+             xml = listFiles(['xml/*'], recursive = True))

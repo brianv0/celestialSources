@@ -11,8 +11,15 @@ libEnv.Tool('GRBtemplateLib', depsOnly = 1)
 GRBtemplateLib = libEnv.StaticLibrary('GRBtemplate', listFiles(['src/*.cxx']))
 
 progEnv.Tool('GRBtemplateLib')
-test_GRBtemplateBin = progEnv.Program('test_GRBtemplate', 'src/test/testGRB.cxx')
-test_GRBTEMPLATEROOTBin = progEnv.Program('test_GRBTEMPLATEROOT', 'src/test/other/GRBROOTtest.cxx')
+test_GRBtemplateBin = progEnv.Program('test_GRBtemplate',
+                                      'src/test/testGRB.cxx')
+test_GRBTEMPLATEROOTBin = progEnv.Program('test_GRBTEMPLATEROOT',
+                                          'src/test/other/GRBROOTtest.cxx')
 
-progEnv.Tool('registerObjects', package = 'GRBtemplate', libraries = [GRBtemplateLib], testApps = [test_GRBtemplateBin, test_GRBTEMPLATEROOTBin],
-             includes = listFiles(['GRBtemplate/*.h']), data = listFiles(['data/*'], recursive = True), xml = listFiles(['xml/*'], recursive = True))
+progEnv.Tool('registerTargets', package = 'GRBtemplate',
+             staticLibraryCxts = [[GRBtemplateLib, libEnv]],
+             testAppCxts = [[test_GRBtemplateBin, progEnv],
+                            [test_GRBTEMPLATEROOTBin, progEnv]],
+             includes = listFiles(['GRBtemplate/*.h']),
+             data = listFiles(['data/*'], recursive = True),
+             xml = listFiles(['xml/*'], recursive = True))

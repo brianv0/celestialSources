@@ -14,4 +14,7 @@ eblAttenLib = libEnv.StaticLibrary('eblAtten', listFiles(['src/*.cxx','src/*.c']
 progEnv.Tool('eblAttenLib')
 test_eblAttenBin = progEnv.Program('test_eblAtten', 'src/test/test.cxx')
 
-progEnv.Tool('registerObjects', package = 'eblAtten', libraries =  [eblAttenLib], includes = listFiles(['eblAtten/*.h']), testApps = [test_eblAttenBin])
+progEnv.Tool('registerTargets', package = 'eblAtten',
+             staticLibraryCxts =  [[eblAttenLib,libEnv]],
+             includes = listFiles(['eblAtten/*.h']),
+             testAppCxts = [[test_eblAttenBin,progEnv]])
