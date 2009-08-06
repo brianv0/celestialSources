@@ -13,6 +13,8 @@
 #include <fstream>
 #include <iomanip>
 #include <ctime>
+#include <cstdlib>
+
 #include "TFile.h"
 #include "TF1.h"
 #include <TTree.h>

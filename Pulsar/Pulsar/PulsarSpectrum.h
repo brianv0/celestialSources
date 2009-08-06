@@ -77,6 +77,11 @@ class PulsarSpectrum : public Spectrum
   //! Compute binary demodulation in iterative way
   double getIterativeDemodulatedTime(double tInput, int LogFlag);
 
+  //! Compute the True anomaly
+  double PulsarSpectrum::getTrueAnomaly(double tInput);
+
+  double PulsarSpectrum::getOrbitalPhase(double tInput);
+
   //! Compute binary demodulation in a single step
   double getBinaryDemodulation( double tInput, int LogDemodFlag);
 
