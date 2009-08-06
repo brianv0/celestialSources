@@ -82,6 +82,7 @@ class SpectObj
   photon GetPhoton(double t0, double enph);
   
   void SetAreaDetector(double AreaDetector=6.0);
+  inline void SetFluxFactor(double FluxFactor=1.0) {m_FluxFactor = FluxFactor;};
     
   inline double GetAreaDetector() { return m_AreaDetector; }
   double flux(double time, double enph);
@@ -103,6 +104,8 @@ class SpectObj
  private:
   int counts;
   double  m_AreaDetector;
+  double  m_FluxFactor;
+
 #if 0 //THB
   TRandom *m_SpRandGen;
 #else
