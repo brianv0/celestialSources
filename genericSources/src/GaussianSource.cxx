@@ -87,15 +87,11 @@ double GaussianSource::energy(double time) {
 std::pair<double, double> GaussianSource::dir(double energy) {
    (void)(energy);
 
-   double psi = CLHEP::RandFlat::shoot()*2.*M_PI;
+   double x = m_major*CLHEP::RandGauss::shoot();
+   double y = m_minor*CLHEP::RandGauss::shoot();
 
-   double x = m_major*cos(psi);
-   double y = m_minor*sin(psi);
-
-   double sigma = sqrt(x*x + y*y);
+   double theta = sqrt(x*x + y*y);
    double phi = atan2(y, x);
-
-   double theta = CLHEP::RandGauss::shoot()*sigma;
 
    CLHEP::Hep3Vector appDir 
       = CLHEP::HepRotation().rotateY(theta).rotateZ(phi+m_posAngle)*m_rotatedSrcVec;
