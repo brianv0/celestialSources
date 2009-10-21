@@ -46,10 +46,15 @@ SimpleTransient::SimpleTransient(const std::string & paramString)
 }
 
 float SimpleTransient::operator()(float xi) const {
+   float energy;
+   if (m_gamma == 1.) {
+      energy = m_emin*std::exp(xi*std::log(m_emax/m_emin));
+      return energy;
+   }
    double one_m_gamma = 1. - m_gamma;
    double arg = xi*(pow(m_emax, one_m_gamma) - pow(m_emin, one_m_gamma)) 
       + pow(m_emin, one_m_gamma);
-   float energy = pow(arg, 1./one_m_gamma);
+   energy = pow(arg, 1./one_m_gamma);
    return energy;
 }
 
