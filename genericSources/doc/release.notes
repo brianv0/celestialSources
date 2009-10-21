@@ -6,6 +6,7 @@
   $Id$
   * EOH *
 
+ genericSources-01-14-01 21-Oct-2009 jchiang handle photon index=-1 for SimpleTransient
  genericSources-01-14-00 17-Oct-2009 jchiang reimplementation of GaussianSource from Josh
   15-Jul-09 v1r13p1 jrb   Update SConscript
   15-May-09 v1r13   JC    allow for sky cone to be specified for Isotropic
