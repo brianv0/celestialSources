@@ -6,6 +6,7 @@
   $Id$
   * EOH *
 
+ eblAtten-00-08-00 11-Nov-2009 lreyes Tagging v0r8
   11-Nov-09  v0r8   LR    add Stecker06 Fast Evol, SalamonStecker 98 and Generic Tau(E,z)
   15-Jul-09  v0r7p2 jrb   Update SConscript
   19-Jun-09 v0r7p1  JC    add EblAtten::model()
