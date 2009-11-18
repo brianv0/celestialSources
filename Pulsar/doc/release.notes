@@ -8,6 +8,7 @@
 *@verbatim
 * EOH *
 
+ Pulsar-03-00-00 18-Nov-2009 razzano Added binary modulation
    v2r5p3   15-Jul-2009  jrb   Update SConscript
 *  v2r5p2   04-Nov-2008 MR log replaced with log10 in timing noise, added EGRET B1706 and B1055
 *  v2r5p1     30-May-2008 MR bug PULSAR_NO_DB corrected 
