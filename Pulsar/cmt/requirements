@@ -1,5 +1,5 @@
 package Pulsar
-version v2r5p3
+version v3r0p0
 author Nicola Omodei<nicola.omodei@pi.infn.it>, Massimiliano Razzano <massimiliano.razzano@pi.infn.it>
 # $Id$
 
