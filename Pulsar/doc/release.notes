@@ -8,6 +8,7 @@
 *@verbatim
 * EOH *
 
+ Pulsar-02-05-03 18-Nov-2009 razzano Added binary modulation
  Pulsar-03-00-01 18-Nov-2009 razzano Added binary modulation
  Pulsar-03-00-00 18-Nov-2009 razzano Added binary modulation
    v2r5p3   15-Jul-2009  jrb   Update SConscript
