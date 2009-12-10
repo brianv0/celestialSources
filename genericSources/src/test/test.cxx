@@ -153,8 +153,10 @@ void TestApp::setSources() {
                         "map_cube_source_0",
                         "fits_spectrum",
                         "source_population",
+#ifndef BUILD_WITHOUT_ROOT
 			"tf1spectrum_test",
  			"tf1map_test",
+#endif
                         "filespectrummap_test",
  			"filespectrum_test",
                         "radial_source"
