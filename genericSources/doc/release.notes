@@ -6,6 +6,7 @@
   $Id$
   * EOH *
 
+ genericSources-01-14-03 13-Dec-2009 jchiang test if stag will apply old-style tag for old RM
  genericSources-01-14-02 10-Dec-2009 vernaleo Minor change to test
 				              code for root free build
  genericSources-01-14-01 21-Oct-2009 jchiang handle photon index=-1 for SimpleTransient
