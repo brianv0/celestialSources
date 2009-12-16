@@ -10,6 +10,7 @@
 #include "facilities/commonUtilities.h"
 #include "facilities/Util.h"
 #include <cmath>
+#include <cstdlib>
 #include <vector>
 
 #define DEBUG 0

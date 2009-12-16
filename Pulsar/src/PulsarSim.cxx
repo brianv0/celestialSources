@@ -3,6 +3,7 @@
 // contains the code for the implementation of the models
 //////////////////////////////////////////////////
 
+#include <cstdlib>
 #include <iostream>
 #include "Pulsar/PulsarConstants.h"
 #include "Pulsar/PulsarSim.h"
