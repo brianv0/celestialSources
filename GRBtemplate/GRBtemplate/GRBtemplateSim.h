@@ -44,7 +44,7 @@ namespace TmpCst
   const double SWIFT1=15.0;
   const double SWIFT2=350.0;      
   //////////////////////////////////////////////////
-};
+}
 
 /*!
   \class GRBtemplateSim
@@ -82,7 +82,7 @@ class GRBtemplateSim
     Compute the Flux, as a function of time. It returns a matrix.
   */
   ///    Converts \f$ph/(m^2~s~keV)\f$ into \f$ph/(m^2)\f$, by multiplying for the bin widths.
-  TH2D *GRBtemplateSim::Nph(const TH2D *Nv);
+  TH2D *Nph(const TH2D *Nv);
   /// Returns the (l,b) galactic position of the burst
   //  inline std::pair<double,double> GRBdir(){return m_GRBengine->GetDirection();}
   /// Rerturn the duration of the burst
