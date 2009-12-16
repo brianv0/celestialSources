@@ -1,4 +1,5 @@
 #include "GRBmanager.h"
+#include <cstdlib>
 #include <iostream>
 #include <fstream>
 #include "flux/SpectrumFactory.h" 
