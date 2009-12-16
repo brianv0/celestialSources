@@ -6,6 +6,8 @@
  * $Header$
  */
 
+#include <cstdlib>
+
 #include "CLHEP/Random/RandomEngine.h"
 #include "CLHEP/Random/JamesRandom.h"
 #include "CLHEP/Random/RandFlat.h"

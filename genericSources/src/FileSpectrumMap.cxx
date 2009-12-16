@@ -7,6 +7,7 @@
 #include "genericSources/FileSpectrumMap.h"
 #include "flux/SpectrumFactory.h"
 #include "facilities/Util.h"
+#include <cstdlib>
 #include <iostream>
 
 ISpectrumFactory &FileSpectrumMapFactory() {

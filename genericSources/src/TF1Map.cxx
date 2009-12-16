@@ -7,6 +7,7 @@
 #include "genericSources/TF1Map.h"
 #include "flux/SpectrumFactory.h"
 #include "facilities/Util.h"
+#include <cstdlib>
 #include <iostream>
 
 ISpectrumFactory &TF1MapFactory() {
