@@ -1,4 +1,5 @@
 #include "GRBtemplate/GRBtemplateManager.h"
+#include <cstdlib>
 #include <iostream>
 #include <stdexcept>
 #include <fstream>
