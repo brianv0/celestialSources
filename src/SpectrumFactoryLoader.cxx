@@ -9,7 +9,9 @@
 #include <vector>
 
 #include "celestialSources/SpectrumFactoryLoader.h"
+#ifndef BUILD_WITHOUT_ROOT
 #include "celestialSources/TRandom4.h"
+#endif
 
 #include "flux/ISpectrumFactory.h"
 
@@ -39,12 +41,16 @@ ISpectrumFactory & RadialSourceFactory();
 SpectrumFactoryLoader::SpectrumFactoryLoader() {
 // Replace ROOT's global TRandom instance with our local version that
 // uses the CLHEP engines underneath.
+#ifndef BUILD_WITHOUT_ROOT
    gRandom = new TRandom4();
+#endif
 
    load(FitsTransientFactory());
+#ifndef BUILD_WITHOUT_ROOT
    load(GRBmanagerFactory());
    load(GRBobsmanagerFactory());
    load(GRBtemplateManagerFactory());
+#endif
    load(GaussianSourceFactory());
    load(IsotropicFactory());
    load(MapSourceFactory());
@@ -55,9 +61,11 @@ SpectrumFactoryLoader::SpectrumFactoryLoader() {
    load(SourcePopulationFactory());
    load(SpectralTransientFactory());
    load(TransientTemplateFactory());
+#ifndef BUILD_WITHOUT_ROOT
    load(PulsarSpectrumFactory());
    load(TF1SpectrumFactory());
    load(TF1MapFactory());
+#endif
    load(FileSpectrumFactory());
    load(FileSpectrumMapFactory());
    load(microQuasarFactory());
