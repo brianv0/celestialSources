@@ -368,7 +368,7 @@ void GRBobsSim::SaveNvEC()
   m_NvEC->Write();
   mod.Close();
   m_NvEC->SetName(name.c_str());
-};
+}
 
 void GRBobsSim::SaveNv()
 {
@@ -393,7 +393,7 @@ void GRBobsSim::SaveNv()
   mod.Close();
   m_Nv->SetName(name.c_str());
 
-};
+}
 
 //////////////////////////////////////////////////
 void GRBobsSim::SaveGBMDefinition(std::string GRBname, double ra, double dec, double theta, double phi, double tstart)
