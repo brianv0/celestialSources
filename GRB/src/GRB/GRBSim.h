@@ -46,7 +46,7 @@ class GRBSim
   /// Compute the TH2 object wich stores the flux as a function of energy and time.
   TH2D* Fireball();
   ///    Converts \f$ph/(m^2~s~keV)\f$ into \f$ph/(m^2)\f$, by multiplying for the bin widths.
-  TH2D *GRBSim::Nph(const TH2D *Nv);
+  TH2D *Nph(const TH2D *Nv);
   /// Returns the (l,b) galactic position of the burst
   inline std::pair<double,double> GRBdir(){return m_GRBengine->GetDirection();}
   inline double GetDistance(){return m_GRBengine->GetDistance();}
