@@ -165,7 +165,6 @@ std::pair<double, double> MapSource::dir(double energy) {
 
    double lon, lat;
    samplePixel(indx, lon, lat);
-
    if (m_axisTypes[0].find_first_of("R") == 0) {
 // We have Equatorial coordinates.
       astro::SkyDir myDir(lon, lat);
@@ -190,7 +189,7 @@ samplePixel(unsigned int indx, double &lon, double &lat) const {
       lon_step = m_lon.at(i+1) - m_lon.at(i);
    }
 
-   lon = xi*lon_step + m_lon.at(i);
+   lon = (xi-0.5)*lon_step + m_lon.at(i);
 
 // Sample as cos(lat) in latitude
    xi = CLHEP::RandFlat::shoot();
