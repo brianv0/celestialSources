@@ -6,6 +6,7 @@
   $Id$
   * EOH *
 
+ genericSources-01-14-04 21-Jan-2010 jchiang bug-fix for 1/2 pixel offset in MapSource (SRCMOD-14@JIRA)
  genericSources-01-14-03 13-Dec-2009 jchiang test if stag will apply old-style tag for old RM
  genericSources-01-14-02 10-Dec-2009 vernaleo Minor change to test
 				              code for root free build
