@@ -7,7 +7,6 @@ Import('listFiles')
 progEnv = baseEnv.Clone()
 libEnv = baseEnv.Clone()
 
-libEnv.Tool('GRBtemplateLib', depsOnly = 1)
 GRBtemplateLib = libEnv.StaticLibrary('GRBtemplate', listFiles(['src/*.cxx']))
 
 progEnv.Tool('GRBtemplateLib')

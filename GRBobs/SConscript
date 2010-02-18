@@ -8,7 +8,6 @@ Import('listFiles')
 progEnv = baseEnv.Clone()
 libEnv = baseEnv.Clone()
 
-libEnv.Tool('GRBobsLib', depsOnly = 1)
 GRBobsLib = libEnv.StaticLibrary('GRBobs', listFiles(['src/*.cxx', 'src/GRBobs/*.cxx']))
 
 progEnv.Tool('GRBobsLib')

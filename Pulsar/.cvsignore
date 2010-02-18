@@ -7,3 +7,5 @@ setup.*
 rh*
 Linux*
 VC8*
+build
+*.pyc
