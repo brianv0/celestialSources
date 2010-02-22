@@ -15,7 +15,7 @@ using namespace grbobstypes;
 
 // result(engine, lo, hi, p)
 // returns interpolated values from lo and hi
-double GRBobsUtilities::result(CLHEP::HepRandomEngine *engine, const double lo, 
+double GRBobsUtilities::result(HepRandomEngine *engine, const double lo, 
                                const double hi, const double p)
 {
     return lo * pow((1.0 - engine->flat() * (1.0 - pow((hi/lo), -p))), (-1/p));

@@ -17,7 +17,9 @@
 #include <string>
 #include <functional>  // for unary_function
 
-namespace CLHEP {class HepRandomEngine;}
+class HepRandomEngine;
+
+
 
 class GrbGlobalData
 {
@@ -25,7 +27,7 @@ public:
     /*!
      * \brief Static access.
      */
-    static GrbGlobalData	*instance(CLHEP::HepRandomEngine *engine);
+    static GrbGlobalData	*instance(HepRandomEngine *engine);
 
     /*!
      * \brief Static destruction.
@@ -47,7 +49,7 @@ protected:
     /*!
      * \brief Singleton - protected ctor/dtor
      */
-    GrbGlobalData(CLHEP::HepRandomEngine *engine);
+    GrbGlobalData(HepRandomEngine *engine);
     virtual ~GrbGlobalData();
     
     
@@ -61,25 +63,25 @@ private:
     /*!
      * \brief Use interpolation to compute the flux for the burst.
      */
-    double computeFlux(CLHEP::HepRandomEngine *engine, const long diff, 
+    double computeFlux(HepRandomEngine *engine, const long diff, 
         const long minval, const std::vector<long> &in,
         const std::vector<double> &v) const;
     
     /*!
      * \brief Use interpolation to return the computed value to the caller (duration/power law index).
      */
-    double evaluate(CLHEP::HepRandomEngine *engine, const long diff, const long minval,
+    double evaluate(HepRandomEngine *engine, const long diff, const long minval,
         const std::vector<long> &in, const std::vector<double> &v) const;
     
     /*!
      * \brief Return samples from global distributions for GRBs: duraton, peak fluxes, and power law indices.
      */
-    void grbGlobal(CLHEP::HepRandomEngine *engine);
+    void grbGlobal(HepRandomEngine *engine);
     
     /*! 
      * \brief Return the index i to the last element of "in" vector such that in[i] < some random value.
      */
-    long index(CLHEP::HepRandomEngine *engine, const long diff, const long minval, 
+    long index(HepRandomEngine *engine, const long diff, const long minval, 
         const std::vector<long> &in) const;
     
     /*!
@@ -90,7 +92,7 @@ private:
      * to GRB 990123 (trig #7343).  This partial sample (1262) includes bursts where backgrounds could be fitted, and
      * peak fluxes subsequently measured.  The sample spans 7.75 years.
      */
-    void getDuration(CLHEP::HepRandomEngine *engine, long &nlong);
+    void getDuration(HepRandomEngine *engine, long &nlong);
     
     /*!
      * \brief Return fluxes for the burst.
@@ -106,12 +108,12 @@ private:
      *
      * *Pendleton used a different PF estimation technique for the initial BATSE Catalog.
      */
-    void getFlux(CLHEP::HepRandomEngine *engine, long nlong);
+    void getFlux(HepRandomEngine *engine, long nlong);
     
     /*!
      * \brief Choose spectral power-law indices from the BATSE power-law distribution, as measured by Preece et al. (1999).
      */
-    void getPowerLawIndex(CLHEP::HepRandomEngine *engine);
+    void getPowerLawIndex(HepRandomEngine *engine);
     
     /*!
      * \brief Compute power law indices.
@@ -119,7 +121,7 @@ private:
     //void powerLawIndex(HepRandomEngine *engine, const std::vector<int> &histpl, 
     //    const std::vector<double> &loEdges,
     //    const double factor, std::vector<double> &vect);
-    void powerLawIndex(CLHEP::HepRandomEngine *engine, const std::vector<int> &histpl, const double factor, std::vector<double> &vect);
+    void powerLawIndex(HepRandomEngine *engine, const std::vector<int> &histpl, const double factor, std::vector<double> &vect);
     
     
     
@@ -137,10 +139,10 @@ private:
      */
     struct calcEpeak : public std::unary_function<double, double>
     {
-        calcEpeak(CLHEP::HepRandomEngine *engine) : m_engine(engine) {}
+        calcEpeak(HepRandomEngine *engine) : m_engine(engine) {}
         double operator() (double x); 
         
-        CLHEP::HepRandomEngine *m_engine;
+        HepRandomEngine *m_engine;
     };
 };
 

@@ -20,7 +20,7 @@
 
 using namespace grbobstypes;
 
-namespace CLHEP {class HepRandomEngine;}
+class HepRandomEngine;
 
 
 
@@ -30,7 +30,7 @@ public:
     /*!
      * \breif Return interpolated value from hi and lo.
      */
-    static double result(CLHEP::HepRandomEngine *engine, const double lo, 
+    static double result(HepRandomEngine *engine, const double lo, 
         const double hi, const double p);
     
     /*!
@@ -56,10 +56,10 @@ public:
      */
     struct randGen : public std::unary_function<double, double>
     {
-        randGen(CLHEP::HepRandomEngine *engine) : m_engine(engine) {}
+        randGen(HepRandomEngine *engine) : m_engine(engine) {}
         double operator() (double x); 
         
-        CLHEP::HepRandomEngine *m_engine;
+        HepRandomEngine *m_engine;
     };
     
     
@@ -92,9 +92,9 @@ public:
     }
     
     
-     /*! 
-      * \brief Create cumulative sum of the input vector "in".
-      */
+    /*! 
+     * \brief Create cumulative sum of the input vector "in".
+     */
     template<class S, class T>
         static void cumulativeSum(const std::vector<S> &in, std::vector<T> &out)
     {
@@ -102,7 +102,7 @@ public:
         
         out.reserve(in.size());
         
-        typename std::vector<S>::const_iterator it = in.begin();
+        std::vector<S>::const_iterator it = in.begin();
         T value = *it;
         out.push_back(value);
         
@@ -115,7 +115,6 @@ public:
             ++it;
         }
     }
-
 };
 
 #endif

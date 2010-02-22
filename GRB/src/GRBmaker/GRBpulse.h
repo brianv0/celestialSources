@@ -14,7 +14,7 @@
 
 #include <vector>
 
-namespace CLHEP {class HepRandomEngine;}
+class HepRandomEngine;
 
 
 
@@ -45,7 +45,7 @@ public:
     /*!
      * \brief Return pulse data.
      */
-    long data(CLHEP::HepRandomEngine *engine, bool first, double ethres, long nphoton, int npuls, 
+    long data(HepRandomEngine *engine, bool first, double ethres, long nphoton, int npuls, 
 		double duration);
     
 private:
@@ -70,7 +70,7 @@ private:
      * width adjustment, ~ as observed at BATSE energies.  
      * These dependences are crude estimates of what we shall measure with GLAST.
      */
-    long createSigmaTdiff(CLHEP::HepRandomEngine *engine);
+    long createSigmaTdiff(HepRandomEngine *engine);
     
     /*!
      * \brief Fill a vector with some hard-coded values.
@@ -87,7 +87,7 @@ private:
      * 
      * Scramble amplitudes of {1st,2nd} l halves of pulses, separately (leaves whole time profile asymmetric).
      */
-    void getAmplitude(CLHEP::HepRandomEngine *engine, const int npuls);
+    void getAmplitude(HepRandomEngine *engine, const int npuls);
     
     /*!
      * \brief Return number of photons for each pulse in the current burst.
@@ -102,18 +102,18 @@ private:
     /*!
      * \brief Return a vector of random numbers multiplied by the duration sorted in ascending order.  
      */
-    void getTmax(CLHEP::HepRandomEngine *engine, const int npuls, const double duration);
+    void getTmax(HepRandomEngine *engine, const int npuls, const double duration);
     
     /*!
      * \brief Return the index i to the last element of "in" vector such that in[i] >= some random value.
      */
-    long index(CLHEP::HepRandomEngine *engine, const long diff, const long minval, 
+    long index(HepRandomEngine *engine, const long diff, const long minval, 
         const std::vector<long> &in) const;
     
     /*! 
      * \brief Choose a universal width for the pulses in the given burst.
      */
-    void pickWidth(CLHEP::HepRandomEngine *engine, bool first, double ethres, double duration);
+    void pickWidth(HepRandomEngine *engine, bool first, double ethres, double duration);
     
     /*!
      * \brief Calculate the universal width for the pulses in the given burst.
@@ -127,7 +127,7 @@ private:
      * quarter of the GRBs by compression factor of 1/10.  Then using Width ~ E^(-0.333)
      * relationship, scale chosen width (at 100 keV) to width at Ethres.
      */
-    void universalWidth(CLHEP::HepRandomEngine *engine, const double ethres, 
+    void universalWidth(HepRandomEngine *engine, const double ethres, 
         const double duration, const long diff, const long minval, 
         const std::vector<long> &in, const std::vector<double> &v);
     

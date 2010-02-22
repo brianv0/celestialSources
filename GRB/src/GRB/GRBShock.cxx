@@ -2,115 +2,144 @@
 //    GRBShock: Class that describes the a Shock between 2 Shells
 //    Authors: Nicola Omodei & Johann Cohen Tanugi 
 //
-#include <cmath>
 #include <iostream>
 
 #include "GRBShock.h"
 #include "GRBShell.h"
 
-#define DEBUG 0
-
-#define PulseShape 0 
-
-#define Spectrum 0 
-
 using namespace cst;
 //////////////////////////////////////////////////
-// BS --> FS ->
-//BS = Fast Shell
-//FS = Slow Shell
-GRBShock::GRBShock(GRBShell *FS, GRBShell *BS, double tshock, double p)
+// S2 --> S1 ->
+GRBShock::GRBShock(GRBShell *S1, GRBShell *S2, double tshock)
 {
-  m_p  =    p;
+  a = -2./3.; // +- 0.15
+  b = -2.5;  // +- 0.07
   m_IC =  1.0;
-    
-  double g1 = FS->GetGamma();
-  double g2 = BS->GetGamma();
-  
-  //  double e1 = FS->GetEnergy();
-  double r2 = BS->GetRadius();
+  // Qty, LESI, HESI
+  //  Ne   a     b
+  //  Fv   a+1   b+1
+  // vFv   a+2   b+2
 
-  double dr1 = FS->GetThickness();
-  double dr2 = BS->GetThickness();
+  tsh = tshock;
+  
+  double g1 = S1->GetGamma();
+  double g2 = S2->GetGamma();
+  
+  double r1 = S1->GetRadius();
+  double r2 = S2->GetRadius();
 
-  double m1 = FS->GetMass();
-  double m2 = BS->GetMass();
+  double dr1 = S1->GetThickness();
+  double dr2 = S2->GetThickness();
+
+  double m1 = S1->GetMass();
+  double m2 = S2->GetMass();
   
-  tsh = tshock - r2/c;
-  
-  double M,b12,b1,b2;
-  
-  // Initial energy of the final shell: (obs)
-  ei  = (m1*g1+m2*g2) * c2; //erg
+  double e1 = S1->GetEnergy();
+  double e2 = S2->GetEnergy();
   
   // mass of the final shell:
   mf  = m1+m2; //g
-  
-  //  std::cout<<"--------------------My Model--------------------"<<std::endl;
-  M   = sqrt(m1*m1+m2*m2+2.0*m1*m2*(g1*g2-sqrt(g1*g1-1.0)*sqrt(g2*g2-1.0)))-(mf);
+
+  // Final lorentz factor of the merged shell:
+  gf  = TMath::Max(1.,sqrt((m1*g1+m2*g2)/((m1/g1)+(m2/g2))));
+
+  // Initial energy of the final shell: (obs)
+  ei  = (m1*g1+m2*g2) * c2; //erg
+
   // Final: (obs) 
-  gf  = (m1*g1 + m2*g2)/(mf+M);
-  
-  //gf  = sqrt((m1*g1 + m2*g2)/(m1/g1 + m2/g2));
   ef  = mf * gf * c2;       //erg
+
   // Internal : (obs) 
   eint_o = ei - ef;         //erg
   eint_c = (eint_o)/gf;     //erg
   eff = eint_o/ei;
-  //////////////////////////////////////////////////
   // Radius of the shell:
-  rf  = r2;//cm
+  rf  = r2;
 
   // Thickness of the final shell
-  drf = (dr2 + dr1)/2.;//cm
-  MS = new GRBShell(gf,rf,drf,ef);
+  drf = (dr2 + dr1);
+
+  MS = new GRBShell(gf,rf,drf,ef,mf);
   
-  b1  = FS->GetBeta();
-  b2  = BS->GetBeta();
-  // relative velocity:
-  b12 = (b1-b2)/(1.0-b1*b2);
-  double g12 = 1.0/sqrt(1.0 - b12*b12);
-  double n1  = FS->GetComPartDens(); //1/cm^3
- 
-  //  double n2  = BS->GetComPartDens(); //1/cm^3
-  //  double x = n1/n2;
-  // Lorentz factor of the shock in the comoving frame of the unshocked fluid
-  //  gsh =  TMath::Max(1.0,pow(x,1./4.)*sqrt(g12));
-  gsh =  sqrt((pow(g12,2.0)+1.0)/2.);
-  double bsh=TMath::Max(1.0e-6,sqrt(1.0-1.0/(gsh*gsh)));
-  // density of the shocked fluid
-  nsh  = 4.0 * n1 * pow(gsh,2.0);//1/cm^3
-  esh  = nsh * mpc2 / erg2meV; //erg
-  // Magnetic field in gauss
-  B    = sqrt(8.0 * pi * ab * esh); 
-  //  B    = 0.39 * sqrt(ab * nsh);
+  // Comoving Volumes and Densities:
+  //double v1c = S1->GetComovingVolume();
+  //double v2c = S2->GetComovingVolume();
+  //double vfc = MS->GetComovingVolume();
   
-  // synchrotron cooling time for an electron with gamma=1
-  ts0  = (5.1e8)/pow(B,2.0)/(2.0*gf); //oss
-  //   tcom = 2 gf toss 	   
-  // Cooling & time scales in observer frame:
-  // a) angular time scale
-  tar   =   rf/c;
-  ta      =   tar/(2.* gf * gf);  // oss
-  // a) Shock crossing time scale:
-  tc    =  TMath::Min(ta,drf/(2.0*bsh*c));// oss (2.* c * gf);// Kobayashi, Sari, Piran 97;
-  // c) cooling time scale:
-  //characteistic gamma factors:
-  // a) Minimum:
-  gem  = TMath::Max(1.0, (m_p-2.0)/(m_p-1.0)* mpc2/mec2 * ae/csi);
-  // b) Cooling :
-  gec  = TMath::Max(1.0,ts0/tc);
-  // c) Maximum:
-  geM  = TMath::Max(1.0,3.77e7/sqrt(B)); 
+  //  double n1c = S1->GetComPartDens(); //1/cm^3
+  // double n2c = S2->GetComPartDens(); //1/cm^3
+  //double nfc = MS->GetComPartDens(); //1/cm^3
+
+  //////////////////////////////////////////////////
+
+  //  double d1 = e1/S1->GetVolume();
+  // double d2 = e2/S2->GetVolume();
+
+  double G = g2/g1;
+  double Y = e2/e1;
   
-  if(DEBUG)
-    {
-      if(gem<gec)
-	std::cout<<" SLOW COOLING (gem = "<<gem<<" gec = "<<gec<<")"<<std::endl;
-      else 
-	std::cout<<" FAST COOLING (gem = "<<gem<<" gec = "<<gec<<")"<<std::endl;
-      Print();
-    }
+  //double g = sqrt(G);
+  double y = TMath::Max(1./G*1.00000000000001,TMath::Min(0.9999999999999*G,sqrt(Y)));  
+  
+  double tv= rf/c*(G*G-1.)/(2.*g2*g2);
+  double C1 = pow(G,3.)/((G-y)*(G*y-1.));
+  //double C2 = (G*y-1.)/(G-y);
+  
+  //  double gsh  = 0.5 * sqrt(g1*g2*C2);
+  // double gsh2 = 0.5 * sqrt(C1);
+  // double esh  = sqrt(d1*d2)*C1*y;
+  //double B    = 9.5e3*pow(ab/0.1,0.5)*pow(e2/1e53,0.5)*pow(g1/100.0,-3);// G
+  
+  Esyn = 1.6  *pow(ae/csi,2.)*pow(ab/0.1,0.5)*pow(e2/1e53,0.5)*pow(g1/100.0,-2.)*pow(tv,-3./2.)*C1*G*G/(G-y);
+  Eic  = 140.0*pow(ae/csi,4.)*pow(ab/0.1,0.5)*pow(e2/1e53,0.5)*pow(g1/100.0,-2.)*pow(tv,-3./2.)*C1*C1*G*G/(G-y);
+  
+
+  /*
+    double gr  = g1*g2-sqrt((g1*g1-1.)*(g2*g2-1.));
+    double gsh = sqrt((gr*gr+1.)/2.);
+    double nsh = n1c* (4.*gsh + 3.); //1/cm^3
+    double esh = gsh * nsh * mpc2; //MeV/cm^3
+    
+    double gfs = gf*sqrt((1.0+2.0*gf/g1)/(2.0+gf/g1));
+    double grs = gf*sqrt((1.0+2.0*gf/g2)/(2.0+gf/g2));
+    double bfs = sqrt(1.0 - 1.0/gfs);
+    
+    std::cout<<gfs<<" "<<grs<<" "<<bfs<<std::endl;
+  */
+  
+  
+  //  double Ub  = ab*esh/erg2meV; //erg/cm^3
+  //  double Ue  = ae*esh; //MeV/cm^3
+  //  double B     = sqrt(8.*pi*Ub); //G   
+  //  double ge    = ae * gsh * mpc2/mec2;
+
+  //  double Ub  = ab * eint_c / v1c; //erg/cm^3
+  //  double Ue  = ae * eint_c / v1c * erg2meV; // MeV/cm^3
+  
+  /*
+    double B     = sqrt(8.* pi* Ub); //G   
+    double ge    = Ue/csi / (nfc * mec2);
+  
+    Esyn   = 0.05 * (gf/300.0) * (B/1000.)*pow(ge/100.0,2.); // kev
+    Eic    = 500.0*Esyn*pow(ge/100.0,2.);                // kev
+    
+    double tau_th = st  * n1c * dr1 * g1;
+    double tau_pp = st  * n1c * dr1 * g1;
+  */
+
+  tc    =   drf/(2.*c);  // oss
+  ta    =   rf/(2.*c*gf*gf);  // oss
+  ts    =  2.9*pow(ae/csi,-1.)*pow(ab/0.1,-1.)*pow(e2/1e53,-1.)*pow(g1/100.0,7)*pow(tv,-3.)*(G*G/((G-y)*C1*C1))/(2*gf*gf);
+  //cout<<ta<<" "<<tc<<" "<<ts<<" "<<sqrt(ta*ta+ts*ts)<<endl;
+  
+  //////////////////////////////////////////////////  
+  /*
+    ofstream fout;
+    fout.open("pippo",ios::app);
+    fout<<Esyn<<" "<<Eic<<" "<<B<<" "<<eint_o/1e52<<" "<<ta<<" "<<tc<<"\n";
+  */
+  //////////////////////////////////////////////////
+  
 }
 
 void GRBShock::SetTime(double time)
@@ -120,102 +149,91 @@ void GRBShock::SetTime(double time)
 
 Double_t GRBShock::Peak(Double_t time,Double_t energy)
 {
-  using std::fabs; using std::pow;
+  
   Double_t to  = time-tsh;   // oss
-  if(PulseShape==0)
-    {
-      //////////////////////////////////////////////////
-      if(to<=0) return 0.0;
-      double mu      = TMath::Max(-1.0,1.0 - to/tar);
-      double beta    = sqrt(1.0-1.0/pow(gf,2.0));
-      double doppler = gf*(1.0-beta*mu);
-      double sintheta = sqrt(1.0-mu*mu);
-      double peak = sintheta/pow(doppler,4.0);
-      return eff*peak;
-    }
-  //////////////////////////////////////////////////
-  double ts    = ts0/GammaElectron(energy); //oss
+  Double_t tts = ts*sqrt(Esyn/energy);
+  Double_t tta = sqrt(ta*ta+tts*tts);
+  if(to<=0.0) return 0.0;
   
-  double width = sqrt(ta*ta + tc*tc + ts*ts);//GammaElectron(energy); //oss;
-  //width*=pow(energy,-0.4);
-  double ratio = 0.4;
-  double decay = width /(1.+ratio);
-  double rise  = ratio*decay; 
-      
-  if(PulseShape==1)
-    {
-      if(to <= tc)
-	return  eff*exp(-pow(fabs(to-tc)/rise,1.0));
-      return  eff*exp(-pow(fabs(to-tc)/decay,1.0));
-    }
-  
-  if(to<0) return 0.0;
-  Double_t F1 = 1./pow(1.+    to/width,2.);
-  Double_t F2 = 1./pow(1.+(to - tc)/width,2.);
+  Double_t F1 = 1./pow(1.+       to/tta,2.);
+  Double_t F2 = 1./pow(1.+(to - tc)/tta,2.);
+  const Double_t H = eint_o /1.0e52;
+
   if(to <= tc)
-    return  eff*(1.- F1);
-  return  eff*(F2 - F1);
+    {
+      return H*(1.- F1);
+    }
+  else
+    {
+      return H*(F2 - F1);
+    }
 }
 //////////////////////////////////////////////////
-Double_t GRBShock::SynSpectrum(Double_t time, Double_t energy)
+Double_t GRBShock::SynSpectrum(Double_t energy)
 {
-  double to = time-tsh;
-  double ec,em,eM,Fv;
-
-  //////////////////////////////////////////////////
-  
-  double mu      = TMath::Max(-1.0,1.0 - to/tar);
-  double beta    = sqrt(1.0-1.0/pow(gf,2.0));
-  double doppler = gf*(1.0-beta*mu);
-  energy*=doppler; //como energy
-  em = EsynCom(gem);
-  ec = EsynCom(gec);
-  eM = EsynCom(geM);
-  
-  if(ec <= em) //FAST COOLOING REGIME
+  // This method computes the spectrum of syncrotron emission
+  // Units : ph/(cm,A2(B s keV)
+  Double_t N,E;
+  if (Esyn>emin)
     {
-      if(energy<=ec)
-	Fv = pow(energy/ec,1./3.);
-      else if(energy<em)
-	Fv = pow(energy/ec,-1./2.);
-      else
-	Fv = pow(em/ec,-1./2.)*pow(energy/em,-m_p/2.);
+      N = (pow(Esyn  ,a+1.)- pow(emin,a+1.))/((a+1.)*pow(Esyn,a)) +
+	(pow(emax,b+1.)- pow(  Esyn,b+1.))/((b+1.)*pow(Esyn,b));
+      
+      E = (pow(Esyn  ,a+2.)- pow(emin,a+2.))/((a+2.)*pow(Esyn,a)) +
+	(pow(emax,b+2.)- pow(  Esyn,b+2.))/((b+2.)*pow(Esyn,b));
     }
-  else  // SLOW COOLING REGIME:
+  else
     {
-      if(energy<=em)
-	Fv = pow(energy/em,1./3.);
-      else if(energy<ec)
-	Fv = pow(energy/em,-(m_p-1.)/2.);
-      else
-	Fv = pow(ec/em,-(m_p-1.)/2.)*pow(energy/ec,-m_p/2.);
+      N = 
+	(pow(emax,b+1.)- pow(  Esyn,b+1.))/((b+1.)*pow(Esyn,b));
+      E = 
+	(pow(emax,b+2.)- pow(  Esyn,b+2.))/((b+2.)*pow(Esyn,b));
     }
   
-  return Fv * exp(-energy/eM) * Peak(time,energy);  // Fv in [keV/(cm² s keV)]
+  if(energy < Esyn) 
+    return pow(energy/Esyn,a)/E ;
+  return pow(energy/Esyn,b)/E;
+  
 }
 
 //////////////////////////////////////////////////
-Double_t GRBShock::ICSpectrum(Double_t time, Double_t energy)
-{ 
-  return SynSpectrum(time,energy/(gem*gem)) / (gem*gem) * exp(-energy/(gem*gf*mec2*1.0e3));
+Double_t GRBShock::ICSpectrum(Double_t energy)
+{
+  Double_t N,E;
+  if (Eic>emin)
+    {
+      N = (pow(Eic  ,a+1.)- pow(emin,a+1.))/((a+1.)*pow(Eic,a)) +
+	(pow(emax,b+1.)- pow(  Eic,b+1.))/((b+1.)*pow(Eic,b));
+      
+      E = (pow(Eic  ,a+2.)- pow(emin,a+2.))/((a+2.)*pow(Eic,a)) +
+	(pow(emax,b+2.)- pow(  Eic,b+2.))/((b+2.)*pow(Eic,b));
+    }
+  else
+    {
+      N = 
+	(pow(emax,b+1.)- pow(  Eic,b+1.))/((b+1.)*pow(Eic,b));
+      E = 
+	(pow(emax,b+2.)- pow(  Eic,b+2.))/((b+2.)*pow(Eic,b));
+    }
+  
+  if(energy < Eic) 
+    return pow(energy/Eic,a)/E ;
+  return pow(energy/Eic,b)/E;
 }
+
 
 double GRBShock::ComputeFlux(double time, double energy)
 {
-  if(time<=tsh) return 0.0;
-  //this has to return Nv in [ph/(cm² s keV)]
-  return (SynSpectrum(time,energy) + m_IC * ICSpectrum(time,energy))/energy;
+  return Peak(time,energy) * (SynSpectrum(energy) + m_IC * ICSpectrum(energy));
 }
 
 void GRBShock::Print()
 {
   std::cout<<"--------------------------------------------------"<<std::endl;
-  std::cout<<"Final Gamma :"<<gf<<" Mass :"<<mf<<" Radius = "<< rf<<" Whidth: "<<drf<<std::endl;
-  std::cout<<"t shock = "<<tsh<<" ta = "<<ta<<" tc = "<<tc<<" ts = "<<ts0<<" Duration = "<<GetDuration()<<std::endl;
-  std::cout<<"Efficiency: "<<eff<<" Initial E = "<<ei<<" Final E = "<<ef<<std::endl;
-  std::cout <<" Int E (obs): "<<eint_o<<" (com): "<<eint_c<<" B Field = "<<B<<std::endl;
-  std::cout<<" Nsh = "<<nsh<<" Gsh = "<<gsh<<" p "<<m_p<<std::endl;
-  std::cout<<"Gmin = "<<gem<<" Gcool = "<<gec<<" Gmax = "<<geM<<std::endl;
-  std::cout<<"Es0 = "<<EsynObs(1)<<" Esm = "<<EsynObs(gem)<<" Esc = "<<EsynObs(gec)<<" EsM = "<<EsynObs(geM)<<" IC/Syn = "<<m_IC<<std::endl;
+  std::cout<<tsh<<" "<<ta<<" "<<tc<<" "<<ts<<std::endl;
+  std::cout<<eff<<" "<<ei<<" "<<ef<<" "<<eint_o<<" "<<eint_c<<" "<<std::endl;
+  std::cout<<gf<<" "<<mf<<" "<< rf<<" "<<drf<<std::endl;
+  std::cout<<Esyn<<" "<<Eic<<" "<<m_IC<<std::endl;
+  std::cout<<a<<" "<<b<<std::endl;
   std::cout<<"--------------------------------------------------"<<std::endl;
 }

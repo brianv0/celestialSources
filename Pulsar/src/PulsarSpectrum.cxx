@@ -7,12 +7,13 @@
 #include "Pulsar/PulsarConstants.h"
 #include "SpectObj/SpectObj.h"
 #include "flux/SpectrumFactory.h"
+#include "facilities/commonUtilities.h"
+#include "facilities/Util.h"
 #include <cmath>
+#include <cstdlib>
+#include <vector>
 
 #define DEBUG 0
-#define BARYCORRLOG 0
-#define BINDEMODLOG 0
-#define TNOISELOG 0
 
 using namespace cst;
 
@@ -150,8 +151,7 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
 
   m_UseFT2 = 0;
 
-
-   //Read from XML file
+  //Read from XML file
   m_PSRname    = parseParamList(params,0).c_str();            // Pulsar name
   m_RA = std::atof(parseParamList(params,1).c_str());         // Pulsar Right Ascension
   m_dec = std::atof(parseParamList(params,2).c_str());         // Pulsar Declination
@@ -163,6 +163,7 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
   //Setting random seed
   m_PSpectrumRandom = new TRandom;
   m_PSpectrumRandom->SetSeed(m_seed);
+
  
   if (m_model == 1) //Phenomenological model
     {
@@ -179,13 +180,50 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
 	m_PSRShapeName = parseParamList(params,8).c_str();        // model parameters
       }
 
+  //look for pulsar data directory, following, in the order $PULSARDATA, $SKYMODEL_DIR/pulsars or $PULSARROOT/data
+  //  std::string m_pulsardata_dir;
+
+  if (::getenv("PULSAR_OUTPUT_LEVEL"))
+    {
+      const char * outlevel = ::getenv("PULSAR_OUTPUT_LEVEL");
+      m_OutputLevel = atoi(outlevel);
+      if ((m_OutputLevel<0) || (m_OutputLevel>2))
+	m_OutputLevel=1;
+    }
+  else
+    {
+      m_OutputLevel=1;
+    }
+
+  if (::getenv("PULSARDATA"))
+    {
+      const char * psrdata = ::getenv("PULSARDATA");
+      m_pulsardata_dir = std::string(psrdata);
+    }
+  else if (::getenv("SKYMODEL_DIR"))
+    {
+      const char * psrdata = ::getenv("SKYMODEL_DIR");
+      m_pulsardata_dir =  std::string(psrdata)+"/pulsars";
+    }
+  else
+    {
+      const char * psrdata = ::getenv("PULSARROOT");
+      m_pulsardata_dir =  std::string(psrdata)+"/data";
+    }
+
+  if (m_OutputLevel>1)
+    {
+      WriteToLog("PULSARDATA used is: "+std::string(m_pulsardata_dir));
+    }
+
   // Determine start and end time for FT2 or orbit file 
   try {
     const astro::PointingHistory & history = astro::GPS::instance()->history();
+    //    throw(NoHistoryError);
     m_FT2_startMET = history.startTime();
     m_FT2_stopMET = history.endTime();
     m_UseFT2 = 1;
-  } catch (astro::GPS::NoHistoryError & eObj)
+  } catch (astro::GPS::NoHistoryError & )
     {
       m_FT2_startMET = Spectrum::startTime();
       m_FT2_stopMET = astro::GPS::instance()->endTime();
@@ -194,296 +232,43 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
   m_Sim_startMET = Spectrum::startTime();
   m_Sim_stopMET = astro::GPS::instance()->endTime();
 
-  //Retrieve pulsar data from a list of DataList file.
-  std::string pulsar_root = ::getenv("PULSARROOT");
-  
-  // if this is in the GLEAM environment, allow for separate path specified by env var PULSARDATA
-  std::string pulsar_data(pulsar_root+"/data/"); // the default, perhaps overriden
-
-  /*changed to old settings
-  const char * gleam = ::getenv("PULSARDATA");
-  if( gleam!=0) {
-       pulsar_data =  std::string(gleam)+"/";
-  }
-  */
-
-  const char * gleam = ::getenv("SKYMODEL_DIR");
-  if( gleam!=0) {
-       pulsar_data =  std::string(gleam)+"/pulsars/";
-  } else
-    std::cout << "Warning !SKYMODEL_DIR not found!"  <<std::endl;
-
-  //Scan PulsarDataList.txt
-  std::string ListFileName = pulsar_data + "PulsarDataList.txt";
-  
-  std::ifstream ListFile;
-  ListFile.open(ListFileName.c_str(), std::ios::in);
-  char DataListFileName[200];
-  std::string CompletePathFileName = "";
-
-  ListFile.getline(DataListFileName,200); 
-
-  int Retrieved = 0;
-  int AllRetrieved = 0;
- 
-  if (! ListFile.is_open()) 
-    {
-      std::cout << "Error opening file containing DataList files" << ListFileName  
-		<< " (check whether $PULSARROOT is set" << std::endl; 
-      exit(1);
-    }  else 
-      {
-
-	ListFile >> DataListFileName;
-	while (!ListFile.eof()) 
-	  {	
-	    CompletePathFileName = pulsar_data + std::string(DataListFileName);
-	    Retrieved = getPulsarFromDataList(CompletePathFileName);
-	    
-	    if (Retrieved == 1)
-	      {
-		if (DEBUG)
-		  {
-		    std::cout << "Pulsar " << m_PSRname << " found in file " << CompletePathFileName << std::endl;
-		  }
-		AllRetrieved = 1;
-	      } 
-	    ListFile >> DataListFileName ;	  
-
-	  }
-
-	if (AllRetrieved == 0)
-	  {
-	    std::cout << "Pulsar " << m_PSRname 
-		      << " not found in any DataList file.Please Check if $PULSARDATA is correctly set " 
-		      << std::endl;
-	    exit(1);
-	  }
-      }
-
-  //  ListFile.getline(DataListFileName,200); 
-
-
-  //Scan for Binary Pulsar if there are
-
-  if (m_BinaryFlag ==1)
-    {
-      std::string BinListFileName = pulsar_data + "PulsarBinDataList.txt";
-      
-      //Look to BinDataList.txt for binary pulsar data
-      std::ifstream BinListFile;
-      BinListFile.open(BinListFileName.c_str(), std::ios::in);
-      char BinDataListFileName[200];
-      BinListFile.getline(BinDataListFileName,200); 
-
-      if (! BinListFile.is_open()) 
-	{
-	  std::cout << "Error opening file containing Binary DataList files" << BinListFileName  
-		    << " (check whether $PULSARDATA is set" << std::endl; 
-	  exit(1);
-	}  else 
-	  {
-
-	    BinListFile >> BinDataListFileName;
-	    while (!BinListFile.eof()) 
-	      {	
-		CompletePathFileName = pulsar_data + std::string(BinDataListFileName);
-		Retrieved = getOrbitalDataFromBinDataList(CompletePathFileName);
-		
-		if (Retrieved == 1)
-		  {
-		    if (DEBUG)
-		      {
-			std::cout << "Binary Pulsar " << m_PSRname << " found in file " << CompletePathFileName << std::endl;
-		      }
-		    AllRetrieved = 1;
-		  } 
-		BinListFile >> BinDataListFileName ;	  
-	      }
-
-	    if (AllRetrieved == 0)
-	      {
-		std::cout << "Binary Pulsar " << m_PSRname 
-			  << " not found in any BinDataList file.Please Check if PULSARDATA is correctly set " 
-			  << std::endl;
-		exit(1);
-	      }
-	  }
-    }
-
-  //Assign as starting ephemeris the first entry of the vectors... 
-  m_t0Init = m_t0InitVect[0];
-  m_t0 = m_t0Vect[0];
-  m_t0End = m_t0EndVect[0];
-  m_period = m_periodVect[0];
-  m_pdot = m_pdotVect[0];
-  m_p2dot = m_p2dotVect[0];
-  m_f0 = m_f0Vect[0];
-  m_f1 = m_f1Vect[0];
-  m_f2 = m_f2Vect[0];
-  m_f0NoNoise = m_f0Vect[0];
-  m_f1NoNoise = m_f1Vect[0];
-  m_f2NoNoise = m_f2Vect[0];
-
-  m_phi0 = m_phi0Vect[0];
-
   //Init SolarSystem stuffs useful for barycentric decorrections
   astro::JulianDate JDStart(StartMissionDateMJD+JDminusMJD);
-  m_earthOrbit = new astro::EarthOrbit(JDStart); 
-  
+  m_earthOrbit = new astro::EarthOrbit(JDStart);   
   astro::SkyDir m_PulsarDir(m_RA,m_dec,astro::SkyDir::EQUATORIAL);
   m_PulsarVectDir = m_PulsarDir.dir();
   m_GalDir = std::make_pair(m_PulsarDir.l(),m_PulsarDir.b());
   m_l = m_GalDir.first;
   m_b = m_GalDir.second;
 
-  //Redirect output to a subdirectory
-  const char * pulsarOutDir = ::getenv("PULSAROUTFILES");
-
-  std::string logLabel;
-  // override obssim if running in Gleam environment
-  if( pulsarOutDir!=0) 
-    logLabel = std::string(pulsarOutDir) + "/" + m_PSRname + "Log.txt";
-  else
-    logLabel = m_PSRname + "Log.txt";
-
-  ofstream PulsarLog(logLabel.c_str());
-
-  //Write infos to Log file  
-
-  PulsarLog << "\n********   PulsarSpectrum Log for pulsar" << m_PSRname << std::endl;
-  PulsarLog << "**   Name : " << m_PSRname << std::endl;
-  PulsarLog << "**\n**   Position : (RA,Dec)=(" << m_RA << "," << m_dec 
-	    << ") ; (l,b)=(" << m_l << "," << m_b << ")" << std::endl; 
-  PulsarLog << "**\n**   Flux above 100 MeV : " << m_flux << " ph/cm2/s " << std::endl;
-  PulsarLog << "**   Enphmin: " << m_enphmin << " keV | Enphmax: " << m_enphmax << " keV" << std::endl;
-  PulsarLog << "**************************************************" << std::endl;
-
-  //Write info about FT2 
-  if (m_UseFT2 == 0)
-    {
-      PulsarLog << "** No FT2 file used " << std::endl;
-    }
-  else
-    PulsarLog << "** FT2 file used " << std::endl;
+  //Load Pulsar General data from PulsarDataList.txt
+  LoadPulsarData(m_pulsardata_dir,0);
   
-  PulsarLog << "** Start time:" << std::setprecision(30) << m_FT2_startMET << " s. MET |  End time:" 
-	    << m_FT2_stopMET << " s. MET" << std::endl;
-  PulsarLog << "**************************************************" << std::endl;
-  PulsarLog << "** Simulation start at " << m_Sim_startMET << " s. MET and ends at :" << m_Sim_stopMET << std::endl;
-  PulsarLog << "**************************************************" << std::endl;
-
-  //Writes down on Log all the ephemerides
-  for (unsigned int n=0; n < m_t0Vect.size(); n++)
+  if (!(::getenv("PULSAR_NO_DB")))
     {
-      PulsarLog << "**   Ephemerides valid from " << m_t0InitVect[n] 
-		<< " to " << m_t0EndVect[n] << " (MJD): " << std::endl;
-      PulsarLog << "**     Epoch (MJD) :  " << m_t0Vect[n] << std::endl;
-      PulsarLog << std::setprecision(8) << "**     TxBary (MJD) where fiducial point (phi=0) is reached : " 
-		<< m_txbaryVect[n] << std::endl;
-      PulsarLog << "**     Phi0 (at Epoch t0) : " << m_phi0Vect[n] << std::endl;
-      
-      if (m_ephemType == "P")
+      //Save the output txt file..
+      int DbFlag = saveDbTxtFile();
+      if ((DbFlag !=1) && (m_OutputLevel>1))
+	WriteToLog("WARNING! Problem in saving SimPulsars_spin.txt");
+    }
+
+
+  //Binary Pulsar Data
+  if (m_BinaryFlag ==1)
+    {
+      LoadPulsarData(m_pulsardata_dir,1); //loading orbital data from PulsarBinDataList.txt
+	
+      if (!(::getenv("PULSAR_NO_DB")))
 	{
-	  PulsarLog << "**     Ephemerides type: PERIOD" << std::endl;
-	  PulsarLog << std::setprecision(14) << "**     Period : " << m_periodVect[n] << " s. | f0: " << m_f0Vect[n] << std::endl;
-	  PulsarLog << std::setprecision(14) << "**     Pdot : " <<  m_pdotVect[n]  << " | f1: " << m_f1Vect[n] << std::endl; 
-	  PulsarLog << std::setprecision(14) << "**     P2dot : " <<  m_p2dotVect[n]  << " | f2: " << m_f2Vect[n] << std::endl; 
-	} 
-      else if (m_ephemType == "F")
-	{
-	  PulsarLog << "**Ephemerides type: FREQUENCY" << std::endl;
-	  PulsarLog << std::setprecision(14) << "**     Period : " << m_periodVect[n] << " s. | f0: " << m_f0Vect[n] << std::endl;
-	  PulsarLog << std::setprecision(14) << "**     f1: " << m_f1Vect[n] << std::endl; 
-	  PulsarLog << std::setprecision(14) << "**     f2: " << m_f2Vect[n] << std::endl; 
+	  int BinDbFlag = saveBinDbTxtFile();
+	  if ((BinDbFlag !=1) && (m_OutputLevel>1))
+	    WriteToLog("WARNING! Problem in saving SimPulsars_bin.txt");
 	}
     }
-
-  PulsarLog << "**\n**   Mission Reference time: MJD " << StartMissionDateMJD << " (" 
-	    << std::setprecision(12) << (StartMissionDateMJD+JDminusMJD)*SecsOneDay 
-	    << " sec.)" << std::endl;
 
   if (m_TimingNoiseModel != 0)
     { 
-      if (TNOISELOG)
-	{
-	  std::ofstream TimingNoiseLogFile((m_PSRname + "TimingNoise.log").c_str());
-	  TimingNoiseLogFile << "Timing Noise log file using model: " << m_TimingNoiseModel << std::endl;
-	  TimingNoiseLogFile << "tMET\tA\tS0\tS1\tS2\tf0_l\tf0_n\tf1_l\tf1_n\tf2_l\tf2_n\tPhi_l\tPhi_n"<<std::endl;
-	  TimingNoiseLogFile.close();
-	}
-
-      //define a default mean rate of about 1 day
-      m_TimingNoiseMeanRate = 1/86400.;
-      // according to Poisson statistics
-      double startTime = Spectrum::startTime();
-      m_TimingNoiseTimeNextEvent = startTime -log(1.-m_PSpectrumRandom->Uniform(1.0))/m_TimingNoiseMeanRate; 
-
-      //Determine next Timing noise event according to the rate R m_TimingNoiseRate
-
-
-      if (m_TimingNoiseModel == 1) // Timing model #1 - Delta8 parameter (Arzoumanian94)
-	{
-	  PulsarLog << "**\n**   Timing Noise Model : " << m_TimingNoiseModel << " (Stability parameter, Arzoumanian 1994)" << std::endl;
-	  PulsarLog << "**      Timing Noise Events Mean Rate : " << m_TimingNoiseMeanRate << std::endl;
-	}
-      else if (m_TimingNoiseModel == 2) //Timing model #2 - PN Random Walk (Cordes-Downs 1985) 
-	{
-	  PulsarLog << "**\n**   Timing Noise Model : " << m_TimingNoiseModel << " (PN Random Walk; Cordes-Downs 1985)" << std::endl;
-	  PulsarLog << "**      Timing Noise Events Mean Rate : " << m_TimingNoiseMeanRate << std::endl;
-	  // double alpha = 0.57;
-	  //double PdotCrab = 422E-15;
-	  //double SigmaRMSCrab = 0.012/0.033;
-	  //m_TimingNoiseActivity = -1.0*alpha*std::log10(PdotCrab)+alpha*std::log10(m_pdotVect[0]);
-	  //m_TimingNoiseRMS = pow(10.,m_TimingNoiseActivity)*SigmaRMSCrab;
-	  //PulsarLog << "**          Cordes Activity Parameter A: " <<  m_TimingNoiseActivity << std::endl;
-	  //PulsarLog << "**          Cordes Activity Timing Noise RMS (phase): " <<  m_TimingNoiseRMS << std::endl;
-	}
-      else if (m_TimingNoiseModel == 3) //Timing model #3 - FN Random Walk (Cordes-Downs 1985) 
-	{
-	  PulsarLog << "**\n**   Timing Noise Model : " << m_TimingNoiseModel << " (FN Random Walk; Cordes-Downs 1985)" << std::endl;
-	  PulsarLog << "**      Timing Noise Events Mean Rate : " << m_TimingNoiseMeanRate << std::endl;
-	}
-      else if (m_TimingNoiseModel == 4) //Timing model #4 - SN Random Walk (Cordes-Downs 1985) 
-	{
-	  PulsarLog << "**\n**   Timing Noise Model : " << m_TimingNoiseModel << " (SN Random Walk; Cordes-Downs 1985)" << std::endl;
-	  PulsarLog << "**      Timing Noise Events Mean Rate : " << m_TimingNoiseMeanRate << std::endl;
-	}
-    }
-
-  PulsarLog << "**************************************************" << std::endl;
-
-  //Add lines in case of binary
-
-  if (m_BinaryFlag == 1)
-    {
-      PulsarLog << "**   Pulsar in a Binary System! Orbital Data:" << std::endl;
-      PulsarLog << "**     Orbital period: " << m_Porb << " s." << std::endl;
-      PulsarLog << "**     Projected major semiaxis (a * sini): " << m_asini << " lightsec." <<std::endl; 
-      PulsarLog << "**     Eccentricity: " << m_ecc << std::endl;
-      PulsarLog << "**     Longitude of periastron: " <<  m_omega << " deg." << std::endl;
-      PulsarLog << "**     Epoch of Periastron (MJD): " << m_t0PeriastrMJD << std::endl;
-      PulsarLog << "**     Epoch of Ascending Node (MJD): " << m_t0AscNodeMJD << std::endl;
-      if (m_PPN ==0)
-	PulsarLog << "**   No Post Newtonian Parameterization " << std::endl; 
-
-      PulsarLog << "**************************************************" << std::endl;
-
-      
-      if ((m_BinaryFlag ==1) && (BINDEMODLOG))
- 	{
-	  std::ofstream BinDemodLogFile((m_PSRname + "BinDemod.log").c_str());
-	  BinDemodLogFile << "tMET\tdt\tE\tAt\tOmega\tecc\tasini\tdt_Roemer\tdt_einstein\tdt_shapiro" << std::endl;
-	  BinDemodLogFile.close();
-	}
-   
-      if (BARYCORRLOG)
-	{
-	  std::ofstream BaryCorrLogFile((m_PSRname + "BaryCorr.log").c_str());
-	  BaryCorrLogFile << "\nPulsar" << m_PSRname << " : Barycentric corrections log generated by PulsarSpectrum" << std::endl;
-	  BaryCorrLogFile << "tMET\tTDB-TT\tGeomDelay\tShapiroDelay" << std::endl;
-	  BaryCorrLogFile.close();
-	}
+      InitTimingNoise();
     }
 
   //Instantiate an object of PulsarSim class
@@ -492,32 +277,14 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
   //Instantiate an object of SpectObj class
   if (m_model == 1)
     {
-      PulsarLog << "**   Model chosen : " << m_model << " --> Using Phenomenological Pulsar Model " << std::endl;  
       m_spectrum = new SpectObj(m_Pulsar->PSRPhenom(double(m_ppar0), m_ppar1,m_ppar2,m_ppar3,m_ppar4),1);
       m_spectrum->SetAreaDetector(EventSource::totalArea());
-
-      PulsarLog << "**   Effective Area set to : " << m_spectrum->GetAreaDetector() << " m2 " << std::endl; 
-
-      if (DEBUG)
-	{
-	  std::cout << "**   Model chosen : " << m_model << " --> Using Phenomenological Pulsar Model " << std::endl;  
-	  std::cout << "**  Effective Area set to : " << m_spectrum->GetAreaDetector() << " m2 " << std::endl; 
- 	}  
     }
   else 
     if (m_model == 2)
       {
-	PulsarLog << "**   Model chosen : " << m_model << " --> Using External 2-D Pulsar Shape" << std::endl;  
 	m_spectrum = new SpectObj(m_Pulsar->PSRShape(m_PSRShapeName,m_ppar0),1);
 	m_spectrum->SetAreaDetector(EventSource::totalArea());
-	
-	PulsarLog << "**   Effective Area set to : " << m_spectrum->GetAreaDetector() << " m2 " << std::endl; 
-	
-	if (DEBUG)
-	  {
-	    std::cout << "**   Model chosen : " << m_model << " --> Using External 2-D Pulsar Shape" << std::endl;  
-	    std::cout << "**  Effective Area set to : " << m_spectrum->GetAreaDetector() << " m2 " << std::endl; 
-	  }  
       }
     else
       {
@@ -526,38 +293,28 @@ PulsarSpectrum::PulsarSpectrum(const std::string& params)
       }
 
 
-  PulsarLog.close();
-
-  //Save the output txt file..
-  int DbFlag = saveDbTxtFile();
-
-  if (DEBUG) 
-    if (DbFlag == 0)
-      { 
-	std::cout << "Database Output file created from scratch " << std::endl;
-      } 
-    else 
-      {
-	std::cout << "Appendended data to existing Database output file" << std::endl;
-      }
-
-
-  //Save the binary data output txt file..
-  if (m_BinaryFlag ==1)
+  if (m_OutputLevel > 0)
     {
-
-      int BinDbFlag = saveBinDbTxtFile();
       
-      if (DEBUG) 
-	if (BinDbFlag == 0)
-	  { 
-	    std::cout << "Database for Binary pulsars file created from scratch " << std::endl;
-	  } 
-	else 
-	  {
-	    std::cout << "Database for Binary pulsars appended to existing binary Database output file" << std::endl;
-	  }
+      //Redirect output to a subdirectory
+      const char * pulsarOutDir = ::getenv("PULSAROUTFILES");
+      
+      // override obssim if running in Gleam environment
+      if( pulsarOutDir!=0) 
+	m_LogFileName = std::string(pulsarOutDir) + "/" + m_PSRname + "Log.txt";
+      else
+	m_LogFileName = m_PSRname + "Log.txt";
+
+      char temp[200];
+      sprintf(temp,"**  Output Level set to: %d",m_OutputLevel);
+      WriteToLog(std::string(temp));
+
+      WritePulsarLog();
+
+
     }
+
+
 
 }
 
@@ -624,7 +381,8 @@ double PulsarSpectrum::interval(double time)
     }
   else
     {
-      if (BINDEMODLOG)
+     
+      if (::getenv("PULSAR_OUT_BIN"))
 	{
 	  timeTildeDemodulated = getIterativeDemodulatedTime(timeTilde,1);      
 	}
@@ -632,146 +390,21 @@ double PulsarSpectrum::interval(double time)
 	{
 	  timeTildeDemodulated = getIterativeDemodulatedTime(timeTilde,0);      
 	}
+
+      //      std::cout <<"\n****Test inverso:"<< timeTildeDemodulated-(StartMissionDateMJD)*SecsOneDay << " con correzioni" << getBinaryDemodulationInverse(timeTildeDemodulated)-(StartMissionDateMJD)*SecsOneDay << std::endl;
+      //    std::cout << " indietro -->" << getIterativeDemodulatedTime(getBinaryDemodulationInverse(timeTildeDemodulated),0)-(StartMissionDateMJD)*SecsOneDay << std::endl;
     }
 
   //Phase assignment
 
   double intPart=0.; //Integer part
-  double PhaseNoNoise,PhaseWithNoise=0.;
+  //  double PhaseNoNoise,PhaseWithNoise=0.;
 
   //Apply timing noise
   if (m_TimingNoiseModel !=0)
     {
-      //Check for a next Timing noise event
-      if ((timeTildeDemodulated-(StartMissionDateMJD)*SecsOneDay) > m_TimingNoiseTimeNextEvent)
-	{
-	  //interval according to Poisson statistics
-	  m_TimingNoiseTimeNextEvent+= -log(1.-m_PSpectrumRandom->Uniform(1.0))/m_TimingNoiseMeanRate;
- 
-	  if (DEBUG)
-	    {
-	      std::cout << std::setprecision(30)<<"Timing Noise Event!Next Event at t=" 
-			<< m_TimingNoiseTimeNextEvent << " |dt=" 
-			<< m_TimingNoiseTimeNextEvent
-		-(timeTildeDemodulated-(StartMissionDateMJD)*SecsOneDay) <<std::endl;
-	    }
-
-
-	  //Timing noise managing...
-
-	  double S0=0.;
-	  double S1=0.;
-	  double S2=0.;
-
-	  if (m_TimingNoiseModel ==1) // Timing Noise #1
-	    {
-	      m_f2 = 0;
-	      PhaseNoNoise = getTurns(timeTildeDemodulated);
-	      PhaseNoNoise = modf(PhaseNoNoise,&intPart); // phase for linear evolution 
-	      if ( PhaseNoNoise <0.)
-		PhaseNoNoise+=1.;
-	      m_TimingNoiseActivity = 6.6 + 0.6*log10(m_pdot) + m_PSpectrumRandom->Gaus(0,0.5);
-	      
-	      //estimate an f2
-	      double Sign = m_PSpectrumRandom->Uniform();
-	      if (Sign > 0.5)
-		m_f2 = ((m_f0*6.*std::pow(10.,m_TimingNoiseActivity))*1e-24);
-	      else
-		m_f2 = -1.0*((m_f0*6.*std::pow(10.,m_TimingNoiseActivity))*1e-24);
-	    }
-	  else if ((m_TimingNoiseModel >1) && (m_TimingNoiseModel < 5)) // Timing Noise RW -Cordes-Downs
-	    {
-
-	      m_f2 = 0.;
-	      double tempPhi0 = m_phi0; 
-	      m_phi0 = 0.;
-	      double tempF0 = m_f0;
-	      m_f0 = m_f0NoNoise;	      
-	      double tempF1 = m_f1;
-	      m_f1 = m_f1NoNoise;	      
-
-	      PhaseNoNoise = getTurns(timeTildeDemodulated);
-	      PhaseNoNoise = modf(PhaseNoNoise,&intPart); // phase for linear evolution 
-	      if ( PhaseNoNoise <0.)
-		PhaseNoNoise+=1.;
-
-	      //Determine Crab RMS
-	      double dt_days = (timeTildeDemodulated-(StartMissionDateMJD)*SecsOneDay)/SecsOneDay;
-	      double s_rms_crab = 0.012*pow((dt_days/1628),1.5);
-
-	      //Activity parameter
-	      m_TimingNoiseActivity = -1.37+0.71*log10(m_pdot*1E15);
-	      double s_rms = pow(10.0,m_TimingNoiseActivity)*s_rms_crab;
-
-
-	      if (m_TimingNoiseModel ==2) //Case 1 :PN
-		{
-		  S0 = (3.7*3.7*s_rms*s_rms)*(2/(SecsOneDay*dt_days));
-		  m_TimingNoiseRMS = std::sqrt((S0/m_TimingNoiseMeanRate));
-		  m_phi0 = tempPhi0+m_PSpectrumRandom->Gaus(0,m_TimingNoiseRMS);
-		  // std::cout << std::setprecision(30) << "A="<<m_TimingNoiseActivity<<" dt"<<dt_days << " s_rms" << s_rms << 
-		  //" S0 " << S0 << " RMS " << m_TimingNoiseRMS << " phi0 " << m_phi0 << std::endl;
-		}
-	      else if (m_TimingNoiseModel ==3) //Case 2 :PN
-		{
-		  S1 =(15.5*15.5*s_rms*s_rms)*(12./pow((SecsOneDay*dt_days),3));
-		  m_TimingNoiseRMS = std::sqrt((S1/m_TimingNoiseMeanRate));
-		  m_f0 = tempF0+m_PSpectrumRandom->Gaus(0,m_TimingNoiseRMS);
-		  //std::cout << std::setprecision(30) << "A="<<m_TimingNoiseActivity<<" dt"<<dt_days << " s_rms" << s_rms << 
-		  //" S1 " << S1 << " RMS " << m_TimingNoiseRMS << " f0 " << m_f0 << std::endl;
-		}
-	      else if (m_TimingNoiseModel ==4) //Case 3 :SN
-		{
-		  S2 =(23.7*23.7*s_rms*s_rms)*(120./pow((SecsOneDay*dt_days),5));
-		  m_TimingNoiseRMS = std::sqrt((S2/m_TimingNoiseMeanRate));
-		  m_f1 = tempF1+m_PSpectrumRandom->Gaus(0,m_TimingNoiseRMS);
-		  //std::cout << std::setprecision(30) << "A="<<m_TimingNoiseActivity<<" dt"<<dt_days << " s_rms" << s_rms << 
-		  //  " S2 " << S2 << " RMS " << m_TimingNoiseRMS << " f1 " << m_f1 << std::endl;
-		}
-
-
-
-	    }
-
-	  
-	  PhaseWithNoise = getTurns(timeTildeDemodulated);
-	  PhaseWithNoise = modf(PhaseWithNoise,&intPart); // phase for linear evolution 
-	  if ( PhaseWithNoise <0.)
-	    PhaseWithNoise+=1.;
-
-	  if (TNOISELOG)
-	    {
-	      
-	      std::ofstream TimingNoiseLogFile((m_PSRname + "TimingNoise.log").c_str(),std::ios::app);
-	      m_f2NoNoise = 0.;
-	      double ft_l = GetFt(timeTildeDemodulated,m_f0NoNoise,m_f1NoNoise,m_f2NoNoise);
-	      double ft_n = GetFt(timeTildeDemodulated,m_f0,m_f1,m_f2);
-	      double ft1_l = GetF1t(timeTildeDemodulated,m_f1NoNoise,m_f2NoNoise);
-	      double ft1_n = GetF1t(timeTildeDemodulated,m_f1,m_f2);
-	      double ft2_l = m_f2NoNoise;//
-	      double ft2_n = m_f2;//
-	      
-	      TimingNoiseLogFile << std::setprecision(30) << timeTildeDemodulated-(StartMissionDateMJD)*SecsOneDay
-				 << "\t" << m_TimingNoiseActivity
-				 << "\t" << S0 
-				 << "\t" << S1
-				 << "\t" << S2 
-				 << "\t" <<ft_l << "\t" << ft_n 
-				 << "\t" <<ft1_l << "\t" << ft1_n 
-				 << "\t" <<ft2_l << "\t" << ft2_n 			 
-				 << "\t" << PhaseNoNoise << "\t" << PhaseWithNoise << std::endl;
-	    }
-	  
-
-	  if (DEBUG)
-	    {
-	      std::cout << std::setprecision(30) << " Activity=" << m_TimingNoiseActivity 
-			<< "f2=" << m_f2 << " PN=" << PhaseWithNoise 
-			<< " dPhi=" << PhaseWithNoise-PhaseNoNoise <<std::endl;
-	    }
-	}
+      ApplyTimingNoise(timeTildeDemodulated);
     }
-
 
   double initTurns = getTurns(timeTildeDemodulated); //Turns made at this time
   double tStart = modf(initTurns,&intPart)*m_period; // Start time for interval
@@ -785,73 +418,7 @@ double PulsarSpectrum::interval(double time)
 		<<  " phase is " << tStart/m_period << " phi0 is " << m_phi0 << std::endl;
     }
 
-  //Checks whether ephemerides (period,pdot, etc..) are within validity ranges
-  if (((timeTildeDemodulated/SecsOneDay) < m_t0Init) || ((timeTildeDemodulated/SecsOneDay) > m_t0End)) 
-    {
-#if DEBUG
-      std::cout << "Warning!Time is out of range of validity for pulsar " << m_PSRname 
-		<< ": Switching to new ephemerides set..." << std::endl;
-#endif
-	for (unsigned int e=0; e < m_t0Vect.size();e++)
-	  if (((timeTildeDemodulated/SecsOneDay) > m_t0InitVect[e]) && ((timeTildeDemodulated/SecsOneDay) < m_t0EndVect[e])) 
-	    {
-	
-	      m_t0Init = m_t0InitVect[e];
-	      m_t0 = m_t0Vect[e];
- 	      m_t0End = m_t0EndVect[e];
-	      m_f0 = m_f0Vect[e];
-	      m_f1 = m_f1Vect[e];
-	      m_f2 = m_f2Vect[e];
-	      m_f0NoNoise = m_f0Vect[e];
-	      m_f1NoNoise = m_f1Vect[e];
-	      m_f2NoNoise = m_f2Vect[e];
-	      m_period = m_periodVect[e];
-	      m_pdot = m_pdotVect[e];
-	      m_p2dot = m_p2dotVect[e];
-	      m_phi0 = m_phi0Vect[e];
-
-	      if (DEBUG)
-		{
-		  std::cout << "Valid Ephemerides set found:" << std::endl;
-		  std::cout << "MJD("<<m_t0Init<<"-"<<m_t0End<<") --> Epoch t0 = MJD " << m_t0 << std::endl; 
-		  std::cout << "f0 " << m_f0 << " f1 " << m_f1 << " f2 " << m_f2 << std::endl;
-		  std::cout << "Period " << m_period << " pdot " << m_pdot << " p2dot " << m_p2dot << std::endl;
-		}
-
-
-	      //Re-instantiate PulsarSim and SpectObj
-	      delete m_Pulsar;
-
-	      m_Pulsar = new PulsarSim(m_PSRname, m_seed, m_flux, m_enphmin, m_enphmax, m_period);
-
-	      if (m_model == 1)
-		{
-
-		  delete m_spectrum;
-		  m_spectrum = new SpectObj(m_Pulsar->PSRPhenom(double(m_ppar0), m_ppar1,m_ppar2,m_ppar3,m_ppar4),1);
-		  m_spectrum->SetAreaDetector(EventSource::totalArea());
-	      
-		}
-
-	      m_N0 = m_N0 + initTurns - getTurns(timeTildeDemodulated); //Number of turns at next t0
-	      double intN0;
-	      double N0frac = modf(m_N0,&intN0); // Start time for interval
-	      m_N0 = m_N0 - N0frac;
-	      std::cout << std::setprecision(20) << " Turns now are " << initTurns  
-			<< " ; at t0 " << m_N0 << std::endl;	           
-	       
-	      //m_phi0 = m_phi0 - N0frac;
-	       
-	      if (DEBUG)
-		{
-		  std::cout << std::setprecision(20) << " At Next t0 Number of Turns will be: " << m_N0 << std::endl;
-		}
-	    }
-	 else
-	   {
-	     std::cout << "Warning! Valid ephemerides not found!Proceeding with the old ones" << std::endl; 
-	   }
-    }
+  CheckEphemeridesValidity(timeTildeDemodulated,initTurns);;
 
   if (DEBUG)
     {
@@ -866,12 +433,32 @@ double PulsarSpectrum::interval(double time)
 
   //Log out the barycentric corrections  
   double bl=0;
-  if (BARYCORRLOG)
-     bl = getBaryCorr(timeTilde,1);
-  
-  //Ephemerides calculations...
+  if (::getenv("PULSAR_OUT_BARY"))
+    bl = getBaryCorr(timeTilde,1);
 
+  //In case of binary add a modulation...
+  if (m_BinaryFlag ==1)
+    {
+      double ModFactor = 0.5;
+      double intOrb;
+      //      double Modulation = 1+ModFactor*sin(2*M_PI*modf(initTurns,&intOrb)-DegToRad*m_omega+0.5*M_PI);
+      double OrbPhase = getOrbitalPhase(timeTildeDemodulated);
+
+      double Modulation = 1+ModFactor*std::sin(2*M_PI*OrbPhase-DegToRad*m_omega+0.5*M_PI);
+      if (DEBUG)
+	std::cout << std::setprecision(12)<<timeTildeDecorr - (StartMissionDateMJD)*SecsOneDay<< " OrbPhase " << OrbPhase << std::endl;
+
+      //std::cout << std::setprecision(12)<<TrueAn<<" " <<modf(TrueAn,&intOrb)<<" " << Modulation<<std::endl;
+      m_spectrum->SetFluxFactor(Modulation);
+    }
+
+
+  //Ephemerides calculations...
   double inte = m_spectrum->interval(tStart,m_enphmin); //deltaT (in system where Pdot = 0
+
+  
+
+
   double inteTurns = inte/m_period; // conversion to # of turns
   double totTurns = initTurns + inteTurns + m_phi0; //Total turns at the nextTimeTilde
 
@@ -887,15 +474,6 @@ double PulsarSpectrum::interval(double time)
   if (m_BinaryFlag == 0)
     {
       nextTimeTilde = nextTimeTildeDemodulated;
-
-      /* need Bug fix
-      if (((nextTimeTilde-(StartMissionDateMJD)*SecsOneDay)+510)>m_FT2_stopMET)
-	{
-	  std::cout << "aiutoooo!!! " << std::endl;
-	  return 3e10;
-	}
-	End code that need bug fix */
-
       nextTimeTildeDecorr = getDecorrectedTime(nextTimeTilde); //Barycentric decorrections
     }
   else 
@@ -925,11 +503,14 @@ double PulsarSpectrum::interval(double time)
 		<< nextTimeTildeDecorr + getBaryCorr(nextTimeTildeDecorr,0) - (StartMissionDateMJD)*SecsOneDay << std::endl;
       std::cout << std::setprecision(15) <<"  -->Interval is " <<  nextTimeTildeDecorr - timeTildeDecorr << std::endl;
     }
-    //  double interv = nextTimeTildeDecorr - timeTildeDecorr;
+
+  //  double interv = nextTimeTildeDecorr - timeTildeDecorr;
 
   double interv = nextTimeTildeDecorr-(time + (StartMissionDateMJD)*SecsOneDay);
-  if (interv < 0.)
+
+  if (interv <= 0.)
     interv = m_periodVect[0]/100.;
+  
 
   return interv;
   
@@ -989,6 +570,7 @@ double PulsarSpectrum::retrieveNextTimeTilde( double tTilde, double totalTurns, 
 
 
   int u = 0;
+  int nIterations = 0;
   while ((NTdown*NTup)>0)
     {
       u++;
@@ -1002,8 +584,8 @@ double PulsarSpectrum::retrieveNextTimeTilde( double tTilde, double totalTurns, 
   
   while(fabs(NTmid) > err )
     { 
-  
-      if (fabs(NTmid) < err) break;
+      nIterations++;
+      if ((fabs(NTmid) < err) || (nIterations > 200)) break;
       NTmid = totalTurns - getTurns(tTildeMid);
       NTdown = totalTurns - getTurns(tTildeDown); 
       if ((NTmid*NTdown)>0)
@@ -1049,9 +631,11 @@ double PulsarSpectrum::getBaryCorr( double ttInput, int LogCorrFlag)
 
   if (((ttInput-(StartMissionDateMJD)*SecsOneDay)+510)>m_FT2_stopMET)
     {
-      if (DEBUG)
+      if (m_OutputLevel>1)
 	{
-	  std::cout << "WARNING!!!Arrival time after FT2 end. No barycentric correction! " << ttInput << std::endl;
+	  char temp[200];
+	  sprintf(temp,"WARNING!!!Arrival time after FT2 end. No barycentric correction! at t=%.f",ttInput);
+	  WriteToLog(std::string(temp));
 	}
       return 0.;
     }
@@ -1079,11 +663,11 @@ double PulsarSpectrum::getBaryCorr( double ttInput, int LogCorrFlag)
     //    std::cout<<astro::GPS::time()<<std::endl;
     astro::GPS::instance()->time(timeMET);
     scPos = astro::GPS::instance()->position(timeMET);
-  } catch (astro::PointingHistory::TimeRangeError & eObj)
+  } catch (astro::PointingHistory::TimeRangeError & )
     {
       if (DEBUG)
 	{
-	  std::cout << "Time Error! " << std::setprecision(30) << timeMET << std::endl;
+	  std::cout << "WARNING! FT2 Time Error at " << std::setprecision(30) << timeMET << std::endl;
 	}
   
       if ((timeMET+510)>=m_FT2_stopMET)
@@ -1104,9 +688,9 @@ double PulsarSpectrum::getBaryCorr( double ttInput, int LogCorrFlag)
     EarthPosGeom = GeomVect.dot(m_PulsarVectDir);
     GeomVect = (scPos/clight) - m_solSys.getBarycenter(ttJD);
     GeomCorr = GeomVect.dot(m_PulsarVectDir);
-  } catch (astro::SolarSystem::BadDate & eObj)
+  } catch (astro::SolarSystem::BadDate & )
     {
-      std::cout << "Time Error JD! " << ttJD << std::endl;
+      std::cout << "WARNING! JD Bad Date " << ttJD <<std::endl;
       GeomCorr = 0.;  
     }
 
@@ -1129,9 +713,17 @@ double PulsarSpectrum::getBaryCorr( double ttInput, int LogCorrFlag)
 
   if ((LogCorrFlag == 1) && (ttInput-StartMissionDateMJD*SecsOneDay > 0.))
     {
+      double intPart=0.;
+      double PhaseOut = getTurns(ttInput);
+      PhaseOut = modf(PhaseOut,&intPart); // phase for linear evolution 
+      if (PhaseOut < 0)
+	PhaseOut++;
+
+
+
 	  std::ofstream BaryCorrLogFile((m_PSRname + "BaryCorr.log").c_str(),std::ios::app);
 	  BaryCorrLogFile << std::setprecision(20)
-			  << timeMET << "\t" <<  GLASTPosGeom << "\t"<< EarthPosGeom << "\t" 
+			  << timeMET << "\t" <<  PhaseOut << "\t" << GLASTPosGeom << "\t"<< EarthPosGeom << "\t" 
 			  << GeomCorr << "\t" << tdb_min_tt << "\t" << ShapiroCorr << std::endl;
 	  BaryCorrLogFile.close();
     }
@@ -1160,10 +752,10 @@ double PulsarSpectrum::getIterativeDemodulatedTime(double tInput, int LogFlag)
   int i=0;
   while ((fabs(timeDemodulated-delay-TargetTime) > DemodTol) && ( i < 50))
     {
-
       i++;
       timeDemodulated = TargetTime+delay;
       delay = getBinaryDemodulation(timeDemodulated,0);
+      // std::cout << "Step " << i << " t= " << timeDemodulated-(StartMissionDateMJD)*SecsOneDay<<std::endl;
     }
   
   if (LogFlag == 1)
@@ -1173,6 +765,65 @@ double PulsarSpectrum::getIterativeDemodulatedTime(double tInput, int LogFlag)
   
   return timeDemodulated;
 }
+
+/////////////////////////////////////////////
+/*!
+ * \param tInput Photon arrival time do be demodulated
+ * <br>
+ * This method returns the true anomaly
+ */
+double PulsarSpectrum::getTrueAnomaly(double tInput)
+{
+  //double BinaryRoemerDelay = 0.;
+  double dt = tInput-m_t0PeriastrMJD*SecsOneDay;
+  double OmegaMean = 2*M_PI/m_Porb;
+  double EccAnConst = OmegaMean*(dt - 0.5*(dt*dt*(m_Porb_dot/m_Porb)));
+  
+  //Calculate Eccenctric Anomaly solving Kepler equation using the atKepler function
+  double EccentricAnomaly = 0.; 
+  int status = atKepler(EccAnConst, m_ecc, &EccentricAnomaly); //AtKepler
+  
+  // atKepler not converged
+  if (0 != status) {
+     throw std::runtime_error("atKepler did not converge.");
+  } 
+  
+  //Calculate True Anomaly
+  double TrueAnomaly = 2.0 * std::atan(std::sqrt((1.0+m_ecc)/(1.0-m_ecc))*std::tan(EccentricAnomaly*0.5));
+  TrueAnomaly = TrueAnomaly + 2*M_PI*floor((EccentricAnomaly - TrueAnomaly)/ (2*M_PI));
+  while ((TrueAnomaly - EccentricAnomaly) > M_PI) TrueAnomaly -= 2*M_PI;
+  while ((EccentricAnomaly - TrueAnomaly) > M_PI) TrueAnomaly += 2*M_PI;
+
+  return TrueAnomaly;
+
+}
+
+
+/////////////////////////////////////////////
+/*!
+ * \param tInput Photon arrival time do be demodulated
+ * <br>
+ * This method returns the true anomaly
+ */
+double PulsarSpectrum::getOrbitalPhase(double tInput)
+{
+  //double BinaryRoemerDelay = 0.;
+  double dt = tInput-m_t0PeriastrMJD*SecsOneDay;
+
+  double dp = dt/m_Porb;
+
+  // Compute the complete phase.
+  double phase = dp * (1. - dp *m_Porb_dot / 2.0);
+
+  double intOrb;
+  double OrbPhase = modf(phase,&intOrb);
+
+  if (OrbPhase<0)
+    OrbPhase+=1;
+
+  return OrbPhase;
+}
+
 
 /////////////////////////////////////////////
 /*!
@@ -1275,11 +926,9 @@ double PulsarSpectrum::getDecorrectedTime(double CorrectedTime)
   //  double CorrectedTime = 54.2342.;
   double deltaT = 510.;
 
-  //  int DEBUG = 1;
-
   double tcurr = CorrectedTime-deltaT;
   double fcurr = tcurr + getBaryCorr(tcurr,0); // fx(tcurr);
-  double fcurr_ct = CorrectedTime;
+  //  double fcurr_ct = CorrectedTime;
 
   if (DEBUG)
     {
@@ -1337,71 +986,22 @@ double PulsarSpectrum::getDecorrectedTime(double CorrectedTime)
 	  //    << " and starting again1 from " << tcurr << std::endl;
 	  //std::cout << std::setprecision(30) << CorrectedTime << 
 	  //" <--" << fcurr << " df=" << CorrectedTime-fcurr << std::endl;
-	  if ((s > 8) || (deltaStep < 1e-7))
+	  if ((s > 10) || (deltaStep < 1e-7))
 	    {
 	      //std::cout << "Skipping ! " << std::endl;
 	      break;
 	    }
 	}
 
-      //      std::cout << std::setprecision(30) <<  s << " -> " << CorrectedTime 
-      //	<< " <--" << fcurr 
-      //	<< " df=" << CorrectedTime-fcurr << std::endl;
-  
+      if (DEBUG)
+	{
+	  std::cout << std::setprecision(30) <<  s << " -> " << CorrectedTime 
+		    << " <--" << fcurr 
+		    << " df=" << CorrectedTime-fcurr << std::endl;
+	}
+
+
       return tcurr;
-
-
-  // Begin old algorithm..
-  /*
-  //Use the bisection method to find the inverse of the de-corrected time, i.e. the time (in TT)
-  //that after correction is equal to Time in TDB
-
-  if (DEBUG)
-    {
-      std::cout << "Get decorrected time from time t=" << CorrectedTime << std::endl;
-    }
-  double deltaMax = 510.0; //max deltat (s)
-  double ttDown = CorrectedTime - deltaMax;
-  double ttUp = CorrectedTime + deltaMax;
-
-  double ttMid = (ttUp + ttDown)/2;
-
-  int i = 0;
-  double hMid = 1e30; //for the 1st iteration
-
-  while (fabs(hMid)>baryCorrTol )
-    {
-      double hDown = (CorrectedTime - (ttDown + getBaryCorr(ttDown,0)));
-      hMid = (CorrectedTime - (ttMid + getBaryCorr(ttMid,0)));
-      //std::cout << std::setprecision(30) 
-      //	<< "\n" << i << "**ttUp " << ttUp << " ttDown " << ttDown << " mid " << ttMid << std::endl;
-             
-       if (fabs(hMid) < baryCorrTol) break;
-      if ((hDown*hMid)>0)
-	{
-	  ttDown = ttMid;
-	  ttMid = (ttUp+ttDown)/2;
-	}
-      else 
-	{
-	  ttUp = ttMid;
-	  ttMid = (ttUp+ttDown)/2;
-	}
-       i++;
-
-       if (i>50)
-	 {
-	   break;
-	 }
-
-    }
-   
-   return ttMid;
-  */
-  // End old algorithm..
-
-
-
 }
 
 /////////////////////////////////////////////
@@ -1415,74 +1015,98 @@ double PulsarSpectrum::getDecorrectedTime(double CorrectedTime)
 double PulsarSpectrum::getBinaryDemodulationInverse( double CorrectedTime)
 {
 
-  //Set initial conditions
-  double deltaMax = m_asini*(1-m_ecc)+m_asini*std::sqrt(1-m_ecc*m_ecc); //max deltat (s)
-  double deltaMin = m_asini*(1+m_ecc)-m_asini*std::sqrt(1-m_ecc*m_ecc);
+  double deltaMin = m_asini*(1.+m_ecc);//-m_asini*std::sqrt(1.-m_ecc*m_ecc);
 
-  double tModUp = CorrectedTime + deltaMax;
-  double tModDown = CorrectedTime - deltaMin;
-  double tModMid = 0.;
+  double tcurr = CorrectedTime-deltaMin;
+  double fcurr = getIterativeDemodulatedTime(tcurr,0);
+  //  double fcurr_ct = CorrectedTime;
 
-  int i = 0;
-  double hModUp = 0.;
-  double hModDown = 0.;
-  double hModMid = 1e30; //for the 1st iteration
-
-   while (fabs(hModMid)>InverseDemodTol )
+  if (DEBUG)
     {
-      i++;
-      tModMid = tModUp*0.5 + tModDown*0.5;
-      
-      if (tModMid == tModDown)
-	{
-	  tModDown = tModDown-1e-5*m_PSpectrumRandom->Uniform();
-	  if (DEBUG) std::cout << "\n**Correcting down to tDown:" << tModDown << std::endl;
-	  tModMid = tModUp*0.5 + tModDown*0.5;
-	}
-
-      if (tModMid == tModUp)
-	{
-	  tModUp = tModUp+1e-5*m_PSpectrumRandom->Uniform();
-	  if (DEBUG) std::cout << "\n**Correcting up to tUp:" << tModUp << std::endl;
-	  tModMid = tModUp*0.5 + tModDown*0.5;
-	}
-
-      hModMid = CorrectedTime - (getIterativeDemodulatedTime(tModMid,0));
-
-      /*
-       std::cout << std::setprecision(30) << "\n****Rand" << RandFrac << " delta " << (tModUp - tModDown)*RandFrac << std::endl;
-       std::cout << std::setprecision(30) << " tUp-tmid " << tModUp - tModMid << std::endl;
-       std::cout << std::setprecision(30) << " tDown-tmid " << tModDown - tModMid << std::endl;
-       std::cout << std::setprecision(30) << "   tdown=" << tModDown << " tup=" << tModUp << " tMid=" << tModMid << std::endl;
-       std::cout << std::setprecision(30) << "   hdown=" << hModDown << " hup=" << hModUp << " hMid=" << hModMid << std::endl;
-      */
-      
-      if ((hModDown*hModMid)<0)
-	{
-	  tModUp = tModMid;
-	  //std::cout << " tMid--->tTup ::: tUp=" << tModUp<<std::endl; 
-	}
-      else
-	{
-	  tModDown = tModMid;
-	  //	  std::cout << " tMid--->tTDown ::: tDown=" << tModDown<<std::endl; 
-	}
-
-      hModUp = CorrectedTime - (getIterativeDemodulatedTime(tModUp,0));
-      hModDown = CorrectedTime - (getIterativeDemodulatedTime(tModDown,0));
-
-      if (i==50) 
-	{
-	  if (DEBUG)
-	    {
-	      std::cout << " ERROR!!!: Inverse demodulation does not converge! " << std::endl;
-	    }
-	  break;
-    	}
+      std::cout << "Get inverse demodulated time for t=" << CorrectedTime << std::endl;
     }
-   
-  return tModMid;
 
+  //double deltaStep = 10.;
+  int s = 0;
+  int SignDirection = 0;
+  double StartStep = 1.0*int(log10(fabs(deltaMin/10.)));
+  double deltaStep =  pow(10.,(StartStep-s));
+  //std::cout << "START " << StartStep << " dmin " << deltaMin << std::endl;
+  if (CorrectedTime <= fcurr) // function increasing
+    {
+      //      std::cout << "Case 1: de-crescent function" << std::endl;
+      SignDirection = 1;
+    }
+  else
+    {
+      //std::cout << "Case 2: crescent function" << std::endl;
+      SignDirection = 2;
+    }
+
+  /*
+  std::cout << "\n\n***\n"<<m_PSRname<<"tstart= " << tcurr << " -->fcurr= " << fcurr 
+	    << " -->fcurr_CT= " << CorrectedTime << " inital delta=" 
+	    << deltaStep << " sign" << SignDirection << std::endl;
+  */
+
+  //double tModMid=0.;
+  int nMaxStepIterations=0;	
+      while ( fabs(CorrectedTime-fcurr) > InverseDemodTol)
+	{
+
+          nMaxStepIterations=0;
+	  if (SignDirection == 1)
+	    {
+	      while ((fcurr > CorrectedTime) && (nMaxStepIterations <1000))
+		{ 
+		  tcurr = tcurr+deltaStep;
+		  fcurr = getIterativeDemodulatedTime(tcurr,0);
+	          nMaxStepIterations++;	 
+                  if (fcurr < CorrectedTime)
+                   {
+		     break;
+                   }
+                  //std::cout << std::setprecision(30) << nMaxStepIterations <<" tcurr=>" << tcurr << " fcurr " << fcurr 
+		  //	<< "df=" << CorrectedTime-fcurr << std::endl; 
+		}
+	    }
+	  else
+	    while ((fcurr < CorrectedTime) && (nMaxStepIterations <1000))
+	      { 
+		tcurr = tcurr+deltaStep;
+		fcurr = getIterativeDemodulatedTime(tcurr,0);
+                nMaxStepIterations++;
+		//std::cout << std::setprecision(30) << nMaxStepIterations << " tcurr=>" << tcurr << " fcurr " << fcurr 
+		  //<< "df=" << CorrectedTime-fcurr << std::endl; 
+             if (fcurr > CorrectedTime)
+                   {
+		     break;
+                   }
+	      
+
+}
+	    
+	  
+	  tcurr = tcurr-deltaStep;
+	  fcurr = getIterativeDemodulatedTime(tcurr,0);
+	  s++;
+	  deltaStep =  pow(10.,(StartStep-s));
+	  //std::cout << "\n" << m_PSRname << "  Target superated, decreasing to " << deltaStep 
+	    //  << " and starting again1 from " << tcurr << std::endl;
+	  //std::cout << std::setprecision(30) << CorrectedTime << 
+	  //" <--" << fcurr << " df=" << CorrectedTime-fcurr << std::endl;
+	  if ((s > 8) || (deltaStep < 1e-7))
+	    {
+	      //std::cout << "Skipping ! " << std::endl;
+	      break;
+	    }
+	}
+
+      //      std::cout << std::setprecision(30) <<  s << " -> " << CorrectedTime 
+      //	<< " <--" << fcurr 
+      //	<< " df=" << CorrectedTime-fcurr << std::endl;
+
+      return tcurr;
 }
 
 /////////////////////////////////////////////
@@ -1497,8 +1121,20 @@ double PulsarSpectrum::getBinaryDemodulationInverse( double CorrectedTime)
 int PulsarSpectrum::getPulsarFromDataList(std::string sourceFileName)
 {
 
-  double startTime = Spectrum::startTime();
-  double endTime = astro::GPS::instance()->endTime();
+  double startTime = 0.;//Spectrum::startTime();
+  double endTime = 0.;//astro::GPS::instance()->endTime();
+
+  if (m_UseFT2 == 1)
+    {
+      startTime =  m_FT2_startMET + (550/86400.);
+      endTime = m_FT2_stopMET - (550/86400.);
+    } else
+      {
+	startTime =  m_Sim_startMET + (550/86400.);
+	endTime = m_Sim_stopMET - (550/86400.);
+      }
+
+
 
   int Status = 0;
   std::ifstream PulsarDataTXT;
@@ -1512,138 +1148,268 @@ int PulsarSpectrum::getPulsarFromDataList(std::string sourceFileName)
   
   if (! PulsarDataTXT.is_open()) 
     {
-      std::cout << "Error opening Datalist file " << sourceFileName  
-		<< " (check whether $PULSARROOT is set" << std::endl; 
-      Status = 0;
-      exit(1);
+      throw "Error! Cannot open file ";
     }
-  
-  char aLine[400];  
-  PulsarDataTXT.getline(aLine,400); 
+  else {
+     char aLine[400];  
+    PulsarDataTXT.getline(aLine,400); 
+    
+    char tempName[15] = "";
+    
+    double flux, ephem0, ephem1, ephem2, t0Init, t0, t0End, txbary, phi0, period, pdot, p2dot, f0, f1, f2, phas;
+    char ephemType[15] = "";
+    int tnmodel, binflag;
+    
+    while (PulsarDataTXT.eof() != 1)
+      {
 
-  char tempName[15] = "";
+	PulsarDataTXT >> tempName >> flux >> ephemType >> ephem0 >> ephem1 >> ephem2 
+		      >> t0Init >> t0 >> t0End  >> txbary >> tnmodel >> binflag;
 
-  double flux, ephem0, ephem1, ephem2, t0Init, t0, t0End, txbary, phi0, period, pdot, p2dot, f0, f1, f2, phas;
-  char ephemType[15] = "";
-  int tnmodel, binflag;
 
-  while (PulsarDataTXT.eof() != 1)
-    {
+	//	std::cout << tempName << flux << ephemType << ephem0 << ephem1 << ephem2 
+	//  << t0Init << t0 << t0End  << txbary << tnmodel << binflag <<std::endl;
 
-      PulsarDataTXT >> tempName >> flux >> ephemType >> ephem0 >> ephem1 >> ephem2 
-		    >> t0Init >> t0 >> t0End  >> txbary >> tnmodel >> binflag;
-      
-      if (std::string(tempName) == m_PSRname)
-	{
+	if (std::string(tempName) == m_PSRname)
+	  {
+	    
+	    Status = 1;
+	    m_flux = flux;
+	    m_TimingNoiseModel = tnmodel;
+	    m_ephemType = ephemType;
+	    m_BinaryFlag = binflag;
+	    
+	    //Check if txbary or t0 are before start of the simulation
+	    double startMJD = StartMissionDateMJD+(startTime/86400.)+(550/86400.);
+	    // std::cout << "T0 " << t0 << " start " << startMJD << std::endl;
+	    if ((t0 < startMJD) || (txbary < startMJD))
+	      {
+		if (m_OutputLevel>1)
+		  {
+		    char temp[200];
+		    sprintf(temp,"Warning! Epoch t0 out the simulation range (t0-tStart=%.10f) s.: changing to MJD=%d",(t0-startMJD),startMJD);
+		    WriteToLog(std::string(temp));
+		  }
+		t0 = startMJD;
+		txbary = startMJD;
+	      }
+	    
+	    //Check if txbary or t0 are after start of the simulation
+	    double endMJD = StartMissionDateMJD+(endTime/86400.)-(550/86400.);
+	    // std::cout << "T0 " << t0 << " start " << startMJD << std::endl;
+	    if ((t0 > endMJD) || (txbary > endMJD))
+	      {
+		if (m_OutputLevel>1)
+		  {
 
-	  Status = 1;
-	  m_flux = flux;
-	  m_TimingNoiseModel = tnmodel;
-	  m_ephemType = ephemType;
-	  m_BinaryFlag = binflag;
-
-	  //Check if txbary or t0 are before start of the simulation
-	  double startMJD = StartMissionDateMJD+(startTime/86400.)+(550/86400.);
-	  // std::cout << "T0 " << t0 << " start " << startMJD << std::endl;
-	  if (t0 < startMJD)
-	    {
-	      if (DEBUG)
-		{
-		  std::cout << std::setprecision(10) 
-			    << "Warning! Epoch t0 out the simulation range (t0-tStart=" << (t0-startMJD)
-			    << " s.: changing to MJD " << startMJD << std::endl;
-		}
-	      t0 = startMJD;
-	    }
-	  
-	  if (txbary < startMJD)
-	    {
-	      if (DEBUG)
-		{
-		  std::cout << "Warning! txbary out the simulation range (t0-tStart=" << (txbary-startMJD)
-			    << " s.: changing to MJD " << startMJD << std::endl;
-		}
-	      txbary = startMJD;
-	    }
-
-	  //Check if txbary or t0 are after start of the simulation
-	  double endMJD = StartMissionDateMJD+(endTime/86400.)-(550/86400.);
-	  // std::cout << "T0 " << t0 << " start " << startMJD << std::endl;
-	  if (t0 > endMJD)
-	    {
-	      if (DEBUG)
-		{
-		  std::cout << std::setprecision(10) 
-			    << "Warning! Epoch t0 out the simulation range (t0-tEnd=" << (t0-endMJD)
-			    << " s.: changing to MJD " << endMJD << std::endl;
-		  std::cout << "***end at " << endTime << " corresp to " << endMJD << std::endl;
-		}
-	      t0 = endMJD;
-	    }
-	  
-	  if (txbary > endMJD)
-	    {
-	      if (DEBUG)
-		{
-		  std::cout << "Warning! txbary out the simulation range (t0-tEnd=" << (txbary-endMJD)
-			    << " s.: changing to MJD " << endMJD << std::endl;
-		}
-		  txbary = endMJD;
-	    }
-
-	  m_t0InitVect.push_back(t0Init);
-	  m_t0Vect.push_back(t0);
-	  m_t0EndVect.push_back(t0End);
-	  m_txbaryVect.push_back(txbary);
-
-	  //Period-type ephemerides
-	  if (std::string(ephemType) == "P")
-	    {
-
-	      period = ephem0;
-	      pdot = ephem1;
-	      p2dot = ephem2;
-	      f0 = 1.0/period;
-	      f1 = -pdot/(period*period);
-	      f2 = 2*pow((pdot/period),2.0)/period - p2dot/(period*period);
-
-	    } 
-	  else if (std::string(ephemType) == "F")
-	    {
-	      //Frequency-style ephemrides
-	      f0 = ephem0;
-	      f1 = ephem1;
-	      f2 = ephem2;
-	      period = 1.0/f0;
-	    }
-	  
-	  m_periodVect.push_back(period);
-	  m_pdotVect.push_back(pdot);
-	  m_p2dotVect.push_back(p2dot);
-	  m_f0Vect.push_back(f0);
-	  m_f1Vect.push_back(f1);
-	  m_f2Vect.push_back(f2);
-
-	  double dt = (txbary-t0)*SecsOneDay;
-
-	  phi0 = -1.0*(f0*dt
-		       + (f1/2.0)*dt*dt
-		       + (f2/6.0)*dt*dt*dt); 
-	
-	  phi0 = modf(phi0,&phas);
-
-	  if (phi0 < 0. ) 
-	    phi0++;
-
-	  m_phi0Vect.push_back(phi0);
-	  
-	}
-    }
+		    char temp[200];
+		    sprintf(temp,"Warning! Epoch t0 out the simulation range (t0-tEnd=%.10f) s.: changing to MJD=%d",
+			    (t0-endMJD),endMJD);
+		    WriteToLog(std::string(temp));
+		    sprintf(temp,"**  Tnd at %d corresp. to MJD %d",endTime,endMJD);
+		    WriteToLog(std::string(temp));
+		  }
+		t0 = endMJD;
+		txbary = endMJD;
+	      }
+	    
+	    m_t0InitVect.push_back(t0Init);
+	    m_t0Vect.push_back(t0);
+	    m_t0EndVect.push_back(t0End);
+	    m_txbaryVect.push_back(txbary);
+	    
+	    //Period-type ephemerides
+	    if (std::string(ephemType) == "P")
+	      {
+		
+		period = ephem0;
+		pdot = ephem1;
+		p2dot = ephem2;
+		f0 = 1.0/period;
+		f1 = -pdot/(period*period);
+		f2 = 2*pow((pdot/period),2.0)/period - p2dot/(period*period);
+		
+	      } 
+	    else if (std::string(ephemType) == "F")
+	      {
+		//Frequency-style ephemrides
+		f0 = ephem0;
+		f1 = ephem1;
+		f2 = ephem2;
+		period = 1.0/f0;
+	      }
+	    
+	    m_periodVect.push_back(period);
+	    m_pdotVect.push_back(pdot);
+	    m_p2dotVect.push_back(p2dot);
+	    m_f0Vect.push_back(f0);
+	    m_f1Vect.push_back(f1);
+	    m_f2Vect.push_back(f2);
+	    
+	    double dt = (txbary-t0)*SecsOneDay;
+	    
+	    phi0 = -1.0*(f0*dt
+			 + (f1/2.0)*dt*dt
+			 + (f2/6.0)*dt*dt*dt); 
+	    
+	    phi0 = modf(phi0,&phas);
+	    
+	    if (phi0 < 0. ) 
+	      phi0++;
+	    
+	    m_phi0Vect.push_back(phi0);
+	    
+	  }
+      }
+  }
 
   return Status;
 }
 
 
+/////////////////////////////////////////////
+/*!
+ * \param pulsar_data_dir: $PULSARDATA directory;
+ * \param DataType: Type of data to be loaded (0=General data; 1=Orbital Data);
+ *
+ * <br>
+ * This method load pulsar general data (flux, spin parameters, etc..) of
+ * orbital data (kepler parameters, etc..) according to DataType parameter
+ * Datafiles containing parameters must be specified in $PULSARDATA/PulsarDataList.txt 
+ * for general data or $PULSARDATA/PulsarBinDataList.txt for orbital data
+ *
+ */
+void PulsarSpectrum::LoadPulsarData(std::string pulsar_data_dir, int DataType = 0)
+{
+
+  //Scan PulsarDataList.txt for Pulsar general data
+
+  std::string ListFileName;
+
+  if (DataType == 0)
+    {
+      ListFileName = facilities::commonUtilities::joinPath(pulsar_data_dir, "PulsarDataList.txt");
+      if (DEBUG)
+	{
+	  std::cout << "Reading General Data" << std::endl;
+	}
+    }
+  else if (DataType == 1)
+    {
+      ListFileName = facilities::commonUtilities::joinPath(pulsar_data_dir, "PulsarBinDataList.txt");
+      if (DEBUG)
+	{      
+	  std::cout << "Reading Orbital Data" << std::endl;
+	}
+    }
+
+  //new block for reading lines
+
+  //max
+ try
+   {
+     CheckFileExistence(ListFileName);
+     
+     std::ifstream ListFile(ListFileName.c_str());
+     std::string dataline;
+     std::vector<std::string> datalines;
+     while (std::getline(ListFile, dataline, '\n'))
+       {
+	 if (dataline != "" && dataline != " "
+	     && dataline.find_first_of('#') != 0)
+	   {
+	     datalines.push_back(dataline);
+	   }
+       }
+
+     // After lines are parsed, each DataList is processed...
+     int PulsarFound=0;
+     int l=0;
+
+     while ((l<datalines.size()) && (PulsarFound!=1))
+       {
+	std::string CompletePathFileName = facilities::commonUtilities::joinPath(pulsar_data_dir,datalines[l]);
+	try
+	    {
+
+	      if (DataType == 0)
+		{
+		  PulsarFound = getPulsarFromDataList(CompletePathFileName);
+		}
+	      else if (DataType == 1)
+		{
+		  PulsarFound = getOrbitalDataFromBinDataList(CompletePathFileName);
+		}
+
+	    }
+	 catch (char const *error) //DataList does not exists....
+	   {
+	     if (m_OutputLevel>1)
+	       {
+		 WriteToLog("WARNING!"+std::string(error)+std::string(CompletePathFileName)
+			    +"... skip to next ASCII Data list file");
+	       }
+	   }
+	
+	 l++;
+       }
+
+     if (PulsarFound == 0)//if no Datalist contains pulsars...
+       {
+	 std::cout << "ERROR! Unable to find pulsar " << m_PSRname 
+		   << " in any DataList. Check $PULSARDATA" << std::endl;
+	 exit(1);
+       }
+
+
+     //if requested, initialize log output for barycentric corrections
+     if (::getenv("PULSAR_OUT_BARY"))
+       {
+	 std::ofstream BaryCorrLogFile((m_PSRname + "BaryCorr.log").c_str());
+	 BaryCorrLogFile << "\nPulsar" << m_PSRname 
+			 << " : Barycentric corrections log generated by PulsarSpectrum" 
+			 << std::endl;
+	 BaryCorrLogFile << "tMET\tTDB-TT\tGeomDelay\tShapiroDelay" << std::endl;
+	 BaryCorrLogFile.close();
+       }
+
+
+     //if requested, initialize log output for barycentric corrections
+      if ((m_BinaryFlag ==1) && (::getenv("PULSAR_OUT_BIN")))
+	{
+	  std::ofstream BinDemodLogFile((m_PSRname + "BinDemod.log").c_str());
+	  BinDemodLogFile << "tMET\tdt\tE\tAt\tOmega\tecc\tasini\tdt_Roemer\tdt_einstein\tdt_shapiro" 
+			  << std::endl;
+	  BinDemodLogFile.close();
+	}
+     
+   }
+ catch (char const *error) //DataList.txt of BinDataList.txt does not exists...
+    {
+      std::cerr << error << ListFileName << std::endl;
+      exit(1);
+    }
+
+ if (DataType == 0)
+   {
+     //Assign as starting ephemeris the first entry of the vectors... 
+     m_t0Init = m_t0InitVect[0];
+     m_t0 = m_t0Vect[0];
+     m_t0End = m_t0EndVect[0];
+     m_period = m_periodVect[0];
+     m_pdot = m_pdotVect[0];
+     m_p2dot = m_p2dotVect[0];
+     m_f0 = m_f0Vect[0];
+     m_f1 = m_f1Vect[0];
+     m_f2 = m_f2Vect[0];
+     m_f0NoNoise = m_f0Vect[0];
+     m_f1NoNoise = m_f1Vect[0];
+     m_f2NoNoise = m_f2Vect[0];
+     m_phi0 = m_phi0Vect[0];
+   }
+
+
+}
 
 /////////////////////////////////////////////
 /*!
@@ -1681,10 +1447,11 @@ int PulsarSpectrum::getOrbitalDataFromBinDataList(std::string sourceBinFileName)
   
   if (! PulsarBinDataTXT.is_open()) 
     {
-      std::cout << "Error opening BinDatalist file " << sourceBinFileName  
-		<< " (check whether $PULSARDATA is set)" << std::endl; 
-      Status = 0;
-      exit(1);
+      throw "Error!Cannot open file";
+      //      std::cout << "Error opening BinDatalist file " << sourceBinFileName  
+      //	<< " (check whether $PULSARDATA is set)" << std::endl; 
+      //Status = 0;
+      //exit(1);
     }
   
   char aLine[400];  
@@ -1700,6 +1467,7 @@ int PulsarSpectrum::getOrbitalDataFromBinDataList(std::string sourceBinFileName)
       
       if (std::string(tempName) == m_PSRname)
 	{
+	  Status = 1;
 	  m_Porb = porb;
 	  m_asini = asini;
 	  m_ecc = ecc;
@@ -1711,6 +1479,277 @@ int PulsarSpectrum::getOrbitalDataFromBinDataList(std::string sourceBinFileName)
     }
 
   return Status;
+}
+
+
+/////////////////////////////////////////////
+/*!
+ * \param None
+ *
+ * <br>
+ * Initialize variable related to timing noise
+ */
+void PulsarSpectrum::InitTimingNoise()
+{
+
+  if (::getenv("PULSAR_OUT_TNOISE"))
+    {
+      std::ofstream TimingNoiseLogFile((m_PSRname + "TimingNoise.log").c_str());
+      TimingNoiseLogFile << "Timing Noise log file using model: " << m_TimingNoiseModel << std::endl;
+      TimingNoiseLogFile << "tMET\tA\tS0\tS1\tS2\tf0_l\tf0_n\tf1_l\tf1_n\tf2_l\tf2_n\tPhi_l\tPhi_n"
+			 <<std::endl;
+      TimingNoiseLogFile.close();
+    }
+  
+  //define a default mean rate of about 1 day
+  m_TimingNoiseMeanRate = 1/86400.;
+  // according to Poisson statistics
+  double startTime = Spectrum::startTime();
+  //Determine next Timing noise event according to the rate R m_TimingNoiseRate      
+  m_TimingNoiseTimeNextEvent = startTime -log(1.-m_PSpectrumRandom->Uniform(1.0))/m_TimingNoiseMeanRate; 
+  
+}
+
+
+/////////////////////////////////////////////
+/*!
+ * \param None
+ *
+ * <br>
+ * TnoiseInputTime input time where to apply noise
+ *
+ * Do the timing noise calculation on ephemerides
+ */
+void PulsarSpectrum::ApplyTimingNoise(double TnoiseInputTime)
+{
+
+  double intPart=0.; //Integer part
+  double PhaseNoNoise,PhaseWithNoise=0.;
+
+  //Check for a next Timing noise event
+      if ((TnoiseInputTime-(StartMissionDateMJD)*SecsOneDay) > m_TimingNoiseTimeNextEvent)
+	{
+	  //interval according to Poisson statistics
+	  m_TimingNoiseTimeNextEvent+= -log(1.-m_PSpectrumRandom->Uniform(1.0))/m_TimingNoiseMeanRate;
+ 
+	  if (DEBUG)
+	    {
+	      std::cout << std::setprecision(30)<<"Timing Noise Event!Next Event at t=" 
+			<< m_TimingNoiseTimeNextEvent << " |dt=" 
+			<< m_TimingNoiseTimeNextEvent
+		-(TnoiseInputTime-(StartMissionDateMJD)*SecsOneDay) <<std::endl;
+	    }
+
+
+	  //Timing noise managing...
+
+	  double S0=0.;
+	  double S1=0.;
+	  double S2=0.;
+
+	  if (m_TimingNoiseModel ==1) // Timing Noise #1
+	    {
+	      m_f2 = 0;
+	      PhaseNoNoise = getTurns(TnoiseInputTime);
+	      PhaseNoNoise = modf(PhaseNoNoise,&intPart); // phase for linear evolution 
+	      if ( PhaseNoNoise <0.)
+		PhaseNoNoise+=1.;
+	      m_TimingNoiseActivity = 6.6 + 0.6*log10(m_pdot) + m_PSpectrumRandom->Gaus(0,0.5);
+	      
+	      //estimate an f2
+	      double Sign = m_PSpectrumRandom->Uniform();
+	      if (Sign > 0.5)
+		m_f2 = ((m_f0*6.*std::pow(10.,m_TimingNoiseActivity))*1e-24);
+	      else
+		m_f2 = -1.0*((m_f0*6.*std::pow(10.,m_TimingNoiseActivity))*1e-24);
+	    }
+	  else if ((m_TimingNoiseModel >1) && (m_TimingNoiseModel < 5)) // Timing Noise RW -Cordes-Downs
+	    {
+
+	      m_f2 = 0.;
+	      double tempPhi0 = m_phi0; 
+	      m_phi0 = 0.;
+	      double tempF0 = m_f0;
+	      m_f0 = m_f0NoNoise;	      
+	      double tempF1 = m_f1;
+	      m_f1 = m_f1NoNoise;	      
+
+
+	      PhaseNoNoise = getTurns(TnoiseInputTime);
+	      PhaseNoNoise = modf(PhaseNoNoise,&intPart); // phase for linear evolution 
+	      if ( PhaseNoNoise <0.)
+		PhaseNoNoise+=1.;
+
+	      //Determine Crab RMS
+	      double dt_days = (TnoiseInputTime-(StartMissionDateMJD)*SecsOneDay)/SecsOneDay;
+	      double s_rms_crab = 0.012*pow((dt_days/1628),1.5);
+
+	      //Activity parameter
+	      //m_TimingNoiseActivity = -1.37+0.71*log10(m_pdot*1E15);
+	      //double s_rms = pow(10.0,m_TimingNoiseActivity)*s_rms_crab;
+              m_TimingNoiseActivity = -1.37+0.71*log(m_pdot*1E15);
+              double s_rms = exp(m_TimingNoiseActivity)*s_rms_crab;
+
+	      if (m_TimingNoiseModel ==2) //Case 1 :PN
+		{
+		  S0 = (3.7*3.7*s_rms*s_rms)*(2/(SecsOneDay*dt_days));
+		  m_TimingNoiseRMS = std::sqrt((S0/m_TimingNoiseMeanRate));
+		  m_phi0 = tempPhi0+m_PSpectrumRandom->Gaus(0,m_TimingNoiseRMS);
+		  // std::cout << std::setprecision(30) << "A="<<m_TimingNoiseActivity<<" dt"<<dt_days << " s_rms" << s_rms << 
+		  //" S0 " << S0 << " RMS " << m_TimingNoiseRMS << " phi0 " << m_phi0 << std::endl;
+		}
+	      else if (m_TimingNoiseModel ==3) //Case 2 :PN
+		{
+		  S1 =(15.5*15.5*s_rms*s_rms)*(12./pow((SecsOneDay*dt_days),3));
+		  m_TimingNoiseRMS = std::sqrt((S1/m_TimingNoiseMeanRate));
+		  m_f0 = tempF0+m_PSpectrumRandom->Gaus(0,m_TimingNoiseRMS);
+		  //std::cout << std::setprecision(30) << "A="<<m_TimingNoiseActivity<<" dt"<<dt_days << " s_rms" << s_rms << 
+		  //" S1 " << S1 << " RMS " << m_TimingNoiseRMS << " f0 " << m_f0 << std::endl;
+		}
+	      else if (m_TimingNoiseModel ==4) //Case 3 :SN
+		{
+		  S2 =(23.7*23.7*s_rms*s_rms)*(120./pow((SecsOneDay*dt_days),5));
+		  m_TimingNoiseRMS = std::sqrt((S2/m_TimingNoiseMeanRate));
+		  m_f1 = tempF1+m_PSpectrumRandom->Gaus(0,m_TimingNoiseRMS);
+		  //std::cout << std::setprecision(30) << "A="<<m_TimingNoiseActivity<<" dt"<<dt_days << " s_rms" << s_rms << 
+		  //  " S2 " << S2 << " RMS " << m_TimingNoiseRMS << " f1 " << m_f1 << std::endl;
+		}
+
+
+
+	    }
+
+	  if ((DEBUG) || (::getenv("PULSAR_OUT_TNOISE")))
+	    {
+	      PhaseWithNoise = getTurns(TnoiseInputTime);
+	      PhaseWithNoise = modf(PhaseWithNoise,&intPart); // phase for linear evolution 
+	      if ( PhaseWithNoise <0.)
+		PhaseWithNoise+=1.;
+	    }
+
+	  if (::getenv("PULSAR_OUT_TNOISE"))
+	    {
+
+	      std::ofstream TimingNoiseLogFile((m_PSRname + "TimingNoise.log").c_str(),std::ios::app);
+	      m_f2NoNoise = 0.;
+	      double ft_l = GetFt(TnoiseInputTime,m_f0NoNoise,m_f1NoNoise,m_f2NoNoise);
+	      double ft_n = GetFt(TnoiseInputTime,m_f0,m_f1,m_f2);
+	      double ft1_l = GetF1t(TnoiseInputTime,m_f1NoNoise,m_f2NoNoise);
+	      double ft1_n = GetF1t(TnoiseInputTime,m_f1,m_f2);
+	      double ft2_l = m_f2NoNoise;//
+	      double ft2_n = m_f2;//
+	      
+	      TimingNoiseLogFile << std::setprecision(30) << TnoiseInputTime-(StartMissionDateMJD)*SecsOneDay
+				 << "\t" << m_TimingNoiseActivity
+				 << "\t" << S0 
+				 << "\t" << S1
+				 << "\t" << S2 
+				 << "\t" <<ft_l << "\t" << ft_n 
+				 << "\t" <<ft1_l << "\t" << ft1_n 
+				 << "\t" <<ft2_l << "\t" << ft2_n 			 
+				 << "\t" << PhaseNoNoise << "\t" << PhaseWithNoise << std::endl;
+	    }
+	  
+
+	  if (DEBUG)
+	    {
+
+	      std::cout << std::setprecision(30) << " Activity=" << m_TimingNoiseActivity 
+			<< "f2=" << m_f2 << " PN=" << PhaseWithNoise 
+			<< " dPhi=" << PhaseWithNoise-PhaseNoNoise <<std::endl;
+	    }
+	}
+}
+
+/////////////////////////////////////////////
+/*!
+ * \param None
+ *
+ * <br>
+ * This method check if the current time is within valid ephemerides
+ */
+void PulsarSpectrum::CheckEphemeridesValidity(double EphCheckTime, double initTurns)
+{
+  //Checks whether ephemerides (period,pdot, etc..) are within validity ranges
+  if (((EphCheckTime/SecsOneDay) < m_t0Init) || ((EphCheckTime/SecsOneDay) > m_t0End)) 
+    {
+
+      if (m_OutputLevel>1)
+	{
+	  WriteToLog("WARNING! Time is out of range of validity for pulsar "+std::string(m_PSRname) 
+		     +": Switching to new ephemerides set...");
+	}
+
+
+	for (unsigned int e=0; e < m_t0Vect.size();e++)
+	  if (((EphCheckTime/SecsOneDay) > m_t0InitVect[e]) && ((EphCheckTime/SecsOneDay) < m_t0EndVect[e])) 
+	    {
+	
+	      m_t0Init = m_t0InitVect[e];
+	      m_t0 = m_t0Vect[e];
+ 	      m_t0End = m_t0EndVect[e];
+	      m_f0 = m_f0Vect[e];
+	      m_f1 = m_f1Vect[e];
+	      m_f2 = m_f2Vect[e];
+	      m_f0NoNoise = m_f0Vect[e];
+	      m_f1NoNoise = m_f1Vect[e];
+	      m_f2NoNoise = m_f2Vect[e];
+	      m_period = m_periodVect[e];
+	      m_pdot = m_pdotVect[e];
+	      m_p2dot = m_p2dotVect[e];
+	      m_phi0 = m_phi0Vect[e];
+
+	      if (m_OutputLevel>1)
+		{
+		  WriteToLog("Valid Ephemerides set found:");
+		  char temp[200];
+		  sprintf(temp,"MJD(%d-%d) --> Epoch t0 = MJD %d",m_t0Init,m_t0End,m_t0);
+		  WriteToLog(std::string(temp));
+		  sprintf(temp,"f0: %.f Hz | f1: %.e Hz/s | f2 %.e Hz/s2 ",m_f0,m_f1,m_f2);
+		  WriteToLog(std::string(temp));
+		  sprintf(temp,"P0: %.f s | P1: %.e s/s | P2 %.e s/s2 ",m_period,m_pdot,m_p2dot);
+		  WriteToLog(std::string(temp));
+		}
+
+
+	      //Re-instantiate PulsarSim and SpectObj
+	      delete m_Pulsar;
+
+	      m_Pulsar = new PulsarSim(m_PSRname, m_seed, m_flux, m_enphmin, m_enphmax, m_period);
+
+	      if (m_model == 1)
+		{
+
+		  delete m_spectrum;
+		  m_spectrum = new SpectObj(m_Pulsar->PSRPhenom(double(m_ppar0), m_ppar1,m_ppar2,m_ppar3,m_ppar4),1);
+		  m_spectrum->SetAreaDetector(EventSource::totalArea());
+	      
+		}
+
+	      m_N0 = m_N0 + initTurns - getTurns(EphCheckTime); //Number of turns at next t0
+	      double intN0;
+	      double N0frac = modf(m_N0,&intN0); // Start time for interval
+	      m_N0 = m_N0 - N0frac;
+	      if (m_OutputLevel > 1)
+		{
+		  std::cout << std::setprecision(20) << " Turns now are " << initTurns  
+			    << " ; at t0 " << m_N0 << std::endl;	           
+		}
+	      //m_phi0 = m_phi0 - N0frac;
+	       
+	      if (DEBUG)
+		{
+		  std::cout << std::setprecision(20) << " At Next t0 Number of Turns will be: " << m_N0 << std::endl;
+		}
+	    }
+	 else
+	   {
+	     if (m_OutputLevel>1)
+	       {
+		 WriteToLog("WARNING! Valid ephemerides not found!Proceeding with the old ones");
+	       }
+	   }
+    }
 }
 
 /////////////////////////////////////////////
@@ -1755,7 +1794,8 @@ int PulsarSpectrum::saveDbTxtFile()
     {
       DbOutputFile.open(DbOutputFileName.c_str(), std::ios::out);
       DbOutputFile << "# Simulated pulsars output file generated by PulsarSpectrum." << std::endl;
-      DbOutputFile << "SPIN_PARAMETERS\n\n# Then, a column header."  << std::endl;
+      DbOutputFile << "SPIN_PARAMETERS\n";
+      DbOutputFile << "EPHSTYLE = FREQ\n\n# Then, a column header."  << std::endl;
       DbOutputFile << "PSRNAME RA DEC EPOCH_INT EPOCH_FRAC TOAGEO_INT TOAGEO_FRAC TOABARY_INT TOABARY_FRAC ";
       DbOutputFile << "F0 F1 F2 RMS VALID_SINCE VALID_UNTIL BINARY_FLAG SOLAR_SYSTEM_EPHEMERIS OBSERVER_CODE" <<std::endl;
       DbOutputFile.close();
@@ -1784,21 +1824,66 @@ int PulsarSpectrum::saveDbTxtFile()
 	BinFlag = "F";
       else if (m_BinaryFlag==1)
 	BinFlag = "T";
-	    
 
-	  DbOutputFile << std::setprecision(14) 
-		       << m_f0Vect[ep] << " " << m_f1Vect[ep] << " " << m_f2Vect[ep] << " " 
-		       << m_TimingNoiseRMS*1e3 << " "  
-		       << m_t0InitVect[ep] << " " << m_t0EndVect[ep] << " "
-		       << BinFlag << " \"JPL DE200\" P" << std::endl;
+
+      std::string SolarEph;
+    
+      if (::getenv("PULSAR_EPH"))
+	{
+	  const char * soleph = ::getenv("PULSAR_EPH");
+	  SolarEph = " \"" + std::string(soleph)  + "\"";
+	}
+      else
+	{
+	  SolarEph = " \"JPL DE405\"";
+	}
+
+      DbOutputFile << std::setprecision(14) 
+		   << m_f0Vect[ep] << " " << m_f1Vect[ep] << " " << m_f2Vect[ep] << " " 
+		   << m_TimingNoiseRMS*1e3 << " "  
+		   << m_t0InitVect[ep] << " " << m_t0EndVect[ep] << " "
+		   << BinFlag << SolarEph << " MR" << std::endl;
 
     }
   
 
   DbOutputFile.close();
+
+  if (DEBUG) 
+    if (Flag == 0)
+      { 
+	std::cout << "Database Output file created from scratch " << std::endl;
+      } 
+    else 
+      {
+	std::cout << "Appendended data to existing Database output file" << std::endl;
+      }
+
   return Flag;
 }
 
+/////////////////////////////////////////////
+/*!
+ * \param NameFileToCheck
+ *
+ * <br>
+ * This method simply check the file and return an exception
+ */
+void PulsarSpectrum::CheckFileExistence(std::string NameFileToCheck)
+{
+
+  std::ifstream FileToCheck;
+
+  FileToCheck.open(NameFileToCheck.c_str(), std::ios::in);
+
+  if (!FileToCheck.is_open()) 
+    {
+      throw "Error!Cannot open file";
+    }
+
+  FileToCheck.close();
+
+}
 
 /////////////////////////////////////////////
 /*!
@@ -1842,9 +1927,9 @@ int PulsarSpectrum::saveBinDbTxtFile()
     {
       DbBinOutputFile.open(DbBinOutputFileName.c_str(), std::ios::out);
       DbBinOutputFile << "# Simulated pulsars orbital data output file generated by PulsarSpectrum." << std::endl;
-      DbBinOutputFile << "ORBITAL_PARAMETERS\n\n# This file can be converted to a D4 fits file using:"  << std::endl;
+      DbBinOutputFile << "ORBITAL_PARAMETERS\nEPHSTYLE = DD /Simplified model\n# This file can be converted to a D4 fits file using:"  << std::endl;
       DbBinOutputFile << "# >gtpulsardb SimPulsars_bin.txt" << std::endl;
-      DbBinOutputFile << "PSRNAME PB PBDOT A1 XDOT ECC ECCDOT OM OMDOT T0 GAMMA OBSERVER_CODE SOLAR_SYSTEM_EPHEMERIS SHAPIRO_R SHAPIRO_S" << std::endl;;
+      DbBinOutputFile << "PSRNAME PB PBDOT A1 XDOT ECC ECCDOT OM OMDOT T0 GAMMA SHAPIRO_R SHAPIRO_S OBSERVER_CODE SOLAR_SYSTEM_EPHEMERIS" << std::endl;;
       DbBinOutputFile.close();
   }
 
@@ -1856,9 +1941,22 @@ int PulsarSpectrum::saveBinDbTxtFile()
   DbBinOutputFile << std::setprecision(10) << m_asini << " " << m_xdot << " ";      // Projected semi-mayor axis and derivative
   DbBinOutputFile << std::setprecision(10) << m_ecc << " " << m_ecc_dot << " ";     // Eccentricity and derivative
   DbBinOutputFile << std::setprecision(10) << m_omega << " " << m_omega_dot << " "; // Long. Periastron and derivative
-  DbBinOutputFile << std::setprecision(10) << m_t0PeriastrMJD << " " <<  m_gamma << " "; // t0 of Periastron and PPN gamma   
-  DbBinOutputFile << "MR \"JPL DE200\" ";                                          // Observer code and ephemerides
-  DbBinOutputFile << std::setprecision(10) << m_shapiro_r << " " << m_shapiro_s << std::endl; //Shapiro Parameters
+  DbBinOutputFile << std::setprecision(10) << m_t0PeriastrMJD << " " <<  m_gamma << " "; // t0 of Periastron and PPN gamma
+//Shapiro Parameters   
+  DbBinOutputFile << std::setprecision(10) << m_shapiro_r << " " << m_shapiro_s; //Shapiro Parameters
+  std::string SolarEph;
+  if (::getenv("PULSAR_EPH"))
+    {
+      const char * soleph = ::getenv("PULSAR_EPH");
+      SolarEph = " \"" + std::string(soleph)  + "\"";
+    }
+  else
+    {
+      SolarEph = " \"JPL DE405\"";
+    }
+
+  DbBinOutputFile << " MR "<<SolarEph<<std::endl;// Observer code and ephemerides
+ 
 
   DbBinOutputFile.close();
 
@@ -1868,10 +1966,154 @@ int PulsarSpectrum::saveBinDbTxtFile()
   DbSumInputFile << "SimPulsars_spin.txt\nSimPulsars_bin.txt" <<std::endl;
   DbSumInputFile.close();
 
+  if (DEBUG) 
+    if (Flag == 0)
+      { 
+	std::cout << "Database for Binary pulsars file created from scratch " << std::endl;
+      } 
+    else 
+      {
+	std::cout << "Database for Binary pulsars appended to existing binary Database output file" << std::endl;
+      }
+
   return Flag;
 
 }
 
+
+/////////////////////////////////////////////
+/*!
+ * \param None
+ *
+ * <br>
+ * This method saves the relevant information about pulsar in a log file
+ */
+void PulsarSpectrum::WritePulsarLog()
+{
+
+  //Write infos to Log file  
+  
+  std::ofstream PulsarLog(m_LogFileName.c_str(),std::ios::app);
+
+  PulsarLog << "** PulsarSpectrum: " << "********   PulsarSpectrum Log for pulsar" << m_PSRname << std::endl;
+  PulsarLog << "** PulsarSpectrum: "<< "**   Name : " << m_PSRname << std::endl;
+  PulsarLog << "** PulsarSpectrum: "<< "**   Position : (RA,Dec)=(" << m_RA << "," << m_dec 
+	    << ") ; (l,b)=(" << m_l << "," << m_b << ")" << std::endl; 
+  PulsarLog << "** PulsarSpectrum: "<< "**   Flux above 100 MeV : " << m_flux << " ph/cm2/s " << std::endl;
+  PulsarLog << "** PulsarSpectrum: "<< "**   Enphmin: " << m_enphmin << " keV | Enphmax: " << m_enphmax << " keV" << std::endl;
+  PulsarLog << "** PulsarSpectrum: "<< "**************************************************" << std::endl;
+  
+
+  //Write info about FT2 
+  if (m_UseFT2 == 0)
+    {
+      PulsarLog << "** PulsarSpectrum: "<< "** No FT2 file used " << std::endl;
+    }
+  else
+    PulsarLog << "** PulsarSpectrum: "<< "** FT2 file used " << std::endl;
+  
+  PulsarLog << "** PulsarSpectrum: "<< "** Start time:" << std::setprecision(30) << m_FT2_startMET << " s. MET |  End time:" 
+	    << m_FT2_stopMET << " s. MET" << std::endl;
+  PulsarLog << "** PulsarSpectrum: "<< "**************************************************" << std::endl;
+  PulsarLog << "** PulsarSpectrum: "<< "** Simulation start at " << m_Sim_startMET << " s. MET and ends at :" 
+	    << m_Sim_stopMET << std::endl;
+  PulsarLog << "** PulsarSpectrum: "<< "**************************************************" << std::endl;
+
+  //Writes down on Log all the ephemerides
+  for (unsigned int n=0; n < m_t0Vect.size(); n++)
+    {
+      PulsarLog << "** PulsarSpectrum: "<< "**   Ephemerides valid from " << m_t0InitVect[n] 
+		<< " to " << m_t0EndVect[n] << " (MJD): " << std::endl;
+      PulsarLog << "** PulsarSpectrum: "<< "**     Epoch (MJD) :  " << m_t0Vect[n] << std::endl;
+      PulsarLog << "** PulsarSpectrum: "<< std::setprecision(8) << "**     TxBary (MJD) where fiducial point (phi=0) is reached : " 
+		<< m_txbaryVect[n] << std::endl;
+      PulsarLog << "** PulsarSpectrum: "<< "**     Phi0 (at Epoch t0) : " << m_phi0Vect[n] << std::endl;
+      
+      if (m_ephemType == "P")
+	{
+	  PulsarLog << "** PulsarSpectrum: "<< "**     Ephemerides type: PERIOD" << std::endl;
+	  PulsarLog << "** PulsarSpectrum: "<< std::setprecision(14) << "**     Period : " 
+		    << m_periodVect[n] << " s. | f0: " << m_f0Vect[n] << std::endl;
+	  PulsarLog << "** PulsarSpectrum: "<< std::setprecision(14) << "**     Pdot : " 
+		    <<  m_pdotVect[n]  << " | f1: " << m_f1Vect[n] << std::endl; 
+	  PulsarLog << "** PulsarSpectrum: "<< std::setprecision(14) << "**     P2dot : " 
+		    <<  m_p2dotVect[n]  << " | f2: " << m_f2Vect[n] << std::endl; 
+	} 
+      else if (m_ephemType == "F")
+	{
+	  PulsarLog << "** PulsarSpectrum: "<< "**Ephemerides type: FREQUENCY" << std::endl;
+	  PulsarLog << "** PulsarSpectrum: "<< std::setprecision(14) << "**     Period : " 
+		    << m_periodVect[n] << " s. | f0: " << m_f0Vect[n] << std::endl;
+	  PulsarLog << "** PulsarSpectrum: "<< std::setprecision(14) << "**     f1: " << m_f1Vect[n] << std::endl; 
+	  PulsarLog << "** PulsarSpectrum: "<< std::setprecision(14) << "**     f2: " << m_f2Vect[n] << std::endl; 
+	}
+    }
+
+  //MJDRef
+  PulsarLog << "** PulsarSpectrum: "<< "**   Mission Reference time: MJD " << StartMissionDateMJD << " (" 
+	    << std::setprecision(12) << (StartMissionDateMJD+JDminusMJD)*SecsOneDay 
+	    << " sec.)" << std::endl;
+
+  //SimulationModel
+  if (m_model ==1)
+    {
+      PulsarLog << "** PulsarSpectrum: "<< "**   Model chosen : " << m_model 
+		<< " --> Using Phenomenological Pulsar Model " << std::endl;  
+    } else if (m_model == 2)
+      {
+	PulsarLog << "** PulsarSpectrum: "<< "**   Model chosen : " << m_model 
+		  << " --> Using External 2-D Pulsar Shape" << std::endl;  
+      }
+
+  PulsarLog << "** PulsarSpectrum: "<< "**   Effective Area set to : " << m_spectrum->GetAreaDetector() << " m^2 " << std::endl; 
+  PulsarLog << "** PulsarSpectrum: "<< "**************************************************" << std::endl;
+
+  //Timing noise
+  if (m_TimingNoiseModel == 1) // Timing model #1 - Delta8 parameter (Arzoumanian94)
+    {
+      PulsarLog << "** PulsarSpectrum: "<< "**   Timing Noise Model : " << m_TimingNoiseModel 
+		<< " (Stability parameter, Arzoumanian 1994)" << std::endl;
+      PulsarLog << "** PulsarSpectrum: "<< "**      Timing Noise Events Mean Rate : " << m_TimingNoiseMeanRate << std::endl;
+    }
+  else if (m_TimingNoiseModel == 2) //Timing model #2 - PN Random Walk (Cordes-Downs 1985) 
+    {
+      PulsarLog << "** PulsarSpectrum: "<< "**   Timing Noise Model : " << m_TimingNoiseModel 
+		<< " (PN Random Walk; Cordes-Downs 1985)" << std::endl;
+      PulsarLog << "** PulsarSpectrum: "<< "**      Timing Noise Events Mean Rate : " << m_TimingNoiseMeanRate << std::endl;
+    }
+  else if (m_TimingNoiseModel == 3) //Timing model #3 - FN Random Walk (Cordes-Downs 1985) 
+    {
+      PulsarLog << "** PulsarSpectrum: "<< "**   Timing Noise Model : " << m_TimingNoiseModel 
+		<< " (FN Random Walk; Cordes-Downs 1985)" << std::endl;
+      PulsarLog << "** PulsarSpectrum: "<< "**      Timing Noise Events Mean Rate : " << m_TimingNoiseMeanRate << std::endl;
+    }
+  else if (m_TimingNoiseModel == 4) //Timing model #4 - SN Random Walk (Cordes-Downs 1985) 
+    {
+      PulsarLog << "** PulsarSpectrum: "<< "**   Timing Noise Model : " << m_TimingNoiseModel 
+		<< " (SN Random Walk; Cordes-Downs 1985)" << std::endl;
+      PulsarLog << "** PulsarSpectrum: "<< "**      Timing Noise Events Mean Rate : " << m_TimingNoiseMeanRate << std::endl;
+    }
+  
+
+  //Orbital info
+  if (m_BinaryFlag == 1)
+    {
+      PulsarLog << "** PulsarSpectrum: "<< "**************************************************" << std::endl;
+      PulsarLog << "** PulsarSpectrum: "<< "**   Pulsar in a Binary System! Orbital Data:" << std::endl;
+      PulsarLog << "** PulsarSpectrum: "<< "**     Orbital period: " << m_Porb << " s." << std::endl;
+      PulsarLog << "** PulsarSpectrum: "<< "**     Projected major semiaxis (a * sini): " << m_asini << " lightsec." <<std::endl; 
+      PulsarLog << "** PulsarSpectrum: "<< "**     Eccentricity: " << m_ecc << std::endl;
+      PulsarLog << "** PulsarSpectrum: "<< "**     Longitude of periastron: " <<  m_omega << " deg." << std::endl;
+      PulsarLog << "** PulsarSpectrum: "<< "**     Epoch of Periastron (MJD): " << m_t0PeriastrMJD << std::endl;
+      PulsarLog << "** PulsarSpectrum: "<< "**     Epoch of Ascending Node (MJD): " << m_t0AscNodeMJD << std::endl;
+      if (m_PPN ==0)
+	PulsarLog << "** PulsarSpectrum: "<< "**   No Post Newtonian Parameterization " << std::endl; 
+
+      PulsarLog << "** PulsarSpectrum: "<< "**************************************************" << std::endl;
+    }
+
+  PulsarLog.close();
+}
 
 //////////////////////////////////////////////////////////
 // no longer used
@@ -1973,6 +2215,18 @@ std::string PulsarSpectrum::parseParamList(std::string input, unsigned int index
 
   if(index>=output.size()) return "";
   return output[index];
-};
+}
 
+//////////////////////////////////////////////////
+/*!
+ * \param Line line to be written in the output log file
+ *
+ * This method writes a line into a log file
+*/
+void PulsarSpectrum::WriteToLog(std::string Line)
+{
+  std::ofstream PulsarLog(m_LogFileName.c_str(),std::ios::app);
+  PulsarLog << "** PulsarSpectrum: " << Line << std::endl;
+  PulsarLog.close();
+}
 

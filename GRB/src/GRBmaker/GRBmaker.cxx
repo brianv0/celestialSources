@@ -21,8 +21,8 @@ GRBurst *GRBmaker::create(const std::vector<std::string> &paramVector)
     else if (paramVector.size() <= 1)
     {
         // Get an engine and set its seed
-        CLHEP::HepRandomEngine *engine = CLHEP::HepRandom::getTheEngine();
-        CLHEP::HepRandom::setTheSeed(grbcst::seed);
+        HepRandomEngine *engine = HepRandom::getTheEngine();
+        HepRandom::setTheSeed(grbcst::seed);
         
         LatGrb *latGrb = new LatGrb(engine, "LAT", paramVector[0]);
         //GbmGrb *gbmGrb = new GbmGrb(engine, "GBM", latGrb->specnorm(), paramVector[0]);
@@ -50,8 +50,8 @@ GRBurst *GRBmaker::create(const double duration, const int npuls, const double f
                           const double specnorm, const bool flag)
 {
     // Get an engine and set its seed
-    CLHEP::HepRandomEngine *engine = CLHEP::HepRandom::getTheEngine();
-    CLHEP::HepRandom::setTheSeed(grbcst::seed);
+    HepRandomEngine *engine = HepRandom::getTheEngine();
+    HepRandom::setTheSeed(grbcst::seed);
     
     LatGrb *latGrb = new LatGrb(engine, duration, npuls, flux, fraction, alpha, 
         beta, epeak, specnorm, flag);

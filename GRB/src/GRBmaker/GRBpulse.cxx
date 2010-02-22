@@ -39,7 +39,7 @@ GRBpulse::~GRBpulse()
 // getAmplitude(HepRandomEngine *engine, const int npuls)
 //		Generates pulse amplitudes and sorts them in ascending order.
 //		Scramples amplitudes of {1st,2nd} l halves of pulses, separately (leaves whole time profile asymmetric)
-void GRBpulse::getAmplitude(CLHEP::HepRandomEngine *engine, const int npuls)
+void GRBpulse::getAmplitude(HepRandomEngine *engine, const int npuls)
 {
     m_amplitude.resize(npuls);
     std::transform(m_amplitude.begin(), m_amplitude.end(), m_amplitude.begin(), 
@@ -116,7 +116,7 @@ void GRBpulse::fillVector(std::vector<long> &ngtwid) const
 
 // index(HepRandomEngine *engine, const long diff, const long minval, const std::vector<long> &in)
 // returns the index i to the last element of "in" vector such that in[i] >= some random value.
-long GRBpulse::index(CLHEP::HepRandomEngine *engine, const long diff, const long minval, 
+long GRBpulse::index(HepRandomEngine *engine, const long diff, const long minval, 
                      const std::vector<long> &in) const
 {
     bool found=0;
@@ -150,7 +150,7 @@ long GRBpulse::index(CLHEP::HepRandomEngine *engine, const long diff, const long
 //		pulse widths ~ 1/10-1/20 that of long GRBs -- multiply pulse widths for one
 //		quarter of the GRBs by compression factor of 1/10.  Then using Width ~ E^(-0.333)
 //		relationship, scale chosen width (at 100 keV) to width at Ethres.
-void GRBpulse::universalWidth(CLHEP::HepRandomEngine *engine, const double ethres, 
+void GRBpulse::universalWidth(HepRandomEngine *engine, const double ethres, 
                               const double duration, const long diff, 
                               const long minval, const std::vector<long> &in, 
                               const std::vector<double> &v) 
@@ -176,7 +176,7 @@ void GRBpulse::universalWidth(CLHEP::HepRandomEngine *engine, const double ethre
 
 // pickWidth(HepRandomEngine *engine, bool first, double ethres, double duration)
 // Chooses a universal width for the pulses within a given burst.
-void GRBpulse::pickWidth(CLHEP::HepRandomEngine *engine, bool first, double ethres, double duration)
+void GRBpulse::pickWidth(HepRandomEngine *engine, bool first, double ethres, double duration)
 {
     static std::vector<double> logwidth;
     static std::vector<long> ngtwid;
@@ -221,7 +221,7 @@ void GRBpulse::pickWidth(CLHEP::HepRandomEngine *engine, bool first, double ethr
 //		scale the pulse width for energy dependence, as E^-0.333.  make the peak shift
 //		1/2 as large as width adjustment, ~ as observed at BATSE energies.
 //		theses dependences are crude estimates of what we shall measure with GLAST.
-long GRBpulse::createSigmaTdiff(CLHEP::HepRandomEngine *engine)
+long GRBpulse::createSigmaTdiff(HepRandomEngine *engine)
 {
     double riseHWHM  = (0.4 + 0.1 * engine->flat()) * m_univFWHM;
     double decayHWHM = (1.-riseHWHM) * m_univFWHM;
@@ -295,7 +295,7 @@ void GRBpulse::getNphotpul(const long nphoton, const int npuls)
 // getTmax(HepRandomEngine *engine, const int npuls, const double duration)
 // Returns a vector of random numbers multiplied by the duration sorted in ascending order.  
 // Random numbers are in the range [0,1).  This vector is used in the calculations of GRB times.
-void GRBpulse::getTmax(CLHEP::HepRandomEngine *engine, const int npuls, 
+void GRBpulse::getTmax(HepRandomEngine *engine, const int npuls, 
                        const double duration)
 {
     m_tmax.resize(npuls);
@@ -336,7 +336,7 @@ void GRBpulse::getPulse(const int npuls)
 
 // data(HepRandomEngine *engine, bool first, double ethres, long nphoton, int npuls, double duration)
 // Returns pulse data needed in the
-long GRBpulse::data(CLHEP::HepRandomEngine *engine, bool first, double ethres, long nphoton, 
+long GRBpulse::data(HepRandomEngine *engine, bool first, double ethres, long nphoton, 
 					int npuls, double duration)
 {
     getAmplitude(engine, npuls);

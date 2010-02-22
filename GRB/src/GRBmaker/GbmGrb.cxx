@@ -20,7 +20,7 @@ const double  denom=7.;
 
 
 // Constructor
-GbmGrb::GbmGrb(CLHEP::HepRandomEngine *engine, const std::string &prefix, 
+GbmGrb::GbmGrb(HepRandomEngine *engine, const std::string &prefix, 
                const std::vector<double> &specnorm, const std::string &dir)
       : GRBurst()
 {
@@ -31,7 +31,7 @@ GbmGrb::GbmGrb(CLHEP::HepRandomEngine *engine, const std::string &prefix,
 
 
 // Constructor
-GbmGrb::GbmGrb(CLHEP::HepRandomEngine *engine, const double duration, const int npuls, 
+GbmGrb::GbmGrb(HepRandomEngine *engine, const double duration, const int npuls, 
                const double flux, const double fraction, const double alpha, 
                const double beta, const double epeak, const double specnorm, 
                const bool flag)
@@ -44,7 +44,7 @@ GbmGrb::GbmGrb(CLHEP::HepRandomEngine *engine, const double duration, const int 
 
 // calcNphoton(HepRandomEngine *engine, long isim)
 // Returns number of photons in the current burst.
-long GbmGrb::calcNphoton(CLHEP::HepRandomEngine *engine, long isim)
+long GbmGrb::calcNphoton(HepRandomEngine *engine, long isim)
 {
     //static long isim=0;
     
@@ -95,7 +95,7 @@ long GbmGrb::calcNphoton(CLHEP::HepRandomEngine *engine, long isim)
 // makeEnergies(HepRandomEngine *engine)
 //		Choose N_inc energies for this burst, from a single power-law spectral distribution
 //		with index = m_beta.  Maximum possible energy to generate is emax, minimum is ethres.
-void GbmGrb::makeEnergies(CLHEP::HepRandomEngine *engine)
+void GbmGrb::makeEnergies(HepRandomEngine *engine)
 {
     double gamma = 1.0 - m_globalData->alpha();
     double epeak = m_globalData->epeak();
@@ -146,7 +146,7 @@ void GbmGrb::makeEnergies(CLHEP::HepRandomEngine *engine)
 
 // makeGRB(engine, first)
 // Calls modules which compute energies and times for photons in the current burst.
-void GbmGrb::makeGRB(CLHEP::HepRandomEngine *engine, bool first)
+void GbmGrb::makeGRB(HepRandomEngine *engine, bool first)
 {
     m_photonlist.resize(m_nphoton);
     

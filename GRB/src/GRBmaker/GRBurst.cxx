@@ -53,7 +53,7 @@ GRBurst::GRBurst(const std::vector<std::string> &paramVector)
 
 
 
-GRBurst::GRBurst(CLHEP::HepRandomEngine *engine, const double duration, const int npuls, 
+GRBurst::GRBurst(HepRandomEngine *engine, const double duration, const int npuls, 
          const double flux, const double fraction, const double alpha, 
          const double beta, const double epeak, const double specnorm, 
          const bool flag)
@@ -127,7 +127,7 @@ GRBurst &GRBurst::operator=(const GRBurst &right)
 //
 //		Generates "nbsim" number of bursts.  Loops through each burst, creates a photon list (time,energy) 
 //      and records the list in an output file.
-void GRBurst::createGRB(CLHEP::HepRandomEngine *engine, const std::string &prefix, 
+void GRBurst::createGRB(HepRandomEngine *engine, const std::string &prefix, 
                         const std::string &dir)
 {
     // Choose from the distributions for durations, peak fluxes, and spectral power-law indices
@@ -189,7 +189,7 @@ void GRBurst::createGRB(CLHEP::HepRandomEngine *engine, const std::string &prefi
 //			   const bool flag)
 // Creates the photon list (time,energy) for the burst specified by the input parameters 
 //		and records it in a file if the flag is set.
-void GRBurst::createGRB(CLHEP::HepRandomEngine *engine, const double duration, 
+void GRBurst::createGRB(HepRandomEngine *engine, const double duration, 
                         const int npuls, const double flux, const double fraction, 
                         const double alpha, const double beta, const double epeak, 
                         const double specnorm, const bool flag)
@@ -245,8 +245,8 @@ void GRBurst::readGRB(const std::vector<std::string> &paramVector)
         is >> *this;
         
         //std::cout << "m_flux: " << m_globalData->flux() << std::endl;
-        //std::ofstream os("GRB_c2.lis");
-        //os << *this;
+        std::ofstream os("GRB_c2.lis");
+        os << *this;
     }
     
     catch (...)
@@ -336,7 +336,7 @@ std::string GRBurst::outputFilename(const std::string &base, const long isim) co
 
 // direction(engine)
 // Calculates the direction of the burst.
-std::pair<float,float> GRBurst::direction(CLHEP::HepRandomEngine *engine) const
+std::pair<float,float> GRBurst::direction(HepRandomEngine *engine) const
 {
     float coszenith = 1.0 - engine->flat() * grbcst::zenNorm;
     float azimuth    = 2. * M_PI * engine->flat();
@@ -350,7 +350,7 @@ std::pair<float,float> GRBurst::direction(CLHEP::HepRandomEngine *engine) const
 // getTimes(HepRandomEngine *engine, const double ethres, const long nphots, const long deltbinsleft, const long iphotoff, 
 //				   const double tmax, const std::vector<double> &pulse)
 // Uses pulse data to generate list of photon times
-void GRBurst::getTimes(CLHEP::HepRandomEngine *engine, const double ethres, 
+void GRBurst::getTimes(HepRandomEngine *engine, const double ethres, 
                        const long nphots, const long deltbinsleft, 
                        const long iphotoff, const double tmax, 
                        const std::vector<double> &pulse)
@@ -401,7 +401,7 @@ void GRBurst::getTimes(CLHEP::HepRandomEngine *engine, const double ethres,
 //		(9)	offset the photon times according to
 //			(a) energy dependence, width ~E^-0.333 and
 //			(b) time of peak, also proportional to E^-0.333.
-void GRBurst::makeTimes(CLHEP::HepRandomEngine *engine, bool first, double ethres)
+void GRBurst::makeTimes(HepRandomEngine *engine, bool first, double ethres)
 {
     if (m_globalData->npuls() == 0)
         m_globalData->setNpuls(std::max(int(15 * m_globalData->duration()/30 + 0.5), 1));
@@ -449,51 +449,40 @@ void GRBurst::makeTimes(CLHEP::HepRandomEngine *engine, bool first, double ethre
 std::ifstream &operator>>(std::ifstream &is, GRBurst &grb)
 {
     std::string str;
-	// >>>>>>>>>>>>>> TEMPORARILY COMMENT OUT READING OF HEADER FOR NOW -- 12/08/03 <<<<<<<<<<<<<<<
-    //is >> str >> str >> str >> str >> str >> str;
+    is >> str >> str >> str >> str >> str >> str;
     
     double duration, flux, beta, specnorm;
     int    npuls;
     
-	// >>>>>>>>>>>>>> TEMPORARILY COMMENT OUT READING OF HEADER FOR NOW -- 12/08/03 <<<<<<<<<<<<<<<
-    //is >> flux >> duration >> beta >> specnorm >> npuls >> grb.m_univFWHM;
-    grb.m_globalData->setFlux(2.5);
-    //grb.m_globalData->setFlux(flux);
-    //grb.m_globalData->setFlux(flux);
-    //grb.m_globalData->setDuration(duration);
-    //grb.m_globalData->setBeta(beta);
-    //grb.m_globalData->setNpuls(npuls);
-    //grb.m_globalData->setSpecnorm(specnorm);
-
-	// >>>>>>>>>>>>>> TEMPORARILY COMMENT OUT READING OF ZENITH/AZIMUTH FOR NOW -- 12/08/03 <<<<<<<<<<<<<<<
-    //is >> str >> str >> str;
-    //float zenith, azimuth;
-    //is >> zenith >> azimuth;
-    //grb.m_grbdir = std::make_pair<float,float> (zenith, azimuth);
+    is >> flux >> duration >> beta >> specnorm >> npuls >> grb.m_univFWHM;
+    grb.m_globalData->setFlux(flux);
+    grb.m_globalData->setDuration(duration);
+    grb.m_globalData->setBeta(beta);
+    grb.m_globalData->setNpuls(npuls);
+    grb.m_globalData->setSpecnorm(specnorm);
+    //is >> grb.m_globalData->m_flux >> grb.m_globalData->m_duration >> grb.m_globalData->m_beta >> 
+    //	grb.m_specnorm >> grb.m_globalData->m_npuls >> grb.m_globalData->m_univFWHM;
+    is >> str >> str >> str;
     
-    //is >> str >> str;
+    float zenith, azimuth;
+    is >> zenith >> azimuth;
+    grb.m_grbdir = std::make_pair<float,float> (zenith, azimuth);
+    
+    is >> str >> str;
     is >> grb.m_nphoton;
-    //is >> str >> str >> str >> str;
+    is >> str >> str >> str >> str;
     
     grb.m_photonlist.resize(grb.m_nphoton);
     
-    //double t, e;
-	double t, e, ra, dec;
+    double t, e;
     for (long i=0; i<grb.m_nphoton; ++i)
     {
-        //s >> t >> e;
-
-		// >>>>>>>>>>>>>>> TEMPORARILY READ TIME, ENERGY, RA, DEC FROM PHOTON LIST -- 12/08/03 <<<<<<<<<<<<<<<<<<<
-        is >> t >> e >> ra >> dec;
+        is >> t >> e;
         
         grb.m_photonlist[i].setTime(t);
         grb.m_photonlist[i].setEnergy(e);
-
-	std::pair<float,float> radec(ra,dec);
-	grb.m_photonlist[i].setDir(radec);
     }
     
-	std::cout << "Finished reading file..." << std::endl;
     return is;
 }
 

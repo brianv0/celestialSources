@@ -66,14 +66,13 @@ namespace cst
 
   //! Number of energy bins used in the TH2D histogram
 
-  const    int Ebin =  50 ; 
+  const    int Ebin =  100 ; 
 
 
 
   //! Number of time bins used in the TH2D histogram
 
   const int Tbin =  200; 
-
 
 
   //! Conversion erg-->MeV
@@ -132,13 +131,13 @@ namespace cst
 
   //! Start Mission Date, expressed in MJD (corresponding to TT January 1st, 2007, at 00:00:00)
 
-  const double StartMissionDateMJD = 51910.0 + 64.184/86400.; ;//54101.0; 
+  const double StartMissionDateMJD = 51910.0 + 64.184/86400.;//54101.0; 
 
   
 
   //! Tolerance for the ephemerides decorrection (in s.)
 
-  const double ephemCorrTol = 1e-5;//1e-6
+  const double ephemCorrTol = 1e-6;
 
 
 
@@ -178,7 +177,7 @@ namespace cst
 
 
 
-};
+}
 
 
 

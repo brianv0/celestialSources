@@ -18,7 +18,7 @@ const double  denom=7.;
 
 
 // Constructor
-LatGrb::LatGrb(CLHEP::HepRandomEngine *engine, const std::string &prefix, 
+LatGrb::LatGrb(HepRandomEngine *engine, const std::string &prefix, 
                const std::string &dir) 
       : GRBurst()   
 { 
@@ -28,7 +28,7 @@ LatGrb::LatGrb(CLHEP::HepRandomEngine *engine, const std::string &prefix,
 
 
 // Constructor
-LatGrb::LatGrb(CLHEP::HepRandomEngine *engine, const double duration, const int npuls, 
+LatGrb::LatGrb(HepRandomEngine *engine, const double duration, const int npuls, 
                const double flux, const double fraction, const double alpha, 
                const double beta, const double epeak, const double specnorm, 
                const bool flag)
@@ -41,7 +41,7 @@ LatGrb::LatGrb(CLHEP::HepRandomEngine *engine, const double duration, const int 
 
 // calcNphoton(HepRandomEngine *engine, long)
 // Returns number of photons in the current burst
-long LatGrb::calcNphoton(CLHEP::HepRandomEngine *engine, long)
+long LatGrb::calcNphoton(HepRandomEngine *engine, long)
 {
     calcSpecnorm(engine);
     
@@ -83,7 +83,7 @@ long LatGrb::calcNphoton(CLHEP::HepRandomEngine *engine, long)
 //
 //		Some of these cofactors are applied in LatGrb::specnorm; the remaining ones 
 //		are applied in LatGrb::nphoton, which follows this module.
-void LatGrb::calcSpecnorm(CLHEP::HepRandomEngine *engine)
+void LatGrb::calcSpecnorm(HepRandomEngine *engine)
 {
     // Code for NEW LAT/GBM
     double specnorm = 3.0 * pow((grbcst::ethresLAT*1000.), (-m_globalData->beta() + 1.0)) * pow(m_globalData->fraction(), 1.15);
@@ -106,7 +106,7 @@ void LatGrb::calcSpecnorm(CLHEP::HepRandomEngine *engine)
 // makeEnergies(HepRandomEngine *engine)
 //		Choose N_inc energies for this burst, from a single power-law spectral distribution
 //		with index = m_beta.  Maximum possible energy to generate is emax, minimum is ethres.
-void LatGrb::makeEnergies(CLHEP::HepRandomEngine *engine)
+void LatGrb::makeEnergies(HepRandomEngine *engine)
 {
     if (m_globalData->beta() == 1.0)
     {
@@ -134,7 +134,7 @@ void LatGrb::makeEnergies(CLHEP::HepRandomEngine *engine)
 
 // makeGRB(engine, first)
 // Calls modules which compute energies and times for photons in the current burst.
-void LatGrb::makeGRB(CLHEP::HepRandomEngine *engine, bool first)
+void LatGrb::makeGRB(HepRandomEngine *engine, bool first)
 {
     m_photonlist.resize(m_nphoton);
     
