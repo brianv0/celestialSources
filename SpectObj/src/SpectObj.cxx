@@ -29,7 +29,6 @@ bool SpectObj::s_gRandom_seed_set(false);
 SpectObj::SpectObj(const TH2D* In_Nv, int type, double z)
 {
   m_AreaDetector = 1.0;
-  m_FluxFactor = 1.0;
   sourceType = type;
   
   Nv   = (TH2D*)In_Nv->Clone(); // ph/kev/s/m²
@@ -187,7 +186,7 @@ void SpectObj::SetAreaDetector(double AreaDetector)
 void SpectObj::GetUniqueName(void *ptr, std::string & name)
 {
   std::ostringstream my_name;
-  my_name << reinterpret_cast<long> (ptr);
+  my_name << reinterpret_cast<int> (ptr);
   name = my_name.str();
   gDirectory->Delete(name.c_str());
   reinterpret_cast<TH1*> (ptr)->SetDirectory(0);
@@ -466,7 +465,7 @@ photon SpectObj::GetPhoton(double t0, double enph)
 
       double InternalTime = t0 - Int_t(t0/m_Tmax)*m_Tmax; // InternalTime is t0 reduced to a period
         
-      double deltaTPoisson =  (1./m_FluxFactor)*(-log(1.-CLHEP::RandFlat::shoot(1.0))/m_meanRate); //interval according to Poisson statistics
+      double deltaTPoisson =  -log(1.-CLHEP::RandFlat::shoot(1.0))/m_meanRate; //interval according to Poisson statistics
       int deltaPer = Int_t((deltaTPoisson - (m_Tmax-InternalTime))/m_Tmax); //number of period up to next photon
       //Computes PerResid ,i.e. the residual time from deltaTPoisson
       //after removing the time up to the beginning of the period that contains the next photon  
