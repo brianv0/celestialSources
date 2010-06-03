@@ -2,7 +2,8 @@
 #
 # $Header$
 # Authors: James Chiang <jchiang@slac.stanford.edu>
-# Version: celestialSources-01-03-04
+# Version: celestialSources-01-03-05
+
 Import('baseEnv')
 Import('listFiles')
 progEnv = baseEnv.Clone()
