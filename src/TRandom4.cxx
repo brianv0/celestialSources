@@ -36,6 +36,6 @@ void TRandom4::RndmArray(Int_t n, Double_t *array) {
 
 void TRandom4::SetSeed(UInt_t seed) {
    if (seed != 0) {
-      CLHEP::HepRandom hepRandom(seed);
+      HepRandom hepRandom(seed);
    }
 }
