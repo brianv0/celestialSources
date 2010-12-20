@@ -6,6 +6,7 @@
 *@verbatim
  * EOH *
 
+ GRB-04-04-06 20-Dec-2010  cohen patch for gcc 4.4 build
  GRB-04-04-05 22-Feb-2010    jrb correct use of xxLib for libEnv
    v4r4p4   15-Jul-2009  jrb  Update to SConscript
 *   v4r4p3   23-apr-2008  JCT compliant with 64bits machines
