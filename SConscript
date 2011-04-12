@@ -2,7 +2,7 @@
 #
 # $Header$
 # Authors: James Chiang <jchiang@slac.stanford.edu>
-# Version: celestialSources-01-03-05
+# Version: celestialSources-01-04-00
 
 Import('baseEnv')
 Import('listFiles')
