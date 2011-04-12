@@ -69,7 +69,12 @@ private:
    /// from the flux/Spectrum base class).
    mutable std::pair<double, double> m_currentDir;
 
-   std::vector<std::vector<std::pair<double,double> > > m_spectra;
+//   typedef std::pair<double, double> SpectralPoint_t;
+   typedef std::pair<float, float> SpectralPoint_t;
+
+   typedef std::vector<SpectralPoint_t> Spectrum_t;
+
+   std::vector<Spectrum_t> m_spectra;
    std::vector<double> m_energies;
 
    double mapValue(unsigned int i, unsigned int j, unsigned int k);
@@ -81,11 +86,11 @@ private:
    double powerLawIntegral(double x1, double x2, double y1, double y2,
                            double & gamma) const;
                            
-   double drawEnergy(const std::vector<std::pair<double, double> > & spectrum)
+   double drawEnergy(const Spectrum_t & spectrum)
       const;
 
-   static bool cmpPair(const std::pair<double, double> & x, 
-                       const std::pair<double, double> & y);
+   static bool cmpPair(const SpectralPoint_t & x, 
+                       const SpectralPoint_t & y);
 
    void checkForNonPositivePixels(const std::string &) const;
 

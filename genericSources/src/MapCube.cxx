@@ -167,7 +167,7 @@ void MapCube::makeCumulativeSpectra() {
 
    for (unsigned int j = 0; j < m_lat.size(); j++) {
       for (unsigned int i = 0; i < m_lon.size(); i++) {
-         std::vector<std::pair<double, double> > counts_spectrum;
+         Spectrum_t counts_spectrum;
          counts_spectrum.reserve(m_energies.size());
          counts_spectrum.push_back(std::make_pair(0, -2));
          for (unsigned int k = 1; k < m_energies.size(); k++) {
@@ -198,9 +198,9 @@ double MapCube::powerLawIntegral(double x1, double x2,
 }
 
 double MapCube::
-drawEnergy(const std::vector<std::pair<double, double> > & spectrum) const {
+drawEnergy(const Spectrum_t & spectrum) const {
    double xi = CLHEP::RandFlat::shoot()*spectrum.back().first;
-   std::vector<std::pair<double, double> >::const_iterator it 
+   Spectrum_t::const_iterator it 
       = std::upper_bound(spectrum.begin(), spectrum.end(),
                          std::make_pair(xi, 0), cmpPair);
    int indx = it - spectrum.begin() - 1;
@@ -213,8 +213,7 @@ drawEnergy(const std::vector<std::pair<double, double> > & spectrum) const {
    return value;
 }
 
-bool MapCube::cmpPair(const std::pair<double, double> & x, 
-                      const std::pair<double, double> & y) {
+bool MapCube::cmpPair(const SpectralPoint_t & x, 
+                      const SpectralPoint_t & y) {
    return x.first < y.first;
 }
-
