@@ -75,7 +75,7 @@ public:
    void test_dgaus8() const;
 
    static void load_sources();
-   static HepRotation instrumentToCelestial(double time);
+   static CLHEP::HepRotation instrumentToCelestial(double time);
 
 private:
 
@@ -193,9 +193,9 @@ void TestApp::createEvents(const std::string & filename) {
       newEvent = m_compositeSource->event(currentTime);
       double interval = m_compositeSource->interval(currentTime);
       currentTime += interval;
-      Hep3Vector launchDir = newEvent->launchDir();
+      CLHEP::Hep3Vector launchDir = newEvent->launchDir();
       
-      HepRotation rotMatrix = instrumentToCelestial(currentTime);
+      CLHEP::HepRotation rotMatrix = instrumentToCelestial(currentTime);
       astro::SkyDir srcDir(rotMatrix(-launchDir), astro::SkyDir::EQUATORIAL);
       
       outputFile << m_compositeSource->findSource().c_str()<<"  "
@@ -229,7 +229,7 @@ void TestApp::load_sources() {
 //   EventListFactory();
 }
 
-HepRotation TestApp::instrumentToCelestial(double time) {
+CLHEP::HepRotation TestApp::instrumentToCelestial(double time) {
    astro::GPS *gps = astro::GPS::instance();
    gps->time(time);
 

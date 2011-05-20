@@ -87,12 +87,12 @@ void galacticTest(FluxMgr* fm, std::string sourceName)
       //of fluxsource, and is expected.
       time+=interval;
       fm->pass(interval);
-      Hep3Vector GlastDir = -(f->launchDir());
+      CLHEP::Hep3Vector GlastDir = -(f->launchDir());
 
       theta = GlastDir.theta();//-TMath::Pi();
       phi   = GlastDir.phi();
       
-      Hep3Vector abc(fm->transformToGlast(time,GPS::CELESTIAL).inverse()*(GlastDir));
+      CLHEP::Hep3Vector abc(fm->transformToGlast(time,GPS::CELESTIAL).inverse()*(GlastDir));
       astro::SkyDir skyDir(abc,astro::SkyDir::EQUATORIAL);
       
       energy=f->energy();

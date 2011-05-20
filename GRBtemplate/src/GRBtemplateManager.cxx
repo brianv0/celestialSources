@@ -1,5 +1,5 @@
 #include "GRBtemplate/GRBtemplateManager.h"
-#include <cstdlib>
+//#include <cstdlib>
 #include <iostream>
 #include <stdexcept>
 #include <fstream>
@@ -55,10 +55,10 @@ GRBtemplateManager::GRBtemplateManager(const std::string& params)
       m_l = 180.-360.*r1;
       m_b = ((180.0/M_PI)*acos(1.0-2.0*r2)-90.0);
       astro::SkyDir sky(m_l,m_b,astro::SkyDir::GALACTIC);
-      Hep3Vector skydir=sky.dir();
+      CLHEP::Hep3Vector skydir=sky.dir();
       try{
-	HepRotation rottoglast = GPS::instance()->transformToGlast(m_startTime,GPS::CELESTIAL);
-	Hep3Vector scdir = rottoglast * skydir;
+	CLHEP::HepRotation rottoglast = GPS::instance()->transformToGlast(m_startTime,GPS::CELESTIAL);
+	CLHEP::Hep3Vector scdir = rottoglast * skydir;
 	m_ra    = sky.ra();
 	m_dec   = sky.dec();
 	double zenithCosTheta=cos(scdir.theta());

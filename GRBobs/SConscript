@@ -1,7 +1,7 @@
 # -*- python -*-
 # $Id$
 # Authors: Nicola Omodei<nicola.omodei@pi.infn.it>
-# Version: GRBobs-03-03-04
+# Version: GRBobs-03-03-05
 
 Import('baseEnv')
 Import('listFiles')
