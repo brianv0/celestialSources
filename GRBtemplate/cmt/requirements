@@ -1,5 +1,5 @@
 package celestialSources/GRBtemplate
-version v1r3p5
+version v1r3p6
 author Nicola Omodei<nicola.omodei@pi.infn.it>
 
 use flux       v*
