@@ -1,5 +1,8 @@
+/*
+ * $Header$
+ */
 #include "GRBtemplate/GRBtemplateManager.h"
-//#include <cstdlib>
+#include <cstdlib>
 #include <iostream>
 #include <stdexcept>
 #include <fstream>
