@@ -1,13 +1,14 @@
 # -*- python -*-
 # $Id$
 # Authors: Nicola Omodei<nicola.omodei@pi.infn.it>
-# Version: SpectObj-01-03-08
+# Version: SpectObj-01-03-06
 Import('baseEnv')
 Import('listFiles')
 libEnv = baseEnv.Clone()
 
 progEnv = baseEnv.Clone()
 
+libEnv.Tool('SpectObjLib', depsOnly = 1)
 SpectObjLib = libEnv.StaticLibrary('SpectObj', listFiles(['src/*.cxx']))
 
 progEnv.Tool('registerTargets', package = 'SpectObj',
