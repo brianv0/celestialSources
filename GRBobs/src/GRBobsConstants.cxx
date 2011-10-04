@@ -1,4 +1,5 @@
 #include "../GRBobs/GRBobsConstants.h"
+#include <stdexcept>
 
 using namespace ObsCst;
 using std::pow;
@@ -190,8 +191,9 @@ void GRBobsParameters::ReadParametersFromFile(std::string paramFile, int NGRB)
   std::ifstream f1(paramFile.c_str());
   if (!f1.is_open()) 
     {
-      std::cout<<"GRBobsConstants: Error Opening paramFile\n";
-      exit(1);
+       throw std::runtime_error("GRBobsConstants: Error Opening paramFile");
+      // std::cout<<"GRBobsConstants: Error Opening paramFile\n";
+      // exit(1);
     }
   double tstart;
   double duration;

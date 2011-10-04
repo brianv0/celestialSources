@@ -2,6 +2,7 @@
 #include <iostream>
 #include <fstream>
 #include <cmath>
+#include <stdexcept>
 
 #include "TMath.h"
 
@@ -122,8 +123,9 @@ void Parameters::ComputeParametersFromFile(std::string paramFile, int NGRB)
   std::ifstream f1(paramFile.c_str());
   if (!f1.is_open()) 
     {
-      std::cout<<"GRBConstants: Error Opening paramFile\n";
-      exit(1);
+       throw std::runtime_error("GRBConstants: Error Opening paramFile");
+      // std::cout<<"GRBConstants: Error Opening paramFile\n";
+      // exit(1);
     }
   double fluence,r0,dr0;
   double gmin,gmax,etot,ic;

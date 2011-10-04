@@ -2,7 +2,7 @@
 
 #define GRBOBSCONSTANT_HH 1
 
-
+#include <cstdlib>
 
 #include <fstream>
 
