@@ -6,6 +6,7 @@
 *@verbatim
  * EOH *
 
+ GRB-04-04-08 03-Oct-2011 jchiang gcc4.4.3/Ubuntu compatibility
  GRB-04-04-07 20-May-2011 hmk    CLHEP 2.1.0.1
  GRB-04-04-06 20-Dec-2010  cohen patch for gcc 4.4 build
  GRB-04-04-05 22-Feb-2010    jrb correct use of xxLib for libEnv

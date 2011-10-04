@@ -6,6 +6,7 @@
   $Id$ 
   * EOH *
 
+ GRBobs-03-03-06 03-Oct-2011 jchiang gcc4.4.3/Ubuntu compatibility
  GRBobs-03-03-05 20-May-2011    hmk CLHEP 2.1.0.1
  GRBobs-03-03-04 22-Feb-2010    jrb correct use of xxLib for libEnv
    15-Jul-09 v3r3p3    jrb   Update to SConscript
