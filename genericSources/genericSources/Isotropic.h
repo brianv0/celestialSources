@@ -14,11 +14,6 @@
 /**
  * @class Isotropic
  *
- * @brief Isotropic diffuse emission.
- *
- * @author J. Chiang
- *
- * $Header$
  */
 
 class Isotropic : public Spectrum {

@@ -18,9 +18,6 @@
  * template file.  The duration, mean flux, and spectral index are
  * given as parameters.
  *
- * @author J. Chiang
- *
- * $Header$
  */
 
 class TransientTemplate : public SimpleTransient {
@@ -33,6 +30,12 @@ public:
 
    static double drawTime(const std::vector<double> & tt,
                           const std::vector<double> & integralDist);
+
+
+   virtual std::pair<double, double> dir(double) {
+      return std::make_pair(0, 0);
+   }
+
 
 private:
 

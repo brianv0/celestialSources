@@ -286,4 +286,19 @@
      </spectrum>
    </source>
 
+   <source name="Isotropic diffuse">
+     <spectrum escale="MeV">
+       <SpectrumClass name="IsotropicFileSpectrum"
+                      params="specFile=isotropic_iem_v02.txt"/>
+       <use_spectrum frame="galaxy"/>
+     </spectrum>
+   </source>
+
+   <source name="Gaussian spectrum">
+     <spectrum escale="MeV">
+       <SpectrumClass name="GaussianSpectrum"
+                      params="flux=1, mean=2e4, sigma=2e3, glon=0, glat=0"/>
+       <use_spectrum frame="galaxy"/>
+     </spectrum>
+   <source>
 </source_library>

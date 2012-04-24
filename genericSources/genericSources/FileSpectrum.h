@@ -25,9 +25,6 @@
  * table. This version has been massively refactored from the original
  * implementation in flux/FILESpectrum by Theodore Hierath.
  *
- * @author J. Chiang
- * 
- * $Header$
  */
 
 class FileSpectrum : public Spectrum {

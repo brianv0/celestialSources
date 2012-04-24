@@ -1,31 +1,31 @@
 /**
- * @file GaussianSource.h
- * @brief Extended source modeled using a 2D Gaussian.
+ * @file GaussianSpectrum.h
+ * @brief Point source with Gaussian spectrum
  * @author J. Chiang
  *
  * $Header$
  */
 
-#ifndef fluxSources_GaussianSource_h
-#define fluxSources_GaussianSource_h
+#ifndef fluxSources_GaussianSpectrum_h
+#define fluxSources_GaussianSpectrum_h
 
 #include "flux/Spectrum.h"
 
 /**
- * @class GaussianSource
- * @brief 2D Gaussian extended source
+ * @class GaussianSpectrum
+ * @brief Point source with a Gaussian spectrum
  *
  */
 
-class GaussianSource : public Spectrum {
+class GaussianSpectrum : public Spectrum {
 
 public:
 
    /// This constructor is required and used in FluxSource for
    /// "SpectrumClass" sources.
-   GaussianSource(const std::string &params);
+   GaussianSpectrum(const std::string & params);
 
-   virtual ~GaussianSource(){}
+   virtual ~GaussianSpectrum(){}
 
    /// @return Particle energy in MeV.
    /// @param xi Uniform random deviate on the unit interval.
@@ -42,7 +42,7 @@ public:
    virtual double solidAngle() const;
 
    /// @return Title describing the spectrum.
-   virtual std::string title() const {return "GaussianSource";}
+   virtual std::string title() const {return "GaussianSpectrum";}
 
    /// @return Interval to the next event (seconds)
    virtual double interval(double time);
@@ -56,16 +56,11 @@ public:
 private:
 
    double m_flux;
-   double m_gamma;
-   double m_major;
-   double m_minor;
-   double m_posAngle;
-   double m_emin;
-   double m_emax;
+   double m_mean;
+   double m_sigma;
 
-   CLHEP::HepRotation m_rot;
-   CLHEP::Hep3Vector m_rotatedSrcVec;
-
+   double m_l;
+   double m_b;
 };
 
-#endif // fluxSources_GaussianSource_h
+#endif // fluxSources_GaussianSpectrum_h
