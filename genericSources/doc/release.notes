@@ -6,6 +6,7 @@
   $Id$
   * EOH *
 
+ genericSources-01-15-02 24-Apr-2012 jchiang add GaussianSpectrum point source
  genericSources-01-15-01 20-May-2011 hmk     CLHEP 2.1.0.1
  genericSources-01-15-00 12-Apr-2011 jchiang add IsotropicFileFunction class
  genericSources-01-14-05 22-Feb-2010    jrb correct use of xxLib for libEnv
