@@ -32,8 +32,10 @@
 
 ISpectrumFactory & FitsTransientFactory();
 ISpectrumFactory & GaussianSourceFactory();
+ISpectrumFactory & GaussianSpectrumFactory();
 ISpectrumFactory & GRBmanagerFactory();
 ISpectrumFactory & IsotropicFactory();
+ISpectrumFactory & IsotropicFileSpectrumFactory();
 ISpectrumFactory & MapCubeFactory();
 ISpectrumFactory & MapSourceFactory();
 ISpectrumFactory & PeriodicSourceFactory();
@@ -159,7 +161,9 @@ void TestApp::setSources() {
 #endif
                         "filespectrummap_test",
  			"filespectrum_test",
-                        "radial_source"
+                        "radial_source",
+                        "Isotropic_diffuse",
+                        "Gaussian_spectrum"
    };
    size_t nsrcNames(sizeof(srcNames)/sizeof(char*));
    std::vector<std::string> sourceNames(srcNames, srcNames + nsrcNames);
@@ -211,7 +215,9 @@ void TestApp::createEvents(const std::string & filename) {
 void TestApp::load_sources() {
    FitsTransientFactory();
    GaussianSourceFactory();
+   GaussianSpectrumFactory();
    IsotropicFactory();
+   IsotropicFileSpectrumFactory();
    MapCubeFactory();
    MapSourceFactory();
    PeriodicSourceFactory();
