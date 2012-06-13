@@ -182,7 +182,7 @@ PointSource::PointSource(const astro::SkyDir & dir, double flux,
 SourcePopulation::
 PointSource::PointSource(const std::string & line) : m_z(0) {
    std::vector<std::string> tokens;
-   facilities::Util::stringTokenize(line, ", \n", tokens);
+   facilities::Util::stringTokenize(line, ", \t\n", tokens);
    m_name = tokens.at(0);
    double ra = std::atof(tokens.at(1).c_str());
    double dec = std::atof(tokens.at(2).c_str());
