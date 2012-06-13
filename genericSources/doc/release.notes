@@ -6,6 +6,7 @@
   $Id$
   * EOH *
 
+ genericSources-01-15-04 13-Jun-2012 jchiang add tab as a possible delimiter for SourcePopulation input file
  genericSources-01-15-03 24-Apr-2012 jchiang fix xml entries for IsotropicFileSpectrum and GaussianSpectrum examples; update test code and data
  genericSources-01-15-02 24-Apr-2012 jchiang add GaussianSpectrum point source
  genericSources-01-15-01 20-May-2011 hmk     CLHEP 2.1.0.1
