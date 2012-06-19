@@ -1,0 +1,20 @@
+# -*- python -*-
+# $Id$
+# Authors: Keith Bechtol<bechtol@stanford.edu>
+# Version: EarthPhenom-01-04-04
+Import('baseEnv')
+Import('listFiles')
+progEnv = baseEnv.Clone()
+libEnv = baseEnv.Clone()
+
+EarthPhenomLib = libEnv.StaticLibrary('EarthPhenom', listFiles(['src/*.cxx']))
+
+progEnv.Tool('EarthPhenomLib')
+test_EarthPhenom = progEnv.Program('test_EarthPhenom',
+                                   listFiles(['src/test/*.cxx']))
+
+progEnv.Tool('registerTargets', package = 'EarthPhenom',
+             staticLibraryCxts = [[EarthPhenomLib, libEnv]],
+             includes = listFiles(['EarthPhenom/*.h']),
+             testAppCxts = [[test_EarthPhenom, progEnv]],
+             xml = listFiles(['xml/*'], recursive = True))
