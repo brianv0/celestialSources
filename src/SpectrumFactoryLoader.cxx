@@ -39,6 +39,8 @@ ISpectrumFactory & FileSpectrumFactory();
 ISpectrumFactory & FileSpectrumMapFactory();
 ISpectrumFactory & microQuasarFactory();
 ISpectrumFactory & RadialSourceFactory();
+ISpectrumFactory & EarthPhenomLimbFactory();
+ISpectrumFactory & EarthPhenomInnerFactory();
 
 SpectrumFactoryLoader::SpectrumFactoryLoader() {
 // Replace ROOT's global TRandom instance with our local version that
@@ -69,6 +71,8 @@ SpectrumFactoryLoader::SpectrumFactoryLoader() {
    load(PulsarSpectrumFactory());
    load(TF1SpectrumFactory());
    load(TF1MapFactory());
+   load(EarthPhenomLimbFactory());
+   load(EarthPhenomInnerFactory());
 #endif
    load(FileSpectrumFactory());
    load(FileSpectrumMapFactory());

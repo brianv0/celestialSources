@@ -9,6 +9,7 @@ def generate(env, **kw):
     env.Tool('PulsarLib')
     env.Tool('eblAttenLib')
     env.Tool('microQuasarLib')
+    env.Tool('EarthPhenomLib')
 
 def exists(env):
     return 1
