@@ -1,6 +1,11 @@
 <source_library title="EP">
 
-<!-- Phenomenological Earth limb model based on Fermi LAT observations -->
+<!-- Phenomenological Earth limb model (nadir angles 50-70 deg) based on Fermi LAT observations 
+     Parameters are:
+     (0) Normalization relative to LAT-observed
+     (1) Minimum energy [MeV]
+     (2) Maximim energy [MeV]
+     (3) "0" is normal; "1" corresponds to inverted zenith coordinates -->
 <source name="EarthPhenomLimb">
 <spectrum escale="MeV">
 <SpectrumClass name="EarthPhenomLimb" params="1.,10.,350000.,0."/>
@@ -8,7 +13,12 @@
 </spectrum>
 </source>
 
-<!-- Phenomenological inner Earth model based on Fermi LAT observations -->
+<!-- Phenomenological inner Earth model (nadir angles 0-50 deg) based on Fermi LAT observations -->
+     Parameters are:
+     (0) Normalization relative to LAT-observed
+     (1) Minimum energy [MeV]
+     (2) Maximim energy [MeV]
+     (3) "0" is normal; "1" corresponds to inverted zenith coordinates -->
 <source name="EarthPhenomInner">
 <spectrum escale="MeV">
 <SpectrumClass name="EarthPhenomInner" params="1.,10.,1000.,0."/>
