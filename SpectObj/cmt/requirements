@@ -3,7 +3,7 @@ package SpectObj
 version v0
 
 use GlastPolicy v6r*
-use ROOT v* IExternal
+use ROOT v2r* IExternal
 
 macro_append ROOT_libs " -lHist -lGraf "\
                  WIN32 " libHist.lib libGraf.lib "
