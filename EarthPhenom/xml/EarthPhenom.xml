@@ -13,7 +13,7 @@
 </spectrum>
 </source>
 
-<!-- Phenomenological inner Earth model (nadir angles 0-50 deg) based on Fermi LAT observations -->
+<!-- Phenomenological inner Earth model (nadir angles 0-50 deg) based on Fermi LAT observations
      Parameters are:
      (0) Normalization relative to LAT-observed
      (1) Minimum energy [MeV]
