@@ -6,6 +6,7 @@
   $Id$
   * EOH *
 
+ genericSources-01-16-00 03-Jul-2012 jchiang use celestialSources::ConstParMap
  genericSources-01-15-05 27-Jun-2012 jchiang check for negative values of the flux parameter in a params string where it is explicitly labeled
  genericSources-01-15-04 13-Jun-2012 jchiang add tab as a possible delimiter for SourcePopulation input file
  genericSources-01-15-03 24-Apr-2012 jchiang fix xml entries for IsotropicFileSpectrum and GaussianSpectrum examples; update test code and data
