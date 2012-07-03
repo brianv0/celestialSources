@@ -17,10 +17,11 @@
 #include "flux/SpectrumFactory.h"
 #include "flux/EventSource.h"
 
+#include "celestialSources/ConstParMap.h"
+
 #include "genericSources/FileSpectrum.h"
 #include "genericSources/RadialSource.h"
 
-#include "ConstParMap.h"
 #include "Util.h"
 
 ISpectrumFactory & RadialSourceFactory() {
@@ -31,7 +32,7 @@ ISpectrumFactory & RadialSourceFactory() {
 RadialSource::RadialSource(const std::string & paramString) 
    : m_spectrum(0) {
 
-   genericSources::ConstParMap pars(paramString);
+   celestialSources::ConstParMap pars(paramString);
    
 // The following call requires the flux parameter to be set.  The actual
 // value is held internally by the m_spectrum data member.

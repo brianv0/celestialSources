@@ -29,9 +29,10 @@
 
 #include "eblAtten/EblAtten.h"
 
+#include "celestialSources/ConstParMap.h"
+
 #include "genericSources/FitsTransient.h"
 
-#include "ConstParMap.h"
 #include "Util.h"
 
 namespace {
@@ -73,7 +74,7 @@ FitsTransient::FitsTransient(const std::string & paramString)
          m_tau = new IRB::EblAtten(IRB::Kneiske);
       }
    } else {
-      genericSources::ConstParMap parmap(paramString);
+      celestialSources::ConstParMap parmap(paramString);
       m_flux = parmap.value("flux");
       m_tstart = parmap.value("tstart");
       m_tstop = parmap.value("tstop");

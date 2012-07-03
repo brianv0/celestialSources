@@ -19,8 +19,9 @@
 
 #include "flux/SpectrumFactory.h"
 
+#include "celestialSources/ConstParMap.h"
+
 #include "genericSources/FileSpectrum.h"
-#include "ConstParMap.h"
 #include "Util.h"
 
 namespace {
@@ -61,7 +62,7 @@ FileSpectrum::FileSpectrum(const std::string& params)
 // here to zero.
    m_flux = 0; 
 
-   genericSources::ConstParMap parmap(params);
+   celestialSources::ConstParMap parmap(params);
    
    try {
       m_flux = parmap.value("flux");

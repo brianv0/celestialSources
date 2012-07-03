@@ -22,11 +22,11 @@
 #include "flux/SpectrumFactory.h"
 #include "flux/EventSource.h"
 
+#include "celestialSources/ConstParMap.h"
+
 #include "genericSources/Isotropic.h"
 
-#include "ConstParMap.h"
-
-ISpectrumFactory &IsotropicFactory() {
+ISpectrumFactory & IsotropicFactory() {
    static SpectrumFactory<Isotropic> myFactory;
    return myFactory;
 }
@@ -49,7 +49,7 @@ Isotropic::Isotropic(const std::string & paramString)
          m_cos_thetamax = std::cos(std::atof(params[6].c_str())*M_PI/180.);
       }
    } else {
-      genericSources::ConstParMap parmap(paramString);
+      celestialSources::ConstParMap parmap(paramString);
       
       m_flux = parmap.value("flux");
       m_gamma = parmap.value("gamma");

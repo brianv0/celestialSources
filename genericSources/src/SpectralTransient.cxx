@@ -25,7 +25,8 @@
 
 #include "fitsio.h"
 
-#include "ConstParMap.h"
+#include "celestialSources/ConstParMap.h"
+
 #include "FitsImage.h"
 #include "Util.h"
 #include "eblAtten/EblAtten.h"
@@ -94,7 +95,7 @@ SpectralTransient::SpectralTransient(const std::string & paramString)
          spectrumFile = params[10];
       }
    } else {
-      genericSources::ConstParMap parmap(paramString);
+      celestialSources::ConstParMap parmap(paramString);
       m_flux = parmap.value("flux");
       m_tstart = parmap.value("tstart");
       m_tstop = parmap.value("tstop");

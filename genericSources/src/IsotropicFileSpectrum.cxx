@@ -22,7 +22,7 @@
 #include "genericSources/FileSpectrum.h"
 #include "genericSources/IsotropicFileSpectrum.h"
 
-#include "ConstParMap.h"
+#include "celestialSources/ConstParMap.h"
 
 ISpectrumFactory & IsotropicFileSpectrumFactory() {
    static SpectrumFactory<IsotropicFileSpectrum> myFactory;
@@ -32,7 +32,7 @@ ISpectrumFactory & IsotropicFileSpectrumFactory() {
 IsotropicFileSpectrum::IsotropicFileSpectrum(const std::string & paramString) 
    : m_fileSpectrum(new FileSpectrum(paramString)),
      m_ra(0), m_dec(0), m_cos_thetamax(-1) {
-   genericSources::ConstParMap parmap(paramString);
+   celestialSources::ConstParMap parmap(paramString);
    try {
       m_ra = parmap.value("ra");
       m_dec = parmap.value("dec");

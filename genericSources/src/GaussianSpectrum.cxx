@@ -21,7 +21,7 @@
 
 #include "genericSources/GaussianSpectrum.h"
 
-#include "ConstParMap.h"
+#include "celestialSources/ConstParMap.h"
 
 ISpectrumFactory & GaussianSpectrumFactory() {
    static SpectrumFactory<GaussianSpectrum> myFactory;
@@ -31,7 +31,7 @@ ISpectrumFactory & GaussianSpectrumFactory() {
 GaussianSpectrum::GaussianSpectrum(const std::string & paramString) 
    : m_flux(1.), m_mean(1e4), m_sigma(1e3), m_l(0), m_b(0) {
 
-   genericSources::ConstParMap pars(paramString);
+   celestialSources::ConstParMap pars(paramString);
    
    m_flux = pars.value("flux");
    m_mean = pars.value("mean");

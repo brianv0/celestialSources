@@ -29,9 +29,9 @@
 
 #include "genericSources/MapSource.h"
 
-#include "ConstParMap.h"
+#include "celestialSources/ConstParMap.h"
 
-ISpectrumFactory &MapSourceFactory() {
+ISpectrumFactory & MapSourceFactory() {
    static SpectrumFactory<MapSource> myFactory;
    return myFactory;
 }
@@ -71,7 +71,7 @@ MapSource::MapSource(const std::string & paramString)
       }
    } else {
 // use the map version
-      genericSources::ConstParMap parmap(paramString);
+      celestialSources::ConstParMap parmap(paramString);
 
       //fitFile and flux return a runtime error if absent
       m_flux = parmap.value("flux");

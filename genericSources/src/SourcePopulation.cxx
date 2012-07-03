@@ -27,9 +27,10 @@
 
 #include "eblAtten/EblAtten.h"
 
+#include "celestialSources/ConstParMap.h"
+
 #include "genericSources/SourcePopulation.h"
 
-#include "ConstParMap.h"
 #include "Util.h"
 #include "GaussianQuadrature.h"
 
@@ -85,7 +86,7 @@ SourcePopulation::SourcePopulation(const std::string & params)
          m_idOffset = std::atoi(pars.at(2).c_str());
       } 
    } else {
-      genericSources::ConstParMap pars(params);
+      celestialSources::ConstParMap pars(params);
       readSourceFile(pars["sourceFile"]);
       try {
          setEblAtten(pars["eblModel"]);

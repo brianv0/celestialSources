@@ -28,11 +28,11 @@
 #include "FitsImage.h"
 #include "Util.h"
 
+#include "celestialSources/ConstParMap.h"
+
 #include "genericSources/MapCube.h"
 
-#include "ConstParMap.h"
-
-ISpectrumFactory &MapCubeFactory() {
+ISpectrumFactory & MapCubeFactory() {
    static SpectrumFactory<MapCube> myFactory;
    return myFactory;
 }
@@ -62,7 +62,7 @@ MapCube::MapCube(const std::string & paramString) : MapSource() {
          }
       }
    } else {
-      genericSources::ConstParMap parmap(paramString);
+      celestialSources::ConstParMap parmap(paramString);
       
       m_flux = parmap.value("flux");
       fitsFile = parmap["fitsFile"];
