@@ -24,17 +24,20 @@
 
 #include "CLHEP/Random/RandFlat.h"
 
+#include "celestialSources/ConstParMap.h"
+
 //static SpectrumFactory<EarthPhenomInner> factory;
 //const ISpectrumFactory& EarthPhenomInnerFactory = factory;
 
-EarthPhenomInner::EarthPhenomInner(const std::string &paramString) {	
-  std::vector<std::string> params;
-  facilities::Util::stringTokenize(paramString, ", ", params);
-
-  m_normalization = std::atof(params[0].c_str()); // Normalization = 1 is default
-  m_emin = std::atof(params[1].c_str()); // MeV
-  m_emax = std::atof(params[2].c_str()); // MeV
-  if(std::atoi(params[3].c_str())!=0) // 0 = normal mode, 1 = invert direction
+EarthPhenomInner::EarthPhenomInner(const std::string &paramString) 	
+  : m_normalization(1.), m_emin(10.), m_emax(1000.), m_invert_direction(false) {
+  
+  celestialSources::ConstParMap pars(paramString);
+  
+  m_normalization = pars.value("norm"); // Normalization = 1 is default
+  m_emin = pars.value("emin"); // MeV
+  m_emax = pars.value("emax"); // MeV
+  if(pars.value("invert_zenith") == 1) // 0 = normal mode, 1 = invert direction
     m_invert_direction = true;
   else
     m_invert_direction = false;

@@ -1,27 +1,29 @@
 <source_library title="EP">
 
 <!-- Phenomenological Earth limb model (nadir angles 50-70 deg) based on Fermi LAT observations 
-     Parameters are:
-     (0) Normalization relative to LAT-observed
-     (1) Minimum energy [MeV]
-     (2) Maximim energy [MeV]
-     (3) "0" is normal; "1" corresponds to inverted zenith coordinates -->
+     Parameters are:     
+     "norm" = Normalization relative to LAT-observed
+     "emin" = Minimum energy [MeV]
+     "emax" = Maximim energy [MeV]
+     "invert_zenith" = "0" is normal; "1" corresponds to inverted zenith coordinates -->
 <source name="EarthPhenomLimb">
 <spectrum escale="MeV">
-<SpectrumClass name="EarthPhenomLimb" params="1.,10.,350000.,0."/>
+<SpectrumClass name="EarthPhenomLimb"
+params="norm=1.,emin=10.,emax=350000.,invert_zenith=0"/>
 <use_spectrum frame="zenith"/>
 </spectrum>
 </source>
 
 <!-- Phenomenological inner Earth model (nadir angles 0-50 deg) based on Fermi LAT observations
      Parameters are:
-     (0) Normalization relative to LAT-observed
-     (1) Minimum energy [MeV]
-     (2) Maximim energy [MeV]
-     (3) "0" is normal; "1" corresponds to inverted zenith coordinates -->
+     "norm" = Normalization relative to LAT-observed
+     "emin" = Minimum energy [MeV]
+     "emax" = Maximim energy [MeV], suggest 1000 MeV as upper bound
+     "invert_zenith" = "0" is normal; "1" corresponds to inverted zenith coordinates -->
 <source name="EarthPhenomInner">
 <spectrum escale="MeV">
-<SpectrumClass name="EarthPhenomInner" params="1.,10.,1000.,0."/>
+<SpectrumClass name="EarthPhenomInner"
+params="norm=1.,emin=10.,emax=1000.,invert_zenith=0"/>
 <use_spectrum frame="zenith"/>
 </spectrum>
 </source>
