@@ -1,6 +1,0 @@
-10		/// Nshell
-0.1		/// Redshift
-1.0e+55 	///Etot
-1.0e+9		///Radius of the shells [cm]
-1.0e+8		///Thickness of the shells[cm]
-
