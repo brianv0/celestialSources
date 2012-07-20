@@ -24,20 +24,27 @@
 
 #include "CLHEP/Random/RandFlat.h"
 
+#include "celestialSources/ConstParMap.h"
+
 //static SpectrumFactory<EarthPhenomInner> factory;
 //const ISpectrumFactory& EarthPhenomInnerFactory = factory;
 
-EarthPhenomInner::EarthPhenomInner(const std::string &paramString) {	
-  std::vector<std::string> params;
-  facilities::Util::stringTokenize(paramString, ", ", params);
-
-  m_normalization = std::atof(params[0].c_str()); // Normalization = 1 is default
-  m_emin = std::atof(params[1].c_str()); // MeV
-  m_emax = std::atof(params[2].c_str()); // MeV
-  if(std::atoi(params[3].c_str())!=0) // 0 = normal mode, 1 = invert direction
+EarthPhenomInner::EarthPhenomInner(const std::string &paramString) 	
+  : m_normalization(1.), m_emin(10.), m_emax(1000.), m_invert_direction(false) {
+  
+  celestialSources::ConstParMap pars(paramString);
+  
+  m_normalization = pars.value("norm"); // Normalization = 1 is default
+  m_emin = pars.value("emin"); // MeV
+  m_emax = pars.value("emax"); // MeV
+  if(pars.value("invert_zenith") == 1) // 0 = normal mode, 1 = invert direction
     m_invert_direction = true;
   else
     m_invert_direction = false;
+
+  if(m_emax>2000.)
+    std::cerr << "WARNING: maximum energy = " << m_emax 
+	      << " MeV. Suggest maximum energy of 1000 MeV (may encounter numerical issues otherwise). Continue at your own risk..." << std::endl; 
 
   init(m_normalization, m_emin, m_emax);
 
@@ -166,23 +173,6 @@ void EarthPhenomInner::init(double normalization, double emin, double emax) {
   // Integral flux
   m_integral_flux = m_solid_angle * m_fSpectralEnergy.Integral(m_emin, m_emax); // (m^-2 s^-1)
 
-  /*
-  std::cerr << m_emin << std::endl;
-  std::cerr << m_emax << std::endl;
-  std::cerr << m_fSpectralEnergy.Integral(m_emin, m_emax) << std::endl;
-  std::cerr << m_integral_flux << std::endl;
-
-  std::cerr << "Integral 2" << m_fSpectralEnergy.Integral(10, 100) << std::endl;
-
-  std::cerr << m_fSpectralEnergy.Eval(10) << std::endl;
-  std::cerr << m_fSpectralEnergy.Eval(100) << std::endl;
-  std::cerr << m_fSpectralEnergy.Eval(1000) << std::endl;
-  std::cerr << m_fSpectralEnergy.Eval(10000) << std::endl;
-  */
-
-  // Integral intensity
-  //double integral_intensity=m_fSpectralEnergy.Integral(m_emin, m_emax); // (m^-2 s^-1 sr^-1)
-
   // Setting precision for inverse cumulative distribution functions
   m_cdf_steps=1000;
   m_cdf_energy_slices=100;
@@ -205,8 +195,6 @@ void EarthPhenomInner::init(double normalization, double emin, double emax) {
   }
   normalize_cdf(m_energy_inverse_cdf);
 
-  //std::cerr << "Set energy inverse CDF successfully..." << std::endl;
-
   // Create zenith and azimuth inverse cumulative distribution functions
   double zenith;
   double d_zenith=(m_zenithmax-m_zenithmin)/cdf_steps;
@@ -221,19 +209,6 @@ void EarthPhenomInner::init(double normalization, double emin, double emax) {
 
     // Set energy-dependent zenith parameter
     m_fZenith.SetParameter(0,m_fZenithSlope.Eval(log10_energy));
-
-    /*
-    zenith=m_zenithmin;
-    integral_zenith=0.;
-    for(int jj=0;jj<m_cdf_steps;jj++){
-      std::cerr << jj << std::endl;
-      integral_zenith+=m_fZenith.Eval(zenith)*(cos(M_PI*zenith/180.)-cos(M_PI*(zenith+d_zenith)/180.));
-      std::cerr << integral_zenith << std::endl;
-      m_zenith_inverse_cdf[ii].SetPoint(m_zenith_inverse_cdf[ii].GetN(),integral_zenith,zenith);
-      std::cerr <<  "Test" << std::endl;
-      zenith+=d_zenith;
-    }
-    */
 
     // Set energy-dependent azimuth parameter
     m_fAzimuth.SetParameter(1,m_fAzimuthalLogsine.Eval(log10_energy));
@@ -252,8 +227,6 @@ void EarthPhenomInner::init(double normalization, double emin, double emax) {
       zenith+=d_zenith;
     }
     normalize_cdf(m_zenith_inverse_cdf[ii]);
-
-    //std::cerr << m_zenith_inverse_cdf[ii] << std::endl;
 
     // Create azimuth inverse cumulative distribution function
     azimuth=m_azimuthmin;
