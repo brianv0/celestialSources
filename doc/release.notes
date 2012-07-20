@@ -6,6 +6,7 @@
   $Id$
   * EOH *
 
+ celestialSources-01-05-00 03-Jul-2012 jchiang mv ConstParMap from genericSources
  celestialSources-01-04-01 24-Apr-2012 jchiang add GaussianSpectrum point source
  celestialSources-01-04-00 12-Apr-2011 jchiang add IsotropicFileFunction class
  celestialSources-01-03-05 03-Jun-2010    JC add CLHEP namespace qualifier
