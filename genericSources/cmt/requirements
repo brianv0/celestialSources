@@ -1,5 +1,5 @@
 package genericSources
-version v1r16p0
+version v1r16p1
 
 author James Chiang <jchiang@slac.stanford.edu>
 
@@ -12,6 +12,7 @@ use facilities v*
 use astro v*
 use flux v*
 use eblAtten v* celestialSources
+use celestialSources v*
 
 apply_pattern package_include
 apply_pattern package_linkopts
