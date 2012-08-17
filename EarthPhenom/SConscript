@@ -7,6 +7,7 @@ Import('listFiles')
 progEnv = baseEnv.Clone()
 libEnv = baseEnv.Clone()
 
+libEnv.Tool('addLinkDeps', package = 'EarthPhenom', toBuild='static')
 EarthPhenomLib = libEnv.StaticLibrary('EarthPhenom', listFiles(['src/*.cxx']))
 
 progEnv.Tool('EarthPhenomLib')

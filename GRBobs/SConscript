@@ -8,6 +8,7 @@ Import('listFiles')
 progEnv = baseEnv.Clone()
 libEnv = baseEnv.Clone()
 
+libEnv.Tool('addLinkDeps', package = 'GRBobs', toBuild='static')
 GRBobsLib = libEnv.StaticLibrary('GRBobs', listFiles(['src/*.cxx', 'src/GRBobs/*.cxx']))
 
 progEnv.Tool('GRBobsLib')
