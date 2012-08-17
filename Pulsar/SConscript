@@ -7,6 +7,7 @@ Import('listFiles')
 progEnv = baseEnv.Clone()
 libEnv = baseEnv.Clone()
 
+libEnv.Tool('addLinkDeps', package = 'Pulsar', toBuild='static')
 PulsarLib = libEnv.StaticLibrary('Pulsar', listFiles(['src/*.cxx', 'src/Pulsar/*.cxx']))
 
 progEnv.Tool('PulsarLib')

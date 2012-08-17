@@ -8,6 +8,7 @@ libEnv = baseEnv.Clone()
 
 progEnv = baseEnv.Clone()
 
+libEnv.Tool('addLinkDeps', package = 'SpectObj', toBuild='static')
 SpectObjLib = libEnv.StaticLibrary('SpectObj', listFiles(['src/*.cxx']))
 
 progEnv.Tool('registerTargets', package = 'SpectObj',

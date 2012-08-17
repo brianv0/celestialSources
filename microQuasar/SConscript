@@ -7,6 +7,7 @@ Import('listFiles')
 progEnv = baseEnv.Clone()
 libEnv = baseEnv.Clone()
 
+libEnv.Tool('addLinkDeps', package = 'microQuasar', toBuild='static')
 microQuasarLib = libEnv.StaticLibrary('microQuasar', listFiles(['src/*.cxx']))
 
 progEnv.Tool('microQuasarLib')

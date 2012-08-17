@@ -9,6 +9,7 @@ Import('listFiles')
 progEnv = baseEnv.Clone()
 libEnv = baseEnv.Clone()
 
+libEnv.Tool('addLinkDeps', package = 'celestialSources', toBuild='static')
 celestialSourcesLib = libEnv.StaticLibrary('celestialSources',
                                            listFiles(['src/*.cxx']))
 
