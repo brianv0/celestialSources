@@ -18,7 +18,6 @@
 // declare the external factories.
 ISpectrumFactory & FitsTransientFactory();
 ISpectrumFactory & GaussianSourceFactory();
-ISpectrumFactory & GaussianSpectrumFactory();
 ISpectrumFactory & GRBmanagerFactory();
 ISpectrumFactory & GRBobsmanagerFactory();
 ISpectrumFactory & GRBtemplateManagerFactory();
@@ -39,8 +38,6 @@ ISpectrumFactory & FileSpectrumFactory();
 ISpectrumFactory & FileSpectrumMapFactory();
 ISpectrumFactory & microQuasarFactory();
 ISpectrumFactory & RadialSourceFactory();
-ISpectrumFactory & EarthPhenomLimbFactory();
-ISpectrumFactory & EarthPhenomInnerFactory();
 
 SpectrumFactoryLoader::SpectrumFactoryLoader() {
 // Replace ROOT's global TRandom instance with our local version that
@@ -56,7 +53,6 @@ SpectrumFactoryLoader::SpectrumFactoryLoader() {
    load(GRBtemplateManagerFactory());
 #endif
    load(GaussianSourceFactory());
-   load(GaussianSpectrumFactory());
    load(IsotropicFactory());
    load(IsotropicFileSpectrumFactory());
    load(MapSourceFactory());
@@ -71,8 +67,6 @@ SpectrumFactoryLoader::SpectrumFactoryLoader() {
    load(PulsarSpectrumFactory());
    load(TF1SpectrumFactory());
    load(TF1MapFactory());
-   load(EarthPhenomLimbFactory());
-   load(EarthPhenomInnerFactory());
 #endif
    load(FileSpectrumFactory());
    load(FileSpectrumMapFactory());
@@ -81,5 +75,5 @@ SpectrumFactoryLoader::SpectrumFactoryLoader() {
 }
 
 void SpectrumFactoryLoader::load(ISpectrumFactory& factory) {
-   m_names.push_back( factory.name() );
+       m_names.push_back( factory.name() );
 }

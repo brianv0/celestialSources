@@ -2,14 +2,13 @@
 #
 # $Header$
 # Authors: James Chiang <jchiang@slac.stanford.edu>
-# Version: celestialSources-01-06-00
+# Version: celestialSources-01-04-00
 
 Import('baseEnv')
 Import('listFiles')
 progEnv = baseEnv.Clone()
 libEnv = baseEnv.Clone()
 
-libEnv.Tool('addLinkDeps', package = 'celestialSources', toBuild='static')
 celestialSourcesLib = libEnv.StaticLibrary('celestialSources',
                                            listFiles(['src/*.cxx']))
 
