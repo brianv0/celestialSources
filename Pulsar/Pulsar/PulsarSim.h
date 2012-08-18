@@ -13,6 +13,8 @@
 #include <fstream>
 #include <iomanip>
 #include <ctime>
+#include <cstdlib>
+
 #include "TFile.h"
 #include "TF1.h"
 #include <TTree.h>
@@ -56,7 +58,7 @@ class PulsarSim
   TH2D* PSRShape(std::string ModelShapeName="PulsarShape", int NormalizeFlux=0);
 
   // Returns a TH2D ROOT matrix that contains in every bin Nv*dE*dT*Aeff
-  TH2D *PulsarSim::Nph(const TH2D *Nv);
+  TH2D *Nph(const TH2D *Nv);
 
   //! Returns the period of the pulsar 
   inline double Period(){return m_period;}
@@ -66,7 +68,13 @@ class PulsarSim
 
   //! Save a TXT file with the Pulsar time profile
   void SaveTimeProfile(TH2D *Nv);
+
+  //! Write to an output log file
+  void WriteToLog(std::string Line);
   
+  //!Flag for Output level
+  int m_OutputLevel;
+
  private:
 
   //! Pulsar name
@@ -90,8 +98,15 @@ class PulsarSim
   //!Random seed
   int m_seed;
 
+  //! PULSARDATA directory
+  std::string m_pulsardata_dir;
+
   //!Outpur 2D ROOT histogram
   TH2D *m_Nv;
+
+  //! output log filename
+  std::string m_LogFileName;
+
 };
 
 #endif

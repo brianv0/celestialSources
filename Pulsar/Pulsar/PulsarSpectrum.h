@@ -11,8 +11,8 @@
 
 #include <iostream>
 #include <iomanip>
-#include <vector>
 #include <string>
+#include <sstream>
 #include <fstream>
 #include <map>
 #include <cmath>
@@ -38,7 +38,7 @@
 * \author Nicola Omodei        nicola.omodei@pi.infn.it 
 * \author Massimiliano Razzano massimiliano.razzano@pi.infn.it
 *
-* PulsarSpectrum, derived from ISpectrum, takes the model parameters from the XML file, where are also located the pulsar name, his position in the sky, 
+* PulsarSpectrum, derived from Spectrum, takes the model parameters from the XML file, where are also located the pulsar name, his position in the sky, 
 * and the energy range of the extracted photons. Then it looks in the PulsarDataList.txt file ( in the <i>/data</i> directory)
 * for the name of the pulsar and then extracts the specific parameters of the pulsar (period, flux, ephemerides, etc.) related 
 * to that pulsar. 
@@ -48,7 +48,7 @@
 *  - Timing Noise;
 *  - Binary demodulation
 */
-class PulsarSpectrum : public ISpectrum
+class PulsarSpectrum : public Spectrum
 {
   
  public:
@@ -77,6 +77,11 @@ class PulsarSpectrum : public ISpectrum
   //! Compute binary demodulation in iterative way
   double getIterativeDemodulatedTime(double tInput, int LogFlag);
 
+  //! Compute the True anomaly
+  double PulsarSpectrum::getTrueAnomaly(double tInput);
+
+  double PulsarSpectrum::getOrbitalPhase(double tInput);
+
   //! Compute binary demodulation in a single step
   double getBinaryDemodulation( double tInput, int LogDemodFlag);
 
@@ -89,17 +94,20 @@ class PulsarSpectrum : public ISpectrum
   //! Get the pulsar ephemerides and data from the DataList
   int getPulsarFromDataList(std::string sourceFileName);
 
-  //! Load Pulsar General data
-  void LoadPulsarGeneralData(std::string pulsar_data_dir);
+  //! Load Pulsar data
+  void LoadPulsarData(std::string pulsar_data_dir, int DataType);
 
   //! Get the binary pulsar orbital data from the BinDataList
   int getOrbitalDataFromBinDataList(std::string sourceBinFileName);
 
-  //! Load Pulsar General data
-  void LoadPulsarOrbitalData(std::string pulsar_data_dir);
-
   //! Initialize timing noise parameters
   void InitTimingNoise();
+
+  //! Apply timing noise algorithms
+  void ApplyTimingNoise(double TnoiseInputTime);
+
+  //! Check the validity of the ephemrides and change it accordingly
+  void CheckEphemeridesValidity(double EphCheckTime, double initTurns);
 
   //! Initialize binray-related effects
   void InitOrbitalEffects();
@@ -109,9 +117,6 @@ class PulsarSpectrum : public ISpectrum
 
   //! Save an output txt file with pulsar orbital data compatible with D4 file
   int saveBinDbTxtFile();
-
-  //! Write Out Pulsar Log file
-  void WritePulsarLog(std::string pulsarOutDir);
 
   //! Check if a file exists using and throw an exception
   void CheckFileExistence(std::string NameFileToCheck);
@@ -142,6 +147,12 @@ class PulsarSpectrum : public ISpectrum
 
   //! Parse parameters from XML file
   std::string parseParamList(std::string input, unsigned int index);  
+
+  //! Write to an output log file
+  void WriteToLog(std::string Line);
+
+  //! Write pulsar info
+  void WritePulsarLog();
       
  private:
   
@@ -162,6 +173,9 @@ class PulsarSpectrum : public ISpectrum
 
   //! Name of file containing shape spectrum for model PSRShape
   std::string m_PSRShapeName;
+
+  //! PULSARDATA directory
+  std::string m_pulsardata_dir;
   
   bool m_ff;
 
@@ -193,6 +207,9 @@ class PulsarSpectrum : public ISpectrum
 
   //!Type of model
   int m_model;
+
+  //!Output level 0 - no output; 1- only pulsar data 2 - also warning messages
+  int m_OutputLevel;
 
   //!Pulsar flux
   double m_flux;
@@ -231,6 +248,9 @@ class PulsarSpectrum : public ISpectrum
   //! Binary parameters - relative to PPN
   double m_Porb_dot,m_xdot,m_ecc_dot,m_omega_dot,m_gamma;
   double m_shapiro_r, m_shapiro_s;
+
+  //! output log filename
+  std::string m_LogFileName;
 
 };
 #endif
