@@ -6,6 +6,7 @@
   $Id$
   * EOH *
 
+ SpectObj-01-04-00 17-Aug-2012    jrb for Windows no-install-headers
  SpectObj-01-03-08 22-Feb-2010    jrb correct use of xxLib for libEnv
  SpectObj-01-03-07 07-Aug-2009 razzano added m_FluxFactor
   15-Jul-09 v1r3p6   jrb  Update SConscript

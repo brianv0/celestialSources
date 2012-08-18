@@ -6,6 +6,7 @@
  * Coordinators: K. Bechtol
     EOH
 
+ EarthPhenom-00-02-00 17-Aug-2012    jrb for Windows no-install-headers
  EarthPhenom-00-01-02 20-Jul-2012 bechtol re-tagging because some files did not get tagged previously
  EarthPhenom-00-01-01 20-Jul-2012 heather Cleaning up the release.notes for the
      new package
