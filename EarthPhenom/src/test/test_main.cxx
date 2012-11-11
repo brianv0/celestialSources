@@ -17,7 +17,6 @@ namespace {
     int default_count = 100;
     std::string default_source("EarthPhenomLimb");
     //std::string default_source("EarthPhenomInner");
-    std::string xml_spec(facilities::commonUtilities::joinPath(facilities::commonUtilities::getXmlPath("EarthPhenom"), "EarthPhenom.xml"));  
 }
 ISpectrumFactory & EarthPhenomLimbFactory();
 ISpectrumFactory & EarthPhenomInnerFactory();
@@ -58,6 +57,8 @@ int main(int argn, char * argc[]) {
         // set up the flux manager, adding in our xml description
         std::vector<std::string> fileList;
         // fileList.push_back(facilities::commonUtilities::joinPath(facilities::commonUtilities::getXmlPath("flux"),"source_library.xml"));
+        facilities::commonUtilities::setupEnvironment();
+        std::string xml_spec(facilities::commonUtilities::joinPath(facilities::commonUtilities::getXmlPath("EarthPhenom"), "EarthPhenom.xml"));
         fileList.push_back(xml_spec);
         FluxMgr fm(fileList);
 

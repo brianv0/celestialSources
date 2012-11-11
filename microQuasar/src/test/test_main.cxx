@@ -16,8 +16,6 @@ $Header$
 namespace {
     int default_count =100 ;
     std::string default_source("Galactic_LS5039");
-    std::string xml_spec(facilities::commonUtilities::joinPath(facilities::commonUtilities::getXmlPath("microQuasar"), "mq.xml"));
-
 }
 ISpectrumFactory & microQuasarFactory();
 
@@ -56,6 +54,8 @@ int main(int argn, char * argc[]) {
 
         // set up the flux manager, adding in our xml description
         std::vector<std::string> fileList;
+        facilities::commonUtilities::setupEnvironment();
+        std::string xml_spec(facilities::commonUtilities::joinPath(facilities::commonUtilities::getXmlPath("microQuasar"), "mq.xml"));
         fileList.push_back(facilities::commonUtilities::joinPath(facilities::commonUtilities::getXmlPath("flux"),"source_library.xml"));
         fileList.push_back(xml_spec);
         FluxMgr fm(fileList);
