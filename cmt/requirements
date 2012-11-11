@@ -1,6 +1,6 @@
 package celestialSources
 
-version v0r3p6
+version v0r2p1
 
 # $Header$
 #
@@ -9,9 +9,7 @@ version v0r3p6
 
 use flux v*
 
-use genericSources v1r2 celestialSources
-use SpectObj v0r1p0 celestialSources
-use GRB v4r1p2 celestialSources
-use GRBobs v0r1p1 celestialSources
-use Pulsar v1r0p3 celestialSources
-#use DarkMatter JCT celestialSources
+use genericSources v0r1p2 celestialSources
+use GRB v4r0p7 celestialSources
+use Pulsar v1r0p0 celestialSources
+use SpectObj  v0r0p0 celestialSources
