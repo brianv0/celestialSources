@@ -8,6 +8,7 @@
 *@verbatim
 * EOH *
 
+ Pulsar-03-03-00 15-Mar-2013    razzano fixed bug in parseParams fuction
  Pulsar-03-02-00 17-Aug-2012    jrb for Windows no-install-headers
  Pulsar-03-01-01 22-Feb-2010    jrb correct use of xxLib for libEnv
  Pulsar-03-01-00 18-Nov-2009 razzano Added binary modulation
