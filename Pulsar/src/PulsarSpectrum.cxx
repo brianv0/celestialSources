@@ -2204,6 +2204,30 @@ std::string PulsarSpectrum::parseParamList(std::string input, unsigned int index
 {
   std::vector<std::string> output;
   unsigned int i=0;
+  int StrLength=input.length();
+
+  while (i<StrLength)
+    {
+      i=input.find_first_of(",");
+      std::string f = ( input.substr(0,i).c_str() );      
+      //std::cout << "i=" <<"sub " << f <<std::endl;     
+      input=input.substr(i+1);
+      output.push_back(f);
+    }
+
+  if(index>=output.size()) return "";
+  return output[index];
+
+}
+
+
+
+
+/* old code:
+std::string PulsarSpectrum::parseParamList(std::string input, unsigned int index)
+{
+  std::vector<std::string> output;
+  unsigned int i=0;
   
   for(;!input.empty() && i!=std::string::npos;){
    
@@ -2216,6 +2240,8 @@ std::string PulsarSpectrum::parseParamList(std::string input, unsigned int index
   if(index>=output.size()) return "";
   return output[index];
 }
+*/
+
 
 //////////////////////////////////////////////////
 /*!
