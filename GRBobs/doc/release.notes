@@ -1,19 +1,9 @@
 /** 
   @file release.notes
-  @brief package celestialSources/GRBobs
+  @brief package celestialSources
 
   @verbatim
   $Id$ 
-  * EOH *
-
- GRBobs-03-04-01 11-Nov-2012 jchiang test program fix
- GRBobs-03-04-00 17-Aug-2012    jrb for Windows no-install-headers
- GRBobs-03-03-06 03-Oct-2011 jchiang gcc4.4.3/Ubuntu compatibility
- GRBobs-03-03-05 20-May-2011    hmk CLHEP 2.1.0.1
- GRBobs-03-03-04 22-Feb-2010    jrb correct use of xxLib for libEnv
-   15-Jul-09 v3r3p3    jrb   Update to SConscript
-   23-apr-08 v3r3p2    JCT   compliant with 64bits machines
-   22-feb-08 v3r3p1    NO    Compatibility with windoz fixed
    22-feb-08 v3r3      NO    Add also a falg to generate single pulse GRBs
 			     Disable the generation of the output if already generated (1sec)
 			     Clean up the generation of the library (can be compiled in root)

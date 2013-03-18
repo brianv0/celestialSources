@@ -120,7 +120,7 @@ GRBobsSim::GRBobsSim(GRBobsParameters *params)
 void GRBobsSim::GetUniqueName(void *ptr, std::string & name)
 {
   std::ostringstream my_name;
-  my_name << reinterpret_cast<long> (ptr);
+  my_name << reinterpret_cast<int> (ptr);
   name = my_name.str();
   gDirectory->Delete(name.c_str());
   reinterpret_cast<TH1*> (ptr)->SetDirectory(0);
@@ -368,7 +368,7 @@ void GRBobsSim::SaveNvEC()
   m_NvEC->Write();
   mod.Close();
   m_NvEC->SetName(name.c_str());
-}
+};
 
 void GRBobsSim::SaveNv()
 {
@@ -393,7 +393,7 @@ void GRBobsSim::SaveNv()
   mod.Close();
   m_Nv->SetName(name.c_str());
 
-}
+};
 
 //////////////////////////////////////////////////
 void GRBobsSim::SaveGBMDefinition(std::string GRBname, double ra, double dec, double theta, double phi, double tstart)

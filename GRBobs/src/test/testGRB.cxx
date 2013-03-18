@@ -88,12 +88,12 @@ void galacticTest(FluxMgr* fm, std::string sourceName, double tstart=0, double t
       //of fluxsource, and is expected.
       time+=interval;
       fm->pass(interval);
-      CLHEP::Hep3Vector GlastDir = -(f->launchDir());
+      Hep3Vector GlastDir = -(f->launchDir());
 
       theta = GlastDir.theta();//-TMath::Pi();
       phi   = GlastDir.phi();
       
-      CLHEP::Hep3Vector abc(fm->transformToGlast(time,GPS::CELESTIAL).inverse()*(GlastDir));
+      Hep3Vector abc(fm->transformToGlast(time,GPS::CELESTIAL).inverse()*(GlastDir));
       astro::SkyDir skyDir(abc,astro::SkyDir::EQUATORIAL);
       
       energy=f->energy();
@@ -133,7 +133,6 @@ int main(int argn, char * argc[]) {
   //TESTING MULTIPLE XML INPUT
   std::vector<std::string> fileList;
 
-  facilities::commonUtilities::setupEnvironment();
   fileList.push_back(facilities::commonUtilities::joinPath(facilities::commonUtilities::getXmlPath("GRBobs"), "GRBobs_user_library.xml"));
   //fileList.push_back("$(GRBOBSROOT)/xml/GRBobs_user_library.xml");
   //  fileList.push_back("$(GRBOBSROOT)/xml/SWIFT_bursts.xml");

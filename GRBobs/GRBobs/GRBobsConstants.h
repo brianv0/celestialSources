@@ -2,7 +2,7 @@
 
 #define GRBOBSCONSTANT_HH 1
 
-#include <cstdlib>
+
 
 #include <fstream>
 
@@ -142,7 +142,7 @@ namespace ObsCst
 
   //////////////////////////////////////////////////
 
-}
+};
 
 
 
@@ -242,7 +242,7 @@ class GRBobsParameters
 
       std::ostringstream my_name;
 
-      my_name << reinterpret_cast<long> (ptr);
+      my_name << reinterpret_cast<int> (ptr);
 
       name = my_name.str();
 

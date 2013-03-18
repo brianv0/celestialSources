@@ -24,9 +24,9 @@ ISpectrumFactory &GRBobsmanagerFactory()
 void ComputeCoordinates(double time, double l, double b, double& ra, double& dec, double& theta, double& phi)
 {
   astro::SkyDir sky(l,b,astro::SkyDir::GALACTIC);
-  CLHEP::Hep3Vector skydir=sky.dir();
-  CLHEP::HepRotation rottoglast =   astro::GPS::instance()->transformToGlast(time,astro::GPS::CELESTIAL);
-  CLHEP::Hep3Vector scdir = rottoglast * skydir;
+  Hep3Vector skydir=sky.dir();
+  HepRotation rottoglast =   astro::GPS::instance()->transformToGlast(time,astro::GPS::CELESTIAL);
+  Hep3Vector scdir = rottoglast * skydir;
   ra    = sky.ra();
   dec   = sky.dec();
   theta = 90. - scdir.theta()*180.0/M_PI;
@@ -38,13 +38,13 @@ void ComputeCoordinates_2(double time, double theta_zenith, double phi,
 			  double& ra, double& dec)
 {
 
-  CLHEP::HepRotation GLASTtoCel =   (astro::GPS::instance()->transformToGlast(time,astro::GPS::CELESTIAL)).inverse();
+  HepRotation GLASTtoCel =   (astro::GPS::instance()->transformToGlast(time,astro::GPS::CELESTIAL)).inverse();
   
   double _theta= theta_zenith * M_PI/180;
   double _phi  = phi   * M_PI/180;
   
-  CLHEP::Hep3Vector scdir(sin(_theta)*cos(_phi),sin(_theta)*sin(_phi),cos(_theta));
-  CLHEP::Hep3Vector skydir = GLASTtoCel * scdir.unit();
+  Hep3Vector scdir(sin(_theta)*cos(_phi),sin(_theta)*sin(_phi),cos(_theta));
+  Hep3Vector skydir = GLASTtoCel * scdir.unit();
   astro::SkyDir sky(skydir, astro::SkyDir::EQUATORIAL);
   ra    = sky.ra();
   dec   = sky.dec();

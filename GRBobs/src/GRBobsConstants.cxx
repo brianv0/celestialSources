@@ -1,5 +1,4 @@
 #include "../GRBobs/GRBobsConstants.h"
-#include <stdexcept>
 
 using namespace ObsCst;
 using std::pow;
@@ -152,7 +151,7 @@ void GRBobsParameters::GenerateSinglePulse()
   while (Peakedness==0) 
     m_Peakedness = pow(10.0,rnd->Gaus(0.16,0.3));
   
-  double scaledDuration=m_duration/(pow(log(100.0),1.0/m_Peakedness));
+  double scaledDuration=m_duration/(pow(log(100),1.0/m_Peakedness));
   
   m_decayTime         = 2./3.*scaledDuration;
   m_riseTime          = 1./3.*scaledDuration;
@@ -191,9 +190,8 @@ void GRBobsParameters::ReadParametersFromFile(std::string paramFile, int NGRB)
   std::ifstream f1(paramFile.c_str());
   if (!f1.is_open()) 
     {
-       throw std::runtime_error("GRBobsConstants: Error Opening paramFile");
-      // std::cout<<"GRBobsConstants: Error Opening paramFile\n";
-      // exit(1);
+      std::cout<<"GRBobsConstants: Error Opening paramFile\n";
+      exit(1);
     }
   double tstart;
   double duration;
