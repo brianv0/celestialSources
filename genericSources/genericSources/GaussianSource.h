@@ -1,6 +1,6 @@
 /**
  * @file GaussianSource.h
- * @brief Extended source modeled using a 2D Gaussian.
+ * @brief Test spectrum for use with flux package.
  * @author J. Chiang
  *
  * $Header$
@@ -13,8 +13,11 @@
 
 /**
  * @class GaussianSource
- * @brief 2D Gaussian extended source
+ * @brief Simple class to exercise flux package.
  *
+ * @author J. Chiang
+ *
+ * $Header$
  */
 
 class GaussianSource : public Spectrum {
@@ -63,8 +66,8 @@ private:
    double m_emin;
    double m_emax;
 
-   CLHEP::HepRotation m_rot;
-   CLHEP::Hep3Vector m_rotatedSrcVec;
+   HepRotation m_rot;
+   Hep3Vector m_rotatedSrcVec;
 
 };
 

@@ -40,7 +40,7 @@ microQuasar::microQuasar(const std::string &paramString)
 {
 	float daySecs = 86400.;
 
-//	m_burstSeed = 124556789.;  // default see for burst generation
+	m_burstSeed = 124556789.;  // default see for burst generation
 
 	float specOrbital1,specOrbital2=-1;
 	float phaseOrbital1,phaseOrbital2=-1;
@@ -93,8 +93,8 @@ microQuasar::microQuasar(const std::string &paramString)
 			m_jetProperties.setJetOnDuration(std::atof(token[1].c_str()));
 		if(token[0]=="JETONDURATIONFLUCTUATION")
 			m_jetProperties.setJetOnDurationFluct(std::atof(token[1].c_str()));
-//		if(token[0]=="BURSTRANDOMSEED")
-//			m_burstSeed = std::atof(token[1].c_str());
+		if(token[0]=="BURSTRANDOMSEED")
+			m_burstSeed = std::atof(token[1].c_str());
 		if(token[0]=="SPECFILE1") {
 			std::string sp1File = std::string("specFile="+token[1]);
             m_spectrum[0] = new FileSpectrum(sp1File);
@@ -116,7 +116,7 @@ microQuasar::microQuasar(const std::string &paramString)
 		m_orbitalRegion.setOrbitalPhase(phaseOrbital1, phaseOrbital2);
 	}
 
-//	m_randGenBurst.setTheSeed(m_burstSeed);  // uh-oh - sets the seed for everyone!
+	m_randGenBurst.setTheSeed(m_burstSeed);
 
 	double time = 0.;
 	burstPairs burstTimes;
@@ -150,7 +150,7 @@ microQuasar::microQuasar(const std::string &paramString)
 
 	m_jetStart = 0.;
 
-	std::cerr << "MicroQuasar created. Total flux = " 
+	std::cerr << "microQuasar created. Total flux = " 
 		<< m_ftot << " m^-2 s^-1 " << " between " 
 		<< m_eMin << " MeV and "
 		<< m_eMax << " MeV." << std::endl;
@@ -176,10 +176,9 @@ std::vector<std::string> microQuasar::tokenize(std::string params, char token){
 }
 
 float microQuasar::operator()(float xi) const {
-	float energy(1.);
+	float energy(0);
 	if( m_spectrum[m_region]==0){
 		if ( m_currentSpectralIndex != -999.) {
-
 			double one_m_gamma = 1. - m_currentSpectralIndex;
 			double arg = xi*(pow(m_eMax, one_m_gamma) - pow(m_eMin, one_m_gamma)) 
 				+ pow(m_eMin, one_m_gamma);
@@ -196,7 +195,7 @@ double microQuasar::energy(double time) {
 
 	m_region = m_orbitalRegion.findRegion(time,m_orbitalPeriod);
 	m_currentSpectralIndex = m_orbitalRegion.getSpectralIndex(m_region);
-	float xi = CLHEP::RandFlat::shoot();
+	double xi = CLHEP::RandFlat::shoot();
 	return (*this)(xi);
 }
 
@@ -271,11 +270,6 @@ double microQuasar::interval(double current_time) {
 
 	double dT = m_currentTime - fTime + deltaT;
 	//	std::cout << "input t (d) " << fTime/daySecs << " interval (sec) " << dT << std::endl;
-
-	if (dT <= 0.) {
-		std::cout << "Zero or negative interval generated! " << dT << std::endl;
-	}
-
 	return dT;
 }
 

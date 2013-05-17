@@ -15,6 +15,12 @@
 /**
  * @class SimpleTransient
  * 
+ * @brief A flaring source defined by a single interval and constant
+ * photon flux and spectral index during that interval.
+ *
+ * @author J. Chiang
+ *
+ * $Header$
  */
 
 class SimpleTransient : public Spectrum {

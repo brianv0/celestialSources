@@ -71,31 +71,20 @@ MapSource::MapSource(const std::string & paramString)
       }
    } else {
 // use the map version
-      genericSources::ConstParMap parmap(paramString);
-
-      //fitFile and flux return a runtime error if absent
+      std::map<std::string, std::string> my_parmap;
+      facilities::Util::keyValueTokenize(paramString, ", ", my_parmap);
+      
+      genericSources::ConstParMap parmap(my_parmap);
       m_flux = parmap.value("flux");
+      m_gamma = parmap.value("gamma");
       fitsFile = parmap["fitsFile"];
-
-      //gamma, emin and emax remain set to default values
-      //if absent from the XML file
-      try {
-         m_gamma = parmap.value("gamma");
-      } catch (...) {
-      }
-      try {
+      if (parmap.size() > 3) {
          m_emin = parmap.value("emin");
-      } catch (...) {
       }
-      try {
+      if (parmap.size() > 4) {
          m_emax = parmap.value("emax");
-      } catch (...) {
       }
-      //these 4 should be all absent or all present. Code is incorrect as is
-      if (parmap.find("lonMin") != parmap.end() ||
-          parmap.find("lonMax") != parmap.end() ||
-	  parmap.find("latMin") != parmap.end() ||
-          parmap.find("latMax") != parmap.end()) {
+      if (parmap.size() > 5) {
          try {
             m_lonMin = parmap.value("lonMin");
             m_lonMax = parmap.value("lonMax");
@@ -109,16 +98,6 @@ MapSource::MapSource(const std::string & paramString)
          }
       }
    }
-
-//    std::cout << m_gamma << " " 
-//              << m_emin << " " 
-//              << m_emax << " " 
-//              << m_lonMin << " "
-//              << m_lonMax << " "
-//              << m_latMin << " "
-//              << m_latMax 
-//              << std::endl;
-
    readFitsFile(fitsFile, createSubMap);
    makeIntegralDistribution(m_image);
 
@@ -145,26 +124,27 @@ double MapSource::solidAngle() const {
 
 double MapSource::interval(double time) {
    double rate = flux(time)*EventSource::totalArea();
-   double xi = CLHEP::RandFlat::shoot();
+   double xi = RandFlat::shoot();
    return -log(1. - xi)/rate;
 }
 
 double MapSource::energy(double time) {
    (void)(time);
-   double xi = CLHEP::RandFlat::shoot();
+   double xi = RandFlat::shoot();
    return (*this)(xi);
 }
 
 std::pair<double, double> MapSource::dir(double energy) {
    (void)(energy);
 
-   double xi = CLHEP::RandFlat::shoot();
+   double xi = RandFlat::shoot();
    std::vector<double>::const_iterator it 
       = std::upper_bound(m_integralDist.begin(), m_integralDist.end(), xi);
    unsigned int indx = it - m_integralDist.begin();
 
    double lon, lat;
    samplePixel(indx, lon, lat);
+
    if (m_axisTypes[0].find_first_of("R") == 0) {
 // We have Equatorial coordinates.
       astro::SkyDir myDir(lon, lat);
@@ -181,7 +161,7 @@ samplePixel(unsigned int indx, double &lon, double &lat) const {
    unsigned int j = indx/m_lon.size();
 
 // Sample uniformly in longitude
-   double xi = CLHEP::RandFlat::shoot();
+   double xi = RandFlat::shoot();
    double lon_step;
    if (i == m_lon.size()-1) {
       lon_step = m_lon.at(i) - m_lon.at(i-1);
@@ -189,10 +169,10 @@ samplePixel(unsigned int indx, double &lon, double &lat) const {
       lon_step = m_lon.at(i+1) - m_lon.at(i);
    }
 
-   lon = (xi-0.5)*lon_step + m_lon.at(i);
+   lon = xi*lon_step + m_lon.at(i);
 
 // Sample as cos(lat) in latitude
-   xi = CLHEP::RandFlat::shoot();
+   xi = RandFlat::shoot();
    double lat_step;
    if (j == m_lat.size()-1) {
       lat_step = m_lat.at(j) - m_lat.at(j-1);
@@ -222,7 +202,7 @@ void MapSource::readFitsFile(std::string fitsFile, bool createSubMap) {
       fitsImage = genericSources::FitsImage::
          sampledImage(fitsImage, m_lon, m_lat, fitsImage.coordSys());
 
-      // rescale the flux by the sub-map integral
+// rescale the flux by the sub-map integral
       double new_integral = fitsImage.mapIntegral();
       m_flux *= new_integral/m_mapIntegral;
       m_mapIntegral = new_integral;
@@ -243,48 +223,11 @@ void MapSource::getSubMapAxes(const genericSources::FitsImage & fitsImage) {
    fitsImage.getAxisVector(0, axis);
    double dx = std::fabs(axis.at(1) - axis.at(0));
    m_lon.clear();
-
-   double img_lonMin = axis.at(0)-0.5*dx;
-   double img_lonMax = axis.at(axis.size()-1)+0.5*dx;
-   //The longitude can go in decreasing steps 
-   //(ascending from 0 to 180 to the left, -180 to 0 to the right)
-   if(img_lonMin>img_lonMax){
-     double temp=img_lonMax;
-     img_lonMax=img_lonMin;
-     img_lonMin=temp;
+   for (size_t i = 0; i < axis.size(); i++) {
+      if (m_lonMin - dx < axis.at(i) && axis.at(i) < m_lonMax + dx) {
+         m_lon.push_back(axis.at(i));
+      }
    }
-
-   //standard case : the subRange is included inside the map boundaries
-   if(m_lonMin>=img_lonMin && m_lonMax<=img_lonMax)
-     {
-       for (size_t i = 0; i < axis.size(); i++) {
-	 if (m_lonMin - dx < axis.at(i) && axis.at(i) < m_lonMax + dx) {
-	   m_lon.push_back(axis.at(i));
-	 }
-       }
-     } else {
-       // non standard case : we need to wrap the longitude  boundaries
-       double wrapped_lonMin = m_lonMin;
-       double wrapped_lonMax = m_lonMax;
-       if(m_lonMin<img_lonMin)
-	 {
-	   //this is the case where the map is [-180,180] or [0,360] and the request
-	   //is [-190,-170] or [-10,10] respectively
-	   wrapped_lonMin = 360. + m_lonMin;
-	 }
-       if(m_lonMax>img_lonMax)
-	 {
-	   //this is the case where the map is [-180,180] or [0,360] and the request
-	   //is [170,-190] or [350,370] respectively
-	   wrapped_lonMax=m_lonMax-360.;
-	 }
-       for (size_t i = 0; i < axis.size(); i++) {
-	 if (wrapped_lonMin - dx < axis.at(i) || axis.at(i) < wrapped_lonMax + dx) {
-	   m_lon.push_back(axis.at(i));
-	 }
-       }
-     }
-   
    fitsImage.getAxisVector(1, axis);
    dx = std::fabs(axis.at(1) - axis.at(0));
    m_lat.clear();

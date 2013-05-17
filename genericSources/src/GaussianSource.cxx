@@ -6,8 +6,6 @@
  * $Header$
  */
 
-#include <cstdlib>
-
 #include "CLHEP/Random/RandomEngine.h"
 #include "CLHEP/Random/JamesRandom.h"
 #include "CLHEP/Random/RandFlat.h"
@@ -51,7 +49,7 @@ GaussianSource::GaussianSource(const std::string &paramString)
    m_posAngle *= M_PI/180.;
 
 // Rotation to align source direction with z-axis.
-   m_rot = CLHEP::HepRotation().rotateZ(-ra*M_PI/180.).rotateY((dec - 90.)*M_PI/180.);
+   m_rot = HepRotation().rotateZ(-ra*M_PI/180.).rotateY((dec - 90.)*M_PI/180.);
 
 // Perform the rotation.
    m_rotatedSrcVec = m_rot*srcDir.dir().unit();
@@ -76,27 +74,31 @@ double GaussianSource::solidAngle() const {
 
 double GaussianSource::interval(double time) {
    double rate = flux(time)*EventSource::totalArea();
-   double xi = CLHEP::RandFlat::shoot();
+   double xi = RandFlat::shoot();
    return -log(1. - xi)/rate;
 }
 
 double GaussianSource::energy(double time) {
    (void)(time);
-   double xi = CLHEP::RandFlat::shoot();
+   double xi = RandFlat::shoot();
    return (*this)(xi);
 }
 
 std::pair<double, double> GaussianSource::dir(double energy) {
    (void)(energy);
 
-   double x = m_major*CLHEP::RandGauss::shoot();
-   double y = m_minor*CLHEP::RandGauss::shoot();
+   double psi = RandFlat::shoot()*2.*M_PI;
 
-   double theta = sqrt(x*x + y*y);
+   double x = m_major*cos(psi);
+   double y = m_minor*sin(psi);
+
+   double sigma = sqrt(x*x + y*y);
    double phi = atan2(y, x);
 
-   CLHEP::Hep3Vector appDir 
-      = CLHEP::HepRotation().rotateY(theta).rotateZ(phi+m_posAngle)*m_rotatedSrcVec;
+   double theta = RandGauss::shoot()*sigma;
+
+   Hep3Vector appDir 
+      = HepRotation().rotateY(theta).rotateZ(phi+m_posAngle)*m_rotatedSrcVec;
 
    astro::SkyDir myDir(m_rot.inverse()*appDir);
    

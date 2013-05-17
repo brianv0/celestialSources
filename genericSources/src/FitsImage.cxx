@@ -239,9 +239,9 @@ void FitsImage::read_fits_image(std::string & filename,
       axes[i].step = value;
 
 // reference pixels
-      fits_read_key_dbl(fptr, crpix[i], &value, comment, &status);
+      fits_read_key_lng(fptr, crpix[i], &ivalue, comment, &status);
       fitsReportError(status);
-      axes[i].refPixel = value;
+      axes[i].refPixel = ivalue;
 
 // axis types and commentary
       fits_read_key_str(fptr, ctype[i], svalue, comment, &status);

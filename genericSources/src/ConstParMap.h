@@ -9,11 +9,6 @@
 #ifndef genericSources_ConstParMap_h
 #define genericSources_ConstParMap_h
 
-#include <map>
-#include <stdexcept>
-
-#include "facilities/Util.h"
-
 namespace genericSources {
 
 class ConstParMap {
@@ -22,10 +17,6 @@ public:
 
    ConstParMap(const std::map<std::string, std::string> & parmap) 
       : m_parmap(parmap) {}
-
-   ConstParMap(const std::string & params) {
-      facilities::Util::keyValueTokenize(params, ", ", m_parmap);
-   }
 
    const std::string & operator[](const std::string & name) const {
       std::map<std::string, std::string>::const_iterator item 
@@ -42,15 +33,6 @@ public:
 
    size_t size() const {
       return m_parmap.size();
-   }
-
-   std::map<std::string, std::string>::const_iterator 
-   find(const std::string & parname) {
-      return m_parmap.find(parname);
-   }
-
-   std::map<std::string, std::string>::const_iterator end() {
-      return m_parmap.end();
    }
 
 private:

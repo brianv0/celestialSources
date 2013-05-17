@@ -62,7 +62,10 @@ MapCube::MapCube(const std::string & paramString) : MapSource() {
          }
       }
    } else {
-      genericSources::ConstParMap parmap(paramString);
+      std::map<std::string, std::string> params;
+      facilities::Util::keyValueTokenize(paramString, ", ", params);
+      
+      genericSources::ConstParMap parmap(params);
       
       m_flux = parmap.value("flux");
       fitsFile = parmap["fitsFile"];
@@ -84,7 +87,7 @@ MapCube::MapCube(const std::string & paramString) : MapSource() {
    facilities::Util::expandEnvVar(&fitsFile);
 
    readFitsFile(fitsFile, createSubMap);
-   checkForNonPositivePixels(fitsFile);
+   checkForNonPositivePixels();
    readEnergyVector(fitsFile);
    makeCumulativeSpectra();
    std::vector<double> totalCounts(m_solidAngles.size());
@@ -97,15 +100,12 @@ MapCube::MapCube(const std::string & paramString) : MapSource() {
 //              << m_mapIntegral << std::endl;
 }
 
-void MapCube::checkForNonPositivePixels(const std::string & fitsFile) const {
+void MapCube::checkForNonPositivePixels() const {
    std::vector<double>::const_iterator pixel = m_image.begin();
    for ( ; pixel != m_image.end(); ++pixel) {
       if (*pixel <= 0) {
-         std::ostringstream message;
-         message << "MapCube: There are negative or zero-valued"
-                 << " pixels in the FITS image read from" 
-                 << fitsFile;
-         throw std::runtime_error(message.str());
+         throw std::runtime_error("MapCube: There are negative or zero-valued"
+                                  + std::string(" pixels in the FITS image."));
       }
    }
 }
@@ -130,7 +130,7 @@ float MapCube::operator()(float xi) const {
 
 double MapCube::energy(double time) {
    (void)(time);
-   double xi = CLHEP::RandFlat::shoot();
+   double xi = RandFlat::shoot();
    return (*this)(xi);
 }
 
@@ -167,7 +167,7 @@ void MapCube::makeCumulativeSpectra() {
 
    for (unsigned int j = 0; j < m_lat.size(); j++) {
       for (unsigned int i = 0; i < m_lon.size(); i++) {
-         Spectrum_t counts_spectrum;
+         std::vector<std::pair<double, double> > counts_spectrum;
          counts_spectrum.reserve(m_energies.size());
          counts_spectrum.push_back(std::make_pair(0, -2));
          for (unsigned int k = 1; k < m_energies.size(); k++) {
@@ -198,9 +198,9 @@ double MapCube::powerLawIntegral(double x1, double x2,
 }
 
 double MapCube::
-drawEnergy(const Spectrum_t & spectrum) const {
-   double xi = CLHEP::RandFlat::shoot()*spectrum.back().first;
-   Spectrum_t::const_iterator it 
+drawEnergy(const std::vector<std::pair<double, double> > & spectrum) const {
+   double xi = RandFlat::shoot()*spectrum.back().first;
+   std::vector<std::pair<double, double> >::const_iterator it 
       = std::upper_bound(spectrum.begin(), spectrum.end(),
                          std::make_pair(xi, 0), cmpPair);
    int indx = it - spectrum.begin() - 1;
@@ -213,7 +213,8 @@ drawEnergy(const Spectrum_t & spectrum) const {
    return value;
 }
 
-bool MapCube::cmpPair(const SpectralPoint_t & x, 
-                      const SpectralPoint_t & y) {
+bool MapCube::cmpPair(const std::pair<double, double> & x, 
+                      const std::pair<double, double> & y) {
    return x.first < y.first;
 }
+
