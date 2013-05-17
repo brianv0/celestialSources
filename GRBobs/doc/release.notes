@@ -6,6 +6,7 @@
   $Id$ 
   * EOH *
 
+ GRBobs-03-04-02 17-May-2013 glastrm Added code to override the default handling of assertion dialogs and make them more friendly to the Release Manager
  GRBobs-03-04-01 11-Nov-2012 jchiang test program fix
  GRBobs-03-04-00 17-Aug-2012    jrb for Windows no-install-headers
  GRBobs-03-03-06 03-Oct-2011 jchiang gcc4.4.3/Ubuntu compatibility

@@ -6,6 +6,7 @@
   $Id$
   * EOH *
 
+ GRBtemplate-01-04-01 17-May-2013 glastrm Added code to override the default handling of assertion dialogs and make them more friendly to the Release Manager
  GRBtemplate-01-04-00 17-Aug-2012    jrb for Windows no-install-headers
  GRBtemplate-01-03-06 07-Jul-2011 jchiang uncomment #include <cstdlib> in GRBtemplateManager.cxx for gcc4.4 builds
  GRBtemplate-01-03-05 20-May-2011    hmk CLHEP 2.1.0.1
