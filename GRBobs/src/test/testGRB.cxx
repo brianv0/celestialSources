@@ -13,6 +13,10 @@
 #include "TTree.h"
 #include "TFile.h"
 
+#ifdef WIN32
+#include "facilities/AssertDialogOverride.h"
+#endif
+
 ISpectrumFactory & GRBobsmanagerFactory();
 
 static int default_count = 10 ;
@@ -122,6 +126,13 @@ void galacticTest(FluxMgr* fm, std::string sourceName, double tstart=0, double t
 }
 
 int main(int argn, char * argc[]) {
+#ifdef _DEBUG
+   _CrtSetReportHook( AssertDialogOverride );
+   _CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_FILE);
+   _CrtSetReportMode(_CRT_ERROR, _CRTDBG_MODE_FILE);
+   _CrtSetReportMode(_CRT_ASSERT, _CRTDBG_MODE_FILE);
+#endif
+
   using std::cout;
   using std::endl;
   flux_load();
