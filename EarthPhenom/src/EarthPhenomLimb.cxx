@@ -82,7 +82,7 @@ void EarthPhenomLimb::init(double normalization, double emin, double emax) {
   m_zenithmin=180.-70.; // (deg)
   m_zenithmax=180.-50.; // (deg)
   m_zenith_peak = 180.-6.795e+01; // (deg) Converting from Earth nadir angle to Earth zenith angle 
-  m_zenith_width = 3.609e-01; // (deg)
+  m_zenith_width = 3.184e-01; // (deg) Deconvolve using a 68% containment radius of 0.17 deg
   
   m_zenith_energy_slope_prefactor = 5.401e-04;
   m_zenith_energy_slope_index = 9.272e-01;
@@ -290,7 +290,7 @@ void EarthPhenomLimb::calculate(double &zenith, double &azimuth, double &energy)
   int log10_energy_index=static_cast<int> ((((log10(temp_energy)-log10(m_emin))/(log10(m_emax)-log10(m_emin)))*cdf_energy_slices)+0.5);
 
   temp_zenith=m_zenith_inverse_cdf[log10_energy_index].Eval(r_zenith);
-  temp_azimuth=m_azimuth_inverse_cdf[log10_energy_index].Eval(r_azimuth);
+  temp_azimuth=360.-m_azimuth_inverse_cdf[log10_energy_index].Eval(r_azimuth); // Update Earth azimuth convention
 
   // Invert photon directions (i.e. turn the Earth inside out for simulating back-entering events)
   if(m_invert_direction){
