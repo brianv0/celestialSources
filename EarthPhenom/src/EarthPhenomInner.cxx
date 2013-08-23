@@ -48,7 +48,7 @@ EarthPhenomInner::EarthPhenomInner(const std::string &paramString)
 
   init(m_normalization, m_emin, m_emax);
 
-  std::cerr << "EarthPhenomInner created. Normalization = "
+  std::cerr << "EarthPhenomInner (updated August 2013) created. Normalization = "
 	    << m_normalization << " . Total flux = "
 	    << m_integral_flux << " m^-2 s^-1" << " between "
 	    << m_emin << " MeV and "
@@ -97,11 +97,10 @@ void EarthPhenomInner::init(double normalization, double emin, double emax) {
 
   // Azimuth angle component
   // Looking towards the Earth
-  // Simulation coordinate system: Azimuth = 0 deg -> east; azimuth = 90 deg -> north (right-handed)
   // LAT analysis coordinate system: Azimuth = 0 deg -> north; azimuth = 90 deg -> east (left-handed)
   m_azimuthmin = 0.; // (deg)
   m_azimuthmax = 360.; // (deg)
-  m_azimuthal_logsine_phase = 90.-176.5; // (deg) Converting from LAT analysis to simulation coordinate system
+  m_azimuthal_logsine_phase = 176.5; // (deg) Converting from LAT analysis to simulation coordinate system
 
   //m_azimuthal_energy_logsine_pol0 = 2.724e-01;
   //m_azimuthal_energy_logsine_pol1 = -2.373e-01;
@@ -162,8 +161,7 @@ void EarthPhenomInner::init(double normalization, double emin, double emax) {
 
   // Variable is azimuth angle (deg)
   // Parameter 1 is energy-dependent
-  // The "-" sign in front of azimuth angle converts from LAT analysis to simulation coordinate system
-  TString azimuthalFormula = "exp([1]*sin(TMath::Pi()*(-x-[0])/180))";
+  TString azimuthalFormula = "exp([1]*sin(TMath::Pi()*(x-[0])/180))";
   m_fAzimuth = TF1("fAzimuth", azimuthalFormula.Data(), m_azimuthmin, m_azimuthmax);
   m_fAzimuth.SetParameter(0,m_azimuthal_logsine_phase);
 
@@ -258,7 +256,7 @@ void EarthPhenomInner::calculate(double &zenith, double &azimuth, double &energy
   int log10_energy_index=static_cast<int> ((((log10(temp_energy)-log10(m_emin))/(log10(m_emax)-log10(m_emin)))*cdf_energy_slices)+0.5);
 
   temp_zenith=m_zenith_inverse_cdf[log10_energy_index].Eval(r_zenith);
-  temp_azimuth=360.-m_azimuth_inverse_cdf[log10_energy_index].Eval(r_azimuth); // Update Earth azimuth convention
+  temp_azimuth=m_azimuth_inverse_cdf[log10_energy_index].Eval(r_azimuth);
 
   // Invert photon directions (i.e. turn the Earth inside out for simulating back-entering events)
   if(m_invert_direction){
@@ -291,7 +289,7 @@ std::pair<double, double> EarthPhenomInner::dir(double energy) {
   m_energy_called = false;
 
   // Using zenith-local coordinates (cos(zenith), azimuth)
-  // Azimuth is 0 in the east and 90 deg in the north when looking at the Earth
+  // Azimuth is 0 in the north and 90 deg in the east when looking at the Earth
   return std::make_pair(cos(M_PI*m_zenith/180.), M_PI*m_azimuth/180.); // Convert from degrees to radians
 }
 
@@ -299,7 +297,7 @@ std::pair<double, std::pair<double, double> > EarthPhenomInner::photon(){
   calculate(m_zenith,m_azimuth,m_energy);
 
   // Using zenith-local coordinates (cos(zenith), azimuth)
-  // Azimuth is 0 in the east and 90 deg in the north when looking at the Earth
+  // Azimuth is 0 in the north and 90 deg in the east when looking at the Earth
   std::pair<double, double> direction = std::make_pair(cos(M_PI*m_zenith/180.), M_PI*m_azimuth/180.); // Convert from degrees to radians
   return std::make_pair(m_energy, direction); // Energy (MeV) 
 }
