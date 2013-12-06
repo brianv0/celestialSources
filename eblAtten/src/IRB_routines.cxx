@@ -30,7 +30,9 @@
 #include <fstream>
 #include <iostream>
 
+#include "facilities/commonUtilities.h"
 
+#include "AsciiTableModel.h"
 #include "Primack05.h"
 
 using namespace std;
@@ -49,7 +51,27 @@ float calcFinke(float energy, float redshift);
 float calcGilmore(float energy, float redshift);
 float calcSalamonStecker(float energy, float redshift);
 float calcGeneric (float energy, float redshift);
+float calcGilmore12_fixed(float energy, float redshift);
+float calcGilmore12_fiducial(float energy, float redshift);
 
+float calcGilmore12_fixed(float energy, float redshift) {
+   static std::string datadir(facilities::commonUtilities::getDataPath("eblAtten"));
+   static std::string od_file = 
+      facilities::commonUtilities::joinPath(datadir, "opdep_fixed_Gilmore2012.dat");
+
+   static AsciiTableModel gilmore_fixed(od_file);
+   /// The Gilmore et al 2012 tables use MeV, so convert back from GeV.
+   return gilmore_fixed.value(energy*1e3, redshift);
+}
+
+float calcGilmore12_fiducial(float energy, float redshift) {
+   static std::string datadir(facilities::commonUtilities::getDataPath("eblAtten"));
+   static std::string od_file = 
+      facilities::commonUtilities::joinPath(datadir, "opdep_fiducial_Gilmore2012.dat");
+   static AsciiTableModel gilmore_fiducial(od_file);
+   /// The Gilmore et al 2012 tables use MeV, so convert back from GeV.
+   return gilmore_fiducial.value(energy*1e3, redshift);
+}
 
 float calcGeneric (float energy, float redshift){
 

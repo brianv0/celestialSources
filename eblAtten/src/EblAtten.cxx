@@ -26,6 +26,8 @@ float calcGilmore(float energy, float redshift);
 float calcStecker05_FE(float energy, float redshift);
 float calcSalamonStecker(float energy, float redshift);
 float calcGeneric(float energy, float redshift);
+float calcGilmore12_fixed(float energy, float redshift);
+float calcGilmore12_fiducial(float energy, float redshift);
 
 EblAtten::EblAtten(EblModel model) : m_model(model) {
    if (s_model_Ids.size() == 0) {
@@ -39,7 +41,9 @@ EblAtten::EblAtten(EblModel model) : m_model(model) {
       s_model_Ids[Stecker05_FE] = "Stecker et al (2006) - Fast Evolution";
       s_model_Ids[SalamonStecker] = "Salamon & Stecker (1998) - with metallicity correction";
       s_model_Ids[Generic] = "Generic representation of tau(E,z) from Justin Finke"; 	  
-      }
+      s_model_Ids[Gilmore12_fixed] = "Gilmore et al (2012) - WMAP5+Fixed";
+      s_model_Ids[Gilmore12_fiducial] = "Gilmore et al (2012) - Evolving Dust";
+   }
    if (s_model_Ids.find(model) == s_model_Ids.end()) {
       std::ostringstream message;
       message << "Invalid model ID: " << model << "\n"
@@ -76,6 +80,10 @@ float EblAtten::operator()(float energy, float redshift) const {
       return calcSalamonStecker(energy, redshift);
    case Generic:
       return calcGeneric(energy, redshift);
+   case Gilmore12_fixed:
+      return calcGilmore12_fixed(energy, redshift);
+   case Gilmore12_fiducial:
+      return calcGilmore12_fiducial(energy, redshift);
    }
    return 0;
 }
