@@ -38,23 +38,29 @@ int main() {
 
    double estep(std::log(emax/emin)/float(npts));
 
-   for (int j = 0; j < 5; j++)
+
+   std::cout << "Energy (GeV)  Tau  KneiskeBF  Primack05  KneiskeUV  "
+             << "Stecker05  Finke  Franceschini  Gilmore  Stecker05_FE  "
+             << "Salamon&Stecker98  Generic  Gilmore12_fixed  "
+             << "Gilmore12_fiducial\n";
+   for (int j = 0; j < 5; j++) {
       for (int i = 0; i < npts; i++) {
          double energy(emin*std::exp(i*estep));
-         std::cout << energy/1e3 << " GeV   "<< "  "
-                   << "redshift = "<< z[j] << "   Tau = "
-                   << tau0(energy, z[j]) << " Kneiske BF |  "
-                   << tau1(energy, z[j]) << " Primack 05 | "
-                   << tau2(energy, z[j]) << " Kneiske UV |  "
-                   << tau3(energy, z[j]) << " Stecker 05 |  "
-                   << tau4(energy, z[j]) << " Finke  |  "
-                   << tau5(energy, z[j]) << " Franceschini  | "
-                   << tau6(energy, z[j]) << " Gilmore  |" 
-                   << tau7(energy, z[j]) << " Stecker05 - FE |"
-                   << tau8(energy, z[j]) << " Salamon & Stecker 98  |"
-                   << tau9(energy, z[j]) << " Generic | " 
-                   << tau10(energy, z[j]) << " Gilmore 12 fixed | " 
-                   << tau11(energy, z[j]) << " Gilmore 12 fiducial" 
+         std::cout << energy/1e3 << "  "
+                   << z[j] << "  "
+                   << tau0(energy, z[j]) << "  "
+                   << tau1(energy, z[j]) << "  "
+                   << tau2(energy, z[j]) << "  "
+                   << tau3(energy, z[j]) << "  "
+                   << tau4(energy, z[j]) << "  "
+                   << tau5(energy, z[j]) << "  "
+                   << tau6(energy, z[j]) << "  " 
+                   << tau7(energy, z[j]) << "  "
+                   << tau8(energy, z[j]) << "  "
+                   << tau9(energy, z[j]) << "  " 
+                   << tau10(energy, z[j]) << "  " 
+                   << tau11(energy, z[j]) << "  "
                    << std::endl;
+      }
    }
 }

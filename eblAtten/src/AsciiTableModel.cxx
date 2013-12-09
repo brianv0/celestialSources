@@ -26,6 +26,9 @@ AsciiTableModel::AsciiTableModel(const std::string & infile)
 }
 
 float AsciiTableModel::value(float energy, float redshift) const {
+   if (redshift < m_redshifts.front()) {
+      return 0;
+   }
    size_t e_index = std::lower_bound(m_energies.begin(), m_energies.end(),
                                      energy) - m_energies.begin();
    if (e_index < 0 || e_index > m_energies.size() + 2) {
