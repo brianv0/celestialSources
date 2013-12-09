@@ -6,6 +6,7 @@
   $Id$
   * EOH *
 
+ eblAtten-00-10-01 09-Dec-2013 jchiang in AsciiTableModel, handle redshifts below lower bound of redshift array by setting to zero to avoid extrapolation to negative values
  eblAtten-00-10-00 06-Dec-2013 jchiang add AsciiTableModel class and Gilmore et al. 2012 EBL models
  eblAtten-00-09-00 17-Aug-2012    jrb for Windows no-install-headers
  eblAtten-00-08-01 22-Feb-2010    jrb correct use of xxLib for libEnv
