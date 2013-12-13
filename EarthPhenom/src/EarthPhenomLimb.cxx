@@ -44,7 +44,7 @@ EarthPhenomLimb::EarthPhenomLimb(const std::string &paramString)
 
   init(m_normalization, m_emin, m_emax);
 
-  std::cerr << "EarthPhenomLimb (updated August 2013) created. Normalization = "
+  std::cerr << "EarthPhenomLimb (updated December 2013) created. Normalization = "
 	    << m_normalization << " . Total flux = "
 	    << m_integral_flux << " m^-2 s^-1" << " between "
 	    << m_emin << " MeV and "
@@ -76,23 +76,28 @@ void EarthPhenomLimb::init(double normalization, double emin, double emax) {
   m_spectral_index2 = -2.790;
   m_spectral_ebreak = 3.703e+02; // (MeV)
   m_spectral_beta = 7.276e-01;
-
+  
   // Zenith angle component
   // Zenith = 0 deg -> away from Earth center; zenith = 180 deg -> towards Earth center
-  m_zenithmin=180.-70.; // (deg)
-  m_zenithmax=180.-50.; // (deg)
-  m_zenith_peak = 180.-6.795e+01; // (deg) Converting from Earth nadir angle to Earth zenith angle 
-  m_zenith_width = 3.184e-01; // (deg) Deconvolve using a 68% containment radius of 0.17 deg
-  
-  m_zenith_energy_slope_prefactor = 5.401e-04;
-  m_zenith_energy_slope_index = 9.272e-01;
-  m_zenith_energy_slope_mu = 1.000e+03; // (MeV)
-  m_zenith_energy_slope_tau = 4.401e+03; // (MeV)
+  m_zenithmin = 180.-70.;
+  m_zenithmax = 180.-50.;
+  m_zenith_peak = 180.-68.03;
+  m_zenith_width = 3.159e-01;
 
-  m_zenith_energy_curve_tanh_prefactor = -3.839e+00;
-  m_zenith_energy_curve_tanh_cross = 4.000e+00; // log10(MeV)
-  m_zenith_energy_curve_tanh_width = 1.399e-01; // (dex)
-  m_zenith_energy_curve_pol_4 = 3.867e-04;
+  m_zenith_energy_slope_refenergy=3.800e+00;
+  m_zenith_energy_slope_prefactor=8.821e-03;
+  m_zenith_energy_slope_exp_index=7.966e-01;
+  m_zenith_energy_slope_lin_corr=-3.625e-01;
+
+  m_zenith_energy_curve_refenergy=3.800e+00;
+  m_zenith_energy_curve_crossenergy=2.500e+00;
+  m_zenith_energy_curve_le_prefactor=1.333e-01;
+  m_zenith_energy_curve_le_index1=2.361e+00;
+  m_zenith_energy_curve_le_index2=7.923e-01;
+  m_zenith_energy_curve_he_prefactor=1.256e-03;
+  m_zenith_energy_curve_he_index1=-1.057e+00;
+  m_zenith_energy_curve_he_index2=-3.632e+00;
+  m_zenith_energy_curve_crosswidth=4.785e-02;
 
   // Azimuth angle component
   // Looking towards the Earth
@@ -132,29 +137,34 @@ void EarthPhenomLimb::init(double normalization, double emin, double emax) {
   m_fSpectral.SetParameter(2,m_spectral_index2);
   m_fSpectral.SetParameter(3,m_spectral_ebreak);
   m_fSpectral.SetParameter(4,m_spectral_beta);
-
+  
   // Variable is energy (MeV, log10-space)
   // Energy-dependent variation in inner Earth logarithmic slope
-  TString zenithSlopeFormula = "[0]*(10^x)^[1]*exp(-1*(10^x-[2])/[3])";
+  TString zenithSlopeFormula = "[1]*(10^(x-1))^[2]*(1+(x>[0])*[3]*(x-[0]))";
   m_fZenithSlope = TF1("fZenithSlope", zenithSlopeFormula.Data(), log10(m_emin), log10(m_emax));
-  m_fZenithSlope.SetParameter(0,m_zenith_energy_slope_prefactor);
-  m_fZenithSlope.SetParameter(1,m_zenith_energy_slope_index);
-  m_fZenithSlope.SetParameter(2,m_zenith_energy_slope_mu);
-  m_fZenithSlope.SetParameter(3,m_zenith_energy_slope_tau);
+  m_fZenithSlope.SetParameter(0,m_zenith_energy_slope_refenergy);
+  m_fZenithSlope.SetParameter(1,m_zenith_energy_slope_prefactor);
+  m_fZenithSlope.SetParameter(2,m_zenith_energy_slope_exp_index);
+  m_fZenithSlope.SetParameter(3,m_zenith_energy_slope_lin_corr);
 
   // Variable is energy (MeV, log10-space)
   // Energy-dependent variation in inner Earth logarithmic curve
-  TString zenithCurveFormula = "0.5*[0]*(1+TMath::TanH((x-[1])/[2]))+(x<4)*([3]*(x-1)^4)";
+  TString zenithCurveFormula = "(x<[0])*(0.5*(1+TMath::TanH((x-[1])/[8]))*[2]*10^([3]*(x-[0])+[4]*(x-[0])^2)+0.5*(1-TMath::TanH((x-[1])/[8]))*[5]*10^([6]*(x-[1])+[7]*(x-[1])^2))";
   m_fZenithCurve = TF1("fZenithCurve", zenithCurveFormula.Data(), log10(m_emin), log10(m_emax));
-  m_fZenithCurve.SetParameter(0,m_zenith_energy_curve_tanh_prefactor);
-  m_fZenithCurve.SetParameter(1,m_zenith_energy_curve_tanh_cross);
-  m_fZenithCurve.SetParameter(2,m_zenith_energy_curve_tanh_width);
-  m_fZenithCurve.SetParameter(3,m_zenith_energy_curve_pol_4);
-  
+  m_fZenithCurve.SetParameter(0,m_zenith_energy_curve_refenergy);
+  m_fZenithCurve.SetParameter(1,m_zenith_energy_curve_crossenergy);
+  m_fZenithCurve.SetParameter(2,m_zenith_energy_curve_le_prefactor);
+  m_fZenithCurve.SetParameter(3,m_zenith_energy_curve_le_index1);
+  m_fZenithCurve.SetParameter(4,m_zenith_energy_curve_le_index2);
+  m_fZenithCurve.SetParameter(5,m_zenith_energy_curve_he_prefactor);
+  m_fZenithCurve.SetParameter(6,m_zenith_energy_curve_he_index1);
+  m_fZenithCurve.SetParameter(7,m_zenith_energy_curve_he_index2);
+  m_fZenithCurve.SetParameter(8,m_zenith_energy_curve_crosswidth);
+
   // Variable is zenith angle (deg)
   // Parameters 2 and 3 are energy-dependent
   // Notice that zenith angle is used instead of nadir angle (sign flip)
-  TString zenithFormula = "(x>[0])*exp([2]*([0]-x)+[3]*([0]-x)^2)+(x<=[0])*exp(-1*([0]-x)^2/(2.*[1]^2))";
+  TString zenithFormula = "(x>([0]+[1]))*exp(-0.5)/exp([2]*(-[1])+[3]*(-[1])^2)*exp(((x<[0]+0.5*[2]/[3])*([3]>0.)+([3]<=0.))*([2]*([0]-x)+[3]*([0]-x)^2)+((x>=[0]+0.5*[2]/[3])*([3]>0.))*(-0.25*[2]^2/[3]))+(x<=([0]+[1]))*exp(-1*([0]-x)^2/(2.*[1]^2))";
   m_fZenith = TF1("fZenith", zenithFormula.Data(), m_zenithmin, m_zenithmax);
   m_fZenith.SetParameter(0,m_zenith_peak);
   m_fZenith.SetParameter(1,m_zenith_width);
@@ -259,6 +269,13 @@ void EarthPhenomLimb::init(double normalization, double emin, double emax) {
     }
     normalize_cdf(m_zenith_inverse_cdf[ii]);
       
+    // Output the zenithal cumulative distribution function (debugging)
+    //for(int jj=0;jj<m_cdf_steps;jj++){
+    //  double x, y;
+    //  m_zenith_inverse_cdf[ii].GetPoint(jj, x, y);
+    //  std::cerr << log10_energy << " " << x << " " << y << std::endl;
+    //}
+
     // Create azimuth inverse cumulative distribution function
     azimuth=m_azimuthmin;
     sum=0.;
