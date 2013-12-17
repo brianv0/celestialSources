@@ -85,15 +85,20 @@ private:
   double m_zenith_peak;
   double m_zenith_width;
 
+  double m_zenith_energy_slope_refenergy;
   double m_zenith_energy_slope_prefactor;
-  double m_zenith_energy_slope_index;
-  double m_zenith_energy_slope_mu;
-  double m_zenith_energy_slope_tau;
-
-  double m_zenith_energy_curve_tanh_prefactor;
-  double m_zenith_energy_curve_tanh_cross;
-  double m_zenith_energy_curve_tanh_width;
-  double m_zenith_energy_curve_pol_4;
+  double m_zenith_energy_slope_exp_index;
+  double m_zenith_energy_slope_lin_corr;
+    
+  double m_zenith_energy_curve_refenergy;
+  double m_zenith_energy_curve_crossenergy;
+  double m_zenith_energy_curve_le_prefactor;
+  double m_zenith_energy_curve_le_index1;
+  double m_zenith_energy_curve_le_index2;
+  double m_zenith_energy_curve_he_prefactor;
+  double m_zenith_energy_curve_he_index1;
+  double m_zenith_energy_curve_he_index2;
+  double m_zenith_energy_curve_crosswidth;
 
   double m_azimuthmin;
   double m_azimuthmax;

@@ -6,6 +6,11 @@
  * Coordinators: K. Bechtol
     EOH
 
+ EarthPhenom-00-02-06 17-Dec-2013 bechtol Default xml model file should use nadir coordinate system
+ EarthPhenom-00-02-05 13-Dec-2013 bechtol Implementing revised zenith profile parametrization from Luigi
+ EarthPhenom-00-02-04 22-Aug-2013 bechtol Matching azimuthal coordinates to data convention
+ EarthPhenom-00-02-03 03-Aug-2013 bechtol fixing Earth azimuth issue
+ EarthPhenom-00-02-02 03-Aug-2013 bechtol fixing Earth azimuth issue
  EarthPhenom-00-02-01 11-Nov-2012 jchiang test program fix
  EarthPhenom-00-02-00 17-Aug-2012    jrb for Windows no-install-headers
  EarthPhenom-00-01-02 20-Jul-2012 bechtol re-tagging because some files did not get tagged previously
