@@ -67,6 +67,7 @@ private:
   TF1 m_fSpectralEnergy;
   TF1 m_fZenithSlope;
   TF1 m_fZenithCurve;
+  TF1 m_fZenithBreak;
   TF1 m_fZenith;
   TF1 m_fAzimuthalLogsine;
   TF1 m_fAzimuthalNotchRatio;
@@ -85,16 +86,28 @@ private:
   double m_zenith_peak;
   double m_zenith_width;
 
-  double m_zenith_energy_slope_prefactor;
-  double m_zenith_energy_slope_index;
-  double m_zenith_energy_slope_mu;
-  double m_zenith_energy_slope_tau;
-
-  double m_zenith_energy_curve_tanh_prefactor;
-  double m_zenith_energy_curve_tanh_cross;
-  double m_zenith_energy_curve_tanh_width;
-  double m_zenith_energy_curve_pol_4;
-
+  double m_zenith_nadir_peak;
+  double m_zenith_nadir_width;
+  
+  double m_zenith_theta_energy_slope_break_energy;
+  double m_zenith_theta_energy_slope_le_prefactor;
+  double m_zenith_theta_energy_slope_le_index;
+  double m_zenith_theta_energy_slope_he_plateau_energy;
+  double m_zenith_theta_energy_slope_he_plateau_halfwidth;
+  
+  double m_zenith_theta_energy_curve_he_plateau;
+  double m_zenith_theta_energy_curve_prefactor;
+  double m_zenith_theta_energy_curve_tanh_center;
+  double m_zenith_theta_energy_curve_tanh_width;
+  double m_zenith_theta_energy_curve_index;
+  double m_zenith_theta_energy_curve_pol1;
+  double m_zenith_theta_energy_curve_pol2;
+  double m_zenith_theta_energy_curve_pol3;
+  
+  double m_zenith_theta_energy_break_prefactor;
+  double m_zenith_theta_energy_break_tanh_center;
+  double m_zenith_theta_energy_break_tanh_width;
+  
   double m_azimuthmin;
   double m_azimuthmax;
   double m_azimuthal_logsine_phase;
