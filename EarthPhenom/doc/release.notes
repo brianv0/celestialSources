@@ -6,6 +6,7 @@
  * Coordinators: K. Bechtol
     EOH
 
+ EarthPhenom-00-02-07 12-Feb-2014 bechtol Implementing revised zenith profile parametrization from Luigi (Feb 2014)
  EarthPhenom-00-02-06 17-Dec-2013 bechtol Default xml model file should use nadir coordinate system
  EarthPhenom-00-02-05 13-Dec-2013 bechtol Implementing revised zenith profile parametrization from Luigi
  EarthPhenom-00-02-04 22-Aug-2013 bechtol Matching azimuthal coordinates to data convention
