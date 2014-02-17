@@ -19,7 +19,8 @@ test_eblAttenBin = progEnv.Program('test_eblAtten', 'src/test/test.cxx')
 
 dataFiles = [os.path.join("data", x)
              for x in ('opdep_fixed_Gilmore2012.dat',
-                       'opdep_fiducial_Gilmore2012.dat')]
+                       'opdep_fiducial_Gilmore2012.dat',
+                       'opdep_INOUEetal_2013.dat')]
 
 progEnv.Tool('registerTargets', package = 'eblAtten',
              staticLibraryCxts =  [[eblAttenLib,libEnv]],

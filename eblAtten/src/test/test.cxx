@@ -29,7 +29,7 @@ int main() {
       tau2(IRB::Kneiske_HighUV), tau3(IRB::Stecker05), 
       tau4(IRB::Finke), tau5(IRB::Franceschini), tau6(IRB::Gilmore),
       tau7(IRB::Stecker05_FE), tau8(IRB::SalamonStecker), tau9(IRB::Generic),
-      tau10(IRB::Gilmore12_fixed), tau11(IRB::Gilmore12_fiducial);
+      tau10(IRB::Gilmore12_fixed), tau11(IRB::Gilmore12_fiducial), tau12(IRB::Inoue13);;
 
    double emin(1e4), emax(5e5);
    int npts(50);
@@ -42,7 +42,7 @@ int main() {
    std::cout << "Energy (GeV)  Tau  KneiskeBF  Primack05  KneiskeUV  "
              << "Stecker05  Finke  Franceschini  Gilmore  Stecker05_FE  "
              << "Salamon&Stecker98  Generic  Gilmore12_fixed  "
-             << "Gilmore12_fiducial\n";
+             << "Gilmore12_fiducial Inoue13 \n";
    for (int j = 0; j < 5; j++) {
       for (int i = 0; i < npts; i++) {
          double energy(emin*std::exp(i*estep));
@@ -60,6 +60,7 @@ int main() {
                    << tau9(energy, z[j]) << "  " 
                    << tau10(energy, z[j]) << "  " 
                    << tau11(energy, z[j]) << "  "
+                   << tau12(energy, z[j]) << "  "
                    << std::endl;
       }
    }

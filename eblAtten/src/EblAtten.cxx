@@ -28,6 +28,7 @@ float calcSalamonStecker(float energy, float redshift);
 float calcGeneric(float energy, float redshift);
 float calcGilmore12_fixed(float energy, float redshift);
 float calcGilmore12_fiducial(float energy, float redshift);
+float calcInoue13(float energy, float redshift);
 
 EblAtten::EblAtten(EblModel model) : m_model(model) {
    if (s_model_Ids.size() == 0) {
@@ -43,6 +44,7 @@ EblAtten::EblAtten(EblModel model) : m_model(model) {
       s_model_Ids[Generic] = "Generic representation of tau(E,z) from Justin Finke"; 	  
       s_model_Ids[Gilmore12_fixed] = "Gilmore et al (2012) - WMAP5+Fixed";
       s_model_Ids[Gilmore12_fiducial] = "Gilmore et al (2012) - Evolving Dust";
+      s_model_Ids[Inoue13] = "Inoue et al (2013)";
    }
    if (s_model_Ids.find(model) == s_model_Ids.end()) {
       std::ostringstream message;
@@ -84,6 +86,8 @@ float EblAtten::operator()(float energy, float redshift) const {
       return calcGilmore12_fixed(energy, redshift);
    case Gilmore12_fiducial:
       return calcGilmore12_fiducial(energy, redshift);
+   case Inoue13:
+      return calcInoue13(energy, redshift);
    }
    return 0;
 }
