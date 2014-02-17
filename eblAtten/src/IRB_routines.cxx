@@ -54,6 +54,16 @@ float calcGeneric (float energy, float redshift);
 float calcGilmore12_fixed(float energy, float redshift);
 float calcGilmore12_fiducial(float energy, float redshift);
 float calcInoue13(float energy, float redshift);
+float calcDominguez11(float energy, float redshift);
+
+float calcDominguez11(float energy, float redshift) {
+   static std::string datadir(facilities::commonUtilities::getDataPath("eblAtten"));
+   static std::string od_file =
+      facilities::commonUtilities::joinPath(datadir, "opdep_DOMINGUEZetal_2011.dat");
+   
+   static AsciiTableModel dominguez11(od_file);
+   return dominguez11.value(energy, redshift);
+}
 
 float calcInoue13(float energy, float redshift) {
    static std::string datadir(facilities::commonUtilities::getDataPath("eblAtten"));

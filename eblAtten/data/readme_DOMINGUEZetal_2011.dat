@@ -1,0 +1,9 @@
+Table by A. Dominguez for the Fermi Collaboration on Jun 13, 2012; Optical depths due to EBL absorption from the model presented by Dominguez et al. 2011
+http://adsabs.harvard.edu/abs/2011MNRAS.410.2556D
+
+Changes by Luis Reyes (lreyes04@calpoly.edu):
+
+- Set optical depth to zero if value in original table less than 1e-6 (in order to remove negative values such as -1e-34, possibly the result of interpolation by the 
+author).
+
+- Remove table rows for energies greater than 31.2 TeV
