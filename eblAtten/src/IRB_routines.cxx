@@ -55,6 +55,37 @@ float calcGilmore12_fixed(float energy, float redshift);
 float calcGilmore12_fiducial(float energy, float redshift);
 float calcInoue13(float energy, float redshift);
 float calcDominguez11(float energy, float redshift);
+float calcScully14_highOp(float energy, float redshift);
+float calcScully14_lowOp(float energy, float redshift);
+float calcKneiskeDole10(float energy, float redshift);
+
+float calcKneiskeDole10(float energy, float redshift) {
+   static std::string datadir(facilities::commonUtilities::getDataPath("eblAtten"));
+   static std::string od_file =
+      facilities::commonUtilities::joinPath(datadir, "opdep_KNEISKEandDOLE_2010.dat");
+   
+   static AsciiTableModel kneiskedole10(od_file);
+   return kneiskedole10.value(energy, redshift);
+}
+
+float calcScully14_highOp(float energy, float redshift) {
+   static std::string datadir(facilities::commonUtilities::getDataPath("eblAtten"));
+   static std::string od_file =
+      facilities::commonUtilities::joinPath(datadir, "opdep_SCULLYetal2014_highOp.dat");
+   
+   static AsciiTableModel scully14_highOp(od_file);
+   return scully14_highOp.value(energy, redshift);
+}
+
+float calcScully14_lowOp(float energy, float redshift) {
+   static std::string datadir(facilities::commonUtilities::getDataPath("eblAtten"));
+   static std::string od_file =
+      facilities::commonUtilities::joinPath(datadir, "opdep_SCULLYetal2014_lowOp.dat");
+
+   static AsciiTableModel scully14_lowOp(od_file);
+   return scully14_lowOp.value(energy, redshift);
+}
+
 
 float calcDominguez11(float energy, float redshift) {
    static std::string datadir(facilities::commonUtilities::getDataPath("eblAtten"));
@@ -939,6 +970,9 @@ double x = log10(energy*1e+09);
 if (energy <= EMIN[zindex])
    return 0.;
 
+if (redshift == 0.0)
+   return 0.;
+
 if (zindex == 0){
    tau1 = 0.;
    tau2 = coeff[1][0]*pow(x,4.)+coeff[1][1]*pow(x, 3.)+coeff[1][2]*x*x+coeff[1][3]*x+coeff[1][4];
@@ -1004,6 +1038,9 @@ double x = log10(energy*1e+09);
 
 
 if (energy <= EMIN[zindex])
+   return 0.;
+
+if (redshift == 0.0)
    return 0.;
 
 if (zindex == 0){

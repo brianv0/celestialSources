@@ -30,6 +30,9 @@ float calcGilmore12_fixed(float energy, float redshift);
 float calcGilmore12_fiducial(float energy, float redshift);
 float calcInoue13(float energy, float redshift);
 float calcDominguez11(float energy, float redshift);
+float calcScully14_highOp(float energy, float redshift);
+float calcScully14_lowOp(float energy, float redshift);
+float calcKneiskeDole10(float energy, float redshift);
 
 EblAtten::EblAtten(EblModel model) : m_model(model) {
    if (s_model_Ids.size() == 0) {
@@ -47,6 +50,9 @@ EblAtten::EblAtten(EblModel model) : m_model(model) {
       s_model_Ids[Gilmore12_fiducial] = "Gilmore et al (2012) - Evolving Dust";
       s_model_Ids[Inoue13] = "Inoue et al (2013)";
       s_model_Ids[Dominguez11] = "Dominguez et al (2011)";
+      s_model_Ids[Scully14_highOp] = "Scully et al (2014) - High Opacity";
+      s_model_Ids[Scully14_lowOp] = "Scully et al (2014) - Low Opacity";
+      s_model_Ids[KneiskeDole10] = "Kneiske & Dole (2010)";
    }
    if (s_model_Ids.find(model) == s_model_Ids.end()) {
       std::ostringstream message;
@@ -92,6 +98,12 @@ float EblAtten::operator()(float energy, float redshift) const {
       return calcInoue13(energy, redshift);
    case Dominguez11:
       return calcDominguez11(energy, redshift);
+   case Scully14_highOp:
+      return calcScully14_highOp(energy, redshift);
+   case Scully14_lowOp:
+      return calcScully14_lowOp(energy, redshift);
+   case KneiskeDole10:
+      return calcKneiskeDole10(energy, redshift);
    }
    return 0;
 }

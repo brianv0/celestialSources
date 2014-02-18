@@ -21,6 +21,9 @@ dataFiles = [os.path.join("data", x)
              for x in ('opdep_fixed_Gilmore2012.dat',
                        'opdep_fiducial_Gilmore2012.dat',
                        'opdep_DOMINGUEZetal_2011.dat',
+                       'opdep_SCULLYetal2014_highOp.dat',
+                       'opdep_SCULLYetal2014_lowOp.dat',
+                       'opdep_KNEISKEandDOLE_2010.dat',
                        'opdep_INOUEetal_2013.dat')]
 
 progEnv.Tool('registerTargets', package = 'eblAtten',

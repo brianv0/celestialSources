@@ -1,0 +1,8 @@
+EBL model by Scully, Malkan and Stecker (http://arxiv.org/abs/1401.4435)
+
+Includes upper and lower limit (68% CL) on the optical depth according to their approach. These correspond to High and Low opacity tables.
+
+Optical depth tables provided by Sean Scully (scullyst@jmu.edu). Same format as here: http://csma31.csm.jmu.edu/physics/scully/opacities.html
+but with energy range now extending up to higher values.
+
+
