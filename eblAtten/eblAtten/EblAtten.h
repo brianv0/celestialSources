@@ -27,8 +27,10 @@ namespace IRB {
 
 enum EblModel {Kneiske, Primack05, Kneiske_HighUV, Stecker05,
                Franceschini, Finke, Gilmore, Stecker05_FE,
-               SalamonStecker, Generic, Gilmore12_fixed, Gilmore12_fiducial, 
-               Inoue13, Dominguez11, Scully14_highOp, Scully14_lowOp, KneiskeDole10};
+               SalamonStecker, Generic, Dominguez11, KneiskeDole10,
+               KneiskeDole10_CMB, Gilmore09, Gilmore12_fiducial, 
+               Gilmore12_fixed, Scully14_lowOp, Scully14_highOp,
+               Inoue13};
 
 class EblAtten {
 

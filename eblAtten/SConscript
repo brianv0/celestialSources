@@ -24,6 +24,7 @@ dataFiles = [os.path.join("data", x)
                        'opdep_SCULLYetal2014_highOp.dat',
                        'opdep_SCULLYetal2014_lowOp.dat',
                        'opdep_KNEISKEandDOLE_2010.dat',
+                       'opdep_KNEISKEandDOLE_2010_noCMB.dat',
                        'opdep_INOUEetal_2013.dat')]
 
 progEnv.Tool('registerTargets', package = 'eblAtten',

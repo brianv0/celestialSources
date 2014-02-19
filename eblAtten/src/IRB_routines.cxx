@@ -58,11 +58,22 @@ float calcDominguez11(float energy, float redshift);
 float calcScully14_highOp(float energy, float redshift);
 float calcScully14_lowOp(float energy, float redshift);
 float calcKneiskeDole10(float energy, float redshift);
+float calcKneiskeDole10_CMB(float energy, float redshift);
+
+float calcKneiskeDole10_CMB(float energy, float redshift) {
+   static std::string datadir(facilities::commonUtilities::getDataPath("eblAtten"));
+   static std::string od_file =
+      facilities::commonUtilities::joinPath(datadir, "opdep_KNEISKEandDOLE_2010.dat");
+
+   static AsciiTableModel kneiskedole10_cmb(od_file); 
+   return kneiskedole10_cmb.value(energy, redshift);
+}
+
 
 float calcKneiskeDole10(float energy, float redshift) {
    static std::string datadir(facilities::commonUtilities::getDataPath("eblAtten"));
    static std::string od_file =
-      facilities::commonUtilities::joinPath(datadir, "opdep_KNEISKEandDOLE_2010.dat");
+      facilities::commonUtilities::joinPath(datadir, "opdep_KNEISKEandDOLE_2010_noCMB.dat");
    
    static AsciiTableModel kneiskedole10(od_file);
    return kneiskedole10.value(energy, redshift);

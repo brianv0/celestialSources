@@ -30,7 +30,7 @@ int main() {
       tau4(IRB::Finke), tau5(IRB::Franceschini), tau6(IRB::Gilmore),
       tau7(IRB::Stecker05_FE), tau8(IRB::SalamonStecker), tau9(IRB::Generic),
       tau10(IRB::Gilmore12_fixed), tau11(IRB::Gilmore12_fiducial), tau12(IRB::Inoue13), tau13(IRB::Dominguez11),
-      tau14(IRB::Scully14_highOp), tau15(IRB::Scully14_lowOp), tau16(IRB::KneiskeDole10);
+      tau14(IRB::Scully14_highOp), tau15(IRB::Scully14_lowOp), tau16(IRB::KneiskeDole10), tau17(IRB::KneiskeDole10_CMB);
 
    double emin(1e4), emax(5e5);
    int npts(50);
@@ -44,7 +44,7 @@ int main() {
              << "Stecker05  Finke  Franceschini  Gilmore  Stecker05_FE  "
              << "Salamon&Stecker98  Generic  Gilmore12_fixed  "
              << "Gilmore12_fiducial Inoue13 Dominguez11 "
-             << "Scully14_highOp  Scully14_lowOp KneiskeDole10\n";
+             << "Scully14_highOp  Scully14_lowOp KneiskeDole10 KneiskeDole10_CMB\n";
    for (int j = 0; j < 5; j++) {
       for (int i = 0; i < npts; i++) {
          double energy(emin*std::exp(i*estep));
@@ -67,6 +67,7 @@ int main() {
                    << tau14(energy, z[j]) << "  "
                    << tau15(energy, z[j]) << "  "
                    << tau16(energy, z[j]) << "  "
+                   << tau17(energy, z[j]) << "  "
                    << std::endl;
       }
    }
