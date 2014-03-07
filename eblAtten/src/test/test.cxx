@@ -27,10 +27,11 @@ int main() {
 
    IRB::EblAtten tau0(IRB::Kneiske), tau1(IRB::Primack05),
       tau2(IRB::Kneiske_HighUV), tau3(IRB::Stecker05), 
-      tau4(IRB::Finke), tau5(IRB::Franceschini), tau6(IRB::Gilmore),
+      tau4(IRB::Franceschini), tau5(IRB::Finke), tau6(IRB::Gilmore),
       tau7(IRB::Stecker05_FE), tau8(IRB::SalamonStecker), tau9(IRB::Generic),
-      tau10(IRB::Gilmore12_fixed), tau11(IRB::Gilmore12_fiducial), tau12(IRB::Inoue13), tau13(IRB::Dominguez11),
-      tau14(IRB::Scully14_highOp), tau15(IRB::Scully14_lowOp), tau16(IRB::KneiskeDole10), tau17(IRB::KneiskeDole10_CMB);
+      tau10(IRB::Dominguez11), tau11(IRB::KneiskeDole10), tau12(IRB::KneiskeDole10_CMB),
+      tau13(IRB::Gilmore09), tau14(IRB::Gilmore12_fiducial), tau15(IRB::Gilmore12_fixed), 
+      tau16(IRB::Scully14_lowOp), tau17(IRB::Scully14_highOp), tau18(IRB::Inoue13);
 
    double emin(1e4), emax(5e5);
    int npts(50);
@@ -68,6 +69,7 @@ int main() {
                    << tau15(energy, z[j]) << "  "
                    << tau16(energy, z[j]) << "  "
                    << tau17(energy, z[j]) << "  "
+                   << tau18(energy, z[j]) << "  "
                    << std::endl;
       }
    }

@@ -26,6 +26,7 @@ float calcGilmore(float energy, float redshift);
 float calcStecker05_FE(float energy, float redshift);
 float calcSalamonStecker(float energy, float redshift);
 float calcGeneric(float energy, float redshift);
+float calcGilmore09(float energy, float redshift);
 float calcGilmore12_fixed(float energy, float redshift);
 float calcGilmore12_fiducial(float energy, float redshift);
 float calcInoue13(float energy, float redshift);
@@ -46,7 +47,8 @@ EblAtten::EblAtten(EblModel model) : m_model(model) {
       s_model_Ids[Gilmore] = "Gilmore et al. (2008)";
       s_model_Ids[Stecker05_FE] = "Stecker et al (2006) - Fast Evolution";
       s_model_Ids[SalamonStecker] = "Salamon & Stecker (1998) - with metallicity correction";
-      s_model_Ids[Generic] = "Generic representation of tau(E,z) from Justin Finke"; 	  
+      s_model_Ids[Generic] = "Generic representation of tau(E,z) from Justin Finke";
+      s_model_Ids[Gilmore09] = "Gilmore et al (2009)";
       s_model_Ids[Gilmore12_fixed] = "Gilmore et al (2012) - WMAP5+Fixed";
       s_model_Ids[Gilmore12_fiducial] = "Gilmore et al (2012) - Evolving Dust";
       s_model_Ids[Inoue13] = "Inoue et al (2013)";
@@ -92,6 +94,8 @@ float EblAtten::operator()(float energy, float redshift) const {
       return calcSalamonStecker(energy, redshift);
    case Generic:
       return calcGeneric(energy, redshift);
+   case Gilmore09:
+      return calcGilmore09(energy, redshift);
    case Gilmore12_fixed:
       return calcGilmore12_fixed(energy, redshift);
    case Gilmore12_fiducial:
