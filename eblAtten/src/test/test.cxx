@@ -33,20 +33,21 @@ int main() {
       tau13(IRB::Gilmore09), tau14(IRB::Gilmore12_fiducial), tau15(IRB::Gilmore12_fixed), 
       tau16(IRB::Scully14_lowOp), tau17(IRB::Scully14_highOp), tau18(IRB::Inoue13);
 
-   double emin(1e4), emax(5e5);
+   double emin(1e4), emax(8e5);
    int npts(50);
 
-   double z [5] = {0., 0.5, 1., 2., 4.};
+   double z [7] = {0., 0.01, 0.1, 0.5, 1., 2., 4.};
 
    double estep(std::log(emax/emin)/float(npts));
 
 
    std::cout << "Energy (GeV)  Tau  KneiskeBF  Primack05  KneiskeUV  "
-             << "Stecker05  Finke  Franceschini  Gilmore  Stecker05_FE  "
-             << "Salamon&Stecker98  Generic  Gilmore12_fixed  "
-             << "Gilmore12_fiducial Inoue13 Dominguez11 "
-             << "Scully14_highOp  Scully14_lowOp KneiskeDole10 KneiskeDole10_CMB\n";
-   for (int j = 0; j < 5; j++) {
+             << "Stecker05  Franceschini Finke  Gilmore  Stecker05_FE  "
+             << "Salamon&Stecker98  Generic  Dominguez11  "
+             << "KneiskeDole10 KneiskeDole10_CMB Gilmore09 Gilmore12_fiducial "
+             << "Gilmore12_fixed Scully14_lowOp, Scully14_highOp Inoue13\n";
+
+   for (int j = 0; j < 7; j++) {
       for (int i = 0; i < npts; i++) {
          double energy(emin*std::exp(i*estep));
          std::cout << energy/1e3 << "  "
