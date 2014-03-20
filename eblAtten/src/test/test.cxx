@@ -33,7 +33,7 @@ int main() {
       tau13(IRB::Gilmore09), tau14(IRB::Gilmore12_fiducial), tau15(IRB::Gilmore12_fixed), 
       tau16(IRB::Scully14_lowOp), tau17(IRB::Scully14_highOp), tau18(IRB::Inoue13), tau19(IRB::HelgasonKashlinsky12);
 
-   double emin(1e2), emax(1e6);
+   double emin(1e3), emax(5e5);
    int npts(50);
 
    double z [7] = {0., 0.01, 0.1, 0.5, 1., 2., 4.};
