@@ -30,7 +30,7 @@ enum EblModel {Kneiske, Primack05, Kneiske_HighUV, Stecker05,
                SalamonStecker, Generic, Dominguez11, KneiskeDole10,
                KneiskeDole10_CMB, Gilmore09, Gilmore12_fiducial, 
                Gilmore12_fixed, Scully14_lowOp, Scully14_highOp,
-               Inoue13};
+               Inoue13, HelgasonKashlinsky12};
 
 class EblAtten {
 

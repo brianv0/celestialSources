@@ -22,7 +22,6 @@ float calcKneiske_HighUV(float energy, float redshift);
 float calcStecker05(float energy, float redshift);
 float calcFranceschini(float energy, float redshift);
 float calcFinke(float energy, float redshift);
-float calcGilmore(float energy, float redshift);
 float calcStecker05_FE(float energy, float redshift);
 float calcSalamonStecker(float energy, float redshift);
 float calcGeneric(float energy, float redshift);
@@ -35,6 +34,7 @@ float calcScully14_highOp(float energy, float redshift);
 float calcScully14_lowOp(float energy, float redshift);
 float calcKneiskeDole10(float energy, float redshift);
 float calcKneiskeDole10_CMB(float energy, float redshift);
+float calcHelgasonKashlinsky12(float energy, float redshift);
 
 EblAtten::EblAtten(EblModel model) : m_model(model) {
    if (s_model_Ids.size() == 0) {
@@ -44,7 +44,7 @@ EblAtten::EblAtten(EblModel model) : m_model(model) {
       s_model_Ids[Stecker05] = "Stecker et al (2006)";
       s_model_Ids[Franceschini] = "Franceschini (2008)";
       s_model_Ids[Finke] = "Finke et al. (2009)";
-      s_model_Ids[Gilmore] = "Gilmore et al. (2008)";
+      s_model_Ids[Gilmore] = "Deprecated (returns Gilmore09 model)";
       s_model_Ids[Stecker05_FE] = "Stecker et al (2006) - Fast Evolution";
       s_model_Ids[SalamonStecker] = "Salamon & Stecker (1998) - with metallicity correction";
       s_model_Ids[Generic] = "Generic representation of tau(E,z) from Justin Finke";
@@ -57,6 +57,7 @@ EblAtten::EblAtten(EblModel model) : m_model(model) {
       s_model_Ids[Scully14_lowOp] = "Scully et al (2014) - Low Opacity";
       s_model_Ids[KneiskeDole10] = "Kneiske & Dole (2010)";
       s_model_Ids[KneiskeDole10_CMB] = "Kneiske & Dole (2010) - with CMB";
+      s_model_Ids[HelgasonKashlinsky12] = "Helgason & Kashlinsky (2012)";
    }
    if (s_model_Ids.find(model) == s_model_Ids.end()) {
       std::ostringstream message;
@@ -87,7 +88,7 @@ float EblAtten::operator()(float energy, float redshift) const {
    case Finke:
       return calcFinke(energy, redshift);
    case Gilmore:
-      return calcGilmore(energy, redshift);
+      return calcGilmore09(energy, redshift);
    case Stecker05_FE:
       return calcStecker05_FE(energy, redshift);
    case SalamonStecker:
@@ -112,6 +113,8 @@ float EblAtten::operator()(float energy, float redshift) const {
       return calcKneiskeDole10(energy, redshift);
    case KneiskeDole10_CMB:
       return calcKneiskeDole10_CMB(energy, redshift);
+   case HelgasonKashlinsky12:
+      return calcHelgasonKashlinsky12(energy, redshift);
    }
    return 0;
 }

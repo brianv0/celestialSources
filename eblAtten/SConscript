@@ -26,7 +26,8 @@ dataFiles = [os.path.join("data", x)
                        'opdep_KNEISKEandDOLE_2010.dat',
                        'opdep_GILMOREetal_2009.dat',
                        'opdep_KNEISKEandDOLE_2010_noCMB.dat',
-                       'opdep_INOUEetal_2013.dat')]
+                       'opdep_INOUEetal_2013.dat',
+                       'opdep_HELGASONandKASHLINSKY_2012.dat')]
 
 progEnv.Tool('registerTargets', package = 'eblAtten',
              staticLibraryCxts =  [[eblAttenLib,libEnv]],
