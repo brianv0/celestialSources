@@ -26,18 +26,22 @@ AsciiTableModel::AsciiTableModel(const std::string & infile)
 }
 
 float AsciiTableModel::value(float energy, float redshift) const {
-   if (redshift < m_redshifts.front()) {
+   if (redshift < m_redshifts.front() || energy < m_energies.front()) {
       return 0;
    }
+
    size_t e_index = std::lower_bound(m_energies.begin(), m_energies.end(),
-                                     energy) - m_energies.begin();
-   if (e_index < 0 || e_index > m_energies.size() + 2) {
+                                     energy) - m_energies.begin() - 1;
+
+
+   if (e_index + 1  > m_energies.size() - 1) {
       throw std::runtime_error("Selected energy outside range of "
                                + m_infile);
    }
    size_t z_index = std::lower_bound(m_redshifts.begin(), m_redshifts.end(),
-                                     redshift) - m_redshifts.begin();
-   if (z_index < 0 || z_index > m_redshifts.size() + 2) {
+                                     redshift) - m_redshifts.begin() -1 ;
+
+   if (z_index + 1 > m_redshifts.size() - 1) {
       throw std::runtime_error("Selected redshift outside range of "
                                + m_infile);
    }
