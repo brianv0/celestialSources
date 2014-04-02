@@ -210,10 +210,10 @@ float calcSalamonStecker(float energy, float redshift){
 //the same as for z=3. This is related to star formation among other things
 //This is a really sensitive topic among theory people...  beware :)
   if (redshift > 3.) redshift = 3.;
-
+       
 
   //Determine redshift index...
-  if(redshift>=3.) zindex=5;
+  if(redshift>=3.) zindex=4;
     else
       for(i=0;i<5;i++){
          if(redshift>=zvalue[i] && redshift<zvalue[i+1]){

@@ -10,7 +10,6 @@
  */
 
 #include <cmath>
-
 #include <algorithm>
 #include <stdexcept>
 
@@ -26,7 +25,7 @@ AsciiTableModel::AsciiTableModel(const std::string & infile)
 }
 
 float AsciiTableModel::value(float energy, float redshift) const {
-   if (redshift < m_redshifts.front() || energy < m_energies.front()) {
+   if (redshift <= m_redshifts.front() || energy <= m_energies.front()) {
       return 0;
    }
 
@@ -45,6 +44,8 @@ float AsciiTableModel::value(float energy, float redshift) const {
       throw std::runtime_error("Selected redshift outside range of "
                                + m_infile);
    }
+
+
    float tau1 = tau_of_e(redshift, e_index, z_index);
    float tau2 = tau_of_e(redshift, e_index+1, z_index);
 
