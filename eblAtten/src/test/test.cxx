@@ -36,14 +36,15 @@ int main() {
    double emin(1e3), emax(5e5);
    int npts(50);
 
-   double z [7] = {0., 0.01, 0.1, 0.5, 1., 2., 4.};
+   double z [7] = {0., 0.01, 0.1, 0.5, 1., 2., 3.};
 
    double estep(std::log(emax/emin)/float(npts));
 
 
    std::cout << "Energy (GeV)  Tau  KneiskeBF  Primack05  KneiskeUV  "
              << "Stecker05  Franceschini Finke  Gilmore  Stecker05_FE  "
-             << "Salamon&Stecker98  Generic  Dominguez11  "
+             << "Salamon&Stecker98  " 
+             << "Generic  Dominguez11  "
              << "KneiskeDole10 KneiskeDole10_CMB Gilmore09 Gilmore12_fiducial "
              << "Gilmore12_fixed Scully14_lowOp, Scully14_highOp Inoue13 HelgasonKashlinsky12\n";
 
@@ -60,7 +61,7 @@ int main() {
                    << tau5(energy, z[j]) << "  "
                    << tau6(energy, z[j]) << "  " 
                    << tau7(energy, z[j]) << "  "
-                   << tau8(energy, z[j]) << "  "
+                   << tau8(energy, z[j]) << "  " 
                    << tau9(energy, z[j]) << "  " 
                    << tau10(energy, z[j]) << "  " 
                    << tau11(energy, z[j]) << "  "

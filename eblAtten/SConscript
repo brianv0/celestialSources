@@ -27,6 +27,11 @@ dataFiles = [os.path.join("data", x)
                        'opdep_GILMOREetal_2009.dat',
                        'opdep_KNEISKEandDOLE_2010_noCMB.dat',
                        'opdep_INOUEetal_2013.dat',
+                       'opdep_SalamonStecker98.dat',
+                       'opdep_Finke_2009.dat',
+                       'opdep_KNEISKEetal2004_bestfit.dat',
+                       'opdep_KNEISKEetal2004_highUV.dat',
+                       'opdep_Franceschini_2008.dat',
                        'opdep_HELGASONandKASHLINSKY_2012.dat')]
 
 progEnv.Tool('registerTargets', package = 'eblAtten',

@@ -26,7 +26,7 @@ AsciiTableModel::AsciiTableModel(const std::string & infile)
 }
 
 float AsciiTableModel::value(float energy, float redshift) const {
-   if (redshift <= m_redshifts.front() || energy <= m_energies.front()) {
+   if (redshift < m_redshifts.front() || energy <= m_energies.front()) {
       return 0;
    }
 
